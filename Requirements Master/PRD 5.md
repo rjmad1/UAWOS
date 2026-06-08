@@ -758,122 +758,119 @@ Mandatory
 
 ---
 
-# Build vs Buy
+# OSS Ingestion & Build Strategy
 
-# Build
+To accelerate delivery, UAWOS core SHALL ingest existing OSS repositories to implement non-differentiating runtime capabilities, while reserving custom engineering resources strictly for strategic IP as defined in the [Bootstrap Directive (BD)](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/Bootstrap%20Directive%20(BD).md).
 
-### Objective Engine
+## Custom Strategic IP (Build)
+The following engines and graphs are strategic custom IP and MUST be custom-developed:
+* **Objective Engine** (incorporating DTASE)
+* **Discovery Engine** (incorporating forked AutoResearch patterns)
+* **Planning Engine**
+* **Governance Engine**
+* **Trust Engine**
+* **Risk Engine**
+* **Knowledge Engine**
+* **Organizational Memory Engine**
+* **Workforce Orchestration Engine**
+* **Value Realization Engine**
+* **Simulation Engine**
+* **Objective Graph**
+* **Governance Graph**
 
-### Planning Engine
-
-### Governance Engine
-
-### Knowledge Engine
-
-### Agent Runtime
-
-### Value Engine
+## Ingested & Adopted OSS Subsystems (Adopt/Extend/Wrap)
+The following OSS systems SHALL be ingested directly into the core:
+* **LLM Gateway & Routing:** Ingest **LiteLLM** (gateway) and **Weave Router** (dynamic routing).
+* **Workflow & Agent Runtime:** Ingest **LangGraph** (stateful agent loops) and **Temporal** (durable workflows).
+* **Policy & Authorization:** Ingest **Open Policy Agent (OPA)** (policy evaluation) and **OpenFGA** (authorization model).
+* **Agent Capabilities:** Ingest **SkillOpt** (skill registry and matching optimization).
+* **Tool & Resource Connectors:** Ingest **GitHub MCP**, **Filesystem MCP**, **PostgreSQL MCP**, **Neo4j MCP**, and **Playwright MCP** (governed tools).
+* **Developer Portal:** Ingest **Backstage** (unified service catalog).
+* **CI/CD Platform:** Ingest **GitHub Actions**, **ArgoCD**, **Trivy**, **Syft**, **Dependency Track**, and **Release Please**.
+* **Documentation Platform:** Ingest **Docusaurus**, **MkDocs Material**, **Mermaid**, and **OpenAPI**.
 
 ---
 
-# Buy
+# MVP Delivery Roadmap (Accelerated by OSS Ingestion)
 
-### Authentication
-
-### Observability
-
-### LLM Providers
-
-### Voice Infrastructure
-
-### Search Infrastructure
-
----
-
-# MVP Delivery Roadmap
-
-# Phase 1
+## Phase 1
 
 Weeks 1–4
 
-Foundation
+Foundation (OSS Ingestion Setup)
 
 Deliver:
-
-* Repositories
-* Infrastructure
-* Identity
-* Event Bus
+* Ingestion and local deployment of **LiteLLM**, **Weave Router**, **OPA**, and **OpenFGA**.
+* Local PostgreSQL and Neo4j database instances connected via MCP servers.
+* Setup of **Backstage** developer portal and platform service catalogs.
+* CI/CD pipelines configured with **GitHub Actions**, **Trivy**, and **Syft**.
 
 ---
 
-# Phase 2
+## Phase 2
 
 Weeks 5–8
 
-Objective Platform
+Objective Platform (Custom Engine Start)
 
 Deliver:
-
-* Objectives
-* Planning
-* Graph Foundation
+* Core custom **Objective Engine** implementation (intake, states, versions).
+* Custom **Domain Translation & Artifact Synthesis Engine (DTASE)** integration.
+* Custom **Discovery Engine** implementation (forking and adapting **AutoResearch**).
+* Initial custom **Objective Graph** schema and federated repository.
 
 ---
 
-# Phase 3
+## Phase 3
 
 Weeks 9–12
 
-Execution Platform
+Execution Platform (Agent & Workflow Ingestion)
 
 Deliver:
-
-* Workflows
-* Agents
-* Orchestration
+* Custom **Workforce Orchestration Engine** coordinating human and AI entities.
+* Integration of **LangGraph** stateful agent teams and **Temporal** durable workflow runtimes.
+* Ingestion of **SkillOpt** for dynamic capability mapping and registry optimization.
+* Activation of tool integrations (GitHub MCP, Filesystem MCP, Playwright MCP).
 
 ---
 
-# Phase 4
+## Phase 4
 
 Weeks 13–16
 
-Governance Platform
+Governance Platform (Custom Policy & Councils)
 
 Deliver:
-
-* Policies
-* Approvals
-* Risk
+* Setup of custom **Governance Engine** and **Risk Engine**.
+* Normative OPA policy evaluation routing and OpenFGA authorization validation.
+* Custom implementation of the six **Agent Councils** (Strategy, Architecture, Governance, Security, Product, Research).
 
 ---
 
-# Phase 5
+## Phase 5
 
 Weeks 17–20
 
-Knowledge Platform
+Knowledge Platform (Custom Memory & Auto-Docs)
 
 Deliver:
-
-* Knowledge Graph
-* Memory
-* Search
+* Custom **Knowledge Engine** and **Organizational Memory Engine**.
+* Neo4j knowledge graph integration and graph query optimization.
+* Automated documentation generation via **Docusaurus**, **MkDocs Material**, and **Mermaid**.
 
 ---
 
-# Phase 6
+## Phase 6
 
 Weeks 21–24
 
-Value Platform
+Value Platform (Custom Outcomes & Release)
 
 Deliver:
-
-* Outcomes
-* Metrics
-* Value Tracking
+* Custom **Value Realization Engine** and outcome measurement ledgers.
+* Continuous value realization metrics and dashboard visualization in Backstage.
+* Release verification and automated versioning via **Release Please**.
 
 ---
 

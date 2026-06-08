@@ -110,6 +110,10 @@ Success is measured by value created, not work completed.
 
 Transforms intent into structured objectives.
 
+### Domain Translation & Artifact Synthesis Engine (DTASE)
+
+Transforms unstructured human communication and multimodal inputs into structured, domain-specific knowledge and professional-grade execution artifacts.
+
 ### Discovery Engine
 
 Identifies assumptions, risks, constraints, stakeholders, and context.

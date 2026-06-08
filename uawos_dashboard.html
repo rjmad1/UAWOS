@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAWOS Operational Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        :root {
+            --bg-color: #080a10;
+            --card-bg: rgba(18, 22, 35, 0.5);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --card-border-hover: rgba(255, 255, 255, 0.15);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.3);
+            
+            /* HSL Status Colors */
+            --color-green-h: 142;
+            --color-green-s: 70%;
+            --color-green-l: 45%;
+            --green: hsl(var(--color-green-h), var(--color-green-s), var(--color-green-l));
+            --green-glow: hsla(var(--color-green-h), var(--color-green-s), var(--color-green-l), 0.2);
+
+            --color-yellow-h: 45;
+            --color-yellow-s: 90%;
+            --color-yellow-l: 50%;
+            --yellow: hsl(var(--color-yellow-h), var(--color-yellow-s), var(--color-yellow-l));
+            --yellow-glow: hsla(var(--color-yellow-h), var(--color-yellow-s), var(--color-yellow-l), 0.2);
+
+            --color-red-h: 0;
+            --color-red-s: 85%;
+            --color-red-l: 50%;
+            --red: hsl(var(--color-red-h), var(--color-red-s), var(--color-red-l));
+            --red-glow: hsla(var(--color-red-h), var(--color-red-s), var(--color-red-l), 0.25);
+
+            --color-gray-h: 215;
+            --color-gray-s: 15%;
+            --color-gray-l: 50%;
+            --gray: hsl(var(--color-gray-h), var(--color-gray-s), var(--color-gray-l));
+            --gray-glow: hsla(var(--color-gray-h), var(--color-gray-s), var(--color-gray-l), 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            padding: 2rem;
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .glass:hover {
+            border-color: var(--card-border-hover);
+        }
+
+        /* Header design */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+
+        .brand h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--green);
+            background: var(--green-glow);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid hsla(var(--color-green-h), var(--color-green-s), var(--color-green-l), 0.3);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--green);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Dashboard grid layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Health circular score card */
+        .health-ring-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 2rem;
+        }
+
+        .health-ring-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .health-svg {
+            transform: rotate(-90deg);
+        }
+
+        .health-ring-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 12;
+        }
+
+        .health-ring-fill {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1s ease-in-out, stroke 1s ease;
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        .health-percentage-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .health-pct {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .health-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metrics-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-pill {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            min-width: 120px;
+        }
+
+        .metric-pill span.num {
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            margin-bottom: 2px;
+        }
+
+        .metric-pill span.lbl {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Traffic light grid */
+        .traffic-signal-card {
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .traffic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .traffic-box {
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .traffic-box:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
+        }
+
+        .status-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .status-indicator.green { background-color: var(--green); box-shadow: 0 0 10px var(--green-glow); }
+        .status-indicator.yellow { background-color: var(--yellow); box-shadow: 0 0 10px var(--yellow-glow); }
+        .status-indicator.red { background-color: var(--red); box-shadow: 0 0 12px var(--red-glow); animation: flash 1s infinite alternate; }
+        .status-indicator.gray { background-color: var(--gray); box-shadow: 0 0 6px var(--gray-glow); }
+
+        @keyframes flash {
+            from { opacity: 0.7; }
+            to { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 10px var(--red)); }
+        }
+
+        .traffic-domain-lbl {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Tabs and tables */
+        .tabs-card {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-headers {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: #a5b4fc;
+            border-bottom: 2px solid #6366f1;
+            background: #181c30;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        th {
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.015);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pill.green { color: var(--green); background: var(--green-glow); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-pill.yellow { color: var(--yellow); background: var(--yellow-glow); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-pill.red { color: var(--red); background: var(--red-glow); border: 1px solid rgba(239, 68, 68, 0.2); animation: pulse-red 2s infinite; }
+        .status-pill.gray { color: var(--gray); background: var(--gray-glow); border: 1px solid rgba(107, 114, 128, 0.2); }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Incidents & Risks design */
+        .incidents-card {
+            padding: 1.5rem;
+            border-left: 4px solid var(--red);
+            margin-bottom: 2rem;
+            animation: pulse-border-red 2.5s infinite;
+        }
+
+        @keyframes pulse-border-red {
+            0% { border-left-color: var(--red); }
+            50% { border-left-color: #f87171; }
+            100% { border-left-color: var(--red); }
+        }
+
+        .incident-item {
+            background: rgba(239, 68, 68, 0.04);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .incident-desc h4 {
+            color: #f87171;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .incident-desc p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* System Info Daemon Side Panel */
+        .system-pnl {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .daemon-status-box {
+            padding: 1.2rem;
+        }
+
+        .daemon-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .daemon-line:last-child {
+            border-bottom: none;
+        }
+
+        .daemon-line span.name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Action triggers */
+        .action-sec {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.2rem;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .troubleshoot-links {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .troubleshoot-links:hover {
+            color: #818cf8;
+        }
+
+        /* Toast notification styling */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 500;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Documentation Browser styling */
+        .doc-category-hdr {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #a5b4fc;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 1.2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .doc-category-hdr:first-child {
+            margin-top: 0;
+        }
+        .doc-file-item {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            padding: 7px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
+        }
+        .doc-file-item:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .doc-file-item.active {
+            color: white;
+            background: #23275c;
+            border-left: 3px solid #6366f1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="glass">
+        <div class="brand">
+            <h1>UAWOS Command Center</h1>
+            <p>Ecosystem Operations & Real-Time Monitoring Panel</p>
+        </div>
+        <div class="live-badge" id="live-indicator">
+            <div class="live-dot"></div>
+            <span>LIVE MONITORS ACTIVE</span>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+        
+        <!-- Left Side: Status and Probes -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            
+            <!-- Health Rings and Breakdown -->
+            <div class="glass health-ring-card">
+                <div class="health-ring-container">
+                    <svg class="health-svg" width="150" height="150" viewBox="0 0 160 160">
+                        <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                        <circle class="health-ring-fill" id="health-ring" cx="80" cy="80" r="70" />
+                    </svg>
+                    <div class="health-percentage-text">
+                        <span class="health-pct" id="strict-health">0%</span>
+                        <span class="health-label">HEALTH</span>
+                    </div>
+                </div>
+
+                <div class="metrics-breakdown">
+                    <div class="metric-pill">
+                        <span class="num" id="metric-green" style="color: var(--green);">0</span>
+                        <span class="lbl">Green Services</span>
+                    </div>
+                    <div class="metric-pill">
+                        <span class="num" id="metric-yellow" style="color: var(--yellow);">0</span>
+                        <span class="lbl">Degraded</span>
+                    </div>
+                    <div class="metric-pill">
+                        <span class="num" id="metric-red" style="color: var(--red);">0</span>
+                        <span class="lbl">Critical Risks</span>
+                    </div>
+                    <div class="metric-pill">
+                        <span class="num" id="metric-gray" style="color: var(--gray);">0</span>
+                        <span class="lbl">Not Wired</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incident Alerts Command Center -->
+            <div class="glass incidents-card" id="incidents-box">
+                <div class="section-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span>Critical Incidents & Blocks</span>
+                </div>
+                <div class="incident-item">
+                    <div class="incident-desc">
+                        <h4>INT-C-04: GPLv3 Marker compliance risk active</h4>
+                        <p><strong>Root Cause:</strong> marker library contains a GPLv3 copyleft license. Integrating it directly into the Python virtual environment triggers build pipeline blockages.</p>
+                        <p style="margin-top: 6px;"><strong>Resolution Plan:</strong> Package Marker as a separate container service communicating exclusively via REST API. Never import `marker` directly.</p>
+                    </div>
+                    <span class="status-pill red">ACTIVE BLOCKER</span>
+                </div>
+            </div>
+
+            <!-- Traffic Signal Board -->
+            <div class="glass traffic-signal-card">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+                    </svg>
+                    <span>Domain Traffic Signals</span>
+                </div>
+                <div class="traffic-grid" id="traffic-grid">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+            <!-- Tabbed Components Lists -->
+            <div class="glass tabs-card">
+                <div class="tab-headers">
+                    <button class="tab-btn active" onclick="switchTab(event, 'tab-services')">Core Services</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-agents')">Agents</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-mcps')">MCPs</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-skills')">Skills</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-integrations')">Integrations</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-sec-gov')">Sec & Gov</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-docs')">Documentation</button>
+                    <a href="/roadmap.html" class="tab-btn" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Roadmap Intelligence ↗</a>
+                </div>
+
+                <!-- Services Tab -->
+                <div id="tab-services" class="tab-content active">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Service Engine</th>
+                                <th>Status</th>
+                                <th>Severity</th>
+                                <th>Dependencies</th>
+                                <th>Current Issue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="services-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Agents Tab -->
+                <div id="tab-agents" class="tab-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Agent</th>
+                                <th>Status</th>
+                                <th>Dependencies</th>
+                                <th>Operational Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agents-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- MCPs Tab -->
+                <div id="tab-mcps" class="tab-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model Context Server (MCP)</th>
+                                <th>Status</th>
+                                <th>Consumers</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mcps-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Skills Tab -->
+                <div id="tab-skills" class="tab-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Skill ID / Name</th>
+                                <th>Status</th>
+                                <th>Primary Dependency</th>
+                                <th>Cost Class</th>
+                            </tr>
+                        </thead>
+                        <tbody id="skills-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Integrations Tab -->
+                <div id="tab-integrations" class="tab-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Integration Code</th>
+                                <th>Status</th>
+                                <th>Dependencies</th>
+                                <th>Current Issue / Blocker</th>
+                            </tr>
+                        </thead>
+                        <tbody id="integrations-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Sec & Gov Tab -->
+                <div id="tab-sec-gov" class="tab-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Governance / Security Control</th>
+                                <th>Status</th>
+                                <th>Scope</th>
+                                <th>Action Required</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sec-gov-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Documentation Tab -->
+                <div id="tab-docs" class="tab-content">
+                    <div style="display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; height: 620px;">
+                        
+                        <!-- Doc categories side-list -->
+                        <div class="glass" style="padding: 1.2rem; overflow-y: auto; background: rgba(0,0,0,0.15); border-radius: 12px; max-height: 620px;">
+                            <div id="docs-tree-container">
+                                <p style="font-size:0.82rem; color:var(--text-secondary); font-style:italic;">Scanning specs...</p>
+                            </div>
+                        </div>
+
+                        <!-- Reading pane -->
+                        <div class="glass" style="padding: 1.8rem; overflow-y: auto; background: rgba(0,0,0,0.1); border-radius: 12px; display: flex; flex-direction: column; max-height: 620px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; margin-bottom:16px; flex-shrink: 0;">
+                                <h3 id="doc-view-title" style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600;">Select a specification document</h3>
+                                <span id="doc-view-meta" style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">No file loaded</span>
+                            </div>
+                            <div id="doc-view-body" style="font-size:0.92rem; line-height:1.65; color:#e5e7eb; overflow-y:auto; flex-grow:1; padding-right:8px;">
+                                <p style="color:var(--text-secondary); font-style:italic;">Click on any architectural standard, PRD, roadmap, or catalog on the left sidebar to render its contents inside this command reader pane.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right Side: Daemon Status, Actions, Local Ports -->
+        <div class="system-pnl">
+            
+            <!-- Docker & Daemon health -->
+            <div class="glass daemon-status-box">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                        <path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                        <path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6"/>
+                    </svg>
+                    <span>System Daemon Services</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Docker Background Daemon</span>
+                    <span class="status-pill gray" id="docker-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">LiteLLM Gateway Outbound</span>
+                    <span class="status-pill gray" id="litellm-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Ollama LLM Server (11434)</span>
+                    <span class="status-pill gray" id="ollama-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Langfuse ClickHouse Engine</span>
+                    <span class="status-pill gray" id="clickhouse-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Langfuse MinIO Object Store</span>
+                    <span class="status-pill gray" id="minio-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Local Python Environment</span>
+                    <span class="status-pill gray" id="venv-daemon-status">UNKNOWN</span>
+                </div>
+            </div>
+
+            <!-- Active Docker Ports -->
+            <div class="glass daemon-status-box">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                    <span>Workspace Containers</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">postgres (5435)</span>
+                    <span class="status-pill gray" id="cnt-postgres">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">qdrant (6333)</span>
+                    <span class="status-pill gray" id="cnt-qdrant">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">marquez (5000)</span>
+                    <span class="status-pill gray" id="cnt-marquez">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">superset (8088)</span>
+                    <span class="status-pill gray" id="cnt-superset">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">dtrack-apiserver (8081)</span>
+                    <span class="status-pill gray" id="cnt-dtrack-api">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">dtrack-frontend (8085)</span>
+                    <span class="status-pill gray" id="cnt-dtrack-ui">OFFLINE</span>
+                </div>
+            </div>
+
+            <!-- Ecosystem Requirements & Blockers Card -->
+            <div class="glass daemon-status-box" id="blockers-card">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span>Ecosystem Requirements & Blockers</span>
+                </div>
+                <div style="font-size:0.82rem; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span>Implemented Requirements:</span>
+                        <strong id="reqs-built" style="color:var(--green);">0</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span>Pending Backlog:</span>
+                        <strong id="reqs-backlog" style="color:var(--yellow);">0</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>Blocked Requirements:</span>
+                        <strong id="reqs-blocked" style="color:var(--red);">0</strong>
+                    </div>
+                </div>
+                <div id="blockers-list-container">
+                    <p style="font-size:0.75rem; color:var(--text-secondary); font-style:italic;">No active environment blockers detected.</p>
+                </div>
+            </div>
+
+            <!-- Actions Panel -->
+            <div class="glass action-sec">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                    <span>Operational Actions</span>
+                </div>
+                <button class="action-btn" onclick="forceRefresh()">Force Probe Refresh</button>
+                <div style="margin-top: 10px;">
+                    <p style="font-size:0.75rem; color:var(--text-secondary); line-height: 1.4;">
+                        For troubleshooting: run the following in terminal:
+                    </p>
+                    <code style="display:block; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.75rem; color:#a5b4fc; font-family:monospace; margin-top:6px; word-break:break-all;">
+                        docker compose up -d
+                    </code>
+                    <span class="troubleshoot-links" role="button" tabindex="0" onclick="shareTelemetry()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { shareTelemetry(); event.preventDefault(); }">
+                        Share Telemetry with AI coding assistant
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Script logic -->
+    <script type="module">
+        window.switchTab = switchTab;
+        window.forceRefresh = forceRefresh;
+        window.shareTelemetry = shareTelemetry;
+
+        function switchTab(evt, tabId) {
+            for (const content of document.getElementsByClassName("tab-content")) {
+                content.classList.remove("active");
+            }
+            for (const btn of document.getElementsByClassName("tab-btn")) {
+                btn.classList.remove("active");
+            }
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch("/api/status");
+                if (!res.ok) throw new Error("API error");
+                const data = await res.json();
+                updateUI(data);
+                
+                try {
+                    const traceRes = await fetch("/api/traceability");
+                    if (traceRes.ok) {
+                        const traceData = await traceRes.json();
+                        updateRequirementsAndBlockers(traceData);
+                    }
+                } catch (traceErr) {
+                    console.error("Traceability fetch failed: ", traceErr);
+                }
+                
+                const indicator = document.getElementById("live-indicator");
+                indicator.style.opacity = "0.5";
+                setTimeout(() => { indicator.style.opacity = "1"; }, 200);
+            } catch (err) {
+                console.error("Dashboard fetch failed: ", err);
+                const indicator = document.getElementById("live-indicator");
+                indicator.style.color = "var(--red)";
+                indicator.style.backgroundColor = "var(--red-glow)";
+                indicator.querySelector("span").textContent = "DISCONNECTED FROM DAEMON";
+            }
+        }
+
+        function forceRefresh() {
+            fetchStatus();
+        }
+
+        function updateUI(data) {
+            const strict = data.health_summary.strict_percentage;
+            document.getElementById("strict-health").textContent = strict + "%";
+            
+            const circle = document.getElementById("health-ring");
+            const circumference = circle.r.baseVal.value * 2 * Math.PI;
+            circle.style.strokeDashoffset = circumference - (strict / 100) * circumference;
+            
+            if (strict < 30) {
+                circle.style.stroke = "var(--red)";
+                circle.style.filter = "drop-shadow(0 0 8px rgba(239, 68, 68, 0.4))";
+            } else if (strict < 70) {
+                circle.style.stroke = "var(--yellow)";
+                circle.style.filter = "drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))";
+            } else {
+                circle.style.stroke = "var(--green)";
+                circle.style.filter = "drop-shadow(0 0 8px rgba(16, 185, 129, 0.4))";
+            }
+
+            document.getElementById("metric-green").textContent = data.health_summary.green;
+            document.getElementById("metric-yellow").textContent = data.health_summary.yellow;
+            document.getElementById("metric-red").textContent = data.health_summary.red;
+            document.getElementById("metric-gray").textContent = data.health_summary.gray;
+
+            updateDaemonLine("docker-daemon-status", data.docker_running ? "GREEN" : "RED", data.docker_running ? "ACTIVE" : "OFFLINE");
+            updateDaemonLine("litellm-daemon-status", data.domains.Infrastructure["Outbound Model Gateway"], data.domains.Infrastructure["Outbound Model Gateway"] === "GREEN" ? "ROUTING" : "OFFLINE");
+            updateDaemonLine("ollama-daemon-status", data.alternate_daemons["Ollama Local LLM"], data.alternate_daemons["Ollama Local LLM"] === "GREEN" ? "RUNNING" : "OFFLINE");
+            updateDaemonLine("clickhouse-daemon-status", data.alternate_daemons["Langfuse ClickHouse"], data.alternate_daemons["Langfuse ClickHouse"] === "GREEN" ? "RUNNING" : "OFFLINE");
+            updateDaemonLine("minio-daemon-status", data.alternate_daemons["Langfuse MinIO"], data.alternate_daemons["Langfuse MinIO"] === "GREEN" ? "RUNNING" : "OFFLINE");
+            updateDaemonLine("venv-daemon-status", data.domains.Infrastructure["Local Dev Environment"], data.domains.Infrastructure["Local Dev Environment"] === "GREEN" ? "CONFIGURED" : "MISSING");
+
+            updateContainerLine("cnt-postgres", data.domains.Infrastructure["Postgres DB"]);
+            updateContainerLine("cnt-qdrant", data.domains.Infrastructure["Qdrant Vector DB"]);
+            updateContainerLine("cnt-marquez", data.domains.Infrastructure["Marquez Lineage"]);
+            updateContainerLine("cnt-superset", data.domains.Infrastructure["Apache Superset"]);
+            updateContainerLine("cnt-dtrack-api", data.domains.Infrastructure["Dependency-Track API"]);
+            updateContainerLine("cnt-dtrack-ui", data.domains.Infrastructure["Dependency-Track UI"]);
+
+            const grid = document.getElementById("traffic-grid");
+            grid.innerHTML = "";
+            for (const [domain, list] of Object.entries(data.domains)) {
+                const statuses = Object.values(list);
+                let domColor = statuses.includes("RED") ? "red" : statuses.includes("YELLOW") ? "yellow" : statuses.includes("GREEN") ? (statuses.includes("GRAY") ? "yellow" : "green") : "gray";
+                const box = document.createElement("div");
+                box.className = "traffic-box glass";
+                box.innerHTML = `<div class="status-indicator ${domColor}"></div><span class="traffic-domain-lbl">${domain}</span>`;
+                grid.appendChild(box);
+            }
+
+            renderServices(data.domains.Services);
+            renderAgents(data.domains.Agents);
+            renderMCPs(data.domains.MCPs);
+            renderSkills(data.domains.Skills);
+            renderIntegrations(data.domains.Integrations);
+            renderSecGov(data.domains.Security, data.domains.Governance);
+
+            document.getElementById("incidents-box").style.display = (data.domains.Integrations["INT-C-04: GPLv3 Marker Wrapper"] === "GREEN") ? "none" : "block";
+        }
+
+        function updateDaemonLine(elemId, status, text) {
+            const el = document.getElementById(elemId);
+            el.className = "status-pill " + status.toLowerCase();
+            el.textContent = text;
+        }
+
+        function updateContainerLine(elemId, status) {
+            const el = document.getElementById(elemId);
+            el.className = "status-pill " + status.toLowerCase();
+            el.textContent = (status === "GREEN") ? "ONLINE" : (status === "YELLOW") ? "DEGRADED" : "OFFLINE";
+        }
+
+        function renderServices(services) {
+            const tbody = document.getElementById("services-tbody");
+            tbody.innerHTML = "";
+            const serviceData = {
+                "Objective Engine": { severity: "Medium", deps: "Pydantic AI, Instructor", issue: "Under active development" },
+                "Discovery Engine": { severity: "Medium", deps: "Haystack, FastEmbed", issue: "RAG index creation pending" },
+                "Planning Engine": { severity: "Medium", deps: "Outlines, DSPy", issue: "Token schemas pending" },
+                "Governance Engine": { severity: "Critical", deps: "OpenLineage, Marquez", issue: "Interceptors not active" },
+                "Knowledge Engine": { severity: "High", deps: "Graphiti, Mem0, Qdrant", issue: "Neo4j connection offline" },
+                "Value Engine": { severity: "High", deps: "dbt-core, ClickHouse", issue: "Clickhouse config pending" },
+                "Simulation Engine": { severity: "Low", deps: "Mesa, NetworkX", issue: "Simulation loop pending" },
+                "DTASE": { severity: "High", deps: "LlamaIndex, FastEmbed", issue: "Persona definitions pending" }
+            };
+
+            for (const [name, status] of Object.entries(services)) {
+                const info = serviceData[name] || { severity: "Low", deps: "None", issue: "Unknown" };
+                const row = document.createElement("tr");
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${info.severity}</td><td>${info.deps}</td><td>${info.issue}</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function renderAgents(agents) {
+            const tbody = document.getElementById("agents-tbody");
+            tbody.innerHTML = "";
+            const agentData = {
+                "Planner Agent": "Plan Generators",
+                "Orchestrator Agent": "State Managers",
+                "Executor Agent": "Filesystem, GitLab MCP",
+                "Reviewer Agent": "Semgrep MCP, SonarQube",
+                "Governor Agent": "OPA Evaluator, OpenFGA",
+                "Learner Agent": "DSPy Optimizer",
+                "Knowledge Manager Agent": "Neo4j MCP, Graphiti",
+                "Portfolio Governor Agent": "Value Forecasters",
+                "Value Analyst Agent": "dbt-core query tool",
+                "Resource Manager Agent": "Capacity Models",
+                "Simulation Agent": "Mesa, NetworkX",
+                "Challenger Agent": "Red-teaming prompts"
+            };
+
+            for (const [name, status] of Object.entries(agents)) {
+                const dep = agentData[name] || "None";
+                const row = document.createElement("tr");
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${dep}</td><td>Pending</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function renderMCPs(mcps) {
+            const tbody = document.getElementById("mcps-tbody");
+            tbody.innerHTML = "";
+            const mcpData = {
+                "GitLab MCP": "Git repository operations",
+                "Bitbucket MCP": "Alternative Git operations",
+                "SonarQube MCP": "Quality gate metrics",
+                "Jenkins MCP": "CI/CD execution",
+                "Confluence MCP": "Knowledge retrieval",
+                "Notion MCP": "Project notes access",
+                "Docusaurus MCP": "Docs management",
+                "Mermaid MCP": "Architecture visualization",
+                "PlantUML MCP": "UML drawing tools",
+                "AWS MCP": "Cloud resources control",
+                "Azure MCP": "Azure resources control",
+                "Terraform MCP": "Infrastructure deployments",
+                "Redis MCP": "Cache interactions",
+                "Kafka MCP": "Event stream monitoring",
+                "ClickHouse MCP": "OLAP analytics querying",
+                "OpenSearch MCP": "Elasticsearch indices access",
+                "Neo4j MCP": "Graph DB traversal",
+                "Slack MCP": "Slack channel notifications",
+                "Teams MCP": "Teams channel alerts",
+                "Discord MCP": "Discord bot triggers"
+            };
+
+            for (const [name, status] of Object.entries(mcps)) {
+                const desc = mcpData[name] || "Ecosystem connector";
+                const row = document.createElement("tr");
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${desc}</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function renderSkills(skills) {
+            const tbody = document.getElementById("skills-tbody");
+            tbody.innerHTML = "";
+            const skillData = {
+                "SKL-AI-01: Prompt Tuning": "System prompts customization",
+                "SKL-AI-02: Structural Parsing": "Regex and JSON constraints checks",
+                "SKL-RAG-01: Dense Retrieval": "Semantic vector search queries",
+                "SKL-RAG-02: Graph Traversal": "Entity relation maps traversal",
+                "SKL-DOC-01: C4 Architecture": "C4 diagrams builder",
+                "SKL-SEC-01: Vulnerability Audit": "Dependency security auditing",
+                "SKL-DAT-01: Analytical Transform": "dbt core transformations compiling",
+                "SKL-SIM-01: Monte Carlo Run": "Run simulations",
+                "SKL-GOV-01: Lineage Audit": "Dataset lineage tracking"
+            };
+
+            for (const [name, status] of Object.entries(skills)) {
+                const desc = skillData[name] || "Agent skill capability";
+                const row = document.createElement("tr");
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${desc}</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function renderIntegrations(integrations) {
+            const tbody = document.getElementById("integrations-tbody");
+            tbody.innerHTML = "";
+            const integrationData = {
+                "INT-A-01: Qdrant Vector Integration": "Qdrant DB",
+                "INT-A-02: Pydantic AI Core Integration": "Pydantic AI",
+                "INT-A-03: Graphiti Temporal Memory": "Graphiti library",
+                "INT-A-04: LlamaIndex & Haystack Pipeline": "LlamaIndex",
+                "INT-A-05: Apache Superset BI": "Apache Superset",
+                "INT-A-06: Security Scanning Suite": "Semgrep, Dependency-Track",
+                "INT-B-01: GitLab/Bitbucket MCP": "GitLab API",
+                "INT-B-02: Figma & Style Dictionary Sync": "Style Dictionary",
+                "INT-B-03: Slack & Teams MCP": "Webhooks",
+                "INT-B-04: AWS/Azure cloud discovery": "Cloud SDKs",
+                "INT-C-01: OpenMetadata Integration": "Docker container",
+                "INT-C-02: Airbyte / Meltano Pipeline Setup": "Meltano",
+                "INT-C-03: Mesa Simulation Models": "Mesa package",
+                "INT-C-04: GPLv3 Marker Wrapper": "Docker, Marker"
+            };
+
+            for (const [name, val] of Object.entries(integrations)) {
+                const dep = integrationData[name] || "None";
+                const row = document.createElement("tr");
+                const issueText = (val === "RED") ? "Critical failure" : (val === "YELLOW") ? "Configuration degraded" : "Implementation pending";
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${val.toLowerCase()}">${val}</span></td><td>${dep}</td><td>${issueText}</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function updateRequirementsAndBlockers(traceData) {
+            const matrix = traceData.matrix;
+            let built = 0;
+            let backlog = 0;
+            let blocked = 0;
+            const blockerReasons = new Set();
+
+            for (const req of Object.values(matrix)) {
+                const status = req.status;
+                if (status === "OPERATIONAL" || status === "DEPLOYED" || status === "TESTED" || status === "IMPLEMENTED") {
+                    built++;
+                } else if (status === "BLOCKED") {
+                    blocked++;
+                    if (req.reason_blocked) {
+                        blockerReasons.add(req.reason_blocked);
+                    }
+                } else {
+                    backlog++;
+                }
+            }
+
+            document.getElementById("reqs-built").textContent = built;
+            document.getElementById("reqs-backlog").textContent = backlog;
+            document.getElementById("reqs-blocked").textContent = blocked;
+
+            const container = document.getElementById("blockers-list-container");
+            container.innerHTML = "";
+
+            if (blockerReasons.size === 0) {
+                container.innerHTML = `<p style="font-size:0.75rem; color:var(--text-secondary); font-style:italic;">No active environment blockers detected.</p>`;
+            } else {
+                const ul = document.createElement("ul");
+                ul.style.paddingLeft = "14px";
+                ul.style.fontSize = "0.75rem";
+                ul.style.lineHeight = "1.4";
+                ul.style.color = "#fca5a5";
+                
+                for (const reason of blockerReasons) {
+                    const li = document.createElement("li");
+                    li.style.marginBottom = "6px";
+                    li.textContent = reason;
+                    ul.appendChild(li);
+                }
+                container.appendChild(ul);
+            }
+        }
+
+        function renderSecGov(sec, gov) {
+            const tbody = document.getElementById("sec-gov-tbody");
+            tbody.innerHTML = "";
+            const meta = {
+                "Semgrep SAST": "Code analysis",
+                "Trivy Container Scanner": "Docker scans",
+                "Gitleaks Secret Detection": "Secrets management",
+                "Dependency-Track SBOM Auditor": "SBOM tracking",
+                "Falco Sandbox": "Execution sandboxing",
+                "License Governance Filters": "Policy compliance",
+                "OpenLineage Execution Ingestion": "Lineage logging",
+                "Marquez Metadata & Lineage": "Metadata management",
+                "OpenMetadata Catalog": "Data discovery",
+                "OPA/Rego Policy Engine": "Policy evaluation",
+                "OpenFGA Authorization": "Access control"
+            };
+
+            for (const [name, val] of Object.entries({...sec, ...gov})) {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${val.toLowerCase()}">${val}</span></td><td>${meta[name] || "System"}</td><td>Action required</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        const remediations = {
+            "INT-C-04: GPLv3 Marker Wrapper": { desc: "GPLv3 violation.", action: "Use Docker isolation." },
+            "Semgrep SAST": { desc: "Missing tool.", action: "Install via pip." },
+            "OPA/Rego Policy Engine": { desc: "Service offline.", action: "Start OPA container." },
+            "OpenFGA Authorization": { desc: "Service offline.", action: "Start FGA container." }
+        };
+
+        async function shareTelemetry() {
+            try {
+                const res = await fetch("/api/status");
+                const data = await res.json();
+                let prompt = `# UAWOS Health Issue Remediation Plan\n\n`;
+                for (const [domain, list] of Object.entries(data.domains)) {
+                    for (const [comp, status] of Object.entries(list)) {
+                        if (status !== "GREEN") prompt += `- [${status}] ${domain} - ${comp}: Needs attention.\n`;
+                    }
+                }
+                await navigator.clipboard.writeText(prompt);
+                const toast = document.getElementById("toast");
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 3000);
+            } catch (err) { console.error("Clipboard copy failed", err); }
+        }
+
+        async function loadDocs() {
+            try {
+                const res = await fetch("/api/docs");
+                const categories = await res.json();
+                const container = document.getElementById("docs-tree-container");
+                container.innerHTML = "";
+                for (const [catName, files] of Object.entries(categories)) {
+                    const catHeader = document.createElement("div");
+                    catHeader.className = "doc-category-hdr";
+                    catHeader.textContent = catName;
+                    container.appendChild(catHeader);
+                    files.forEach(f => {
+                        const fileItem = document.createElement("div");
+                        fileItem.className = "doc-file-item";
+                        fileItem.textContent = f.replace(".md", "");
+                        fileItem.onclick = () => loadDocContent(f, fileItem);
+                        container.appendChild(fileItem);
+                    });
+                }
+            } catch (err) { console.error("Docs load error:", err); }
+        }
+
+        async function loadDocContent(fileName, element) {
+            const items = document.getElementsByClassName("doc-file-item");
+            for (const item of items) {
+                item.classList.remove("active");
+            }
+            if (element) element.classList.add("active");
+            
+            document.getElementById("doc-view-title").textContent = "Loading specification...";
+            document.getElementById("doc-view-meta").textContent = fileName;
+            
+            try {
+                const res = await fetch("/api/docs/content?file=" + encodeURIComponent(fileName));
+                if (!res.ok) throw new Error("Document content fetch failed");
+                const text = await res.text();
+                
+                document.getElementById("doc-view-title").textContent = fileName.replace(".md", "");
+                document.getElementById("doc-view-body").innerHTML = renderMarkdown(text);
+            } catch (err) {
+                document.getElementById("doc-view-title").textContent = "Error loading document";
+                document.getElementById("doc-view-body").innerHTML = `<p style="color:var(--red);">${err.message}</p>`;
+            }
+        }
+
+        // --- Custom Markdown-to-HTML parser ---
+        function parseMarkdownBlocks(html) {
+            // Code Blocks
+            html = html.replace(/```(?:[a-zA-Z0-9-]*)\n([\s\S]*?)```/gm, '<pre style="background:rgba(0,0,0,0.35); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.06); font-family:monospace; font-size:0.82rem; overflow-x:auto; margin: 1rem 0; white-space:pre-wrap; line-height:1.4;"><code>$1</code></pre>');
+            
+            // Headers
+            html = html.replace(/^# (.*?)$/gm, '<h1 style="font-family:\'Outfit\', sans-serif; font-size:1.6rem; font-weight:700; margin:1.5rem 0 0.8rem 0; color:#818cf8;">$1</h1>');
+            html = html.replace(/^## (.*?)$/gm, '<h2 style="font-family:\'Outfit\', sans-serif; font-size:1.3rem; font-weight:600; margin:1.4rem 0 0.7rem 0; color:#a5b4fc; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:4px;">$1</h2>');
+            html = html.replace(/^### (.*?)$/gm, '<h3 style="font-family:\'Outfit\', sans-serif; font-size:1.1rem; font-weight:600; margin:1.2rem 0 0.6rem 0; color:#e0e7ff;">$1</h3>');
+            html = html.replace(/^#### (.*?)$/gm, '<h4 style="font-family:\'Outfit\', sans-serif; font-size:0.95rem; font-weight:600; margin:1rem 0 0.5rem 0; color:#e0e7ff;">$1</h4>');
+            
+            // Horizontal Rules
+            html = html.replace(/^---$/gm, '<hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin: 1.5rem 0;" />');
+            
+            // Inline Code
+            html = html.replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.08); padding:2px 5px; border-radius:4px; font-family:monospace; font-size:0.8rem; color:#f472b6;">$1</code>');
+            
+            // Bold & Italics
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color:white; font-weight:600;">$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em style="color:#d1d5db;">$1</em>');
+            
+            // Links
+            html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color:#818cf8; text-decoration:none; border-bottom: 1px dotted #818cf8;">$1</a>');
+            
+            return html;
+        }
+
+        function parseMarkdownTablesAndLists(html) {
+            const lines = html.split('\n');
+            let inTable = false;
+            let tableRows = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                
+                // Bullet points
+                if (line.startsWith('* ') || line.startsWith('- ')) {
+                    const content = line.substring(2);
+                    lines[i] = `<li style="margin-left: 1.2rem; margin-bottom: 0.35rem; list-style-type: disc; padding-left: 4px;">${content}</li>`;
+                    continue;
+                }
+                
+                // Blockquotes
+                if (line.startsWith('&gt; ')) {
+                    const content = line.substring(5);
+                    lines[i] = `<blockquote style="border-left:3px solid #6366f1; padding: 6px 12px; background:rgba(99,102,241,0.04); border-radius: 0 8px 8px 0; font-style:italic; margin: 1rem 0; color:#d1d5db;">${content}</blockquote>`;
+                    continue;
+                }
+
+                // Table parsing
+                if (line.startsWith('|') && line.endsWith('|')) {
+                    if (!inTable) {
+                        inTable = true;
+                        tableRows = [];
+                    }
+                    if (line.match(/^\|[ -:|]*\|$/)) {
+                        lines[i] = "";
+                        continue;
+                    }
+                    const cols = line.split('|').slice(1, -1).map(c => c.trim());
+                    tableRows.push(cols);
+                    lines[i] = "";
+                } else if (inTable) {
+                    let tableHtml = '<div style="overflow-x:auto; margin: 1.5rem 0;"><table style="width:100%; border-collapse:collapse; font-size:0.85rem; border:1px solid rgba(255,255,255,0.06);">';
+                    tableRows.forEach((row, rIdx) => {
+                        tableHtml += `<tr style="${rIdx === 0 ? 'background:rgba(255,255,255,0.02);' : 'border-bottom:1px solid rgba(255,255,255,0.04);'}">`;
+                        row.forEach(col => {
+                            const tag = rIdx === 0 ? 'th' : 'td';
+                            tableHtml += `<${tag} style="padding: 10px 14px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left; font-weight:${rIdx === 0 ? '600' : 'normal'}; color:${rIdx === 0 ? '#a5b4fc' : '#e5e7eb'};">${col}</${tag}>`;
+                        });
+                        tableHtml += '</tr>';
+                    });
+                    tableHtml += '</table></div>';
+                    lines[i - 1] = tableHtml;
+                    inTable = false;
+                }
+            }
+            
+            let resultHtml = lines.filter(l => l !== "").join('\n');
+            return resultHtml.split('\n\n').map(p => {
+                if (p.trim().startsWith('<h') || p.trim().startsWith('<pre') || p.trim().startsWith('<div') || p.trim().startsWith('<li') || p.trim().startsWith('<blockquote')) {
+                    return p;
+                }
+                return `<div style="margin-bottom: 1rem;">${p}</div>`;
+            }).join('\n');
+        }
+
+        function renderMarkdown(md) {
+            if (!md) return "";
+            let html = md.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+            html = parseMarkdownBlocks(html);
+            return parseMarkdownTablesAndLists(html);
+        }
+
+        await fetchStatus();
+        await loadDocs();
+        setInterval(fetchStatus, 5000);
+    </script>
+    
+    <!-- CSS Toast Notification Container -->
+    <div id="toast" class="toast">Telemetry copied to clipboard!</div>
+</body>
+</html>

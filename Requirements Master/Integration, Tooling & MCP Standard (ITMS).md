@@ -168,11 +168,31 @@ Produces forecasts.
 
 ---
 
-# 10. MCP Model
+# 10. MCP Architecture & Model
 
 ## Definition
 
-MCP Servers provide governed access to external capabilities.
+Model Context Protocol (MCP) Servers provide governed access to external capabilities.
+
+## Architecture
+
+MCP interactions SHALL occur exclusively through the UAWOS MCP Gateway and be regulated by the UAWOS MCP Registry and Governance Layer as defined in the [Bootstrap Directive (BD)](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/Bootstrap%20Directive%20(BD).md).
+
+```text
+Workforce Entities
+      ↓
+UAWOS MCP Gateway
+      ↓
+UAWOS MCP Registry & Governance Layer
+      ↓
+MCP Servers
+```
+
+## UAWOS MCP Gateway
+* The UAWOS MCP Gateway SHALL route, throttle, and secure all requests between workforce entities (agents or humans) and registered MCP servers.
+
+## UAWOS MCP Governance Layer
+* Enforces policy evaluation, checks tool trust scores, validates approval workflows, and generates immutable audit records of all tool executions.
 
 ---
 
@@ -189,9 +209,30 @@ Every MCP Server SHALL contain:
 
 ---
 
-# 12. MCP Registry
+# 12. MCP Registry & Tool Governance
 
-All MCP Servers SHALL be registered.
+All MCP Servers SHALL be registered in the UAWOS MCP Registry.
+
+The Registry and Governance systems SHALL enforce:
+- **Tool Registration:** Schema validation and capability discovery.
+- **Tool Governance:** Contextual policy verification via the Policy Engine.
+- **Tool Trust Scoring:** Dynamic trust scores based on error rates and security history.
+- **Tool Approval Workflows:** Human-in-the-loop approvals for high-risk or write-based tools.
+- **Tool Auditing:** Logging of all tool invocation requests, responses, and parameters.
+
+## Required MCP Servers
+The platform SHALL support and govern the following MCP servers:
+- GitHub MCP
+- Filesystem MCP
+- PostgreSQL MCP
+- Neo4j MCP
+- Playwright MCP
+- OpenSearch MCP
+- Kubernetes MCP
+- Terraform MCP
+- Slack MCP
+- Jira MCP
+- Confluence MCP
 
 ---
 

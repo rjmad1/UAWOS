@@ -349,7 +349,7 @@ Supported sources:
 
 # 16. Knowledge Extraction
 
-Knowledge extraction SHALL be automatic.
+Knowledge extraction, domain translation, and professional artifact synthesis SHALL be automated through the Domain Translation & Artifact Synthesis Engine (DTASE), which maps unstructured multimodal inputs into structured, domain-specific knowledge assets.
 
 Sources SHALL be analyzed continuously.
 

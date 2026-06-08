@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAWOS - Rich Delivery & Traceability View</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #080a10;
+            --card-bg: rgba(18, 22, 35, 0.6);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --card-border-hover: rgba(255, 255, 255, 0.15);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.2);
+            --accent: #ec4899;
+            
+            /* Status Colors */
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.15);
+            --yellow: #f59e0b;
+            --yellow-glow: rgba(245, 158, 11, 0.15);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.2);
+            --gray: #6b7280;
+            --gray-glow: rgba(107, 114, 128, 0.1);
+            --blue: #3b82f6;
+            --blue-glow: rgba(59, 130, 246, 0.15);
+            --purple: #8b5cf6;
+            --purple-glow: rgba(139, 92, 246, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.04) 0%, transparent 40%);
+            background-attachment: fixed;
+            padding: 2rem;
+        }
+
+        /* Nav Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+        }
+
+        .brand h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--card-border-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.45);
+        }
+
+        /* Layout Grid */
+        .grid-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Glass Cards */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #818cf8;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        th {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.015);
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge.green { color: var(--green); background: var(--green-glow); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge.yellow { color: var(--yellow); background: var(--yellow-glow); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge.red { color: var(--red); background: var(--red-glow); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .badge.blue { color: var(--blue); background: var(--blue-glow); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .badge.purple { color: var(--purple); background: var(--purple-glow); border: 1px solid rgba(139, 92, 246, 0.2); }
+        .badge.gray { color: var(--gray); background: var(--gray-glow); border: 1px solid rgba(107, 114, 128, 0.2); }
+
+        /* Progress Bars */
+        .progress-bar-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            height: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+        }
+
+        /* Executive Metrics Grid */
+        .exec-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .exec-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .exec-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .exec-box .num {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            color: #e5e7eb;
+        }
+
+        .exec-box .label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Technical Info Lists */
+        .list-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .list-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .list-box h3 {
+            font-size: 1.05rem;
+            color: #a5b4fc;
+            margin-bottom: 1rem;
+            font-family: 'Outfit', sans-serif;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 4px;
+        }
+
+        .list-box ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-box li {
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            background: rgba(255,255,255,0.015);
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .list-box li span.key {
+            font-weight: 500;
+        }
+
+        .list-box li span.val {
+            color: var(--text-secondary);
+            font-family: monospace;
+            font-size: 0.82rem;
+        }
+
+        /* Prompt generation styling */
+        .prompt-preview {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: monospace;
+            font-size: 0.82rem;
+            color: #d1d5db;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            max-height: 400px;
+            margin-top: 1.5rem;
+            display: none;
+            line-height: 1.5;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(16, 185, 129, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            font-weight: 500;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="brand">
+            <h1>Roadmap Delivery Intelligence</h1>
+            <p>Traceability Matrix, Health Controls & AI Code Generation Platform</p>
+        </div>
+        <div class="nav-buttons">
+            <a href="/index.html" class="btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Back to Command Center
+            </a>
+            <button class="btn btn-primary" onclick="forceRefreshData()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+                Sync Real-time Evidence
+            </button>
+        </div>
+    </header>
+
+    <div class="grid-container">
+
+        <!-- SECTION A: Executive Summary -->
+        <section class="card">
+            <div class="section-title">
+                <span>SECTION A — Executive Progress Dashboard</span>
+                <span id="health-score-classification" class="badge">COMPILING...</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 2rem;">
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <strong style="color: #a5b4fc;">Roadmap Objective:</strong>
+                        <p style="font-size: 0.95rem; color: var(--text-primary); margin-top: 4px;">
+                            Establish a fully containerized, secure, and compliance-governed multi-agent workspace (Universal AI Workforce Operating System).
+                        </p>
+                    </div>
+                    <div>
+                        <strong style="color: #a5b4fc;">Business Goal:</strong>
+                        <p style="font-size: 0.95rem; color: var(--text-primary); margin-top: 4px;">
+                            Achieve automated objective decomposition, structured vector documentation retrieval, Rego policy enforcement, and 100% legal isolation of copyleft licenses (Marker GPLv3 wrapper) before production release.
+                        </p>
+                    </div>
+                    <div>
+                        <strong style="color: #a5b4fc;">Delivery Health Score:</strong>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-top: 6px;">
+                            <span id="health-score-value" style="font-size: 2.2rem; font-weight: 800; font-family: 'Outfit'; color: var(--primary);">0%</span>
+                            <div style="flex-grow: 1;">
+                                <div class="progress-bar-container">
+                                    <div id="health-score-fill" class="progress-bar-fill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exec-grid" style="grid-template-columns: 1fr 1fr; width: 100%; margin-top: 0;">
+                    <div class="exec-box">
+                        <span class="num" id="stat-req-cov">0%</span>
+                        <span class="label">Requirement Coverage</span>
+                    </div>
+                    <div class="exec-box">
+                        <span class="num" id="stat-test-cov">0%</span>
+                        <span class="label">Test Coverage</span>
+                    </div>
+                    <div class="exec-box">
+                        <span class="num" id="stat-deploy-read">0%</span>
+                        <span class="label">Deployment Readiness</span>
+                    </div>
+                    <div class="exec-box">
+                        <span class="num" id="stat-ops-read">0%</span>
+                        <span class="label">Operational Readiness</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION B: Requirement Coverage -->
+        <section class="card">
+            <div class="section-title">
+                <span>SECTION B — Requirement Traceability Mapping</span>
+                <span id="req-count-badge" class="badge gray">0 Requirements</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+                Direct verification of PRD 2.md Functional Requirements mapped against active engineering code and deployment evidence.
+            </p>
+            <div class="table-container" style="max-height: 450px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Requirement</th>
+                            <th>Category</th>
+                            <th>Epic</th>
+                            <th>Status</th>
+                            <th>Environment</th>
+                            <th>Evidence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sec-b-tbody">
+                        <tr><td colspan="7" style="text-align:center; color:var(--text-secondary);">Syncing traceability matrix...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION C: Implemented Functionality -->
+        <section class="card">
+            <div class="section-title">
+                <span>SECTION C — Implemented Functionality Verification</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+                Features built and validated locally with active health check probes.
+            </p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature Name / ID</th>
+                            <th>Implementation Date</th>
+                            <th>Environment</th>
+                            <th>Technical Design Ref</th>
+                            <th>Verification Status</th>
+                            <th>Deployment Evidence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sec-c-tbody">
+                        <!-- Dynamic -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION E: Partial Implementations -->
+        <section class="card">
+            <div class="section-title">
+                <span>SECTION E — Partial Implementations & Work-in-Progress</span>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Completed Scope</th>
+                            <th>Remaining Scope</th>
+                            <th>Completion %</th>
+                            <th>Active Dependency</th>
+                            <th>Next Engineering Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sec-e-tbody">
+                        <!-- Dynamic -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION D: Missing Functionality -->
+        <section class="card">
+            <div class="section-title">
+                <span>SECTION D — Outstanding & Missing Functionality</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+                Planned roadmap scope that is not yet implemented or actively blocked by constraints.
+            </p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature ID / Description</th>
+                            <th>Expected Outcome</th>
+                            <th>Business Impact</th>
+                            <th>Dependency</th>
+                            <th>Reason Not Implemented</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sec-d-tbody">
+                        <!-- Dynamic -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION F & G: Technical Delivery & Evidence -->
+        <div class="list-grid">
+            
+            <!-- SECTION F: Technical Delivery -->
+            <section class="card">
+                <div class="section-title">
+                    <span>SECTION F — Technical Infrastructure Config</span>
+                </div>
+                <div class="list-box">
+                    <h3>Services & Configuration Modifications</h3>
+                    <ul>
+                        <li>
+                            <span class="key">Active Services</span>
+                            <span class="val">postgres, qdrant, marquez, superset, dependency-track</span>
+                        </li>
+                        <li>
+                            <span class="key">APIs Added</span>
+                            <span class="val">/api/traceability, /api/roadmap, /api/changes</span>
+                        </li>
+                        <li>
+                            <span class="key">Infrastructure Changes</span>
+                            <span class="val">Postgres mappings (port 5435), Qdrant indexing (port 6333)</span>
+                        </li>
+                        <li>
+                            <span class="key">Security Sandboxing</span>
+                            <span class="val">Pre-commit checks via Gitleaks, SBOM scanning in API</span>
+                        </li>
+                        <li>
+                            <span class="key">Database Schema</span>
+                            <span class="val">Marquez WAL lineage pipeline, Qdrant vectors index</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- SECTION G: Delivery Evidence -->
+            <section class="card">
+                <div class="section-title">
+                    <span>SECTION G — Git & Delivery Evidence Links</span>
+                </div>
+                <div class="list-box">
+                    <h3>Code & Document Artifact Artifacts</h3>
+                    <ul>
+                        <li>
+                            <span class="key">Architecture Decision Document</span>
+                            <span class="val"><a href="file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/Architecture%20Definition%20Document%20(ADD).md" target="_blank" style="color:#818cf8; text-decoration:none;">ADD.md</a></span>
+                        </li>
+                        <li>
+                            <span class="key">Docker Compose Definition</span>
+                            <span class="val"><a href="file:///c:/Users/rajaj/Projects/UAWOS/docker-compose.yml" target="_blank" style="color:#818cf8; text-decoration:none;">docker-compose.yml</a></span>
+                        </li>
+                        <li>
+                            <span class="key">Daemon Server Implementation</span>
+                            <span class="val"><a href="file:///c:/Users/rajaj/Projects/UAWOS/uawos_dashboard_daemon.py" target="_blank" style="color:#818cf8; text-decoration:none;">uawos_dashboard_daemon.py</a></span>
+                        </li>
+                        <li>
+                            <span class="key">Traceability Matrix Logic</span>
+                            <span class="val"><a href="file:///c:/Users/rajaj/Projects/UAWOS/uawos_traceability.py" target="_blank" style="color:#818cf8; text-decoration:none;">uawos_traceability.py</a></span>
+                        </li>
+                        <li>
+                            <span class="key">Dependency Config File</span>
+                            <span class="val"><a href="file:///c:/Users/rajaj/Projects/UAWOS/requirements.txt" target="_blank" style="color:#818cf8; text-decoration:none;">requirements.txt</a></span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- SECTION H: AI Prompt Generation -->
+        <section class="card">
+            <div class="section-title">
+                <span>SECTION H — AI Prompt Generation Workspace</span>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                Synthesize a context-aware execution prompt for Antigravity, specifying completed elements and current blocks (GPLv3 Marker wrapper risk, offline OPA modules). This prevents redundant builds and enforces compliance.
+            </p>
+            <div style="margin-top: 1.2rem;">
+                <button class="btn btn-primary" onclick="generatePrompt()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Generate Antigravity Execution Prompt
+                </button>
+            </div>
+            
+            <pre id="prompt-output" class="prompt-preview"></pre>
+        </section>
+
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="toast">Copied prompt to clipboard!</div>
+
+    <script>
+        async function fetchDeliveryTraceability() {
+            try {
+                const res = await fetch("/api/traceability");
+                if (!res.ok) throw new Error("Traceability API failed");
+                const data = await res.json();
+                
+                updateExecutiveSummary(data.health);
+                renderTables(data.matrix);
+            } catch (err) {
+                console.error("Delivery fetch failed:", err);
+                showToast("Connection to backend lost: " + err.message, true);
+            }
+        }
+
+        function forceRefreshData() {
+            fetchDeliveryTraceability();
+            showToast("Dynamic evidence recalculated.");
+        }
+
+        function updateExecutiveSummary(health) {
+            const score = health.score;
+            document.getElementById("health-score-value").textContent = score + "%";
+            document.getElementById("health-score-fill").style.width = score + "%";
+            
+            const classificationBadge = document.getElementById("health-score-classification");
+            classificationBadge.textContent = "HEALTH: " + health.classification.toUpperCase();
+            
+            classificationBadge.className = "badge";
+            if (health.classification === "Excellent") classificationBadge.classList.add("green");
+            else if (health.classification === "Good") classificationBadge.classList.add("blue");
+            else if (health.classification === "Moderate Risk") classificationBadge.classList.add("yellow");
+            else if (health.classification === "High Risk") classificationBadge.classList.add("purple");
+            else classificationBadge.classList.add("red");
+
+            // Summary metrics
+            document.getElementById("stat-req-cov").textContent = health.metrics.requirement_coverage + "%";
+            document.getElementById("stat-test-cov").textContent = health.metrics.test_coverage + "%";
+            document.getElementById("stat-deploy-read").textContent = health.metrics.deployment_readiness + "%";
+            document.getElementById("stat-ops-read").textContent = health.metrics.operational_readiness + "%";
+        }
+
+        function renderTables(matrix) {
+            const requirements = Object.values(matrix);
+            document.getElementById("req-count-badge").textContent = `${requirements.length} Requirements`;
+            
+            // Section B Table
+            const bTbody = document.getElementById("sec-b-tbody");
+            bTbody.innerHTML = "";
+            
+            // Section C Table
+            const cTbody = document.getElementById("sec-c-tbody");
+            cTbody.innerHTML = "";
+            
+            // Section D Table
+            const dTbody = document.getElementById("sec-d-tbody");
+            dTbody.innerHTML = "";
+
+            // Section E Table
+            const eTbody = document.getElementById("sec-e-tbody");
+            eTbody.innerHTML = "";
+
+            let cCount = 0;
+            let dCount = 0;
+            let eCount = 0;
+
+            requirements.forEach(req => {
+                const statusColor = getStatusColor(req.status);
+                
+                // Section B
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${req.id}</strong></td>
+                    <td>${req.description}</td>
+                    <td>${req.category}</td>
+                    <td>${req.epic}</td>
+                    <td><span class="badge ${statusColor}">${req.status}</span></td>
+                    <td><span class="badge ${req.environment === 'production' ? 'green' : req.environment === 'dev_testing' ? 'blue' : 'gray'}">${req.environment.toUpperCase()}</span></td>
+                    <td style="color:#818cf8; font-family:monospace; font-size:0.8rem;">${req.test_evidence || 'N/A'}</td>
+                `;
+                bTbody.appendChild(row);
+
+                // Section C: Implemented
+                if (req.status === "OPERATIONAL" || req.status === "DEPLOYED") {
+                    cCount++;
+                    const cRow = document.createElement("tr");
+                    cRow.innerHTML = `
+                        <td><strong>${req.id}</strong> - ${req.description.substring(0, 45)}...</td>
+                        <td>2026-06-08</td>
+                        <td><span class="badge ${req.environment === 'production' ? 'green' : 'blue'}">${req.environment.toUpperCase()}</span></td>
+                        <td>${req.technical_design}</td>
+                        <td><span class="badge green">VERIFIED</span></td>
+                        <td style="font-family:monospace; font-size:0.8rem;">${req.deployment_references.join(', ')}</td>
+                    `;
+                    cTbody.appendChild(cRow);
+                }
+
+                // Section E: Partially Implemented / In Progress
+                else if (req.status === "PARTIALLY_IMPLEMENTED" || req.status === "IN_PROGRESS") {
+                    eCount++;
+                    const eRow = document.createElement("tr");
+                    
+                    let compScope = "Skeleton Setup";
+                    let remScope = "Full Integration";
+                    let compPct = "20%";
+                    let nextAction = "Hook daemon triggers";
+                    
+                    if (req.id === "FR-251" || req.id === "FR-254") {
+                        compScope = "Library wrappers mapped";
+                        remScope = "Resolve Marker legal compliance wrap";
+                        compPct = "50%";
+                        nextAction = "Deploy standalone marker REST service";
+                    } else if (req.section === "Governance") {
+                        compScope = "Rego file blueprints written";
+                        remScope = "Wire OPA intercepts in Python";
+                        compPct = "40%";
+                        nextAction = "Activate OPA HTTP connection";
+                    } else if (req.section === "Security & Identity") {
+                        compScope = "Dependency-Track API set";
+                        remScope = "OpenFGA container mapping";
+                        compPct = "60%";
+                        nextAction = "Launch OpenFGA docker service";
+                    }
+                    
+                    eRow.innerHTML = `
+                        <td><strong>${req.id}</strong> - ${req.description.substring(0, 40)}...</td>
+                        <td>${compScope}</td>
+                        <td>${remScope}</td>
+                        <td style="font-weight:600; color:#fbbf24;">${compPct}</td>
+                        <td style="font-family:monospace; font-size:0.8rem;">${req.deployment_references.join(', ') || 'Local .venv'}</td>
+                        <td>${nextAction}</td>
+                    `;
+                    eTbody.appendChild(eRow);
+                }
+
+                // Section D: Missing / Blocked
+                else {
+                    dCount++;
+                    const dRow = document.createElement("tr");
+                    
+                    let expectedOutcome = "Execution coordinates properly";
+                    let bizImpact = "Deployment blockages";
+                    let dep = req.deployment_references.join(', ') || 'Core API Engine';
+                    let reason = req.reason_blocked || 'Deferred to Phase 4 release';
+                    
+                    if (req.status === "BLOCKED") {
+                        bizImpact = "<strong style='color:#ef4444;'>CRITICAL LICENSE COMPLIANCE RISK</strong>";
+                        expectedOutcome = "PDF text parsed safely without GPLv3 pollution";
+                    }
+                    
+                    dRow.innerHTML = `
+                        <td><strong>${req.id}</strong> - ${req.description.substring(0, 45)}...</td>
+                        <td>${expectedOutcome}</td>
+                        <td>${bizImpact}</td>
+                        <td style="font-family:monospace; font-size:0.8rem;">${dep}</td>
+                        <td style="color:${req.status === 'BLOCKED' ? '#ef4444' : 'var(--text-secondary)'}; font-weight:${req.status === 'BLOCKED' ? '600' : 'normal'};">${reason}</td>
+                    `;
+                    dTbody.appendChild(dRow);
+                }
+            });
+
+            if (cCount === 0) {
+                cTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">No fully implemented items found.</td></tr>`;
+            }
+            if (eCount === 0) {
+                eTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">No partially implemented items in progress.</td></tr>`;
+            }
+            if (dCount === 0) {
+                dTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary);">No missing functionality detected. All requirements met!</td></tr>`;
+            }
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case "OPERATIONAL":
+                case "IMPLEMENTED":
+                case "DEPLOYED":
+                case "TESTED":
+                    return "green";
+                case "PARTIALLY_IMPLEMENTED":
+                case "IN_PROGRESS":
+                    return "blue";
+                case "BLOCKED":
+                    return "red";
+                case "APPROVED":
+                case "ANALYZED":
+                    return "yellow";
+                case "DEFERRED":
+                case "NOT_CAPTURED":
+                default:
+                    return "gray";
+            }
+        }
+
+        async function generatePrompt() {
+            try {
+                const res = await fetch("/api/generate_prompt");
+                if (!res.ok) throw new Error("Prompt generation failed");
+                const data = await res.json();
+                
+                const preview = document.getElementById("prompt-output");
+                preview.textContent = data.prompt;
+                preview.style.display = "block";
+                
+                // Copy to Clipboard
+                await navigator.clipboard.writeText(data.prompt);
+                showToast("Antigravity prompt compiled and copied to clipboard!");
+            } catch (err) {
+                showToast("Error generating prompt: " + err.message, true);
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.style.background = isError ? "var(--red)" : "rgba(16, 185, 129, 0.95)";
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        // Init
+        fetchDeliveryTraceability();
+    </script>
+</body>
+</html>

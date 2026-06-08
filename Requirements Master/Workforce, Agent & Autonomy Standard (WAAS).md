@@ -271,7 +271,7 @@ Responsible for:
 
 ---
 
-# 8. Agent Team Model
+# 8. Agent Team Model & Stateful Workflows
 
 ## Agent Team
 
@@ -285,6 +285,28 @@ A governed collection of agents working toward a common objective.
 - Shared Governance
 - Shared Context
 - Shared Constraints
+
+---
+
+## Agent Team Workflows (LangGraph Ingestion)
+
+To reduce development time and support robust multi-agent coordination, the platform SHALL directly ingest **LangGraph** (https://github.com/langchain-ai/langgraph) to build stateful agent collaboration workflows.
+
+---
+
+## Agent Councils
+
+To resolve design decisions, establish strategic alignment, and govern execution under human accountability, the platform SHALL establish Agent Councils as a specialized class of Agent Teams.
+
+The following councils SHALL be implemented:
+- **Strategy Council:** Governs strategic alignment, portfolio prioritization, and business outcome maps.
+- **Architecture Council:** Governs technical standards, API contracts, database schemas, and tool specifications.
+- **Governance Council:** Governs policy updates, compliance reviews, and exceptions.
+- **Security Council:** Governs threat modeling, security policies, vulnerability reviews, and access controls.
+- **Product Council:** Governs feature prioritization, requirements (PRDs), and user experience metrics.
+- **Research Council:** Governs requirements discovery, feasibility analysis, and research validation.
+
+Council interactions and reasoning patterns SHALL extract architecture patterns from the `llm-council` repository (https://github.com/karpathy/llm-council) but SHALL be implemented as custom UAWOS strategic IP.
 
 ---
 
@@ -302,17 +324,21 @@ Teams may contain:
 
 ---
 
-# 10. Capability Model
+# 10. Capability Model & Skill Platform
 
 ## Capability Definition
 
-A governed ability possessed by a workforce entity.
+A governed ability possessed by a workforce entity. Capabilities are managed as Skills.
+
+## Skill Platform Integration (SkillOpt Ingestion)
+
+To reduce development time and optimize workforce execution, the platform SHALL directly ingest and integrate the **SkillOpt** repository (https://github.com/microsoft/SkillOpt) to serve as the capability optimization layer.
 
 ---
 
 ## Capability Characteristics
 
-Every capability SHALL possess:
+Every capability/skill SHALL possess:
 
 - Capability ID
 - Capability Type
@@ -320,10 +346,12 @@ Every capability SHALL possess:
 - Version
 - Trust Rating
 - Governance Profile
+- Execution Cost (tokens, compute, financial)
+- Dependencies (required context or tools)
 
 ---
 
-# 11. Capability Assignment
+# 11. Capability Assignment & Lifecycle
 
 Capabilities may be:
 
@@ -332,7 +360,7 @@ Capabilities may be:
 - Suspended
 - Upgraded
 
-All capability changes SHALL be governed.
+All capability changes and assignments SHALL be governed via the Skill Registry.
 
 ---
 
@@ -608,9 +636,18 @@ Registry SHALL contain:
 
 ---
 
-# 26. Capability Registry
+# 26. Capability Registry & Skill Architecture
 
-All capabilities SHALL be registered.
+All capabilities and skills SHALL be registered. The platform core SHALL implement the following sub-systems:
+
+## Skill Registry
+* A database of all skills, metadata, capabilities, execution costs, and trust scores, powered by SkillOpt capability mappings.
+
+## Skill Marketplace
+* Services to support capability discovery, selection, ranking, and runtime evaluation of agents/humans for assignment.
+
+## Skill Lifecycle
+* Governance rules for registering, validating, certifying, deprecating, and retiring skills.
 
 ---
 

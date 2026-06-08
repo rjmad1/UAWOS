@@ -193,6 +193,8 @@ Industry-agnostic execution foundation.
 - Learning
 - Automation
 
+The implementation of the Universal Core SHALL adhere to the open-source software (OSS) adoption and capability decision hierarchy defined in the [Bootstrap Directive (BD)](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/Bootstrap%20Directive%20(BD).md) to accelerate MVP delivery, with custom development restricted strictly to designated Strategic IP components.
+
 ---
 
 ## Layer 2 — Domain Packs
@@ -656,6 +658,7 @@ Responsible for:
 # 21. Core Platform Engines
 
 - Objective Intake Engine
+- Domain Translation & Artifact Synthesis Engine (DTASE)
 - Discovery Engine
 - Planning Engine
 - Execution Engine
@@ -675,6 +678,38 @@ Responsible for:
 - Registry Engine
 - Identity Engine
 - Context Engine
+
+## Development and Adoption Strategy
+
+All core platform engines and graphs SHALL be developed or adopted in accordance with the decision hierarchy defined in the [Bootstrap Directive (BD)](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/Bootstrap%20Directive%20(BD).md).
+
+### Strategic Custom IP (Must Build Custom)
+The following engines and graphs represent the primary strategic differentiation of UAWOS and SHALL be custom-developed:
+- **Objective Engine** (incorporating Objective Intake, Objective Management, and DTASE capabilities)
+- **Discovery Engine** (incorporating AutoResearch patterns)
+- **Planning Engine**
+- **Governance Engine**
+- **Trust Engine**
+- **Risk Engine**
+- **Knowledge Engine**
+- **Organizational Memory Engine**
+- **Workforce Orchestration Engine**
+- **Value Realization Engine**
+- **Simulation Engine**
+- **Objective Graph**
+- **Governance Graph**
+
+### Adopted & Extended Subsystems (Evaluate OSS First)
+All other services, engines, registries, and runtimes SHALL be bootstrapped by adopting, extending, wrapping, or forking existing OSS options as specified in the [Bootstrap Directive (BD)](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/Bootstrap%20Directive%20(BD).md).
+
+The platform core SHALL ingest and integrate these repositories directly to minimize development time:
+- **Reasoning, Model Access & Intake Layer:** Ingest **LiteLLM** as the model gateway and **Weave Router** for cost/capability model routing.
+- **Workflow & Execution Runtime:** Ingest **LangGraph** for multi-agent workflows and **Temporal** for durable, human-in-the-loop task execution.
+- **Policy Engine & Authorization Layer:** Ingest **Open Policy Agent (OPA)** for declarative policy evaluation and **OpenFGA** for relationship-based access control.
+- **Agent Registry & Skill Platform:** Ingest **SkillOpt** for dynamic agent skill matching and optimization.
+- **Discovery Automation:** Fork **AutoResearch** to automate hypothesis and context discovery.
+- **Database & Graph Infrastructure:** Ingest **PostgreSQL** and **Neo4j** (via their respective MCP servers) for transactional and knowledge graph storage.
+- **Internal Platform Portal:** Ingest **Backstage** to serve as the unified service catalog and developer workspace.
 
 ---
 

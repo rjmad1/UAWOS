@@ -261,6 +261,23 @@ Output:
 
 ---
 
+## Domain Translation & Artifact Synthesis Engine (DTASE)
+
+Transforms unstructured human communication and multimodal inputs into structured, domain-specific knowledge and professional-grade execution artifacts.
+
+Inputs:
+
+- Multimodal inputs (Voice, Text, Visual, Documents, Multimedia)
+- Context models and ontology definitions
+
+Outputs:
+
+- Structured professional artifacts (PRDs, Legal Briefs, Clinical Notes, etc.)
+- Opportunities, Risks, and Anomalies
+- Traceable evidence and confidence scores
+
+---
+
 ## Discovery Engine
 
 Produces:

@@ -139,9 +139,9 @@ Retired
 
 ---
 
-# 7. Policy Evaluation Engine
+# 7. Policy Evaluation Engine & OPA Ingestion
 
-The Policy Engine SHALL evaluate:
+The Policy Engine SHALL evaluate execution elements by ingesting and running **Open Policy Agent (OPA)** (https://github.com/open-policy-agent/opa). Declarative policy models written in Rego SHALL evaluate:
 
 - Objectives
 - Plans
@@ -558,6 +558,19 @@ All platform capabilities SHALL:
 - Support Trust Evaluation
 - Support Compliance Validation
 - Support Governance Auditing
+
+## Open Policy Agent (OPA) Integration
+* Declarative policies SHALL be evaluated using **Open Policy Agent (OPA)** as the normative policy engine. OPA rules (Rego) SHALL govern all platform engine lifecycle transitions, workflow generation, and tool invocations.
+
+## OpenFGA Fine-Grained Authorization
+* Workforce identity, permissions, and tool execution authorization SHALL be validated using **OpenFGA** (https://github.com/openfga/openfga) to enforce relationship-based access control (ReBAC).
+
+## Adopted Component Governance Rules
+To prevent supply-chain and legal risks, all adopted open-source software, registries, and third-party dependencies SHALL be continuously evaluated against the following compliance rules:
+- **License Compliance:** AGPL, unapproved copyleft, or commercial licenses are strictly prohibited. Permitted licenses include MIT, Apache 2.0, and BSD.
+- **Security Compliance:** Automated dependency scans (Trivy/Syft) must return zero unresolved High or Critical CVEs.
+- **Maintenance Compliance:** Dependencies must have an active commit history within the past six months and maintain a low bus-factor.
+- **Complexity and TCO Compliance:** Projects with excessive operational footprint or integration overhead SHALL be rejected.
 
 ---
 

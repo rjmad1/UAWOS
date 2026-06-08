@@ -386,6 +386,7 @@ Additional agents:
 # Platform Engines
 
 * Objective Intake Engine
+* Domain Translation & Artifact Synthesis Engine (DTASE)
 * Discovery Engine
 * Planning Engine
 * Governance Engine

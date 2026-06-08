@@ -631,6 +631,7 @@ A system SHALL be considered UAWOS-compliant only if it conforms to:
 - ACS
 - RDMS
 - PMCMS
+- DTASE
 
 ---
 
