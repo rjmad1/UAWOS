@@ -98,6 +98,37 @@ Every UAWOS-compliant runtime instance MUST register and support the following c
 * **Core Toolset**: Red-teaming prompts, risk check lists.
 * **Council Assignment**: Security Council, Research Council.
 
+### 3.6. Community / Imported Agents (Claude Directory)
+These specialized developer agents are imported from [Claude Directory](https://www.claudedirectory.org/) and saved locally in [Requirements Master/claudedirectory_imports/agents/](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/).
+
+| Agent Name | Primary Purpose | Council Assignment | Link |
+| :--- | :--- | :--- | :--- |
+| **code-architect** | Core software design patterns and system architecture mapping. | Architecture Council | [code-architect.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/code-architect.md) |
+| **cloud-architect** | Designing and reviewing deployment architecture on public cloud platforms. | Architecture Council | [cloud-architect.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/cloud-architect.md) |
+| **backend-architect** | Optimizing services, APIs, database integration, and performance. | Architecture Council | [backend-architect.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/backend-architect.md) |
+| **ai-engineer** | Building LLM-powered applications, RAG pipelines, and vector databases. | Research Council | [ai-engineer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/ai-engineer.md) |
+| **prompt-engineer** | Prompt tuning, Chain-of-Thought setups, and output structural validations. | Research Council | [prompt-engineer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/prompt-engineer.md) |
+| **api-developer** | Building and documenting REST, gRPC, and GraphQL contracts. | Product Council | [api-developer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/api-developer.md) |
+| **frontend-developer** | UX implementation, modular web components, and responsive views. | Product Council | [frontend-developer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/frontend-developer.md) |
+| **nextjs-pro** | High-performance Next.js architectures and page routing systems. | Product Council | [nextjs-pro.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/nextjs-pro.md) |
+| **python-pro** | PEP-compliant coding, async patterns, and package architecture. | Architecture Council | [python-pro.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/python-pro.md) |
+| **typescript-pro** | Strictly-typed application code and package configurations. | Architecture Council | [typescript-pro.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/typescript-pro.md) |
+| **database-expert** | Query auditing, migration designs, and indexing structures. | Architecture Council | [database-expert.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/database-expert.md) |
+| **debugger** | Root-cause analysis, tracing bugs, and resolving stack dumps. | Research Council | [debugger.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/debugger.md) |
+| **test-automator** | Writing unit, integration, and E2E test suites with mocks. | Product Council | [test-automator.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/test-automator.md) |
+| **code-reviewer** | Automated pull request checking, security auditing, and formatting. | Architecture / Security | [code-reviewer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/code-reviewer.md) |
+| **observability-engineer**| Configuring OpenTelemetry bindings, trace collection, and logs. | Architecture Council | [observability-engineer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/observability-engineer.md) |
+| **sre-engineer** | System operations, reliability budgets, and recovery pipelines. | Security Council | [sre-engineer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/sre-engineer.md) |
+| **devops-incident-responder**| Real-time alerts triage, log analysis, and system failovers. | Security Council | [devops-incident-responder.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/devops-incident-responder.md) |
+| **deployment-engineer** | CI/CD YAML configuration, container packaging, and GitOps deployments. | Product Council | [deployment-engineer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/deployment-engineer.md) |
+| **software-configuration-manager** | SCM baseline identification, change control, configuration auditing, and enterprise packaging. | Architecture / Security | [software-configuration-manager.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/software-configuration-manager.md) |
+| **performance-optimizer**| CPU/memory optimization, service load benchmarks, and caching models. | Research Council | [performance-optimizer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/performance-optimizer.md) |
+| **design-system-engineer**| Token generation, Style Dictionary mapping, CSS primitives. | Product Council | [design-system-engineer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/design-system-engineer.md) |
+| **accessibility-expert** | WCAG 2.1 compliance audits, screen reader assets, and contrast. | Product Council | [accessibility-expert.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/accessibility-expert.md) |
+| **product-manager** | Spec design, PRD reviews, features priority, and scoping. | Product Council (Lead) | [product-manager.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/product-manager.md) |
+| **technical-writer** | C4 specification documents, API references, and user manuals. | Research Council | [technical-writer.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/technical-writer.md) |
+| **documentation-expert**| Service catalogs (Backstage) and OpenAPI specification templates. | Research Council | [documentation-expert.md](file:///c:/Users/rajaj/Projects/UAWOS/Requirements%20Master/claudedirectory_imports/agents/documentation-expert.md) |
+
 ---
 
 # 4. Agent Memory Architecture Configuration

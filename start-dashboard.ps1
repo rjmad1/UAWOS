@@ -27,12 +27,16 @@ if ($PortActive) {
 } else {
     Write-Host "Starting UAWOS Dashboard Daemon in the background..." -ForegroundColor Yellow
     
-    # Separate stdout and stderr log outputs to prevent PowerShell errors
-    $OutLog = Join-Path $ScriptDir "uawos_dashboard_out.log"
-    $ErrLog = Join-Path $ScriptDir "uawos_dashboard_err.log"
-    $proc = Start-Process -FilePath $PythonPath -ArgumentList $DaemonScript -RedirectStandardOutput $OutLog -RedirectStandardError $ErrLog -NoNewWindow -PassThru
-    Write-Host "Dashboard daemon started with Process ID: $($proc.Id)" -ForegroundColor Green
-    Start-Sleep -Seconds 2
+    $VbsPath = Join-Path $ScriptDir "uawos-dashboard.vbs"
+    if (Test-Path $VbsPath) {
+        Write-Host "Launching background daemon via VBScript wrapper..." -ForegroundColor Cyan
+        Start-Process "wscript.exe" -ArgumentList "`"$VbsPath`""
+    } else {
+        Write-Host "VBScript wrapper not found. Launching via hidden PowerShell..." -ForegroundColor Yellow
+        $PersistentScript = Join-Path $ScriptDir "run-daemon-persistent.ps1"
+        Start-Process "powershell.exe" -ArgumentList "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$PersistentScript`""
+    }
+    Start-Sleep -Seconds 3
 }
 
 Write-Host "Opening Dashboard Web Interface..." -ForegroundColor Green

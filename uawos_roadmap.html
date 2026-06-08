@@ -342,6 +342,14 @@
                 </svg>
                 Rich Delivery View
             </a>
+            <a href="/requirement_studio.html" class="btn" style="background: linear-gradient(135deg, rgba(217, 70, 239, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%); border-color: rgba(217,70,239,0.3); color:#e0a7ff;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                    <polyline points="2 17 12 22 22 17"/>
+                    <polyline points="2 12 12 17 22 12"/>
+                </svg>
+                Requirement Studio
+            </a>
             <button class="btn btn-primary" onclick="syncRoadmapData()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
@@ -395,6 +403,74 @@
                     </thead>
                     <tbody id="roadmap-table-body">
                         <tr><td colspan="11" style="text-align:center; color:var(--text-secondary);">Querying roadmap records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Strategic Portfolio Alignment & Capacity Insights Heatmap -->
+        <section class="card" id="portfolio-insights-card">
+            <div class="section-title">
+                <span>Strategic Portfolio Alignment & Capacity Insights</span>
+                <span style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">Real-Time Sequencing Heatmap</span>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap:2rem;">
+                <div>
+                    <h4 style="font-size:0.95rem; font-family:'Outfit',sans-serif; color:#a5b4fc; margin-bottom:12px;">Strategic Alignment Heatmap</h4>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; text-align:center; font-size:0.75rem;" id="alignment-heatmap">
+                        <!-- Filled dynamically -->
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.72rem; color:var(--text-secondary);">
+                        <span>Theme 1: Local Foundation</span>
+                        <span>Theme 2: RAG & Memory</span>
+                        <span>Theme 3: Security & Gov</span>
+                        <span>Theme 4: Simulation & Twin</span>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 style="font-size:0.95rem; font-family:'Outfit',sans-serif; color:#a5b4fc; margin-bottom:12px;">Workforce Capacity Allocation</h4>
+                    <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.04); padding:1rem; border-radius:10px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">
+                            <span>Cumulative Capacity Utilized</span>
+                            <span id="roadmap-capacity-percentage">0% / 100%</span>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.04); border-radius:6px; height:12px; overflow:hidden;">
+                            <div id="roadmap-capacity-fill" style="background:linear-gradient(90deg, #6366f1 0%, #d946ef 100%); height:100%; width: 0%;"></div>
+                        </div>
+                        <p style="font-size:0.72rem; color:var(--text-secondary); margin-top:8px;" id="roadmap-capacity-conflict-text">
+                            Workforce allocations within safe limits. No overlaps detected.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Prioritization & Resequencing Ledger -->
+        <section class="card" id="resequencing-ledger-card">
+            <div class="section-title">
+                <span>Portfolio Prioritization & Resequencing Ledger</span>
+                <span id="resequenced-timestamp-sub" style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">Reconciliation Active</span>
+            </div>
+            <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom: 12px; line-height: 1.45;">
+                This ledger visualizes all active commitments and new requirement candidates, dynamically sorted by Composite Priority Score with historical movement tracks.
+            </p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Initiative Name</th>
+                            <th>Initiative ID</th>
+                            <th>Priority Score</th>
+                            <th>Position Shift</th>
+                            <th>Milestone Impact</th>
+                            <th>Capacity Allocation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resequencing-table-body">
+                        <!-- Dynamic list -->
                     </tbody>
                 </table>
             </div>
@@ -487,9 +563,126 @@
                     const changes = await changeRes.json();
                     renderChangeAlert(changes);
                 }
+
+                // 4. Fetch Requirement Studio state
+                const reqRes = await fetch("/api/requirement/list");
+                if (reqRes.ok) {
+                    const reqData = await reqRes.json();
+                    renderHeatmapAndLedger(reqData.resequenced_portfolio || [], reqData.roadmap_candidates || {}, loadedRoadmap);
+                }
             } catch (err) {
                 console.error("Roadmap fetch failed:", err);
                 showToast("Connection to backend failed: " + err.message, true);
+            }
+        }
+
+        function renderHeatmapAndLedger(resequenced, candidates, roadmapData) {
+            // 1. Build Heatmap
+            const heatmap = document.getElementById("alignment-heatmap");
+            if (heatmap) {
+                heatmap.innerHTML = "";
+                
+                const itemsToShow = resequenced.length > 0 ? resequenced.slice(0, 5) : [
+                    { id: "RD-01", name: "Local Enablement" },
+                    { id: "RD-03", name: "Security & Governance" },
+                    { id: "RD-02", name: "RAG & Memory" },
+                    { id: "RD-04", name: "Enterprise Rollout" }
+                ];
+
+                itemsToShow.forEach(item => {
+                    const id = item.id;
+                    let alignments = [false, false, false, false];
+                    if (id === "RD-01") alignments = [true, false, false, false];
+                    else if (id === "RD-02") alignments = [true, true, false, false];
+                    else if (id === "RD-03") alignments = [true, true, true, false];
+                    else if (id === "RD-04") alignments = [true, true, true, true];
+                    else {
+                        const score = item.priority_score || 70;
+                        alignments = [score > 40, score > 60, score > 70, score > 80];
+                    }
+
+                    alignments.forEach((aligned, idx) => {
+                        const cell = document.createElement("div");
+                        cell.style.padding = "10px 4px";
+                        cell.style.borderRadius = "4px";
+                        cell.style.fontWeight = "600";
+                        cell.style.color = "white";
+                        if (aligned) {
+                            cell.style.background = idx === 2 ? "rgba(16, 185, 129, 0.4)" : "rgba(99, 102, 241, 0.4)";
+                            cell.style.border = "1px solid rgba(255,255,255,0.15)";
+                            cell.textContent = `${id} (Fit)`;
+                        } else {
+                            cell.style.background = "rgba(255, 255, 255, 0.02)";
+                            cell.style.border = "1px solid rgba(255,255,255,0.03)";
+                            cell.style.color = "var(--text-secondary)";
+                            cell.textContent = "-";
+                        }
+                        heatmap.appendChild(cell);
+                    });
+                });
+            }
+
+            // 2. Render Resequencing Ledger Table
+            const ledgerBody = document.getElementById("resequencing-table-body");
+            if (ledgerBody) {
+                ledgerBody.innerHTML = "";
+                
+                const list = resequenced.length > 0 ? resequenced : [
+                    { id: "RD-01", name: "Local Enablement", previous_position: 1, new_position: 1, movement: "↔", delivery_effort: 15, capacity_impact: "15% effort", milestone_impact: "On Schedule" },
+                    { id: "RD-03", name: "Security & Governance Enforcement", previous_position: 2, new_position: 2, movement: "↔", delivery_effort: 20, capacity_impact: "20% effort", milestone_impact: "On Schedule" },
+                    { id: "RD-02", name: "RAG & Memory Integration", previous_position: 3, new_position: 3, movement: "↔", delivery_effort: 25, capacity_impact: "25% effort", milestone_impact: "On Schedule" },
+                    { id: "RD-04", name: "Full Enterprise Production Rollout", previous_position: 4, new_position: 4, movement: "↔", delivery_effort: 35, capacity_impact: "35% effort", milestone_impact: "On Schedule" }
+                ];
+
+                let cumulativeEffort = 0;
+                list.forEach((seq, idx) => {
+                    const row = document.createElement("tr");
+                    const isCandidate = !["RD-01", "RD-02", "RD-03", "RD-04"].includes(seq.id);
+                    
+                    let pScore = 0;
+                    if (seq.id === "RD-01") pScore = 90.0;
+                    else if (seq.id === "RD-03") pScore = 82.0;
+                    else if (seq.id === "RD-02") pScore = 75.0;
+                    else if (seq.id === "RD-04") pScore = 60.0;
+                    else {
+                        const cand = Object.values(candidates).find(c => c.roadmap_id === seq.id);
+                        pScore = cand ? cand.priority_score : 70.0;
+                    }
+
+                    let mColor = "gray";
+                    if (seq.movement === "↑") mColor = "green";
+                    else if (seq.movement === "↓") mColor = "red";
+
+                    cumulativeEffort += seq.delivery_effort || 15;
+
+                    row.innerHTML = `
+                        <td><span class="status-pill ${isCandidate ? 'blue' : 'gray'}" style="font-weight:700;">Rank ${idx + 1}</span></td>
+                        <td><span style="font-weight:600; color:${isCandidate ? '#e0a7ff' : '#a5b4fc'};">${seq.name}</span></td>
+                        <td><strong>${seq.id}</strong></td>
+                        <td style="font-family:monospace;">${pScore}</td>
+                        <td><span class="status-pill ${mColor}">${seq.movement} ${seq.previous_position ? `(was ${seq.previous_position})` : ''}</span></td>
+                        <td style="color:${seq.milestone_impact.includes('Delayed') ? 'var(--red)' : 'var(--green)'};">${seq.milestone_impact}</td>
+                        <td style="font-family:monospace; font-size:0.82rem;">${seq.capacity_impact || `${seq.delivery_effort}% capacity`}</td>
+                    `;
+                    ledgerBody.appendChild(row);
+                });
+
+                // Capacity indicators
+                const capPct = Math.min(100, cumulativeEffort);
+                document.getElementById("roadmap-capacity-percentage").textContent = `${capPct}% / 100% capacity`;
+                const capFill = document.getElementById("roadmap-capacity-fill");
+                if (capFill) {
+                    capFill.style.width = `${capPct}%`;
+                    if (capPct > 90) {
+                        capFill.style.background = "var(--red)";
+                        document.getElementById("roadmap-capacity-conflict-text").textContent = "WARNING: Portfolio capacity exceeds 90%! Schedule slippage or resource conflicts predicted.";
+                        document.getElementById("roadmap-capacity-conflict-text").style.color = "var(--red)";
+                    } else {
+                        capFill.style.background = "linear-gradient(90deg, #6366f1 0%, #d946ef 100%)";
+                        document.getElementById("roadmap-capacity-conflict-text").textContent = "Workforce allocations within safe limits. No overlaps detected.";
+                        document.getElementById("roadmap-capacity-conflict-text").style.color = "";
+                    }
+                }
             }
         }
 

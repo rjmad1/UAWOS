@@ -1,4 +1,4 @@
-# Ecosystem Stand-Up and Delivery Roadmap
+# Delivery Roadmap
 
 ---
 

@@ -663,6 +663,8 @@
                     <button class="tab-btn" onclick="switchTab(event, 'tab-skills')">Skills</button>
                     <button class="tab-btn" onclick="switchTab(event, 'tab-integrations')">Integrations</button>
                     <button class="tab-btn" onclick="switchTab(event, 'tab-sec-gov')">Sec & Gov</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-dtase')">DTASE Engine</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-budget')">Budget & Cost</button>
                     <button class="tab-btn" onclick="switchTab(event, 'tab-docs')">Documentation</button>
                     <a href="/roadmap.html" class="tab-btn" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Roadmap Intelligence ↗</a>
                 </div>
@@ -792,6 +794,348 @@
                             </div>
                         </div>
 
+                    </div>
+                </div>
+
+                <!-- Budget & Cost Management Tab -->
+                <div id="tab-budget" class="tab-content">
+                    <!-- Top metrics grid -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Total Budget & Spend</span>
+                            <div style="display: flex; align-items: baseline; gap: 10px;">
+                                <span id="budget-total-actual" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--text-primary);">$0.00</span>
+                                <span style="font-size: 0.82rem; color: var(--text-secondary);">of <span id="budget-total-limit">$0.00</span></span>
+                            </div>
+                            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; margin-top: 4px;">
+                                <div id="budget-spend-bar" style="width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.5s ease;"></div>
+                            </div>
+                        </div>
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Daily Run Rate (Est.)</span>
+                            <span id="budget-run-rate" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700; color: #60a5fa;">$0.00 / day</span>
+                            <span style="font-size: 0.76rem; color: var(--text-secondary);">Calculated over 10 active days</span>
+                        </div>
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Cost Forecast (30-day)</span>
+                            <span id="budget-forecast" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700; color: #a78bfa;">$0.00</span>
+                            <span id="budget-forecast-alert" class="status-pill green" style="padding: 2px 8px; font-size: 0.7rem; align-self: flex-start;">SAFE RUN RATE</span>
+                        </div>
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Budget Variance</span>
+                            <div style="display: flex; align-items: baseline; gap: 10px;">
+                                <span id="budget-variance-val" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700;">$0.00</span>
+                                <span id="budget-variance-pct" style="font-size: 0.85rem; font-weight: 600;">0.0%</span>
+                            </div>
+                            <span style="font-size: 0.76rem; color: var(--text-secondary);">Actual vs planned baseline deviation</span>
+                        </div>
+                    </div>
+
+                    <!-- Two column table and playground layout -->
+                    <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; min-height: 600px;">
+                        
+                        <!-- Left Column: Tables -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            
+                            <!-- Objective Budgets Table -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
+                                    </svg>
+                                    <span>Objective Budgets & Variance</span>
+                                </h3>
+                                <div class="table-container" style="max-height: 300px;">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Objective ID</th>
+                                                <th>Name</th>
+                                                <th>Budget</th>
+                                                <th>Actual Spend</th>
+                                                <th>Variance</th>
+                                                <th>Governance</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-obj-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Action Budgets Table -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22 4 12 14.01 9 11.01"/>
+                                    </svg>
+                                    <span>Decomposed Action Budgets</span>
+                                </h3>
+                                <div class="table-container" style="max-height: 250px;">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Action ID</th>
+                                                <th>Action Name</th>
+                                                <th>Parent Objective</th>
+                                                <th>Budget</th>
+                                                <th>Actual Spend</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-act-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Value-to-Cost ROI Analysis -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                                        <line x1="18" y1="20" x2="18" y2="10"/>
+                                        <line x1="12" y1="20" x2="12" y2="4"/>
+                                        <line x1="6" y1="20" x2="6" y2="14"/>
+                                    </svg>
+                                    <span>Value-to-Cost (ROI) Analysis</span>
+                                </h3>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Objective ID</th>
+                                                <th>Value Score</th>
+                                                <th>Actual Cost</th>
+                                                <th>ROI Ratio</th>
+                                                <th>Investment Return</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-roi-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Playground, Agents, Attribution -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            
+                            <!-- Budget Playground -->
+                            <div class="glass" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                                <h3 class="section-title" style="color: #f472b6; margin-bottom: 0.5rem;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
+                                        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                        <polyline points="2 17 12 22 22 17"/>
+                                        <polyline points="2 12 12 17 22 12"/>
+                                    </svg>
+                                    <span>Cost Control & Sandbox Playground</span>
+                                </h3>
+                                
+                                <!-- Record Token Form -->
+                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 0.8rem; font-weight: 600; color: #a5b4fc;">Record Agent LLM Consumption</span>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                                        <select id="play-agent-select" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;">
+                                            <option value="Executor Agent">Executor Agent</option>
+                                            <option value="Planner Agent">Planner Agent</option>
+                                            <option value="Orchestrator Agent">Orchestrator Agent</option>
+                                            <option value="Reviewer Agent">Reviewer Agent</option>
+                                            <option value="Governor Agent">Governor Agent</option>
+                                        </select>
+                                        <select id="play-model-select" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;">
+                                            <option value="tinyllama">tinyllama</option>
+                                            <option value="llama3">llama3</option>
+                                            <option value="deepseek-r1">deepseek-r1</option>
+                                            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                                        </select>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                                        <input type="number" id="play-tokens-in" placeholder="Input Tokens" value="50000" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" />
+                                        <input type="number" id="play-tokens-out" placeholder="Output Tokens" value="20000" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" />
+                                        <input type="number" id="play-tokens-re" placeholder="Reasoning" value="0" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" />
+                                    </div>
+                                    <button onclick="recordSimulatedTokens()" class="action-btn" style="background: #4f46e5; border-color: #6366f1; font-size: 0.78rem; padding: 6px 0;">Inject Token Event</button>
+                                </div>
+
+                                <!-- Adjust Budget Form -->
+                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 0.8rem; font-weight: 600; color: #a5b4fc;">Adjust Objective Budget Limit</span>
+                                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
+                                        <select id="play-obj-select" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;">
+                                            <!-- Dynamic -->
+                                        </select>
+                                        <input type="number" id="play-obj-budget" placeholder="Amount ($)" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" />
+                                    </div>
+                                    <button onclick="adjustObjectiveBudget()" class="action-btn" style="background: #e11d48; border-color: #f43f5e; font-size: 0.78rem; padding: 6px 0;">Adjust Objective Budget</button>
+                                </div>
+
+                                <!-- Approvals Workflow -->
+                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 0.8rem; font-weight: 600; color: #a5b4fc;">Pending Budget Approvals</span>
+                                    <div id="play-approvals-list" style="display:flex; flex-direction:column; gap:6px; max-height: 150px; overflow-y: auto;">
+                                        <!-- Dynamic -->
+                                    </div>
+                                </div>
+
+                                <!-- Governance verdicts panel -->
+                                <div id="play-gov-result" style="display: none; padding: 10px; border-radius: 6px; font-size: 0.8rem; line-height: 1.45;">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+
+                            <!-- Agent costs and Token breakdown -->
+                            <div class="glass" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                    <span>Agent Workforce Cost Ledger</span>
+                                </h3>
+                                <div class="table-container" style="max-height: 200px;">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Agent Profile</th>
+                                                <th>Calls</th>
+                                                <th>Tokens</th>
+                                                <th>Total Spend</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-agent-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="table-container" style="max-height: 200px;">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Model Endpoint</th>
+                                                <th>Input Tokens</th>
+                                                <th>Output Tokens</th>
+                                                <th>Cumulative Cost</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-tokens-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Portfolio Attribution -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 2v20"/>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                    </svg>
+                                    <span>Portfolio Cost Attribution</span>
+                                </h3>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Strategic Portfolio</th>
+                                                <th>Attributed Cost</th>
+                                                <th>Attribution %</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-attr-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- DTASE Engine Tab -->
+                <div id="tab-dtase" class="tab-content">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; min-height: 600px;">
+                        
+                        <!-- Left Panel: Input & Controls -->
+                        <div class="glass" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; background: rgba(0,0,0,0.1); border-radius: 12px;">
+                            <h3 style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600;">DTASE Playground</h3>
+                            <p style="font-size:0.82rem; color:var(--text-secondary); line-height: 1.4;">
+                                Input unstructured communication (voice transcripts, emails, chats, or notes) and automatically classify professional domains, apply translation frameworks, discover risks/opportunities, and synthesize multi-persona outputs.
+                            </p>
+                            
+                            <!-- Preset Dropdown/List -->
+                            <div>
+                                <span style="font-size:0.8rem; font-weight:600; color:#a5b4fc; display:block; margin-bottom:8px;">Load Unstructured Narrative Preset:</span>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('overtime')">Overtime Retaliation (Legal/Comp)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('headaches')">Evening Headaches (Clinical)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('checkout')">Checkout Abandonment (Product/Res)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('latency')">API Gateway Latency (Eng)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('rego')">Rego Security Bypass (Gov)</button>
+                                </div>
+                            </div>
+                            
+                            <textarea id="dtase-raw-input" style="flex-grow: 1; min-height: 250px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--text-primary); padding: 12px; font-size: 0.88rem; font-family: sans-serif; resize: none; line-height: 1.45;" placeholder="Type or paste unstructured text narrative here..."></textarea>
+                            
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <button class="action-btn" id="dtase-btn-analyze" onclick="runDtaseAnalysis()" style="background:#4f46e5; border-color:#6366f1; width:200px; padding: 10px 0;">Run DTASE Analysis</button>
+                                <button class="tab-btn" onclick="clearDtase()" style="font-size:0.8rem;">Clear Input</button>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Domain Identification & ORA Board -->
+                        <div style="display:flex; flex-direction:column; gap:1.5rem;">
+                            
+                            <!-- Domain Classifier Output -->
+                            <div class="glass" style="padding: 1.5rem; background: rgba(0,0,0,0.1); border-radius: 12px;">
+                                <h3 style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600; margin-bottom:12px;">Identified Professional Domains</h3>
+                                <div id="dtase-domains-container" style="display:flex; flex-direction:column; gap:12px;">
+                                    <p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">No analysis run yet. Enter text and analyze.</p>
+                                </div>
+                            </div>
+
+                            <!-- Opportunities, Risks, Anomalies (ORA) Output -->
+                            <div class="glass" style="padding: 1.5rem; flex-grow:1; background: rgba(0,0,0,0.1); border-radius: 12px; display:flex; flex-direction:column;">
+                                <h3 style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600; margin-bottom:12px;">Discovered Insights (ORA Board)</h3>
+                                <div style="display:grid; grid-template-columns: 1fr; gap:12px; overflow-y:auto; max-height:300px; flex-grow:1;" id="dtase-ora-container">
+                                    <p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">Discoveries board will populate after analysis.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Bottom Section: Multi-Persona Synthesis Output View -->
+                    <div class="glass" style="margin-top: 1.5rem; padding: 1.8rem; background: rgba(0,0,0,0.1); border-radius: 12px; display: flex; flex-direction: column; min-height: 350px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:16px;">
+                            <h3 style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600;">Multi-Persona Output Synthesis</h3>
+                            <span id="dtase-traceability-lbl" style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">Traceability ID: None</span>
+                        </div>
+                        
+                        <div style="display:flex; gap:6px; margin-bottom:1rem; overflow-x:auto;" id="dtase-persona-tabs">
+                            <button class="tab-btn active" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Executive Summary')">Executive Summary</button>
+                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Legal Assessment')">Legal Assessment</button>
+                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Product Requirement')">Product Requirement</button>
+                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Compliance Review')">Compliance Review</button>
+                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Technical Specification')">Technical Specification</button>
+                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Clinical Intake')">Clinical Intake</button>
+                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Research Analysis')">Research Analysis</button>
+                        </div>
+                        
+                        <div id="dtase-synthesis-body" style="font-size:0.92rem; line-height:1.65; color:#e5e7eb; overflow-y:auto; flex-grow:1; background:rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding:1.2rem; border-radius:8px;">
+                            <p style="color:var(--text-secondary); font-style:italic;">Synthesized outputs for multiple professional personas will be displayed here.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -934,6 +1278,214 @@
         window.switchTab = switchTab;
         window.forceRefresh = forceRefresh;
         window.shareTelemetry = shareTelemetry;
+        window.loadDtasePreset = loadDtasePreset;
+        window.runDtaseAnalysis = runDtaseAnalysis;
+        window.clearDtase = clearDtase;
+        window.switchPersonaTab = switchPersonaTab;
+
+        const presets = {
+            overtime: "I worked 12 hours overtime this week on the product launch, but my supervisor denied my overtime compensation claim and threatened that if I escalated it to HR, I would be terminated immediately. This is totally illegal and violating my contract.",
+            headaches: "I have been getting severe tension headaches every evening after finishing work. The symptoms usually start around 6 PM, causing head pain and fatigue. I am not taking any medications and need a clinical evaluation plan.",
+            checkout: "We have a critical user experience issue in our e-commerce product. Customers are repeatedly abandoning checkout and leaving the site as soon as the shipping fees are displayed at the final step. We need user stories and a roadmap feature to solve this.",
+            latency: "The checkout gateway microservice is showing extremely high latency (over 5 seconds per request) during container deployment. We need to refactor the database query logic, add Redis cache headers, and update our API specifications.",
+            rego: "The security SAST scan discovered that the authorization checks in the gateway bypass OPA policies. We must audit our Rego rules, ensure compliance with SOC 2 Common Criteria, and record this risk in our registry."
+        };
+
+        function loadDtasePreset(type) {
+            const txt = presets[type] || "";
+            document.getElementById("dtase-raw-input").value = txt;
+        }
+
+        function clearDtase() {
+            document.getElementById("dtase-raw-input").value = "";
+            document.getElementById("dtase-domains-container").innerHTML = `<p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">No analysis run yet. Enter text and analyze.</p>`;
+            document.getElementById("dtase-ora-container").innerHTML = `<p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">Discoveries board will populate after analysis.</p>`;
+            document.getElementById("dtase-synthesis-body").innerHTML = `<p style="color:var(--text-secondary); font-style:italic;">Synthesized outputs for multiple professional personas will be displayed here.</p>`;
+            document.getElementById("dtase-traceability-lbl").textContent = "Traceability ID: None";
+            window.currentDtasePersonas = null;
+        }
+
+        window.currentDtasePersonas = null;
+        async function runDtaseAnalysis() {
+            const rawText = document.getElementById("dtase-raw-input").value.trim();
+            if (!rawText) {
+                alert("Please enter some unstructured text or load a preset first.");
+                return;
+            }
+            
+            const btn = document.getElementById("dtase-btn-analyze");
+            const originalText = btn.textContent;
+            btn.textContent = "Analyzing...";
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch("/api/dtase/analyze", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ text: rawText })
+                });
+                
+                if (!res.ok) {
+                    throw new Error("DTASE API error: " + res.statusText);
+                }
+                
+                const data = await res.json();
+                renderDtaseResults(data);
+                
+            } catch (err) {
+                console.error("DTASE analysis failed:", err);
+                alert("Analysis failed: " + err.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function renderDtaseResults(data) {
+            document.getElementById("dtase-traceability-lbl").textContent = "Traceability ID: " + data.evidence_traceability.traceability_id + " (Confidence: " + Math.round(data.evidence_traceability.confidence_overall * 100) + "%)";
+            
+            const domainsContainer = document.getElementById("dtase-domains-container");
+            domainsContainer.innerHTML = "";
+            
+            data.domains.forEach(d => {
+                const domDiv = document.createElement("div");
+                domDiv.style.background = "rgba(255,255,255,0.02)";
+                domDiv.style.border = "1px solid rgba(255,255,255,0.04)";
+                domDiv.style.padding = "10px";
+                domDiv.style.borderRadius = "8px";
+                
+                const pct = Math.round(d.confidence * 100);
+                let colorClass = "green";
+                if (pct < 40) colorClass = "gray";
+                else if (pct < 70) colorClass = "yellow";
+                
+                domDiv.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.85rem;">
+                        <strong>${d.domain.toUpperCase()}</strong>
+                        <span class="status-pill ${colorClass}" style="padding: 2px 6px; font-size: 0.72rem;">${pct}% CONFIDENCE</span>
+                    </div>
+                    <div style="width:100%; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
+                        <div style="width:${pct}%; height:100%; background: ${d.confidence >= 0.7 ? 'var(--green)' : d.confidence >= 0.4 ? 'var(--yellow)' : 'var(--gray)'}; border-radius:3px;"></div>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">
+                        Evidence markers: <code>${d.evidence.join(", ")}</code>
+                    </div>
+                `;
+                domainsContainer.appendChild(domDiv);
+            });
+            
+            const oraContainer = document.getElementById("dtase-ora-container");
+            oraContainer.innerHTML = "";
+            
+            let itemsCount = 0;
+            
+            data.opportunities.forEach(item => {
+                itemsCount++;
+                const card = document.createElement("div");
+                card.style.borderLeft = "4px solid var(--green)";
+                card.style.background = "rgba(16,185,129,0.03)";
+                card.style.padding = "10px 12px";
+                card.style.borderRadius = "0 8px 8px 0";
+                card.style.fontSize = "0.82rem";
+                card.style.border = "1px solid rgba(16,185,129,0.08)";
+                card.style.borderLeftWidth = "4px";
+                
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:var(--green); font-weight:600; font-size:0.75rem; letter-spacing:0.5px; text-transform:uppercase;">Opportunity: ${item.type}</span>
+                        <span style="color:var(--text-secondary); font-size:0.7rem;">Conf: ${Math.round(item.confidence * 100)}%</span>
+                    </div>
+                    <div style="margin-bottom:6px; color:#e5e7eb;">${item.description}</div>
+                    <div style="font-style:italic; font-size:0.75rem; color:var(--text-secondary); background:rgba(0,0,0,0.15); padding:6px; border-radius:4px; border-left: 2px solid var(--green);">
+                        "${item.evidence}"
+                    </div>
+                `;
+                oraContainer.appendChild(card);
+            });
+            
+            data.risks.forEach(item => {
+                itemsCount++;
+                const card = document.createElement("div");
+                card.style.borderLeft = "4px solid var(--red)";
+                card.style.background = "rgba(239,68,68,0.03)";
+                card.style.padding = "10px 12px";
+                card.style.borderRadius = "0 8px 8px 0";
+                card.style.fontSize = "0.82rem";
+                card.style.border = "1px solid rgba(239,68,68,0.08)";
+                card.style.borderLeftWidth = "4px";
+                
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:var(--red); font-weight:600; font-size:0.75rem; letter-spacing:0.5px; text-transform:uppercase;">Risk: ${item.type}</span>
+                        <span style="color:var(--text-secondary); font-size:0.7rem;">Conf: ${Math.round(item.confidence * 100)}%</span>
+                    </div>
+                    <div style="margin-bottom:6px; color:#e5e7eb;">${item.description}</div>
+                    <div style="font-style:italic; font-size:0.75rem; color:var(--text-secondary); background:rgba(0,0,0,0.15); padding:6px; border-radius:4px; border-left: 2px solid var(--red);">
+                        "${item.evidence}"
+                    </div>
+                `;
+                oraContainer.appendChild(card);
+            });
+            
+            data.anomalies.forEach(item => {
+                itemsCount++;
+                const card = document.createElement("div");
+                card.style.borderLeft = "4px solid var(--yellow)";
+                card.style.background = "rgba(245,158,11,0.03)";
+                card.style.padding = "10px 12px";
+                card.style.borderRadius = "0 8px 8px 0";
+                card.style.fontSize = "0.82rem";
+                card.style.border = "1px solid rgba(245,158,11,0.08)";
+                card.style.borderLeftWidth = "4px";
+                
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:var(--yellow); font-weight:600; font-size:0.75rem; letter-spacing:0.5px; text-transform:uppercase;">Anomaly: ${item.type}</span>
+                        <span style="color:var(--text-secondary); font-size:0.7rem;">Conf: ${Math.round(item.confidence * 100)}%</span>
+                    </div>
+                    <div style="margin-bottom:6px; color:#e5e7eb;">${item.description}</div>
+                    <div style="font-style:italic; font-size:0.75rem; color:var(--text-secondary); background:rgba(0,0,0,0.15); padding:6px; border-radius:4px; border-left: 2px solid var(--yellow);">
+                        "${item.evidence}"
+                    </div>
+                `;
+                oraContainer.appendChild(card);
+            });
+            
+            if (itemsCount === 0) {
+                oraContainer.innerHTML = `<p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">No clear opportunities, risks, or anomalies discovered in this text.</p>`;
+            }
+            
+            window.currentDtasePersonas = data.personas;
+            
+            const activeTab = document.querySelector("#dtase-persona-tabs .tab-btn.active");
+            if (activeTab) {
+                switchPersonaTab(activeTab.textContent.trim());
+            } else {
+                switchPersonaTab("Executive Summary");
+            }
+        }
+
+        function switchPersonaTab(personaName) {
+            const tabs = document.querySelectorAll("#dtase-persona-tabs .tab-btn");
+            tabs.forEach(tab => {
+                if (tab.textContent.trim() === personaName) {
+                    tab.classList.add("active");
+                } else {
+                    tab.classList.remove("active");
+                }
+            });
+            
+            const body = document.getElementById("dtase-synthesis-body");
+            if (!window.currentDtasePersonas) {
+                body.innerHTML = `<p style="color:var(--text-secondary); font-style:italic;">Synthesized outputs for multiple professional personas will be displayed here.</p>`;
+                return;
+            }
+            
+            const content = window.currentDtasePersonas[personaName] || `### ${personaName}\nNo translation content synthesized.`;
+            body.innerHTML = renderMarkdown(content);
+        }
 
         function switchTab(evt, tabId) {
             for (const content of document.getElementsByClassName("tab-content")) {
@@ -961,6 +1513,12 @@
                     }
                 } catch (traceErr) {
                     console.error("Traceability fetch failed: ", traceErr);
+                }
+                
+                try {
+                    await fetchBudgetStatus();
+                } catch (budgetErr) {
+                    console.error("Budget fetch failed: ", budgetErr);
                 }
                 
                 const indicator = document.getElementById("live-indicator");
@@ -1417,6 +1975,338 @@
             html = parseMarkdownBlocks(html);
             return parseMarkdownTablesAndLists(html);
         }
+
+        // --- Budget & Cost Functions ---
+        async function fetchBudgetStatus() {
+            try {
+                const res = await fetch("/api/budget/status");
+                if (!res.ok) throw new Error("Failed to fetch budget status");
+                const data = await res.json();
+                renderBudgetDashboard(data);
+            } catch (err) {
+                console.error("Budget fetch error:", err);
+            }
+        }
+
+        function renderBudgetDashboard(data) {
+            // 1. Overview metrics
+            const metrics = data.metrics;
+            document.getElementById("budget-total-actual").textContent = "$" + metrics.total_actual.toFixed(2);
+            document.getElementById("budget-total-limit").textContent = "$" + metrics.total_budget.toFixed(2);
+            document.getElementById("budget-run-rate").textContent = "$" + metrics.run_rate_per_day.toFixed(2) + " / day";
+            document.getElementById("budget-forecast").textContent = "$" + metrics.forecast_spend.toFixed(2);
+            
+            const pct = Math.min(100, (metrics.total_actual / metrics.total_budget) * 100);
+            document.getElementById("budget-spend-bar").style.width = pct + "%";
+            
+            // Forecast alert pill
+            const fAlert = document.getElementById("budget-forecast-alert");
+            if (metrics.is_over_budget_risk) {
+                fAlert.className = "status-pill red";
+                fAlert.textContent = "OVER BUDGET RISK";
+            } else {
+                fAlert.className = "status-pill green";
+                fAlert.textContent = "SAFE RUN RATE";
+            }
+            
+            // Variance
+            const varianceVal = document.getElementById("budget-variance-val");
+            const variancePct = document.getElementById("budget-variance-pct");
+            varianceVal.textContent = (metrics.variance >= 0 ? "+" : "") + "$" + metrics.variance.toFixed(2);
+            variancePct.textContent = (metrics.variance >= 0 ? "+" : "") + metrics.variance_pct.toFixed(1) + "%";
+            if (metrics.variance > 0) {
+                varianceVal.style.color = "var(--red)";
+                variancePct.style.color = "var(--red)";
+            } else {
+                varianceVal.style.color = "var(--green)";
+                variancePct.style.color = "var(--green)";
+            }
+
+            // 2. Objective budgets table
+            const objTbody = document.getElementById("budget-obj-tbody");
+            objTbody.innerHTML = "";
+            
+            // Populate select dropdown options for playground
+            const objSelect = document.getElementById("play-obj-select");
+            const previousVal = objSelect.value;
+            objSelect.innerHTML = "";
+
+            for (const [id, o] of Object.entries(data.objective_budgets)) {
+                const opt = document.createElement("option");
+                opt.value = id;
+                opt.textContent = `${id} - ${o.name}`;
+                objSelect.appendChild(opt);
+                
+                const variance = o.actual - o.budget;
+                const varPct = o.budget > 0 ? (variance / o.budget) * 100 : 0.0;
+                const varText = (variance >= 0 ? "+" : "") + "$" + variance.toFixed(2) + " (" + (variance >= 0 ? "+" : "") + varPct.toFixed(1) + "%)";
+                const varColor = variance > 0 ? "var(--red)" : "var(--green)";
+                
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${id}</strong></td>
+                    <td style="color:#a5b4fc;">${o.name}</td>
+                    <td>$${o.budget.toFixed(2)}</td>
+                    <td>$${o.actual.toFixed(2)}</td>
+                    <td style="color:${varColor};">${varText}</td>
+                    <td>
+                        <button class="action-btn action-btn-primary" style="font-size:0.7rem; padding: 2px 6px;" onclick="runGovCheck('${id}')">Audit Gov</button>
+                    </td>
+                `;
+                objTbody.appendChild(row);
+            }
+            if (previousVal && objSelect.querySelector(`option[value="${previousVal}"]`)) {
+                objSelect.value = previousVal;
+            }
+
+            // 3. Action budgets table
+            const actTbody = document.getElementById("budget-act-tbody");
+            actTbody.innerHTML = "";
+            for (const [id, a] of Object.entries(data.action_budgets)) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${id}</strong></td>
+                    <td>${a.name}</td>
+                    <td><span class="status-pill blue" style="font-size: 0.72rem; padding: 2px 6px;">${a.objective_id}</span></td>
+                    <td>$${a.budget.toFixed(2)}</td>
+                    <td>$${a.actual.toFixed(2)}</td>
+                `;
+                actTbody.appendChild(row);
+            }
+
+            // 4. Value-to-Cost ROI Table
+            const roiTbody = document.getElementById("budget-roi-tbody");
+            roiTbody.innerHTML = "";
+            for (const [id, r] of Object.entries(data.value_to_cost)) {
+                const score = r.value_score.toFixed(1);
+                const cost = r.cost.toFixed(2);
+                const roi = r.roi_ratio.toFixed(2);
+                
+                let rating = "Low Return";
+                let rColor = "var(--gray)";
+                if (r.roi_ratio >= 4.0) {
+                    rating = "High Return";
+                    rColor = "var(--green)";
+                } else if (r.roi_ratio >= 1.5) {
+                    rating = "Moderate Return";
+                    rColor = "var(--yellow)";
+                }
+                
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${id}</strong></td>
+                    <td>${score} / 100.0</td>
+                    <td>$${cost}</td>
+                    <td style="font-weight:600; color:#c7d2fe;">${roi}x</td>
+                    <td><span class="status-pill" style="color:${rColor}; border:1px solid ${rColor}25; background:${rColor}05; font-size:0.72rem; padding: 2px 6px;">${rating}</span></td>
+                `;
+                roiTbody.appendChild(row);
+            }
+
+            // 5. Agent cost table
+            const agentTbody = document.getElementById("budget-agent-tbody");
+            agentTbody.innerHTML = "";
+            for (const [name, a] of Object.entries(data.agent_costs)) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${name}</strong></td>
+                    <td>${a.call_count}</td>
+                    <td>${a.token_count.toLocaleString()}</td>
+                    <td style="color:#f472b6; font-weight:600;">$${a.cost.toFixed(2)}</td>
+                `;
+                agentTbody.appendChild(row);
+            }
+
+            // 6. Token consumption table
+            const tokensTbody = document.getElementById("budget-tokens-tbody");
+            tokensTbody.innerHTML = "";
+            for (const [model, tc] of Object.entries(data.token_consumption)) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${model}</strong></td>
+                    <td>${tc.input_tokens.toLocaleString()}</td>
+                    <td>${tc.output_tokens.toLocaleString()}</td>
+                    <td style="font-weight:600;">$${tc.cost.toFixed(2)}</td>
+                `;
+                tokensTbody.appendChild(row);
+            }
+
+            // 7. Portfolio attribution table
+            const attrTbody = document.getElementById("budget-attr-tbody");
+            attrTbody.innerHTML = "";
+            for (const [id, p] of Object.entries(data.portfolio_attribution)) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${p.name}</strong></td>
+                    <td>$${p.cost.toFixed(2)}</td>
+                    <td><span style="font-weight:600; color:#fb923c;">${p.percentage.toFixed(1)}%</span></td>
+                `;
+                attrTbody.appendChild(row);
+            }
+
+            // 8. Pending approvals list
+            const approvalsList = document.getElementById("play-approvals-list");
+            approvalsList.innerHTML = "";
+            const pending = data.budget_approvals.filter(a => a.status === "Pending");
+            if (pending.length === 0) {
+                approvalsList.innerHTML = `<span style="font-size:0.75rem; color:var(--text-secondary); font-style:italic;">No pending approvals.</span>`;
+            } else {
+                pending.forEach(app => {
+                    const div = document.createElement("div");
+                    div.style.background = "rgba(255,255,255,0.01)";
+                    div.style.border = "1px solid rgba(255,255,255,0.03)";
+                    div.style.padding = "8px";
+                    div.style.borderRadius = "6px";
+                    div.style.display = "flex";
+                    div.style.justifyContent = "space-between";
+                    div.style.alignItems = "center";
+                    div.style.fontSize = "0.74rem";
+                    
+                    div.innerHTML = `
+                        <div>
+                            <strong>${app.id}</strong>: request for <strong>$${app.amount.toFixed(2)}</strong> on <strong>${app.objective_id}</strong><br/>
+                            <span style="color:var(--text-secondary); font-size:0.7rem;">By ${app.requested_by}</span>
+                        </div>
+                        <div style="display:flex; gap:4px;">
+                            <button onclick="processApproval('${app.id}', 'Approved')" class="action-btn" style="background:var(--green); border:none; padding:2px 6px; font-size:0.7rem; color:black; font-weight:bold;">Approve</button>
+                            <button onclick="processApproval('${app.id}', 'Rejected')" class="action-btn" style="background:var(--red); border:none; padding:2px 6px; font-size:0.7rem; color:white; font-weight:bold;">Deny</button>
+                        </div>
+                    `;
+                    approvalsList.appendChild(div);
+                });
+            }
+        }
+
+        async function recordSimulatedTokens() {
+            const agent = document.getElementById("play-agent-select").value;
+            const model = document.getElementById("play-model-select").value;
+            const inTok = parseInt(document.getElementById("play-tokens-in").value) || 0;
+            const outTok = parseInt(document.getElementById("play-tokens-out").value) || 0;
+            const reTok = parseInt(document.getElementById("play-tokens-re").value) || 0;
+            
+            try {
+                const res = await fetch("/api/budget/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "record_tokens",
+                        agent: agent,
+                        model: model,
+                        tokens_in: inTok,
+                        tokens_out: outTok,
+                        tokens_reasoning: reTok
+                    })
+                });
+                if (!res.ok) throw new Error("API call failed");
+                const data = await res.json();
+                showCustomToast(data.message);
+                await fetchBudgetStatus();
+            } catch (err) {
+                alert("Error injecting tokens: " + err.message);
+            }
+        }
+
+        async function adjustObjectiveBudget() {
+            const objId = document.getElementById("play-obj-select").value;
+            const amount = parseFloat(document.getElementById("play-obj-budget").value) || 0;
+            if (amount <= 0) {
+                alert("Please enter a valid positive budget amount.");
+                return;
+            }
+            
+            try {
+                const res = await fetch("/api/budget/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "adjust_budget",
+                        objective_id: objId,
+                        amount: amount
+                    })
+                });
+                if (!res.ok) throw new Error("API call failed");
+                const data = await res.json();
+                showCustomToast(data.message);
+                await fetchBudgetStatus();
+            } catch (err) {
+                alert("Error adjusting budget: " + err.message);
+            }
+        }
+
+        async function processApproval(appId, decision) {
+            try {
+                const res = await fetch("/api/budget/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "approve_request",
+                        approval_id: appId,
+                        decision: decision
+                    })
+                });
+                if (!res.ok) throw new Error("API call failed");
+                const data = await res.json();
+                showCustomToast(data.message);
+                await fetchBudgetStatus();
+            } catch (err) {
+                alert("Error processing approval: " + err.message);
+            }
+        }
+
+        async function runGovCheck(objId) {
+            try {
+                const res = await fetch("/api/budget/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "check_governance",
+                        objective_id: objId
+                    })
+                });
+                if (!res.ok) throw new Error("API call failed");
+                const data = await res.json();
+                
+                const box = document.getElementById("play-gov-result");
+                box.style.display = "block";
+                
+                const verdict = data.gov.governance_verdict;
+                if (verdict === "APPROVED") {
+                    box.style.background = "rgba(16,185,129,0.15)";
+                    box.style.border = "1px solid var(--green)";
+                    box.style.color = "#c7d2fe";
+                } else if (verdict === "WARNING") {
+                    box.style.background = "rgba(245,158,11,0.15)";
+                    box.style.border = "1px solid var(--yellow)";
+                    box.style.color = "#c7d2fe";
+                } else {
+                    box.style.background = "rgba(239,68,68,0.15)";
+                    box.style.border = "1px solid var(--red)";
+                    box.style.color = "#fca5a5";
+                }
+                
+                box.innerHTML = `
+                    <strong>Governance Evaluation on ${objId}:</strong><br/>
+                    Verdict: <span class="status-pill ${verdict.toLowerCase()}">${verdict}</span><br/>
+                    Message: ${data.gov.message}<br/>
+                    Budget Limit: $${data.gov.budget.toFixed(2)} | Actual Spent: $${data.gov.actual.toFixed(2)}
+                `;
+            } catch (err) {
+                alert("Error auditing governance: " + err.message);
+            }
+        }
+
+        function showCustomToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.textContent = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+
+        window.recordSimulatedTokens = recordSimulatedTokens;
+        window.adjustObjectiveBudget = adjustObjectiveBudget;
+        window.processApproval = processApproval;
+        window.runGovCheck = runGovCheck;
+        // --- End of Budget & Cost Functions ---
 
         await fetchStatus();
         await loadDocs();

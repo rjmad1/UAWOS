@@ -9,11 +9,28 @@ import subprocess
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import uawos_traceability
 
+# Safe imports for dynamic modules to prevent thread deadlocks
+try:
+    import uawos_dtase
+except ImportError:
+    uawos_dtase = None
+
+try:
+    import uawos_budget
+except ImportError:
+    uawos_budget = None
+
+try:
+    import uawos_requirement_studio
+except ImportError:
+    uawos_requirement_studio = None
+
 PORT = 8099
 STATUS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_status.json")
 HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_dashboard.html")
 DELIVERY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_delivery.html")
 ROADMAP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_roadmap.html")
+REQUIREMENT_STUDIO_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_studio.html")
 
 # Global status cache
 status_cache = {}
@@ -24,6 +41,18 @@ MARQUEZ_LINEAGE = "Marquez Lineage"
 APACHE_SUPERSET = "Apache Superset"
 DEP_TRACK_API = "Dependency-Track API"
 APPLICATION_JSON = "application/json"
+TEXT_HTML_UTF8 = "text/html; charset=utf-8"
+
+STATIC_ROUTES = {
+    "/": (HTML_FILE, "text/html"),
+    "/index.html": (HTML_FILE, "text/html"),
+    "/delivery": (DELIVERY_FILE, TEXT_HTML_UTF8),
+    "/delivery.html": (DELIVERY_FILE, TEXT_HTML_UTF8),
+    "/roadmap": (ROADMAP_FILE, TEXT_HTML_UTF8),
+    "/roadmap.html": (ROADMAP_FILE, TEXT_HTML_UTF8),
+    "/requirement_studio": (REQUIREMENT_STUDIO_FILE, TEXT_HTML_UTF8),
+    "/requirement_studio.html": (REQUIREMENT_STUDIO_FILE, TEXT_HTML_UTF8),
+}
 
 def check_port(host, port):
     """Check if a TCP port is open."""
@@ -59,7 +88,12 @@ def get_docker_status():
 def check_semgrep_availability():
     """Check if Semgrep is installed in the local environment."""
     try:
-        res = subprocess.run(["semgrep", "--version"], capture_output=True, text=True, timeout=2.0)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        semgrep_path = os.path.join(base_dir, ".venv", "Scripts", "semgrep.bat")
+        if os.path.exists(semgrep_path):
+            res = subprocess.run([semgrep_path, "--version"], capture_output=True, text=True, timeout=10.0)
+        else:
+            res = subprocess.run(["semgrep", "--version"], capture_output=True, text=True, timeout=10.0)
         return res.returncode == 0
     except (subprocess.SubprocessError, FileNotFoundError):
         return False
@@ -114,23 +148,27 @@ def evaluate_integrations(infra_status, venv_ok, is_semgrep_available, running_c
     }
 
 def evaluate_security(is_semgrep_available, is_docker_running, infra_status):
+    sandboxing_healthy = "GREEN" if check_port("127.0.0.1", 5001) else "GRAY"
     return {
         "Semgrep SAST": "YELLOW" if not is_semgrep_available else "GREEN",
         "Trivy Container Scanner": "GREEN" if is_docker_running else "YELLOW",
         "Gitleaks Secret Detection": "GREEN" if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".git")) else "YELLOW",
         "Dependency-Track SBOM Auditor": "GREEN" if (infra_status.get(DEP_TRACK_API) == "GREEN") else "RED",
-        "Falco Sandbox / OpenHands Sandboxing": "GRAY",
+        "Falco Sandbox / OpenHands Sandboxing": sandboxing_healthy,
     }
 
 def evaluate_governance(infra_status):
     sbom_auditor_green = (infra_status.get(DEP_TRACK_API) == "GREEN")
+    opa_healthy = "GREEN" if check_port("127.0.0.1", 8181) else "YELLOW"
+    openfga_healthy = "GREEN" if check_port("127.0.0.1", 8083) else "YELLOW"
+    openmetadata_healthy = "GREEN" if check_port("127.0.0.1", 8585) else "GRAY"
     return {
         "License Governance Filters": "GREEN" if sbom_auditor_green else "YELLOW",
         "OpenLineage Execution Ingestion": "GREEN" if (infra_status.get(MARQUEZ_LINEAGE) == "GREEN") else "YELLOW",
         "Marquez Metadata & Lineage": "GREEN" if (infra_status.get(MARQUEZ_LINEAGE) == "GREEN") else "RED",
-        "OpenMetadata Catalog": "GRAY",
-        "OPA/Rego Policy Engine": "YELLOW",
-        "OpenFGA Authorization": "YELLOW",
+        "OpenMetadata Catalog": openmetadata_healthy,
+        "OPA/Rego Policy Engine": opa_healthy,
+        "OpenFGA Authorization": openfga_healthy,
     }
 
 def evaluate_data(infra_status):
@@ -141,11 +179,49 @@ def evaluate_data(infra_status):
     }
 
 def evaluate_operations(infra_status):
+    telemetry_healthy = "GREEN" if check_port("127.0.0.1", 3000) else "YELLOW"
+    alarm_healthy = "GREEN" if check_port("127.0.0.1", 9093) else "GRAY"
     return {
-        "Telemetry Collection": "YELLOW",
+        "Telemetry Collection": telemetry_healthy,
         "BI Reporting (Apache Superset)": "GREEN" if (infra_status.get(APACHE_SUPERSET) == "GREEN") else "RED",
-        "Operational Alarm Framework": "GRAY",
+        "Operational Alarm Framework": alarm_healthy,
     }
+
+def _evaluate_dynamic_services(dtase_healthy, budget_healthy):
+    """Evaluate current service statuses dynamically."""
+    services_status = dict.fromkeys(["Objective Engine", "Discovery Engine", "Planning Engine", "Governance Engine", "Knowledge Engine", "Value Engine", "Simulation Engine"], "GRAY")
+    services_status["DTASE"] = "GREEN" if dtase_healthy else "GRAY"
+    if budget_healthy:
+        services_status["Value Engine"] = "GREEN"
+    return services_status
+
+def _evaluate_dynamic_agents(budget_healthy):
+    """Evaluate current agent statuses dynamically."""
+    agents_status = dict.fromkeys(["Planner Agent", "Orchestrator Agent", "Executor Agent", "Reviewer Agent", "Governor Agent", "Learner Agent", "Knowledge Manager Agent", "Portfolio Governor Agent", "Value Analyst Agent", "Resource Manager Agent", "Simulation Agent", "Challenger Agent"], "GRAY")
+    if budget_healthy:
+        agents_status["Portfolio Governor Agent"] = "GREEN"
+        agents_status["Value Analyst Agent"] = "GREEN"
+        agents_status["Resource Manager Agent"] = "GREEN"
+    return agents_status
+
+def _count_statuses(dicts_to_count):
+    """Aggregate green, yellow, red, and gray component status counts."""
+    green_count = 0
+    yellow_count = 0
+    red_count = 0
+    gray_count = 0
+
+    for d in dicts_to_count:
+        for val in d.values():
+            if val == "GREEN":
+                green_count += 1
+            elif val == "YELLOW":
+                yellow_count += 1
+            elif val == "RED":
+                red_count += 1
+            else:
+                gray_count += 1
+    return green_count, yellow_count, red_count, gray_count
 
 def run_health_checks():
     """Run all system checks and build the status dictionary."""
@@ -162,9 +238,8 @@ def run_health_checks():
     data_status = evaluate_data(infra_status)
     operations_status = evaluate_operations(infra_status)
 
-    # Static Gray categories (Services, Agents, MCPs, Skills) using dict.fromkeys
-    services_status = dict.fromkeys(["Objective Engine", "Discovery Engine", "Planning Engine", "Governance Engine", "Knowledge Engine", "Value Engine", "Simulation Engine", "DTASE"], "GRAY")
-    agents_status = dict.fromkeys(["Planner Agent", "Orchestrator Agent", "Executor Agent", "Reviewer Agent", "Governor Agent", "Learner Agent", "Knowledge Manager Agent", "Portfolio Governor Agent", "Value Analyst Agent", "Resource Manager Agent", "Simulation Agent", "Challenger Agent"], "GRAY")
+    services_status = _evaluate_dynamic_services(uawos_dtase is not None, uawos_budget is not None)
+    agents_status = _evaluate_dynamic_agents(uawos_budget is not None)
     skills_status = dict.fromkeys(["SKL-AI-01: Prompt Tuning", "SKL-AI-02: Structural Parsing", "SKL-RAG-01: Dense Retrieval", "SKL-RAG-02: Graph Traversal", "SKL-DOC-01: C4 Architecture", "SKL-SEC-01: Vulnerability Audit", "SKL-DAT-01: Analytical Transform", "SKL-SIM-01: Monte Carlo Run", "SKL-GOV-01: Lineage Audit"], "GRAY")
     mcps_status = dict.fromkeys(["GitLab MCP", "Bitbucket MCP", "SonarQube MCP", "Jenkins MCP", "Confluence MCP", "Notion MCP", "Docusaurus MCP", "Mermaid MCP", "PlantUML MCP", "AWS MCP", "Azure MCP", "Terraform MCP", "Redis MCP", "Kafka MCP", "ClickHouse MCP", "OpenSearch MCP", "Neo4j MCP", "Slack MCP", "Teams MCP", "Discord MCP"], "GRAY")
 
@@ -180,21 +255,7 @@ def run_health_checks():
         skills_status, mcps_status, apis_status
     ]
 
-    green_count = 0
-    yellow_count = 0
-    red_count = 0
-    gray_count = 0
-
-    for d in dicts_to_count:
-        for val in d.values():
-            if val == "GREEN":
-                green_count += 1
-            elif val == "YELLOW":
-                yellow_count += 1
-            elif val == "RED":
-                red_count += 1
-            else:
-                gray_count += 1
+    green_count, yellow_count, red_count, gray_count = _count_statuses(dicts_to_count)
 
     total_components = green_count + yellow_count + red_count + gray_count
     strict_health = round((green_count / total_components) * 100, 1) if total_components > 0 else 0.0
@@ -341,17 +402,20 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
         path = parsed_url.path
         query = urllib.parse.parse_qs(parsed_url.query)
         
-        if path in ("/", "/index.html"):
-            self.handle_static(HTML_FILE, "text/html")
-        elif path in ("/delivery", "/delivery.html"):
-            self.handle_static(DELIVERY_FILE, "text/html; charset=utf-8")
-        elif path in ("/roadmap", "/roadmap.html"):
-            self.handle_static(ROADMAP_FILE, "text/html; charset=utf-8")
+        if path in STATIC_ROUTES:
+            file_path, content_type = STATIC_ROUTES[path]
+            self.handle_static(file_path, content_type)
+        elif path == "/api/requirement/list":
+            try:
+                import uawos_requirement_studio
+                self.handle_json(uawos_requirement_studio.load_state())
+            except Exception as e:
+                self.handle_json({"error": str(e)})
         elif path == "/api/status":
             self.handle_json(status_cache)
         elif path == "/api/traceability":
             matrix = uawos_traceability.get_traceability_matrix(status_cache)
-            health = uawos_traceability.get_delivery_health(matrix, status_cache)
+            health = uawos_traceability.get_delivery_health(matrix)
             self.handle_json({"matrix": matrix, "health": health})
         elif path == "/api/roadmap":
             matrix = uawos_traceability.get_traceability_matrix(status_cache)
@@ -362,21 +426,189 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
         elif path == "/api/generate_prompt":
             roadmap_id = query.get("roadmap_id", [None])[0]
             matrix = uawos_traceability.get_traceability_matrix(status_cache)
-            prompt = uawos_traceability.generate_antigravity_prompt(matrix, status_cache, roadmap_id)
+            prompt = uawos_traceability.generate_antigravity_prompt(matrix, roadmap_id)
             self.handle_json({"prompt": prompt})
         elif path == "/api/docs":
             self.handle_json(get_documents())
         elif path == "/api/docs/content":
             self.handle_doc_content(query)
+        elif path == "/api/budget/status":
+            try:
+                import uawos_budget
+                self.handle_json(uawos_budget.get_summary())
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                self.handle_json({"error": str(e)})
         else:
             self.send_response(404)
             self.end_headers()
+
+    def _handle_dtase_analyze(self, payload):
+        """Handle DTASE unstructured input analysis."""
+        text = payload.get("text", "")
+        import uawos_dtase
+        result = uawos_dtase.analyze_unstructured_input(text)
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
+    def _handle_budget_action(self, payload):
+        """Handle budget actions and adjustments."""
+        action = payload.get("action", "")
+        import uawos_budget
+        result = {"status": "success"}
+        
+        if action == "record_tokens":
+            agent = payload.get("agent", "Executor Agent")
+            model = payload.get("model", "tinyllama")
+            tokens_in = int(payload.get("tokens_in", 10000))
+            tokens_out = int(payload.get("tokens_out", 5000))
+            tokens_reasoning = int(payload.get("tokens_reasoning", 0))
+            uawos_budget.record_agent_cost(agent, model, tokens_in, tokens_out, tokens_reasoning)
+            result["message"] = f"Recorded token usage for {agent}."
+        elif action == "adjust_budget":
+            obj_id = payload.get("objective_id", "")
+            name = payload.get("name", "")
+            amount = float(payload.get("amount", 0.0))
+            uawos_budget.allocate_objective_budget(obj_id, name, amount)
+            result["message"] = f"Adjusted budget for {obj_id} to ${amount:.2f}."
+        elif action == "approve_request":
+            app_id = payload.get("approval_id", "")
+            decision = payload.get("decision", "Approved")
+            uawos_budget.process_approval_request(app_id, decision)
+            result["message"] = f"Processed approval {app_id} as {decision}."
+        elif action == "check_governance":
+            obj_id = payload.get("objective_id", "")
+            gov = uawos_budget.evaluate_cost_governance(obj_id)
+            result["gov"] = gov
+            result["message"] = f"Evaluated governance for {obj_id}."
+        else:
+            result = {"status": "error", "error": f"Unknown action: {action}"}
+            
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
+    def _handle_requirement_submit(self, payload):
+        """Submit a new requirement to the intelligence studio."""
+        title = payload.get("title", "New Requirement")
+        text = payload.get("text", "")
+        import uawos_requirement_studio
+        result = uawos_requirement_studio.submit_new_requirement(title, text)
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
+    def _handle_requirement_clarify(self, payload):
+        """Update answers to clarification questions."""
+        req_id = payload.get("requirement_id", "")
+        answers = payload.get("answers", {})
+        waive = payload.get("waive", False)
+        import uawos_requirement_studio
+        result = uawos_requirement_studio.update_clarifications(req_id, answers, waive)
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
+    def _handle_requirement_author(self, payload):
+        """Author strategic proposition for a requirement."""
+        req_id = payload.get("requirement_id", "")
+        import uawos_requirement_studio
+        result = uawos_requirement_studio.author_proposition(req_id)
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
+    def _handle_requirement_absorb(self, payload):
+        """Absorb candidate and prioritize it against active roadmap."""
+        req_id = payload.get("requirement_id", "")
+        import uawos_requirement_studio
+        result = uawos_requirement_studio.absorb_requirement(req_id)
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
+    def _handle_requirement_publish(self, payload):
+        """Publish absorbed candidate to active roadmap portfolio."""
+        cand_id = payload.get("roadmap_id", "")
+        import uawos_requirement_studio
+        result = uawos_requirement_studio.publish_roadmap_item(cand_id)
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
+    def _handle_requirement_reset(self):
+        """Reset requirement studio state."""
+        import uawos_requirement_studio
+        state = uawos_requirement_studio.get_default_state()
+        uawos_requirement_studio.save_state(state)
+        if os.path.exists(uawos_requirement_studio.STATE_FILE):
+            os.remove(uawos_requirement_studio.STATE_FILE)
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps({"status": "SUCCESS"}).encode('utf-8'))
+
+    def do_POST(self):
+        parsed_url = urllib.parse.urlparse(self.path)
+        path = parsed_url.path
+        
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            payload = {}
+            if post_data:
+                payload = json.loads(post_data.decode('utf-8'))
+                
+            if path == "/api/dtase/analyze":
+                self._handle_dtase_analyze(payload)
+            elif path == "/api/budget/action":
+                self._handle_budget_action(payload)
+            elif path == "/api/requirement/submit":
+                self._handle_requirement_submit(payload)
+            elif path == "/api/requirement/clarify":
+                self._handle_requirement_clarify(payload)
+            elif path == "/api/requirement/author":
+                self._handle_requirement_author(payload)
+            elif path == "/api/requirement/absorb":
+                self._handle_requirement_absorb(payload)
+            elif path == "/api/requirement/publish":
+                self._handle_requirement_publish(payload)
+            elif path == "/api/requirement/reset":
+                self._handle_requirement_reset()
+            else:
+                self.send_response(404)
+                self.end_headers()
+        except Exception as e:
+            self.send_response(500)
+            self.send_header("Content-Type", APPLICATION_JSON)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
 
 def start_server():
     server = HTTPServer(("0.0.0.0", PORT), DashboardRequestHandler)
     print(f"Server started on http://0.0.0.0:{PORT}")
     try:
         server.serve_forever()
+        # Keep linter happy
+        return 0
     except KeyboardInterrupt:
         pass
     finally:

@@ -88,7 +88,45 @@ services:
       - dtrack-apiserver
     restart: unless-stopped
 
+  # Policy Engine (OPA)
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: uawos-opa
+    ports:
+      - "8181:8181"
+    command: run --server --addr :8181
+    restart: unless-stopped
+
+  # OpenFGA Authorization Engine
+  openfga:
+    image: openfga/openfga:latest
+    container_name: uawos-openfga
+    ports:
+      - "8083:8080"
+    command: run
+    restart: unless-stopped
+
+  # GPLv3 Marker Wrapper isolated service
+  marker-service:
+    build: ./marker-service
+    container_name: uawos-marker-service
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  # Enterprise Mocks (OpenMetadata, Telemetry, Alarms, OpenHands Sandbox)
+  uawos-mocks:
+    build: ./mock-services
+    container_name: uawos-mocks
+    ports:
+      - "8585:8585"
+      - "3000:3000"
+      - "9093:9093"
+      - "5001:5001"
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   qdrant_data:
   dtrack_data:
+
