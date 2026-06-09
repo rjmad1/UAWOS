@@ -630,6 +630,38 @@ def publish_roadmap_item(candidate_id: str) -> dict:
     save_state(state)
     return {"status": "PUBLISHED", "roadmap_id": candidate_id}
 
+def direct_ingest_to_backlog(req_id: str, answers: dict = None, waive: bool = False) -> dict:
+    """Directly ingest, clarify, author, absorb, and publish a requirement in one step."""
+    # 1. Update clarifications
+    clarify_res = update_clarifications(req_id, answers or {}, waive=waive)
+    if "error" in clarify_res:
+        return clarify_res
+        
+    # 2. Author proposition
+    author_res = author_proposition(req_id)
+    if isinstance(author_res, dict) and "error" in author_res:
+        return author_res
+        
+    # 3. Absorb requirement
+    absorb_res = absorb_requirement(req_id)
+    if "error" in absorb_res:
+        return absorb_res
+        
+    # 4. Publish roadmap item
+    candidate_id = absorb_res["roadmap_candidate"]["roadmap_id"]
+    publish_res = publish_roadmap_item(candidate_id)
+    if "error" in publish_res:
+        return publish_res
+        
+    return {
+        "status": "SUCCESS",
+        "requirement_id": req_id,
+        "roadmap_id": candidate_id,
+        "priority_score": absorb_res["roadmap_candidate"]["priority_score"],
+        "ranking_position": absorb_res["roadmap_candidate"]["ranking_position"],
+        "absorb_contract": absorb_res
+    }
+
 # Run automated tests to prove compliance
 def run_self_tests():
     print("Executing Requirement Intelligence Studio self tests...")

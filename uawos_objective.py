@@ -329,6 +329,15 @@ def recalculate_scores(objective_id: str):
     except Exception:
         pass
         
+    # Enforce Constitutional Law 1: No Objective without measurable Outcomes
+    try:
+        import uawos_outcome
+        outcomes = uawos_outcome.get_objective_outcomes(objective_id)
+        if not outcomes:
+            health -= 20.0
+    except Exception:
+        pass
+        
     obj["health_score"] = max(0.0, min(100.0, health))
     
     # 2. Confidence Score Calculation (Base 100)
@@ -510,7 +519,15 @@ def verify_fr_028():
 def verify_fr_029():
     """Verify Objective health scoring."""
     obj = create_objective("Health Score Test", "Details", "text", "", "A", "B", "Low")
-    assert obj["health_score"] == 100.0, "Health score must initially be 100.0."
+    assert obj["health_score"] == 80.0, "Health score must initially be 80.0 due to Constitutional Law 1."
+    
+    import uawos_outcome
+    uawos_outcome.create_outcome(obj["id"], "Test Metric", "Metric", "units")
+    
+    recalculate_scores(obj["id"])
+    state = load_state()
+    updated_obj = state["objectives"][obj["id"]]
+    assert updated_obj["health_score"] == 100.0, "Health score must become 100.0 once outcomes exist."
     return True
 
 def verify_fr_030():

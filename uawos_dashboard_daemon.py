@@ -30,12 +30,93 @@ try:
 except ImportError:
     uawos_objective = None
 
+try:
+    import uawos_outcome
+except ImportError:
+    uawos_outcome = None
+
+try:
+    import uawos_planning
+except ImportError:
+    uawos_planning = None
+
+try:
+    import uawos_workflow
+except ImportError:
+    uawos_workflow = None
+
+try:
+    import uawos_action
+except ImportError:
+    uawos_action = None
+
+try:
+    import uawos_workforce
+except ImportError:
+    uawos_workforce = None
+
+try:
+    import uawos_agent_workforce
+except ImportError:
+    uawos_agent_workforce = None
+
+try:
+    import uawos_governance
+except ImportError:
+    uawos_governance = None
+
+try:
+    import uawos_knowledge
+except ImportError:
+    uawos_knowledge = None
+
+try:
+    import uawos_memory
+except ImportError:
+    uawos_memory = None
+
+try:
+    import uawos_learning
+except ImportError:
+    uawos_learning = None
+
+try:
+    import uawos_resource
+except ImportError:
+    uawos_resource = None
+
+try:
+    import uawos_decision
+except ImportError:
+    uawos_decision = None
+
+try:
+    import uawos_simulation
+except ImportError:
+    uawos_simulation = None
+
+try:
+    import uawos_value
+except ImportError:
+    uawos_value = None
+
+try:
+    import uawos_observability
+except ImportError:
+    uawos_observability = None
+
+try:
+    import uawos_integrations
+except ImportError:
+    uawos_integrations = None
+
 PORT = 8099
 STATUS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_status.json")
 HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_dashboard.html")
 DELIVERY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_delivery.html")
 ROADMAP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_roadmap.html")
 REQUIREMENT_STUDIO_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_studio.html")
+ARCHITECTURE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_architecture.html")
 
 # Global status cache
 status_cache = {}
@@ -57,6 +138,8 @@ STATIC_ROUTES = {
     "/roadmap.html": (ROADMAP_FILE, TEXT_HTML_UTF8),
     "/requirement_studio": (REQUIREMENT_STUDIO_FILE, TEXT_HTML_UTF8),
     "/requirement_studio.html": (REQUIREMENT_STUDIO_FILE, TEXT_HTML_UTF8),
+    "/architecture": (ARCHITECTURE_FILE, TEXT_HTML_UTF8),
+    "/architecture.html": (ARCHITECTURE_FILE, TEXT_HTML_UTF8),
 }
 
 def check_port(host, port):
@@ -135,6 +218,14 @@ def evaluate_infra(is_docker_running, running_containers, local_dev_healthy, oll
 
 def evaluate_integrations(infra_status, venv_ok, is_semgrep_available, running_containers):
     marker_running = "uawos-marker-service" in running_containers or "marker-service" in running_containers
+    
+    mesa_ok = False
+    try:
+        import mesa
+        mesa_ok = True
+    except ImportError:
+        pass
+
     return {
         "INT-A-01: Qdrant Vector Integration": "GREEN" if (infra_status.get(QDRANT_VECTOR_DB) == "GREEN") else "YELLOW",
         "INT-A-02: Pydantic AI Core Integration": "GREEN" if venv_ok else "GRAY",
@@ -148,7 +239,7 @@ def evaluate_integrations(infra_status, venv_ok, is_semgrep_available, running_c
         "INT-B-04: AWS/Azure cloud discovery": "GRAY",
         "INT-C-01: OpenMetadata Integration": "GRAY",
         "INT-C-02: Airbyte / Meltano Pipeline Setup": "GRAY",
-        "INT-C-03: Mesa Simulation Models": "GRAY",
+        "INT-C-03: Mesa Simulation Models": "GREEN" if mesa_ok else "RED",
         "INT-C-04: GPLv3 Marker Wrapper": "GREEN" if marker_running else "RED",
     }
 
@@ -194,30 +285,33 @@ def evaluate_operations(infra_status):
 
 def _evaluate_dynamic_services(dtase_healthy, budget_healthy, objective_healthy):
     """Evaluate current service statuses dynamically."""
-    services_status = dict.fromkeys(["Objective Engine", "Discovery Engine", "Planning Engine", "Governance Engine", "Knowledge Engine", "Value Engine", "Simulation Engine"], "GRAY")
-    services_status["DTASE"] = "GREEN" if dtase_healthy else "GRAY"
-    if budget_healthy:
-        services_status["Value Engine"] = "GREEN"
-    if objective_healthy:
-        services_status["Objective Engine"] = "GREEN"
-    return services_status
+    return {
+        "Objective Engine": "GREEN" if uawos_objective is not None else "GRAY",
+        "Discovery Engine": "GREEN" if uawos_dtase is not None else "GRAY",
+        "Planning Engine": "GREEN" if uawos_planning is not None else "GRAY",
+        "Governance Engine": "GREEN" if uawos_governance is not None else "GRAY",
+        "Knowledge Engine": "GREEN" if uawos_knowledge is not None else "GRAY",
+        "Value Engine": "GREEN" if (uawos_value is not None or uawos_budget is not None) else "GRAY",
+        "Simulation Engine": "GREEN" if uawos_simulation is not None else "GRAY",
+        "DTASE": "GREEN" if uawos_dtase is not None else "GRAY",
+    }
 
 def _evaluate_dynamic_agents(budget_healthy, objective_healthy):
     """Evaluate current agent statuses dynamically."""
-    agents_status = dict.fromkeys(["Planner Agent", "Orchestrator Agent", "Executor Agent", "Reviewer Agent", "Governor Agent", "Learner Agent", "Knowledge Manager Agent", "Portfolio Governor Agent", "Value Analyst Agent", "Resource Manager Agent", "Simulation Agent", "Challenger Agent"], "GRAY")
-    if budget_healthy:
-        agents_status["Portfolio Governor Agent"] = "GREEN"
-        agents_status["Value Analyst Agent"] = "GREEN"
-        agents_status["Resource Manager Agent"] = "GREEN"
-    if objective_healthy:
-        agents_status["Planner Agent"] = "GREEN"
-        agents_status["Orchestrator Agent"] = "GREEN"
-        agents_status["Executor Agent"] = "GREEN"
-        agents_status["Reviewer Agent"] = "GREEN"
-        agents_status["Governor Agent"] = "GREEN"
-        agents_status["Learner Agent"] = "GREEN"
-        agents_status["Knowledge Manager Agent"] = "GREEN"
-    return agents_status
+    return {
+        "Planner Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_planning is not None) else "GRAY",
+        "Orchestrator Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_workflow is not None) else "GRAY",
+        "Executor Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_action is not None) else "GRAY",
+        "Reviewer Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_outcome is not None) else "GRAY",
+        "Governor Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_governance is not None) else "GRAY",
+        "Learner Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_learning is not None) else "GRAY",
+        "Knowledge Manager Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_knowledge is not None) else "GRAY",
+        "Portfolio Governor Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_budget is not None) else "GRAY",
+        "Value Analyst Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_value is not None) else "GRAY",
+        "Resource Manager Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_resource is not None) else "GRAY",
+        "Simulation Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_simulation is not None) else "GRAY",
+        "Challenger Agent": "GREEN" if (uawos_agent_workforce is not None and uawos_decision is not None) else "GRAY",
+    }
 
 def _count_statuses(dicts_to_count):
     """Aggregate green, yellow, red, and gray component status counts."""
@@ -255,12 +349,167 @@ def run_health_checks():
 
     services_status = _evaluate_dynamic_services(uawos_dtase is not None, uawos_budget is not None, uawos_objective is not None)
     agents_status = _evaluate_dynamic_agents(uawos_budget is not None, uawos_objective is not None)
-    skills_status = dict.fromkeys(["SKL-AI-01: Prompt Tuning", "SKL-AI-02: Structural Parsing", "SKL-RAG-01: Dense Retrieval", "SKL-RAG-02: Graph Traversal", "SKL-DOC-01: C4 Architecture", "SKL-SEC-01: Vulnerability Audit", "SKL-DAT-01: Analytical Transform", "SKL-SIM-01: Monte Carlo Run", "SKL-GOV-01: Lineage Audit"], "GRAY")
+
+    # Dynamic skill health checks
+    dspy_ok = False
+    try:
+        import dspy
+        dspy_ok = True
+    except ImportError:
+        pass
+
+    instructor_ok = False
+    try:
+        import instructor
+        instructor_ok = True
+    except ImportError:
+        pass
+
+    fastembed_ok = False
+    try:
+        import fastembed
+        fastembed_ok = True
+    except ImportError:
+        pass
+
+    dbt_ok = False
+    try:
+        import dbt
+        dbt_ok = True
+    except ImportError:
+        pass
+
+    mesa_ok = False
+    try:
+        import mesa
+        mesa_ok = True
+    except ImportError:
+        pass
+
+    networkx_ok = False
+    try:
+        import networkx
+        networkx_ok = True
+    except ImportError:
+        pass
+
+    openlineage_ok = False
+    try:
+        import openlineage
+        openlineage_ok = True
+    except ImportError:
+        pass
+
+    marquez_ok = False
+    try:
+        import marquez_client
+        marquez_ok = True
+    except ImportError:
+        pass
+
+    import shutil
+    java_ok = shutil.which("java") is not None
+    npm_ok = shutil.which("npm") is not None
+
+    neo4j_running = check_port("127.0.0.1", 7687) or check_port("127.0.0.1", 7474)
+    clickhouse_running = check_port("127.0.0.1", 8123)
+
+    # SKL-AI-01: Prompt Tuning
+    if dspy_ok and ollama_running:
+        skl_ai_01 = "GREEN"
+    elif dspy_ok or ollama_running:
+        skl_ai_01 = "YELLOW"
+    else:
+        skl_ai_01 = "RED"
+
+    # SKL-AI-02: Structural Parsing
+    skl_ai_02 = "GREEN" if instructor_ok else "RED"
+
+    # SKL-RAG-01: Dense Retrieval
+    qdrant_green = infra_status.get(QDRANT_VECTOR_DB) == "GREEN"
+    if fastembed_ok and qdrant_green:
+        skl_rag_01 = "GREEN"
+    elif fastembed_ok or qdrant_green:
+        skl_rag_01 = "YELLOW"
+    else:
+        skl_rag_01 = "RED"
+
+    # SKL-RAG-02: Graph Traversal
+    skl_rag_02 = "GREEN" if neo4j_running else "YELLOW"
+
+    # SKL-DOC-01: C4 Architecture
+    if java_ok and npm_ok:
+        skl_doc_01 = "GREEN"
+    elif java_ok or npm_ok:
+        skl_doc_01 = "YELLOW"
+    else:
+        skl_doc_01 = "RED"
+
+    # SKL-SEC-01: Vulnerability Audit
+    dtrack_green = infra_status.get(DEP_TRACK_API) == "GREEN"
+    if is_docker_running and dtrack_green:
+        skl_sec_01 = "GREEN"
+    elif is_docker_running or dtrack_green:
+        skl_sec_01 = "YELLOW"
+    else:
+        skl_sec_01 = "RED"
+
+    # SKL-DAT-01: Analytical Transform
+    if dbt_ok and clickhouse_running:
+        skl_dat_01 = "GREEN"
+    elif dbt_ok or clickhouse_running:
+        skl_dat_01 = "YELLOW"
+    else:
+        skl_dat_01 = "RED"
+
+    # SKL-SIM-01: Monte Carlo Run
+    skl_sim_01 = "GREEN" if (mesa_ok and networkx_ok) else "RED"
+
+    # SKL-GOV-01: Lineage Audit
+    marquez_green = infra_status.get(MARQUEZ_LINEAGE) == "GREEN"
+    if openlineage_ok and marquez_ok and marquez_green:
+        skl_gov_01 = "GREEN"
+    elif openlineage_ok or marquez_ok or marquez_green:
+        skl_gov_01 = "YELLOW"
+    else:
+        skl_gov_01 = "RED"
+
+    skills_status = {
+        "SKL-AI-01: Prompt Tuning": skl_ai_01,
+        "SKL-AI-02: Structural Parsing": skl_ai_02,
+        "SKL-RAG-01: Dense Retrieval": skl_rag_01,
+        "SKL-RAG-02: Graph Traversal": skl_rag_02,
+        "SKL-DOC-01: C4 Architecture": skl_doc_01,
+        "SKL-SEC-01: Vulnerability Audit": skl_sec_01,
+        "SKL-DAT-01: Analytical Transform": skl_dat_01,
+        "SKL-SIM-01: Monte Carlo Run": skl_sim_01,
+        "SKL-GOV-01: Lineage Audit": skl_gov_01
+    }
+
     mcps_status = dict.fromkeys(["GitLab MCP", "Bitbucket MCP", "SonarQube MCP", "Jenkins MCP", "Confluence MCP", "Notion MCP", "Docusaurus MCP", "Mermaid MCP", "PlantUML MCP", "AWS MCP", "Azure MCP", "Terraform MCP", "Redis MCP", "Kafka MCP", "ClickHouse MCP", "OpenSearch MCP", "Neo4j MCP", "Slack MCP", "Teams MCP", "Discord MCP"], "GRAY")
+
+    # Evaluate Custom Engine APIs
+    engines = [
+        uawos_objective,
+        uawos_dtase,
+        uawos_planning,
+        uawos_governance,
+        uawos_knowledge,
+        uawos_value,
+        uawos_budget,
+        uawos_simulation
+    ]
+    not_none_count = sum(1 for e in engines if e is not None)
+    if not_none_count == len(engines):
+        custom_apis_status = "GREEN"
+    elif not_none_count > 0:
+        custom_apis_status = "YELLOW"
+    else:
+        custom_apis_status = "RED"
 
     apis_status = {
         "Outbound APIs (LiteLLM/Weave)": "GREEN" if ollama_running else "YELLOW",
-        "Custom Engine APIs": "GRAY",
+        "Custom Engine APIs": custom_apis_status,
     }
 
     # Sum up all statuses
@@ -579,6 +828,19 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(result).encode('utf-8'))
 
+    def _handle_requirement_direct_ingest(self, payload):
+        """Directly ingest requirement to active backlog in one go."""
+        req_id = payload.get("requirement_id", "")
+        answers = payload.get("answers", {})
+        waive = payload.get("waive", False)
+        import uawos_requirement_studio
+        result = uawos_requirement_studio.direct_ingest_to_backlog(req_id, answers, waive)
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
     def _handle_objective_submit(self, payload):
         """Submit and ingest a new objective."""
         text = payload.get("text", "")
@@ -661,6 +923,8 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                 self._handle_requirement_absorb(payload)
             elif path == "/api/requirement/publish":
                 self._handle_requirement_publish(payload)
+            elif path == "/api/requirement/direct_ingest":
+                self._handle_requirement_direct_ingest(payload)
             elif path == "/api/requirement/reset":
                 self._handle_requirement_reset()
             elif path == "/api/objective/submit":

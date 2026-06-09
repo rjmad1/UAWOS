@@ -1,0 +1,560 @@
+{
+  "plans": {
+    "PLN-101": {
+      "id": "PLN-101",
+      "objective_id": "OBJ-101",
+      "title": "New Mod Title",
+      "steps": [
+        "Step 1: DB Query refactoring",
+        "Step 2: Add cache headers",
+        "Step 3: Setup conversion metrics"
+      ],
+      "cost_estimate": 345.5,
+      "duration_estimate": 7,
+      "resource_requirements": [
+        "Database Expert",
+        "Frontend Dev"
+      ],
+      "success_probability": 0.95,
+      "status": "archived",
+      "version": 5,
+      "history": [
+        {
+          "timestamp": 1780986696.1016352,
+          "state": {
+            "id": "PLN-101",
+            "objective_id": "OBJ-101",
+            "title": "Optimized Cache and Funnel Refactor Plan",
+            "steps": [
+              "Step 1: DB Query refactoring",
+              "Step 2: Add cache headers",
+              "Step 3: Setup conversion metrics"
+            ],
+            "cost_estimate": 345.5,
+            "duration_estimate": 7,
+            "resource_requirements": [
+              "Database Expert",
+              "Frontend Dev"
+            ],
+            "success_probability": 0.95,
+            "status": "approved",
+            "version": 1,
+            "risks": [
+              "Database downtime during index build"
+            ],
+            "assumptions": [
+              "Redis cache is available and running"
+            ],
+            "is_alternative": false
+          }
+        },
+        {
+          "timestamp": 1780986696.1046338,
+          "state": {
+            "id": "PLN-101",
+            "objective_id": "OBJ-101",
+            "title": "Updated Plan title",
+            "steps": [
+              "Step 1: DB Query refactoring",
+              "Step 2: Add cache headers",
+              "Step 3: Setup conversion metrics"
+            ],
+            "cost_estimate": 345.5,
+            "duration_estimate": 7,
+            "resource_requirements": [
+              "Database Expert",
+              "Frontend Dev"
+            ],
+            "success_probability": 0.95,
+            "status": "approved",
+            "version": 2,
+            "risks": [
+              "Database downtime during index build"
+            ],
+            "assumptions": [
+              "Redis cache is available and running"
+            ],
+            "is_alternative": false
+          }
+        },
+        {
+          "timestamp": 1780986696.1066325,
+          "state": {
+            "id": "PLN-101",
+            "objective_id": "OBJ-101",
+            "title": "Updated Plan title",
+            "steps": [
+              "Step 1: DB Query refactoring",
+              "Step 2: Add cache headers",
+              "Step 3: Setup conversion metrics"
+            ],
+            "cost_estimate": 345.5,
+            "duration_estimate": 7,
+            "resource_requirements": [
+              "Database Expert",
+              "Frontend Dev"
+            ],
+            "success_probability": 0.95,
+            "status": "rejected",
+            "version": 3,
+            "risks": [
+              "Database downtime during index build"
+            ],
+            "assumptions": [
+              "Redis cache is available and running"
+            ],
+            "is_alternative": false
+          }
+        },
+        {
+          "timestamp": 1780986696.1086352,
+          "state": {
+            "id": "PLN-101",
+            "objective_id": "OBJ-101",
+            "title": "New Mod Title",
+            "steps": [
+              "Step 1: DB Query refactoring",
+              "Step 2: Add cache headers",
+              "Step 3: Setup conversion metrics"
+            ],
+            "cost_estimate": 345.5,
+            "duration_estimate": 7,
+            "resource_requirements": [
+              "Database Expert",
+              "Frontend Dev"
+            ],
+            "success_probability": 0.95,
+            "status": "rejected",
+            "version": 4,
+            "risks": [
+              "Database downtime during index build"
+            ],
+            "assumptions": [
+              "Redis cache is available and running"
+            ],
+            "is_alternative": false
+          }
+        }
+      ],
+      "risks": [
+        "Database downtime during index build"
+      ],
+      "assumptions": [
+        "Redis cache is available and running"
+      ],
+      "is_alternative": false
+    },
+    "PLN-102": {
+      "id": "PLN-102",
+      "objective_id": "OBJ-101",
+      "title": "Full Funnel Rebuild Plan (Alternative)",
+      "steps": [
+        "Step 1: Build brand new React checkout page",
+        "Step 2: Migrate payment gateway"
+      ],
+      "cost_estimate": 1500.0,
+      "duration_estimate": 21,
+      "resource_requirements": [
+        "React Developer",
+        "QA Engineer",
+        "Architect"
+      ],
+      "success_probability": 0.8,
+      "status": "archived",
+      "version": 3,
+      "history": [
+        {
+          "timestamp": 1780986696.0986342,
+          "state": {
+            "id": "PLN-102",
+            "objective_id": "OBJ-101",
+            "title": "Full Funnel Rebuild Plan (Alternative)",
+            "steps": [
+              "Step 1: Build brand new React checkout page",
+              "Step 2: Migrate payment gateway"
+            ],
+            "cost_estimate": 1500.0,
+            "duration_estimate": 21,
+            "resource_requirements": [
+              "React Developer",
+              "QA Engineer",
+              "Architect"
+            ],
+            "success_probability": 0.8,
+            "status": "draft",
+            "version": 1,
+            "risks": [
+              "High integration overhead",
+              "High regression risk"
+            ],
+            "assumptions": [
+              "API specs remain unchanged"
+            ],
+            "is_alternative": true
+          }
+        },
+        {
+          "timestamp": 1780986696.1168196,
+          "state": {
+            "id": "PLN-102",
+            "objective_id": "OBJ-101",
+            "title": "Full Funnel Rebuild Plan (Alternative)",
+            "steps": [
+              "Step 1: Build brand new React checkout page",
+              "Step 2: Migrate payment gateway"
+            ],
+            "cost_estimate": 1500.0,
+            "duration_estimate": 21,
+            "resource_requirements": [
+              "React Developer",
+              "QA Engineer",
+              "Architect"
+            ],
+            "success_probability": 0.8,
+            "status": "approved",
+            "version": 2,
+            "risks": [
+              "High integration overhead",
+              "High regression risk"
+            ],
+            "assumptions": [
+              "API specs remain unchanged"
+            ],
+            "is_alternative": true
+          }
+        }
+      ],
+      "risks": [
+        "High integration overhead",
+        "High regression risk"
+      ],
+      "assumptions": [
+        "API specs remain unchanged"
+      ],
+      "is_alternative": true
+    },
+    "PLN-103": {
+      "id": "PLN-103",
+      "objective_id": "OBJ-101",
+      "title": "Plan A for OBJ-101 (Optimized)",
+      "steps": [
+        "Step A1: Basic deployment",
+        "Step A2: Verify"
+      ],
+      "cost_estimate": 200.0,
+      "duration_estimate": 5,
+      "resource_requirements": [
+        "Dev Agent"
+      ],
+      "success_probability": 0.9,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": false
+    },
+    "PLN-104": {
+      "id": "PLN-104",
+      "objective_id": "OBJ-101",
+      "title": "Plan B for OBJ-101 (Extended)",
+      "steps": [
+        "Step B1: Full regression tests",
+        "Step B2: Canary deployment"
+      ],
+      "cost_estimate": 450.0,
+      "duration_estimate": 12,
+      "resource_requirements": [
+        "Dev Agent",
+        "QA Agent"
+      ],
+      "success_probability": 0.98,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": true
+    },
+    "PLN-105": {
+      "id": "PLN-105",
+      "objective_id": "OBJ-101",
+      "title": "Plan A for OBJ-101 (Optimized)",
+      "steps": [
+        "Step A1: Basic deployment",
+        "Step A2: Verify"
+      ],
+      "cost_estimate": 200.0,
+      "duration_estimate": 5,
+      "resource_requirements": [
+        "Dev Agent"
+      ],
+      "success_probability": 0.9,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": false
+    },
+    "PLN-106": {
+      "id": "PLN-106",
+      "objective_id": "OBJ-101",
+      "title": "Plan B for OBJ-101 (Extended)",
+      "steps": [
+        "Step B1: Full regression tests",
+        "Step B2: Canary deployment"
+      ],
+      "cost_estimate": 450.0,
+      "duration_estimate": 12,
+      "resource_requirements": [
+        "Dev Agent",
+        "QA Agent"
+      ],
+      "success_probability": 0.98,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": true
+    },
+    "PLN-107": {
+      "id": "PLN-107",
+      "objective_id": "OBJ-101",
+      "title": "T",
+      "steps": [
+        "step"
+      ],
+      "cost_estimate": 150.0,
+      "duration_estimate": 5,
+      "resource_requirements": [
+        "Dev"
+      ],
+      "success_probability": 0.9,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": false
+    },
+    "PLN-108": {
+      "id": "PLN-108",
+      "objective_id": "OBJ-101",
+      "title": "T",
+      "steps": [
+        "step"
+      ],
+      "cost_estimate": 150.0,
+      "duration_estimate": 5,
+      "resource_requirements": [
+        "Dev"
+      ],
+      "success_probability": 0.9,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": false
+    },
+    "PLN-109": {
+      "id": "PLN-109",
+      "objective_id": "OBJ-101",
+      "title": "T",
+      "steps": [
+        "step"
+      ],
+      "cost_estimate": 150.0,
+      "duration_estimate": 5,
+      "resource_requirements": [
+        "Dev"
+      ],
+      "success_probability": 0.9,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": false
+    },
+    "PLN-110": {
+      "id": "PLN-110",
+      "objective_id": "OBJ-101",
+      "title": "T",
+      "steps": [
+        "step"
+      ],
+      "cost_estimate": 150.0,
+      "duration_estimate": 5,
+      "resource_requirements": [
+        "Dev"
+      ],
+      "success_probability": 0.9,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "Risk X"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": false
+    },
+    "PLN-111": {
+      "id": "PLN-111",
+      "objective_id": "OBJ-101",
+      "title": "T",
+      "steps": [
+        "step"
+      ],
+      "cost_estimate": 150.0,
+      "duration_estimate": 5,
+      "resource_requirements": [
+        "Dev"
+      ],
+      "success_probability": 0.9,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Assump X"
+      ],
+      "is_alternative": false
+    },
+    "PLN-112": {
+      "id": "PLN-112",
+      "objective_id": "OBJ-101",
+      "title": "Plan A for OBJ-101 (Optimized)",
+      "steps": [
+        "Step A1: Basic deployment",
+        "Step A2: Verify"
+      ],
+      "cost_estimate": 200.0,
+      "duration_estimate": 5,
+      "resource_requirements": [
+        "Dev Agent"
+      ],
+      "success_probability": 0.9,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": false
+    },
+    "PLN-113": {
+      "id": "PLN-113",
+      "objective_id": "OBJ-101",
+      "title": "Plan B for OBJ-101 (Extended)",
+      "steps": [
+        "Step B1: Full regression tests",
+        "Step B2: Canary deployment"
+      ],
+      "cost_estimate": 450.0,
+      "duration_estimate": 12,
+      "resource_requirements": [
+        "Dev Agent",
+        "QA Agent"
+      ],
+      "success_probability": 0.98,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": true
+    },
+    "PLN-114": {
+      "id": "PLN-114",
+      "objective_id": "OBJ-101",
+      "title": "Replanned strategy due to: System Drift",
+      "steps": [
+        "Step R1: Address constraints",
+        "Step R2: Resume execution"
+      ],
+      "cost_estimate": 250.0,
+      "duration_estimate": 6,
+      "resource_requirements": [
+        "Replanning Agent"
+      ],
+      "success_probability": 0.92,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": false
+    },
+    "PLN-115": {
+      "id": "PLN-115",
+      "objective_id": "OBJ-101",
+      "title": "Replanned strategy due to: Governance Cost Warning",
+      "steps": [
+        "Step R1: Address constraints",
+        "Step R2: Resume execution"
+      ],
+      "cost_estimate": 250.0,
+      "duration_estimate": 6,
+      "resource_requirements": [
+        "Replanning Agent"
+      ],
+      "success_probability": 0.92,
+      "status": "draft",
+      "version": 1,
+      "history": [],
+      "risks": [
+        "General delivery risk"
+      ],
+      "assumptions": [
+        "Required resources are available"
+      ],
+      "is_alternative": false
+    }
+  }
+}

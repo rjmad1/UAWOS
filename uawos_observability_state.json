@@ -1,0 +1,43 @@
+{
+  "telemetry_events": [
+    {
+      "event_id": "TEL-01",
+      "name": "system_startup",
+      "details": "UAWOS system components initialized.",
+      "timestamp": 1780963292
+    },
+    {
+      "event_id": "TEL-02",
+      "name": "test_event",
+      "details": {
+        "msg": "ok"
+      },
+      "timestamp": 1780986763
+    }
+  ],
+  "metrics": {
+    "operational": {
+      "active_agents": 4,
+      "completed_actions": 12
+    },
+    "governance": {
+      "policies_evaluated": 42,
+      "violations_blocked": 1
+    },
+    "workforce": {
+      "total_capacity_hours": 140,
+      "allocated_hours": 45
+    },
+    "value": {
+      "estimated_roi_usd": 1250.0
+    }
+  },
+  "anomalies": [],
+  "digital_twin": {
+    "last_sync": 1780986763,
+    "status": "synchronized",
+    "NODE-01": {
+      "status": "online"
+    }
+  }
+}

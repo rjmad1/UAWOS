@@ -1,0 +1,95 @@
+{
+  "integrations": {
+    "GitLab": {
+      "status": "connected",
+      "trust_score": 95.0,
+      "governed": true
+    },
+    "AWS": {
+      "status": "connected",
+      "trust_score": 98.0,
+      "governed": true
+    },
+    "API": {
+      "status": "connected",
+      "trust_score": 90.0,
+      "governed": true
+    },
+    "MCP": {
+      "status": "connected",
+      "trust_score": 90.0,
+      "governed": true
+    },
+    "DB": {
+      "status": "connected",
+      "trust_score": 90.0,
+      "governed": true
+    },
+    "SaaS": {
+      "status": "connected",
+      "trust_score": 90.0,
+      "governed": true
+    },
+    "DocRepo": {
+      "status": "connected",
+      "trust_score": 90.0,
+      "governed": true
+    },
+    "Slack": {
+      "status": "connected",
+      "trust_score": 90.0,
+      "governed": true
+    },
+    "Kafka": {
+      "status": "connected",
+      "trust_score": 90.0,
+      "governed": true
+    }
+  },
+  "identities": {
+    "admin": {
+      "role": "CEO",
+      "trust_level": 100.0
+    },
+    "dev": {
+      "role": "Developer",
+      "trust_level": 90.0
+    }
+  },
+  "installed_packs": {
+    "Core Pack": {
+      "version": "1.0.0",
+      "parent": null
+    },
+    "Billing Pack": {
+      "version": "1.1.0",
+      "parent": "Core Pack"
+    },
+    "Healthcare Pack": {
+      "version": "1.0.0",
+      "parent": null
+    },
+    "Retail Pack": {
+      "version": "1.0.0",
+      "parent": null
+    },
+    "Org Pack": {
+      "version": "1.0.0",
+      "parent": null
+    }
+  },
+  "configs": {
+    "organization_name": "UAWOS Inc",
+    "workspace_id": "WS-99",
+    "retention_days": 90,
+    "theme": "light"
+  },
+  "audit_logs": [
+    {
+      "user": "admin",
+      "action": "auth",
+      "timestamp": 1780987216
+    }
+  ],
+  "optimizations": []
+}

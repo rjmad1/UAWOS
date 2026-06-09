@@ -2,12 +2,12 @@
   "requirements": {
     "REQ-001": {
       "id": "REQ-001",
-      "title": "Enterprise SSO Integration",
+      "title": "Multi-tenant SSO Integration",
       "raw_text": "Add multi-tenant SSO support to the enterprise control plane to solve the security vulnerability problem. Scope includes SAML and OIDC protocol interfaces, and excludes legacy LDAP protocols. Success metrics: user sign-in latency under 100ms. Business constraints: must deploy within the next 3 weeks with a budget of $5000. Technical constraints: must integrate with our Postgres database.",
-      "timestamp": 1780963292.4382818,
+      "timestamp": 1780986778.8157988,
       "ingestion_analysis": {
         "completeness_score": 100,
-        "readiness_score": 85,
+        "readiness_score": 89,
         "checklist": {
           "has_problem_statement": true,
           "has_clear_scope": true,
@@ -123,18 +123,21 @@
           "impact_level": "High"
         }
       ],
-      "clarification_answers": {},
-      "clarification_waiver": true,
+      "clarification_answers": {
+        "Q1": "Latency must be < 50ms",
+        "Q2": "Supports Okta OIDC"
+      },
+      "clarification_waiver": false,
       "product_proposition": {
-        "A_Executive_Summary": "This proposition outlines the strategic implementation of 'Enterprise SSO Integration' inside the UAWOS ecosystem. It establishes a governance-native, objective-centric framework to support this feature.",
-        "B_Problem_Statement": "Currently, the platform lacks dedicated support for 'Enterprise SSO Integration', leading to manual overhead, isolated capabilities, and gaps in strategic product management governance.",
-        "C_Opportunity_Statement": "By integrating 'Enterprise SSO Integration', UAWOS can automate execution, capture structured metadata, and increase value-to-cost efficiency by 25% across corresponding workspaces.",
+        "A_Executive_Summary": "This proposition outlines the strategic implementation of 'Multi-tenant SSO Integration' inside the UAWOS ecosystem. It establishes a governance-native, objective-centric framework to support this feature. [Clarified Q1: Latency must be < 50ms] [Clarified Q2: Supports Okta OIDC]",
+        "B_Problem_Statement": "Currently, the platform lacks dedicated support for 'Multi-tenant SSO Integration', leading to manual overhead, isolated capabilities, and gaps in strategic product management governance.",
+        "C_Opportunity_Statement": "By integrating 'Multi-tenant SSO Integration', UAWOS can automate execution, capture structured metadata, and increase value-to-cost efficiency by 25% across corresponding workspaces.",
         "D_Strategic_Alignment": "Directly aligns with UAWOS Strategic Themes, supporting enterprise scaling, governed AI workflows, and single-source-of-truth roadmap alignment.",
         "E_Business_Value": "Reduces operational friction, minimizes tech debt growth, and increases ROI by enabling automated priority audit logs.",
         "F_User_Value": "Empowers product managers, CPOs, and enterprise architects with live visual feedback, detailed critique logs, and real-time portfolio sequencing.",
         "G_Personas": "Chief Product Officer (CPO), Portfolio Management Lead, Enterprise Business Analyst, Principal Software Architect.",
         "H_Functional_Requirements": [
-          "REQ-REQ-001-01: The system shall provide an interactive intake interface for 'Enterprise SSO Integration' raw data.",
+          "REQ-REQ-001-01: The system shall provide an interactive intake interface for 'Multi-tenant SSO Integration' raw data.",
           "REQ-REQ-001-02: The system shall parse and output strategic alignment and completeness metrics.",
           "REQ-REQ-001-03: The system shall generate exactly 10 clarification questions with risk analysis.",
           "REQ-REQ-001-04: The system shall auto-calculate relative prioritization against existing commitments."
@@ -214,7 +217,7 @@
     },
     {
       "id": "RD-05",
-      "name": "Enterprise SSO Integration",
+      "name": "Multi-tenant SSO Integration",
       "previous_position": null,
       "new_position": 4,
       "movement": "\u2194",

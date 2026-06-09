@@ -13,7 +13,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 60.0
     },
     "OBJ-202": {
@@ -29,7 +29,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 60.0
     },
     "OBJ-203": {
@@ -45,7 +45,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 60.0
     },
     "OBJ-204": {
@@ -61,7 +61,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 60.0
     },
     "OBJ-205": {
@@ -77,7 +77,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 60.0
     },
     "OBJ-206": {
@@ -93,7 +93,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 60.0
     },
     "OBJ-207": {
@@ -109,7 +109,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 90.0
     },
     "OBJ-208": {
@@ -125,7 +125,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 100.0
     },
     "OBJ-209": {
@@ -141,7 +141,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 90.0
     },
     "OBJ-210": {
@@ -159,7 +159,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 90.0
     },
     "OBJ-211": {
@@ -176,7 +176,7 @@
       "version": 2,
       "history": [
         {
-          "timestamp": 1780963492.973562,
+          "timestamp": 1780986685.5059767,
           "state": {
             "id": "OBJ-211",
             "title": "Version Test",
@@ -189,12 +189,12 @@
             "dependencies": [],
             "status": "active",
             "version": 1,
-            "health_score": 100.0,
+            "health_score": 80.0,
             "confidence_score": 100.0
           }
         }
       ],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 100.0
     },
     "OBJ-212": {
@@ -211,7 +211,7 @@
       "version": 3,
       "history": [
         {
-          "timestamp": 1780963492.9794388,
+          "timestamp": 1780986685.5159853,
           "state": {
             "id": "OBJ-212",
             "title": "Archive Test",
@@ -224,12 +224,12 @@
             "dependencies": [],
             "status": "active",
             "version": 1,
-            "health_score": 100.0,
+            "health_score": 80.0,
             "confidence_score": 100.0
           }
         },
         {
-          "timestamp": 1780963492.9832718,
+          "timestamp": 1780986685.521149,
           "state": {
             "id": "OBJ-212",
             "title": "Archive Test",
@@ -242,12 +242,12 @@
             "dependencies": [],
             "status": "archived",
             "version": 2,
-            "health_score": 100.0,
+            "health_score": 80.0,
             "confidence_score": 100.0
           }
         }
       ],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 100.0
     },
     "OBJ-213": {
@@ -264,7 +264,7 @@
       "version": 2,
       "history": [
         {
-          "timestamp": 1780963492.9919896,
+          "timestamp": 1780986685.5331855,
           "state": {
             "id": "OBJ-213",
             "title": "Cancel Test",
@@ -277,12 +277,12 @@
             "dependencies": [],
             "status": "active",
             "version": 1,
-            "health_score": 100.0,
+            "health_score": 80.0,
             "confidence_score": 100.0
           }
         }
       ],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 100.0
     },
     "OBJ-214": {
@@ -299,7 +299,7 @@
       "version": 2,
       "history": [
         {
-          "timestamp": 1780963492.9999318,
+          "timestamp": 1780986685.543222,
           "state": {
             "id": "OBJ-214",
             "title": "Pause Test",
@@ -312,12 +312,12 @@
             "dependencies": [],
             "status": "active",
             "version": 1,
-            "health_score": 100.0,
+            "health_score": 80.0,
             "confidence_score": 100.0
           }
         }
       ],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 100.0
     },
     "OBJ-215": {
@@ -349,7 +349,7 @@
       "status": "active",
       "version": 1,
       "history": [],
-      "health_score": 100.0,
+      "health_score": 80.0,
       "confidence_score": 100.0
     }
   }

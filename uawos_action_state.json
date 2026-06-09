@@ -1,0 +1,126 @@
+{
+  "actions": {
+    "ACT-101": {
+      "id": "ACT-101",
+      "workflow_id": "WRK-101",
+      "name": "Analyze database slow queries",
+      "owner": "Senior Engineer",
+      "dependencies": [],
+      "priority": "High",
+      "budget": 200.0,
+      "deadline": 1781049600,
+      "status": "pending",
+      "approval_required": true
+    },
+    "ACT-102": {
+      "id": "ACT-102",
+      "workflow_id": "WRK-101",
+      "name": "Execute: Cache Configuration",
+      "owner": "Executor Agent",
+      "dependencies": [],
+      "priority": "Medium",
+      "budget": 50.0,
+      "deadline": 1781245905,
+      "status": "pending",
+      "approval_required": false
+    },
+    "ACT-103": {
+      "id": "ACT-103",
+      "workflow_id": "WRK-101",
+      "name": "Execute: DB Index Setup",
+      "owner": "Executor Agent",
+      "dependencies": [],
+      "priority": "Medium",
+      "budget": 50.0,
+      "deadline": 1781245905,
+      "status": "pending",
+      "approval_required": false
+    },
+    "ACT-104": {
+      "id": "ACT-104",
+      "workflow_id": "WRK-101",
+      "name": "Execute: Verification Tests",
+      "owner": "Executor Agent",
+      "dependencies": [],
+      "priority": "Medium",
+      "budget": 50.0,
+      "deadline": 1781245905,
+      "status": "pending",
+      "approval_required": false
+    },
+    "ACT-105": {
+      "id": "ACT-105",
+      "workflow_id": "WRK-101",
+      "name": "Task X",
+      "owner": "Dev",
+      "dependencies": [
+        "ACT-101"
+      ],
+      "priority": "Medium",
+      "budget": 0.0,
+      "deadline": 1781245905,
+      "status": "pending",
+      "approval_required": false
+    },
+    "ACT-106": {
+      "id": "ACT-106",
+      "workflow_id": "WRK-101",
+      "name": "Task Y",
+      "owner": "Dev",
+      "dependencies": [],
+      "priority": "Critical",
+      "budget": 0.0,
+      "deadline": 1781245905,
+      "status": "pending",
+      "approval_required": false
+    },
+    "ACT-107": {
+      "id": "ACT-107",
+      "workflow_id": "WRK-101",
+      "name": "Task Z",
+      "owner": "Dev",
+      "dependencies": [],
+      "priority": "Medium",
+      "budget": 120.0,
+      "deadline": 1781245905,
+      "status": "pending",
+      "approval_required": false
+    },
+    "ACT-108": {
+      "id": "ACT-108",
+      "workflow_id": "WRK-101",
+      "name": "Task A",
+      "owner": "Dev",
+      "dependencies": [],
+      "priority": "Medium",
+      "budget": 0.0,
+      "deadline": 123456,
+      "status": "pending",
+      "approval_required": false
+    },
+    "ACT-109": {
+      "id": "ACT-109",
+      "workflow_id": "WRK-101",
+      "name": "Task B",
+      "owner": "Dev",
+      "dependencies": [],
+      "priority": "Medium",
+      "budget": 0.0,
+      "deadline": 1781245905,
+      "status": "running",
+      "approval_required": false
+    },
+    "ACT-110": {
+      "id": "ACT-110",
+      "workflow_id": "WRK-101",
+      "name": "Task C",
+      "owner": "Dev",
+      "dependencies": [],
+      "priority": "Medium",
+      "budget": 0.0,
+      "deadline": 1781245905,
+      "status": "pending",
+      "approval_required": true
+    }
+  }
+}

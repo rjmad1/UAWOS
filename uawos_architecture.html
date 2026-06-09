@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAWOS - System Architecture & Design Blueprint</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        :root {
+            --bg-color: #080a10;
+            --card-bg: rgba(18, 22, 35, 0.6);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --card-border-hover: rgba(255, 255, 255, 0.15);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.25);
+            --accent: #ec4899;
+            
+            /* Status Colors */
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.15);
+            --yellow: #f59e0b;
+            --yellow-glow: rgba(245, 158, 11, 0.15);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.2);
+            --gray: #6b7280;
+            --gray-glow: rgba(107, 114, 128, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.04) 0%, transparent 40%);
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Glass header card */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .brand h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--card-border-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Workspace Grid */
+        .workspace-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            flex-grow: 1;
+            height: calc(100vh - 88px);
+            overflow: hidden;
+        }
+
+        @media (max-width: 1024px) {
+            .workspace-container {
+                grid-template-columns: 1fr;
+                height: auto;
+                overflow: visible;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: rgba(10, 12, 22, 0.5);
+            border-right: 1px solid var(--card-border);
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--card-border);
+                max-height: 300px;
+            }
+        }
+
+        .sidebar-category {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .category-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #818cf8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+            padding-left: 0.5rem;
+        }
+
+        .nav-item {
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 10px 12px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-item:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            color: white;
+            background: #23275c;
+            border-color: rgba(99, 102, 241, 0.3);
+            font-weight: 600;
+            box-shadow: inset 0 0 10px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Detail reading pane */
+        .content-pane {
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            background: rgba(8, 10, 16, 0.2);
+        }
+
+        /* Glass Cards */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.8rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: border-color 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: #818cf8;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Metadata & Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .info-box h4 {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .info-box p {
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            line-height: 1.45;
+        }
+
+        /* Visual canvas container & Zoom control style */
+        .canvas-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            top: 1.25rem;
+            left: 1.25rem;
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+            background: rgba(10, 12, 22, 0.9);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 6px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        
+        .zoom-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--card-border-hover);
+        }
+
+        .zoom-btn.btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            border: none;
+            color: white;
+        }
+
+        .zoom-btn.btn-primary:hover {
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+        }
+
+        .diagram-container {
+            width: 100%;
+            height: 520px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .diagram-container:active {
+            cursor: grabbing;
+        }
+
+        #diagram-canvas {
+            transform-origin: center center;
+            transition: transform 0.05s ease-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #diagram-canvas svg {
+            max-width: none !important;
+            max-height: none !important;
+            width: auto !important;
+            height: auto !important;
+            display: block;
+        }
+
+        .mermaid {
+            background: transparent !important;
+            color: var(--text-primary);
+        }
+
+        /* Raw code block preview */
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: monospace;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            color: #d1d5db;
+            overflow-y: auto;
+            max-height: 400px;
+            width: 100%;
+            white-space: pre-wrap;
+            display: none;
+        }
+
+        /* Alerts & Risks boxes */
+        .alert-box {
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .alert-box.risk {
+            border-left: 4px solid var(--red);
+            background: rgba(239, 68, 68, 0.03);
+        }
+
+        .alert-box.gap {
+            border-left: 4px solid var(--yellow);
+            background: rgba(245, 158, 11, 0.03);
+        }
+
+        .alert-box.improve {
+            border-left: 4px solid var(--primary);
+            background: rgba(99, 102, 241, 0.03);
+        }
+
+        /* Alerts Header */
+        .alert-hdr {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-box.risk .alert-hdr { color: var(--red); }
+        .alert-box.gap .alert-hdr { color: var(--yellow); }
+        .alert-box.improve .alert-hdr { color: #a5b4fc; }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 500;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Scrollbars custom styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="glass">
+        <div class="brand">
+            <h1>UAWOS System Architecture & Design Blueprint</h1>
+            <p>17 Interactive C4 Modeling Diagrams, Repository Dependencies & Strategic Capabilities</p>
+        </div>
+        <div class="nav-buttons">
+            <a href="/index.html" class="btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Operations Center
+            </a>
+            <a href="/roadmap.html" class="btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                    <polyline points="2 17 12 22 22 17"/>
+                    <polyline points="2 12 12 17 22 12"/>
+                </svg>
+                Roadmap Center
+            </a>
+            <a href="/delivery.html" class="btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Rich Delivery View
+            </a>
+            <a href="/requirement_studio.html" class="btn" style="background: linear-gradient(135deg, rgba(217, 70, 239, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%); border-color: rgba(217,70,239,0.3); color:#e0a7ff;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                    <polyline points="2 17 12 22 22 17"/>
+                    <polyline points="2 12 12 17 22 12"/>
+                </svg>
+                Requirement Studio
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="workspace-container">
+        
+        <!-- Left Sidebar Navigation -->
+        <div class="sidebar">
+            
+            <!-- Category 1: Foundational C4 Architecture -->
+            <div class="sidebar-category">
+                <div class="category-title">Foundational C4 Modeling</div>
+                <button class="nav-item active" onclick="loadDiagram('diagram-1')">1. System Context (C4 L1)</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-2')">2. Container Diagram (C4 L2)</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-3')">3. E2E Sequence Diagram</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-4')">4. Domain Model (ER)</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-5')">5. State Machine Lifecycle</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-6')">6. Data Flow & Security</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-7')">7. Deployment Topology</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-8')">8. Observability & Operations</button>
+            </div>
+
+            <!-- Category 2: Repository Source Dependencies -->
+            <div class="sidebar-category">
+                <div class="category-title">Codebase Dependencies</div>
+                <button class="nav-item" onclick="loadDiagram('diagram-9')">9. Service Dependency Graph</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-10')">10. Package Dependency Graph</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-11')">11. Database Access Map</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-12')">12. Event Flow Diagram</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-13')">13. Agent Interaction Diagram</button>
+            </div>
+
+            <!-- Category 3: Requirement & Strategy Maps -->
+            <div class="sidebar-category">
+                <div class="category-title">Product & Strategy Mapping</div>
+                <button class="nav-item" onclick="loadDiagram('diagram-14')">14. Capability Map</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-15')">15. Requirement Traceability</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-16')">16. User Journey Diagram</button>
+                <button class="nav-item" onclick="loadDiagram('diagram-17')">17. Value Stream Diagram</button>
+            </div>
+
+        </div>
+
+        <!-- Right Content Detail Pane -->
+        <div class="content-pane">
+            
+            <!-- Card 1: Header / Metadata -->
+            <section class="card">
+                <div class="section-title">
+                    <span id="diagram-title">System Context Diagram (C4 Level 1)</span>
+                    <span id="diagram-meta" class="btn btn-primary" style="font-size:0.75rem; padding: 4px 10px; cursor:default;">C4 MODEL</span>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-box">
+                        <h4>1. Purpose</h4>
+                        <p id="diagram-purpose">Loading...</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>2. Assumptions</h4>
+                        <p id="diagram-assumptions">Loading...</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>3. Key Insights</h4>
+                        <p id="diagram-insights">Loading...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Card 2: Interactive Mermaid Canvas -->
+            <section class="card canvas-card">
+                <div style="position: absolute; top: 1.25rem; right: 1.25rem; display: flex; gap: 8px; z-index: 5;">
+                    <button class="btn" id="btn-toggle-view" onclick="toggleViewMode()">View Mermaid Source</button>
+                    <button class="btn btn-primary" id="btn-copy-source" onclick="copyMermaidSource()">Copy Code</button>
+                </div>
+                
+                <!-- Diagram Visual Output Canvas -->
+                <div class="diagram-container" id="visual-container">
+                    <pre class="mermaid" id="diagram-canvas">
+                        <!-- Rendered by Mermaid dynamically -->
+                    </pre>
+                </div>
+
+                <!-- Zoom Controls -->
+                <div class="zoom-controls" id="zoom-controls-wrapper">
+                    <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">+</button>
+                    <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">−</button>
+                    <button class="zoom-btn btn-primary" onclick="zoomReset()" title="Reset Zoom">⟲</button>
+                </div>
+
+                <!-- Source Code Output Container -->
+                <pre class="code-block" id="source-container"></pre>
+            </section>
+
+            <!-- Card 3: Risks, Gaps, Improvements -->
+            <section class="card" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                <div class="section-title" style="margin-bottom:0.5rem; border-bottom:none; padding-bottom:0;">
+                    <span>Architectural Review Controls</span>
+                </div>
+
+                <div class="alert-box risk">
+                    <div class="alert-hdr">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        <span>4. Risks Identified</span>
+                    </div>
+                    <p id="diagram-risks">Loading...</p>
+                </div>
+
+                <div class="alert-box gap">
+                    <div class="alert-hdr">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <span>5. Missing Information / Gaps</span>
+                    </div>
+                    <p id="diagram-missing">Loading...</p>
+                </div>
+
+                <div class="alert-box improve">
+                    <div class="alert-hdr">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                            <polyline points="17 6 23 6 23 12"/>
+                        </svg>
+                        <span>6. Recommended Improvements</span>
+                    </div>
+                    <p id="diagram-improvements">Loading...</p>
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+
+    <!-- Toast Notification container -->
+    <div id="toast-notify" class="toast">Copied source markup to clipboard!</div>
+
+    <!-- Load Diagrams Data Model & Interactive Controllers -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        
+        // Initialize Mermaid in Dark Theme
+        mermaid.initialize({ 
+            startOnLoad: false, 
+            theme: 'dark', 
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true },
+            sequence: { useMaxWidth: true, htmlLabels: true }
+        });
+
+        // 17 Complete Diagram Schemas with reviews mapped from evidence
+        const diagramsData = {
+            "diagram-1": {
+                title: "Diagram 1 — System Context Diagram (C4 Level 1)",
+                meta: "C4 LEVEL 1",
+                purpose: "Show UAWOS system boundaries, actor personas, and high-level integrations with local Ollama model gateways, OPA compliance checkers, and Dependency-Track SBOM servers.",
+                assumptions: "Assumes Ollama gateway, OPA engine, Dependency-Track API, Marquez, Postgres, and Qdrant are configured and communicating over the local bridge network.",
+                insights: "SREs and Architects can trace the complete data ingestion boundary. UAWOS sits as a custom control plane orchestrating background execution tools.",
+                code: `graph TD
+    classDef person fill:#1a365d,stroke:#3b82f6,stroke-width:2px,color:#fff;
+    classDef system fill:#0f172a,stroke:#6366f1,stroke-width:2px,color:#fff;
+    classDef extSystem fill:#1e293b,stroke:#9ca3af,stroke-width:1px,stroke-dasharray: 5 5,color:#cbd5e1;
+
+    User["Human User (Product, SRE, Security, QA, Arch)"]:::person
+    UAWOS["UAWOS Execution Platform"]:::system
+    Ollama["Ollama Local LLM Gateway (TinyLlama/Llama3)"]:::extSystem
+    Postgres["PostgreSQL Database (Lineage/State Store)"]:::extSystem
+    Qdrant["Qdrant Vector DB (Temporal/Dense Memory)"]:::extSystem
+    DTrack["Dependency-Track API (SBOM Auditor)"]:::extSystem
+    Marquez["Marquez Server (OpenLineage Lineage UI)"]:::extSystem
+
+    User -->|Defines Objectives / Submits PRD| UAWOS
+    UAWOS -->|Generates Embeddings & RAG Queries| Qdrant
+    UAWOS -->|Dispatches LLM prompts & Structured Parsing| Ollama
+    UAWOS -->|Audits library licenses & SBOM vulnerabilities| DTrack
+    UAWOS -->|Persists Marquez catalog & transactional state| Postgres
+    UAWOS -->|Emits execution job lineage telemetry| Marquez`,
+                risks: "Local Ollama performance degradation (GPU limits) stalls task intake; offline OPA daemon blocks cost verification.",
+                missing: "External cloud vendor API endpoints (e.g. AWS/Azure discovery interfaces) details not specified.",
+                improvements: "Configure asynchronous queue for Ollama and OPA calls with a dead-letter-queue (DLQ) to prevent core process stalling."
+            },
+            "diagram-2": {
+                title: "Diagram 2 — Container Diagram (C4 Level 2)",
+                meta: "C4 LEVEL 2",
+                purpose: "Decompose UAWOS into internal service components (the 19 Python engines) and mapping their relations to relational/vector storages and mock layers.",
+                assumptions: "Core engines read/write exclusively to their dedicated local JSON database files while exposing REST APIs served by uawos_dashboard_daemon.py.",
+                insights: "Maps components to owners. The isolated Marker REST container ensures GPLv3 compliance risks are contained without copyleft pollution.",
+                code: `graph TD
+    classDef container fill:#0f172a,stroke:#6366f1,stroke-width:2px,color:#fff;
+    classDef db fill:#111827,stroke:#10b981,stroke-width:2px,color:#fff;
+    classDef agent fill:#312e81,stroke:#a5b4fc,stroke-width:1.5px,color:#fff;
+    classDef external fill:#1e293b,stroke:#9ca3af,stroke-width:1px,stroke-dasharray: 5 5,color:#cbd5e1;
+
+    UI["Command Center Web UI (Dashboard/Studio/Roadmap)"]:::container
+    Daemon["Dashboard Daemon BFF (uawos_dashboard_daemon.py - Python HTTP Server)"]:::container
+    
+    subgraph Python Core Engines ["UAWOS Control Plane (Core Engines)"]
+        ObjEngine["Objective Management Engine (uawos_objective.py)"]:::container
+        BudgetEngine["Budget & Cost Engine (uawos_budget.py)"]:::container
+        DTASE["DTASE (uawos_dtase.py)"]:::container
+        GovEngine["Governance Engine (uawos_governance.py)"]:::container
+    end
+
+    subgraph Autonomous Agent Workforce ["Agent Workforce (uawos_agent_workforce.py)"]
+        Planner["Planner Agent"]:::agent
+        Executor["Executor Agent"]:::agent
+        Governor["Governor Agent"]:::agent
+    end
+
+    subgraph Storage Layer ["Data & Cache Services"]
+        StateDB["Transactional State JSONs (uawos_*_state.json)"]:::db
+        Postgres["Postgres DB (uawos-postgres)"]:::db
+        Qdrant["Qdrant DB (uawos-qdrant)"]:::db
+    end
+
+    subgraph Security & Policy Services ["Adopted Security Services"]
+        OPA["OPA Daemon (uawos-opa - Rego Engine)"]:::container
+        OpenFGA["OpenFGA (uawos-openfga - Auth)"]:::container
+        Marker["Marker Service (uawos-marker-service - Standalone API)"]:::container
+    end
+
+    UI -->|HTTP requests| Daemon
+    Daemon -->|Routes APIs & invokes| ObjEngine
+    Daemon -->|Routes APIs & invokes| BudgetEngine
+    
+    ObjEngine -->|Invokes LLM for schema mapping| DTASE
+    DTASE -->|REST calls / isolated parsing| Marker
+    
+    BudgetEngine -->|Evaluates Rego rules| OPA
+    GovEngine -->|Checks auth rules| OpenFGA
+    
+    Planner -->|Decomposes tasks| ObjEngine
+    Executor -->|Executes workspace actions| StateDB
+    Governor -->|Monitors agent decisions| GovEngine
+    
+    ObjEngine -->|Queries/Writes state| StateDB
+    BudgetEngine -->|Persists token usage| StateDB
+    
+    DTASE -->|Stores semantic embeddings| Qdrant
+    Daemon -->|Stores Marquez WAL tables| Postgres`,
+                risks: "JSON-based state databases present write-concurrency locks under multi-agent executions.",
+                missing: "The authorization mapping configurations between OpenFGA, OPA and core python engines.",
+                improvements: "Migrate the json transactional files into PostgreSQL tables to support locking features and transactional ACID safety."
+            },
+            "diagram-3": {
+                title: "Diagram 3 — End-to-End Sequence Diagram",
+                meta: "BEHAVIOR PATTERNS",
+                purpose: "Traces execution behaviors of strategic requirement ingestion. Shows both the Happy path (parsing and OPA validation success) and Failure paths (budget breach or license alert).",
+                assumptions: "Intake processes complete within the 4-second HTTP server response window, failing back to local heuristic classifiers on timeout.",
+                insights: "Validates policy intercepts. Budget checks and license validations execute proactively before agent scheduling occurs.",
+                code: `sequenceDiagram
+    autonumber
+    actor User as Human Operator
+    participant UI as Command Center UI
+    participant BFF as Dashboard BFF
+    participant Obj as Objective Engine
+    participant OPA as OPA Policy Engine
+    participant Work as Agent Workforce
+    participant Marker as Marker REST Sandbox
+
+    Note over User, Marker: Happy Path Ingestion
+    User->>UI: Submit strategic PDF requirement
+    UI->>BFF: Ingest PDF file request
+    BFF->>Obj: create_objective_from_input()
+    Obj->>Marker: POST /parse (Isolated REST Container)
+    Marker-->>Obj: Return clean Markdown text (No GPLv3 pollution)
+    Obj->>OPA: POST /v1/data/cost/governance (Verify budget limits)
+    OPA-->>Obj: Verdict: APPROVED (Spend within threshold)
+    Obj->>Work: Dispatch to Planner & Executor Agents
+    Work-->>UI: Update Operational Dashboard Status (GREEN)
+
+    Note over User, Marker: Failure Path Ingestion (Budget Breach or GPLv3 Risk)
+    User->>UI: Submit requirement with excessive budget/Marker wrapper risk
+    UI->>BFF: Ingest request
+    BFF->>Obj: create_objective_from_input()
+    Obj->>OPA: Check cost policy / license checks
+    OPA-->>Obj: Verdict: BREACHED / BLOCKED (Exceeded limit or copyleft import)
+    Obj->>Obj: Set objective health_score = 30.0 (Status: Blocked)
+    Obj-->>BFF: Return governance failure response
+    BFF-->>UI: Trigger Active Blocker Alert & Notification (RED)`,
+                risks: "In failure paths, direct sync calls to OPA increase request latency on blocked routes.",
+                missing: "Details regarding user notification retry schemes for offline alerts.",
+                improvements: "Implement event-driven asynchronous callbacks for long-running PDF ingests using Server-Sent Events (SSE)."
+            },
+            "diagram-4": {
+                title: "Diagram 4 — Domain Model Diagram",
+                meta: "ENTITY RELATIONSHIPS",
+                purpose: "Represent business concepts and context boundaries in UAWOS, including Objective, Outcome, Portfolio, budget attributions, and workforce entities.",
+                assumptions: "Each Objective is mapped to a parent Portfolio and allocates a dedicated Budget tracking actual spend vs forecast.",
+                insights: "Defines bounded contexts clearly. Objectives, Outcomes, and Budgets form the core transactional context, while Agents and Tasks define the execution workspace.",
+                code: `erDiagram
+    PORTFOLIO ||--o{ OBJECTIVE : group
+    OBJECTIVE ||--o{ OUTCOME : requires
+    OBJECTIVE ||--o{ OBJECTIVE : depends_on
+    OBJECTIVE ||--|| BUDGET : allocates
+    BUDGET ||--o{ BUDGET_APPROVAL : requests
+    TASK ||--|| OBJECTIVE : fulfills
+    TASK ||--|| AGENT : executes
+    TASK ||--o{ ARTIFACT : produces
+    TASK ||--o{ POLICY : governed_by
+
+    PORTFOLIO {
+        string id PK
+        string name
+        float total_allocated_budget
+    }
+    OBJECTIVE {
+        string id PK
+        string title
+        string description
+        string priority
+        string status
+        float health_score
+        float confidence_score
+    }
+    OUTCOME {
+        string id PK
+        string objective_id FK
+        string description
+        string success_metric
+        boolean verified
+    }
+    BUDGET {
+        string objective_id PK
+        string name
+        float limit_amount
+        float actual_spent
+        string status
+    }
+    BUDGET_APPROVAL {
+        string id PK
+        string objective_id FK
+        float requested_amount
+        string status
+        string requested_by
+    }
+    AGENT {
+        string name PK
+        string role
+        float trust_score
+        string reputation_status
+    }
+    TASK {
+        string id PK
+        string objective_id FK
+        string agent_name FK
+        string status
+        float cost_limit
+    }
+    ARTIFACT {
+        string id PK
+        string task_id FK
+        string uri
+        string classification
+    }
+    POLICY {
+        string id PK
+        string rule_name
+        string rego_query
+    }`,
+                risks: "Lack of direct mapping between Policies and Portfolios could permit inconsistent governance rule applications.",
+                missing: "Historical data model definitions for archived and versioned objectives.",
+                improvements: "Introduce a 'POLICY_ASSIGNMENT' table mapping OPA policy scopes dynamically to specific Portfolios."
+            },
+            "diagram-5": {
+                title: "Diagram 5 — State Machine Diagram (Objective Status & Health)",
+                meta: "LIFECYCLE BEHAVIORS",
+                purpose: "Detail the database lifecycle status of an Objective in UAWOS (draft, active, paused, archived, cancelled), showing valid transitions and health degradation levels.",
+                assumptions: "Transitions are triggered via the Python Objective Engine API (pause_objective, resume_objective, cancel_objective, archive_objective, restore_objective).",
+                insights: "Reflects the exact DB statuses. The active state dynamically computes health_score, degrading on circular dependencies, paused dependencies, or OPA budget warnings.",
+                code: `stateDiagram-v2
+    [*] --> draft : Objective created as draft
+    draft --> active : Ingest / Parse complete
+    
+    active --> paused : User pauses execution (pause_objective)
+    paused --> active : User resumes execution (resume_objective)
+    
+    active --> cancelled : User cancels (cancel_objective)
+    paused --> cancelled : User cancels (cancel_objective)
+    
+    active --> archived : User archives (archive_objective)
+    paused --> archived : User archives (archive_objective)
+    archived --> active : User restores (restore_objective)
+    
+    state active {
+        [*] --> Healthy : health_score = 100
+        Healthy --> Degraded : health_score < 80 (Circular dep, paused dep, or budget warning)
+        Degraded --> Healthy : conflicts resolved
+        Degraded --> Critical : health_score < 50 (GPLv3 risk, budget breach, or outcome missing)
+        Critical --> Degraded : partial resolution
+    }
+    
+    cancelled --> [*]
+    archived --> [*]`,
+                risks: "Local state JSONs hold status and score records, but concurrent updates could overwrite status transitions if not synchronized.",
+                missing: "No persistent history rollback for archived states.",
+                improvements: "Implement row-level locking or transactional state updates to protect objective status changes."
+            },
+            "diagram-6": {
+                title: "Diagram 6 — Data Flow Diagram",
+                meta: "SECURITY & COMPLIANCE",
+                purpose: "Trace data sources, sinks, trust boundaries, and PII classifications to ensure security compliance across the platform.",
+                assumptions: "Host workspace network communication to dockerized services is encrypted via local loopback.",
+                insights: "Visualizes boundaries. PDF and text inputs are categorized as restricted/confidential, isolated from public outbound networks.",
+                code: `graph TD
+    classDef public fill:#10b981,stroke:#047857,color:#fff;
+    classDef internal fill:#3b82f6,stroke:#1d4ed8,color:#fff;
+    classDef confidential fill:#fbbf24,stroke:#d97706,color:#fff;
+    classDef restricted fill:#ef4444,stroke:#b91c1c,color:#fff;
+    
+    subgraph Trust Boundary: Developer Desktop
+        User[Human Operator]
+        UI[Command Center Dashboard UI]
+        Daemon[BFF Daemon API]
+        StateJSON[Local state JSONs]
+    end
+
+    subgraph Trust Boundary: Docker Containers
+        Postgres[Postgres DB]
+        Qdrant[Qdrant Vector DB]
+        OPA[OPA Rego Server]
+        DTrack[Dependency-Track]
+    end
+
+    subgraph Trust Boundary: Isolated Sandbox
+        Marker[Marker REST Sandbox]
+    end
+
+    subgraph Trust Boundary: Local Ollama
+        Ollama[Ollama Model Gateway]
+    end
+
+    User -->|Web interactions| UI
+    UI -->|API calls: public keys/health| Daemon:::public
+    Daemon -->|Lineage data| Postgres:::internal
+    Daemon -->|Raw PRD documents| Marker:::restricted
+    Marker -->|Sanitized markdown text| Daemon:::confidential
+    Daemon -->|Prompt queries| Ollama:::confidential
+    Daemon -->|Metadata indexing| Qdrant:::confidential
+    Daemon -->|Budget evaluation payload| OPA:::confidential
+    Daemon -->|SBOM manifest verification| DTrack:::confidential
+    Daemon -->|Persist state changes| StateJSON:::confidential`,
+                risks: "Local state JSONs hold plain-text confidential data without file-system level encryption keys.",
+                missing: "Detailed encryption key management policy for vector stores.",
+                improvements: "Enforce AES-256 encryption-at-rest for JSON databases and configure SSL/TLS verification for Ollama REST gateway."
+            },
+            "diagram-7": {
+                title: "Diagram 7 — Deployment Architecture Diagram",
+                meta: "RUNTIME INFRASTRUCTURE",
+                purpose: "Display container host configurations, port allocations, and network boundaries within the Docker Compose runtime environment.",
+                assumptions: "Docker Compose deploys all containers locally on the host bridge network, mapping local daemon ports.",
+                insights: "Validates HA. Individual component isolation (like OPA, FGA, and Standalone Marker) ensures high scalability and clear blast radius boundaries.",
+                code: `graph TD
+    subgraph Developer Local Node ["Local Dev Workstation Node"]
+        subgraph Frontend Browser ["Experience Layer"]
+            UI["Web Browser (Chrome/Firefox)"]
+        end
+        
+        subgraph Daemon Host ["Control Plane Host"]
+            BFF["Python BFF Server (uawos_dashboard_daemon.py - Port 8099)"]
+        end
+        
+        subgraph Docker Bridge Network ["Docker Compose Bridge Network"]
+            DB["uawos-postgres (Port 5435 -> 5432 - Marquez DB)"]
+            Vector["uawos-qdrant (Port 6333 - Dense Vector store)"]
+            Lineage["uawos-marquez (Port 5000 - OpenLineage metadata)"]
+            BI["uawos-superset (Port 8088 - Analytic Dashboards)"]
+            OPA["uawos-opa (Port 8181 - Cost/Compliance OPA)"]
+            OpenFGA["uawos-openfga (Port 8083 -> 8080 - Relationship Auth)"]
+            DTrackAPI["uawos-dependency-track-api (Port 8081 - SBOM Auditor)"]
+            DTrackUI["uawos-dependency-track-ui (Port 8085 -> 8080 - SBOM UI)"]
+            Marker["uawos-marker-service (Port 8000 - Standalone Sandbox)"]
+            Mocks["uawos-mocks (Ports 8585, 3000, 9093, 5001 - Mocks)"]
+        end
+    end
+
+    UI -->|HTTPS/WS on 8099| BFF
+    BFF -->|TCP 5435| DB
+    BFF -->|TCP 6333| Vector
+    BFF -->|TCP 5000| Lineage
+    BFF -->|TCP 8181| OPA
+    BFF -->|TCP 8083| OpenFGA
+    BFF -->|TCP 8081| DTrackAPI
+    BFF -->|TCP 8000| Marker
+    BFF -->|TCP 8585/3000/9093/5001| Mocks
+    DTrackUI -->|Proxy TCP 8081| DTrackAPI
+    Lineage -->|TCP 5432| DB`,
+                risks: "Single-node host deployment introduces a single point of failure (SPOF) for production availability.",
+                missing: "Multi-region fallback and database replication configs.",
+                improvements: "Define Kubernetes helm chart manifests to migrate from docker-compose to EKS/GKE cluster deployments."
+            },
+            "diagram-8": {
+                title: "Diagram 8 — Observability & Operations Diagram",
+                meta: "OPERATIONAL TELEMETRY",
+                purpose: "Trace logs, metrics, alerts, and SLO budgeting paths through the dashboard telemetry framework.",
+                assumptions: "Operational telemetry collection relies on mock endpoints mapping to Prometheus formats and local filesystem log persistence.",
+                insights: "Validates operations. Alerts immediately highlight degraded states, allowing SREs to intervene via the Command Center.",
+                code: `graph TD
+    classDef monitor fill:#1e1b4b,stroke:#818cf8,color:#fff;
+
+    subgraph Operations Plane ["Operations Control Plane"]
+        Collector["OpenTelemetry Metric Collector (uawos-mocks - Port 3000)"]:::monitor
+        LogFiles["Local Log Files (*.log / *.json)"]:::monitor
+        Alarms["Operational Alarm Framework (uawos-mocks - Port 9093)"]:::monitor
+        Superset["Apache Superset (Analytics BI - Port 8088)"]:::monitor
+        UI["Command Center Dashboard UI (Port 8099)"]:::monitor
+    end
+
+    subgraph Service Layer ["Monitored Components"]
+        BFF["BFF Daemon"]
+        Postgres["Postgres DB"]
+        Qdrant["Qdrant DB"]
+        Marker["Marker Standalone Service"]
+        OPA["OPA Engine"]
+    end
+
+    BFF -->|Job Execution Lineage| LogFiles
+    BFF -->|API Request Metrics| Collector
+    Postgres & Qdrant & Marker -->|CPU/Mem/Thread telemetry| Collector
+    OPA -->|Policy execution logs| LogFiles
+    
+    Collector -->|Latency / Failure threshold check| Alarms
+    LogFiles -->|Aggregate metrics| Superset
+    
+    Alarms -->|"Active incidents (Red states)"| UI
+    Superset -->|Traceability matrices| UI`,
+                risks: "Operational logs are kept in local log files; no centralized log indexer is configured in the current deployment.",
+                missing: "Alert notification routing channels (e.g., Slack Webhook or PagerDuty integrations).",
+                improvements: "Provision real Prometheus and ClickHouse instances to capture native docker logs and system telemetry."
+            },
+            "diagram-9": {
+                title: "Diagram 9 — Service Dependency Graph",
+                meta: "CODE COUPLING",
+                purpose: "Map relationships, REST API dependencies, and data lineages between custom python modules and external third-party services.",
+                assumptions: "The dashboard daemon imports trace modules directly, while routing other queries to REST engines.",
+                insights: "Illustrates runtime dependencies. Objective management relies heavily on DTASE and Marker for input sanitizations.",
+                code: `graph TD
+    classDef core fill:#312e81,stroke:#6366f1,stroke-width:2px,color:#fff;
+    classDef adopt fill:#111827,stroke:#10b981,stroke-width:1.5px,color:#fff;
+    
+    BFF["Dashboard Daemon BFF (uawos_dashboard_daemon.py)"]:::core
+    Trace["Traceability Engine (uawos_traceability.py)"]:::core
+    Obj["Objective Engine (uawos_objective.py)"]:::core
+    DTASE["DTASE (uawos_dtase.py)"]:::core
+    Budget["Budget Engine (uawos_budget.py)"]:::core
+    Gov["Governance Engine (uawos_governance.py)"]:::core
+    
+    Postgres["Postgres DB (adopted)"]:::adopt
+    Qdrant["Qdrant Vector DB (adopted)"]:::adopt
+    Ollama["Ollama Local LLM Gateway (adopted)"]:::adopt
+    OPA["OPA Policy Engine (adopted)"]:::adopt
+    FGA["OpenFGA Engine (adopted)"]:::adopt
+    Marker["Marker Sandbox (adopted/wrapped)"]:::adopt
+    DTrack["Dependency-Track API (adopted)"]:::adopt
+    Marquez["Marquez Lineage API (adopted)"]:::adopt
+    
+    BFF -->|Lineage reports| Trace
+    Trace -->|Status validation| Obj
+    Trace -->|Status validation| Budget
+    BFF -->|Persistent line logs| Marquez
+    BFF -->|Authentication| FGA
+    
+    Obj -->|Domain synthesis| DTASE
+    Obj -->|Queries data| Postgres
+    DTASE -->|REST text parsing| Marker
+    DTASE -->|Dense embeddings| Qdrant
+    DTASE -->|Heuristic validation| Ollama
+    
+    Budget -->|Cost OPA checks| OPA
+    Budget -->|Record agent tokens| Ollama
+    Gov -->|Secret check / SBOM audit| DTrack`,
+                risks: "Highly synchronous REST calls to OPA and Marker during Objective Intake might degrade server performance.",
+                missing: "Verification check status maps for third party integrations.",
+                improvements: "Introduce an API gateway layer with connection pooling to manage outbound client requests."
+            },
+            "diagram-10": {
+                title: "Diagram 10 — Package Dependency Graph",
+                meta: "MODULE DEPS",
+                purpose: "Display how the custom UAWOS python scripts import external pip packages, highlighting boundaries to prevent circular imports.",
+                assumptions: "Avoids circular dependencies by using lazy imports for dynamic budget-objective checks.",
+                insights: "Validates code structure. Mesa and NetworkX power the Simulation engine, while DSPy, Haystack, and LiteLLM drive Plan execution.",
+                code: `graph TD
+    classDef engine fill:#1e1b4b,stroke:#818cf8,color:#fff;
+    classDef library fill:#064e3b,stroke:#059669,color:#fff;
+
+    subgraph Custom Engines ["UAWOS Custom Packages"]
+        ObjEngine["uawos_objective.py"]:::engine
+        BudgetEngine["uawos_budget.py"]:::engine
+        DtaseEngine["uawos_dtase.py"]:::engine
+        PlanningEngine["uawos_planning.py"]:::engine
+        SimulationEngine["uawos_simulation.py"]:::engine
+    end
+
+    subgraph Imported Pip Packages ["requirements.txt"]
+        Pydantic["pydantic-ai"]:::library
+        LiteLLM["litellm"]:::library
+        Haystack["haystack-ai"]:::library
+        DSPy["dspy"]:::library
+        Instructor["instructor"]:::library
+        FastEmbed["fastembed"]:::library
+        Mesa["mesa"]:::library
+        NetworkX["networkx"]:::library
+        OpenLineage["openlineage-python"]:::library
+    end
+
+    ObjEngine -->|Lazy importing / Dynamic schemas| DtaseEngine
+    BudgetEngine -.->|Evaluates OPA metrics| ObjEngine
+    DtaseEngine --> Pydantic
+    DtaseEngine --> Instructor
+    DtaseEngine --> FastEmbed
+    PlanningEngine --> DSPy
+    PlanningEngine --> LiteLLM
+    PlanningEngine --> Haystack
+    SimulationEngine --> Mesa
+    SimulationEngine --> NetworkX
+    BudgetEngine --> OpenLineage`,
+                risks: "Subsystem modules share local JSON file readers, bypassing module APIs.",
+                missing: "Detailed list of all shared library module functions.",
+                improvements: "Isolate all file access operations within a shared 'DataAccessService' module."
+            },
+            "diagram-11": {
+                title: "Diagram 11 — Database Access Map",
+                meta: "DATA OWNERSHIP",
+                purpose: "Trace service-to-table access parameters, confirming read/write ownership and database boundaries.",
+                assumptions: "Each engine manages its local state.json file, whereas Marquez writes Job logs directly to the PostgreSQL database.",
+                insights: "Demonstrates data encapsulation. The objective engine holds exclusive ownership over its objective state file, preventing dirty writes.",
+                code: `graph TD
+    classDef engine fill:#1e293b,stroke:#6366f1,color:#fff;
+    classDef store fill:#0f172a,stroke:#10b981,color:#fff;
+
+    subgraph Python Engines ["Platform Service Engines"]
+        Obj["uawos_objective.py"]:::engine
+        Budget["uawos_budget.py"]:::engine
+        Planning["uawos_planning.py"]:::engine
+        Outcome["uawos_outcome.py"]:::engine
+        Trace["uawos_traceability.py"]:::engine
+    end
+
+    subgraph State JSON Files ["Local state JSONs (Transactional)"]
+        ObjState[uawos_objective_state.json]:::store
+        BudgetState[uawos_budget_state.json]:::store
+        PlanState[uawos_planning_state.json]:::store
+        OutcomeState[uawos_outcome_state.json]:::store
+    end
+
+    subgraph Container Storage ["Relational & Vector Data Store"]
+        Postgres[Postgres DB - marquez schema]:::store
+        Qdrant[Qdrant DB - temporal memory vectors]:::store
+    end
+
+    Obj -->|Exclusive Owner: Read/Write| ObjState
+    Budget -->|Exclusive Owner: Read/Write| BudgetState
+    Planning -->|Exclusive Owner: Read/Write| PlanState
+    Outcome -->|Exclusive Owner: Read/Write| OutcomeState
+    
+    Trace -->|Shared: Read-Only| ObjState
+    Trace -->|Shared: Read-Only| BudgetState
+    Trace -->|Shared: Read-Only| OutcomeState
+
+    Planning -->|Read/Write Vectors| Qdrant
+    Trace -->|Write WAL lineage metrics| Postgres`,
+                risks: "Concurrency write collisions on shared Postgres schemas could degrade lineage throughput.",
+                missing: "Transactional isolation levels for Postgres database queries.",
+                improvements: "Implement connection pooling and set strict transactional isolation levels (Read Committed) in Postgres."
+            },
+            "diagram-12": {
+                title: "Diagram 12 — In-Process Call & Event Flow Diagram",
+                meta: "EVENT SOURCING",
+                purpose: "Trace how calls, events, and state mutations propagate synchronously through local python engines, APIs, and file-based state writes.",
+                assumptions: "Communication is synchronous via direct imports/invocations, REST API requests, and local state file persistence.",
+                insights: "Matches actual sync mechanics. The BFF and Objective engines directly coordinate parser sandbox invocations and policy evaluations.",
+                code: `graph TD
+    classDef publisher fill:#1a365d,stroke:#3b82f6,color:#fff;
+    classDef logic fill:#0f172a,stroke:#6366f1,color:#fff;
+    classDef store fill:#111827,stroke:#10b981,color:#fff;
+    
+    UI["Command Center UI"] -->|HTTP POST| BFF["Dashboard BFF Daemon"]
+    
+    subgraph BFF In-Process Call Chain ["In-Process Ingestion Call Chain"]
+        BFF -->|1. create_objective_from_input| Obj["Objective Engine"]
+        Obj -->|2. POST /parse| Marker["Marker REST Service"]
+        Obj -->|3. evaluate_cost_governance| Budget["Budget Engine"]
+        Budget -->|4. POST /v1/data/cost/governance| OPA["OPA Policy Engine"]
+    end
+    
+    subgraph Local State Dispatch
+        Obj -->|5. Write active status| ObjState["uawos_objective_state.json"]
+        Budget -->|6. Write actual cost| BudState["uawos_budget_state.json"]
+    end
+    
+    subgraph SRE Telemetry Alerts
+        BFF -->|7. POST /api/metrics| Telemetry["Langfuse Mock (Port 3000)"]
+        Budget -->|8. Trigger Alarm| Alertmanager["Alertmanager Mock (Port 9093)"]
+    end`,
+                risks: "Synchronous execution coupling means if OPA or Marker services slow down, API response latency increases.",
+                missing: "No internal worker thread pool to run intake processing asynchronously.",
+                improvements: "Configure a local task queue (e.g. Celery or a background queue worker) to isolate engine execution from the API request thread."
+            },
+            "diagram-13": {
+                title: "Diagram 13 — Agent Interaction Diagram",
+                meta: "AI COORDINATION",
+                purpose: "Map the multi-agent coordination workforce in UAWOS. Traces the interactions between Planners, Orchestrators, and Executors.",
+                assumptions: "Agents communicate under human accountability guidelines, routing plans to checkpoints before task execution.",
+                insights: "Highlights governance gates. Human approvals must validate decomposed plan actions before agent executors start tools.",
+                code: `graph TD
+    classDef agent fill:#312e81,stroke:#6366f1,color:#fff;
+    classDef tool fill:#1e293b,stroke:#fbbf24,color:#fff;
+    classDef gate fill:#7f1d1d,stroke:#ef4444,color:#fff;
+
+    subgraph Coordinating Agent workforce ["Agent Workforce"]
+        Planner["Planner Agent"]:::agent
+        Orchestrator["Orchestrator Agent"]:::agent
+        Executor["Executor Agent"]:::agent
+        Governor["Governor Agent"]:::agent
+    end
+
+    subgraph Execution Tools ["Agent Capabilities & Tools"]
+        Semgrep["Semgrep SAST tool"]:::tool
+        Gitleaks["Gitleaks secrets scanner"]:::tool
+        Ollama["Ollama local model parser"]:::tool
+        DTrack["Dependency-Track SBOM Auditor"]:::tool
+    end
+
+    subgraph Governance Checkpoint Gates
+        Checkpoint["Human-in-the-Loop approval gate"]:::gate
+    end
+
+    Planner -->|Task decomposition plan| Checkpoint
+    Checkpoint -->|Approval granted| Orchestrator
+    Orchestrator -->|Assigns task workflow| Executor
+    Executor -->|Invokes parsing| Ollama
+    Executor -->|Invokes security audit| Semgrep
+    Executor -->|Invokes secret audit| Gitleaks
+    
+    Executor -->|Reports execution logs| Governor
+    Governor -->|Audits library licenses| DTrack
+    Governor -->|Triggers cost warnings| Checkpoint`,
+                risks: "If human approvals are delayed, agent wait times might exceed API task timeouts.",
+                missing: "Trust scores and reputation history threshold levels for agents.",
+                improvements: "Define an escalation scheme where unapproved plans are auto-escalated or paused without crashing active agents."
+            },
+            "diagram-14": {
+                title: "Diagram 14 — Capability Map",
+                meta: "CAPABILITY MODEL",
+                purpose: "Maps high-level business capabilities to sub-capabilities, features, and functional requirements.",
+                assumptions: "Functional requirement codes (FR-xxx) correspond directly to UAWOS product blueprints.",
+                insights: "Traces alignment. Outlines how objective decomposition, token tracking, and vector memory trace to requirements.",
+                code: `graph TD
+    subgraph UAWOS Capabilities
+        subgraph Business Capabilities
+            OM["Objective Management"] --> OM1["Decomposition"]
+            OM --> OM2["Lifecycle Tracking"]
+            Cost["Cost & Budgeting"] --> Cost1["Token Tracking"]
+            Cost --> Cost2["Forecast & Variance"]
+        end
+        subgraph Technical Capabilities
+            Memory["Temporal Memory"] --> Mem1["Dense Retrieval"]
+            Memory --> Mem2["Vector Indexing"]
+            DTASE["Domain Translation"] --> Dtase1["Multimodal Parsing"]
+            DTASE --> Dtase2["Artifact Synthesis"]
+        end
+        subgraph Governance Capabilities
+            Gov["Platform Compliance"] --> Gov1["Rego Policy Audits"]
+            Gov --> Gov2["License Compliance Isolations"]
+        end
+    end`,
+                risks: "Unmapped requirements represent gaps in strategic platform verification.",
+                missing: "Trace mappings for administrative capabilities.",
+                improvements: "Extend the dashboard matrix to cover platform maturity metrics (PMCMS) in real-time."
+            },
+            "diagram-15": {
+                title: "Diagram 15 — Requirement Traceability Diagram",
+                meta: "REQUIREMENT TRACE",
+                purpose: "Traces a single requirement from Objective down to Feature, Service Engine, Agent, and Outcome.",
+                assumptions: "Provides context for QA, DevOps, and Product review to verify strategic compliance.",
+                insights: "Enforces transparency. Demonstrates how setting up a SAST scan maps through Executor agents to realize secure commits.",
+                code: `graph TD
+    classDef obj fill:#1e1b4b,stroke:#818cf8,color:#fff;
+    classDef cap fill:#064e3b,stroke:#10b981,color:#fff;
+    classDef feat fill:#7c2d12,stroke:#ea580c,color:#fff;
+    classDef srv fill:#1e293b,stroke:#cbd5e1,color:#fff;
+    classDef agent fill:#312e81,stroke:#a5b4fc,color:#fff;
+    classDef out fill:#581c87,stroke:#a855f7,color:#fff;
+
+    Objective["Objective: Setup Git SAST Scanner"]:::obj
+    Capability["Capability: Security Scanning Suite"]:::cap
+    Feature["Feature: Automated pre-commit scans"]:::feat
+    Service["Service Engine: uawos_integrations.py"]:::srv
+    Workflow["Workflow Orchestrator: Temporal / LangGraph task"]:::srv
+    Agent["Agent: Executor Agent"]:::agent
+    Outcome["Outcome realized: 100% commits audited"]:::out
+
+    Objective --> Capability
+    Capability --> Feature
+    Feature --> Service
+    Service --> Workflow
+    Workflow --> Agent
+    Agent --> Outcome`,
+                risks: "Manual mapping of code files to services presents operational drift risks.",
+                missing: "Auto-scan scripts to keep service-to-agent traces updated.",
+                improvements: "Wire the Marquez lineage engine to parse python code structure and dynamically update trace nodes."
+            },
+            "diagram-16": {
+                title: "Diagram 16 — User Journey Diagram",
+                meta: "USER EXPERIENCE",
+                purpose: "Describe the interaction flow of an operator validating security and roadmap commitments.",
+                assumptions: "Assumes user works within the Command Center pages (dashboard, studio, roadmap).",
+                insights: "Validates workflow logic. Shows how requirements travel through multi-persona critiques and check checklists.",
+                code: `graph TD
+    classDef step fill:#111827,stroke:#6366f1,color:#fff;
+    classDef sys fill:#1e1b4b,stroke:#10b981,color:#fff;
+    classDef res fill:#1f2937,stroke:#a855f7,color:#fff;
+
+    User["User Goal: Enforce Code Compliance"] --> Step1["Step 1: Ingest PRD document via Requirement Studio UI"]:::step
+    Step1 --> Sys1["System Action: Parses text & runs multi-persona critique"]:::sys
+    Step1 --> Step2["Step 2: Answers/Waives information gaps in checklist"]:::step
+    Step2 --> Sys2["System Action: Automatically generates objective dependency tree"]:::step
+    Step2 --> Step3["Step 3: Commits objective to Master Roadmap"]:::step
+    Step3 --> Sys3["System Action: Deploys executors, records Marquez audit logs"]:::sys
+    Sys3 --> Outcome["Outcome: Platform verified compliant & deployed!"]:::res`,
+                risks: "Complex multi-persona critiques could cause cognitive fatigue for human operators.",
+                missing: "Fallback routes if executive waivers are denied.",
+                improvements: "Add context-aware recommendations inside the critique cards to guide human responses."
+            },
+            "diagram-17": {
+                title: "Diagram 17 — Value Stream Diagram",
+                meta: "VALUE STREAM",
+                purpose: "Trace value creation from raw objective intake up to final value realization.",
+                assumptions: "Value Realization is computed continuously against baseline and target state metrics.",
+                insights: "Connects code to business value. Shows that OPA checks and license reviews protect strategic capital.",
+                code: `graph TD
+    Objective["Ingest Objective"] --> Plan["Generate Plan (Forecast tokens/effort)"]
+    Plan --> Gov["OPA Governance (Rego checks & license isolate validation)"]
+    Gov --> Execution["Workforce Execution (Coordinating agents & tools)"]
+    Execution --> Learning["Continuous Learning (Capture best practices & outcomes)"]
+    Learning --> Value["Value Realization (Audit spent vs ROI, update dashboard)"]`,
+                risks: "Manual inputs for value metrics introduce bias or reporting latency.",
+                missing: "Automated business KPI monitoring bindings.",
+                improvements: "Wire the Value Realization engine directly to Apache Superset datasets to compute live ROI metrics."
+            }
+        };
+
+        let currentDiagramId = "diagram-1";
+        let isCodeView = false;
+
+        // Zoom and Pan State Variables
+        let zoom = 1;
+        let panX = 0;
+        let panY = 0;
+        let isPanning = false;
+        let startX = 0;
+        let startY = 0;
+
+        function applyTransform() {
+            const canvas = document.getElementById("diagram-canvas");
+            if (canvas) {
+                canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+            }
+        }
+
+        window.zoomIn = function() {
+            zoom = Math.min(zoom + 0.15, 4.0);
+            applyTransform();
+        };
+
+        window.zoomOut = function() {
+            zoom = Math.max(zoom - 0.15, 0.4);
+            applyTransform();
+        };
+
+        window.zoomReset = function() {
+            zoom = 1;
+            panX = 0;
+            panY = 0;
+            applyTransform();
+        };
+
+        // Render selected diagram to screen
+        window.loadDiagram = async function(id) {
+            currentDiagramId = id;
+            
+            // Highlight active navigation item
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(b => b.getAttribute('onclick').includes(id));
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const data = diagramsData[id];
+            if (!data) return;
+
+            // Update Text descriptions
+            document.getElementById("diagram-title").textContent = data.title;
+            document.getElementById("diagram-meta").textContent = data.meta;
+            document.getElementById("diagram-purpose").textContent = data.purpose;
+            document.getElementById("diagram-assumptions").textContent = data.assumptions;
+            document.getElementById("diagram-insights").textContent = data.insights;
+            document.getElementById("diagram-risks").textContent = data.risks;
+            document.getElementById("diagram-missing").textContent = data.missing;
+            document.getElementById("diagram-improvements").textContent = data.improvements;
+
+            // Render visual diagram or code block depending on mode
+            const visualContainer = document.getElementById("visual-container");
+            const sourceContainer = document.getElementById("source-container");
+            const zoomControls = document.getElementById("zoom-controls-wrapper");
+            
+            sourceContainer.textContent = data.code;
+            
+            // Reset zoom for the new diagram
+            zoomReset();
+
+            if (isCodeView) {
+                visualContainer.style.display = "none";
+                sourceContainer.style.display = "block";
+                if (zoomControls) zoomControls.style.display = "none";
+            } else {
+                visualContainer.style.display = "flex";
+                sourceContainer.style.display = "none";
+                if (zoomControls) zoomControls.style.display = "flex";
+                
+                // Compile and draw visual SVG dynamically
+                const canvas = document.getElementById("diagram-canvas");
+                canvas.removeAttribute("data-processed");
+                canvas.innerHTML = data.code;
+                
+                try {
+                    await mermaid.run({ nodes: [canvas] });
+                } catch (err) {
+                    console.error("Mermaid compilation failed:", err);
+                    canvas.innerHTML = `<p style="color:var(--red); font-weight:600; padding: 1.5rem;">[Mermaid Parse Error]: ${err.message}</p>`;
+                }
+            }
+        };
+
+        // Switch between Diagram SVG render & Code markup view
+        window.toggleViewMode = function() {
+            isCodeView = !isCodeView;
+            
+            const btn = document.getElementById("btn-toggle-view");
+            if (isCodeView) {
+                btn.textContent = "View Visual Diagram";
+            } else {
+                btn.textContent = "View Mermaid Source";
+            }
+            
+            loadDiagram(currentDiagramId);
+        };
+
+        // Copy Mermaid source code to system clipboard
+        window.copyMermaidSource = function() {
+            const data = diagramsData[currentDiagramId];
+            if (data) {
+                navigator.clipboard.writeText(data.code).then(() => {
+                    showToast("Diagram source copied to clipboard!");
+                }).catch(err => {
+                    console.error("Copy failed:", err);
+                });
+            }
+        };
+
+        // Show CSS Toast notification
+        function showToast(message) {
+            const toast = document.getElementById("toast-notify");
+            toast.textContent = message;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        // Setup Pan & Zoom Event Listeners
+        const container = document.getElementById("visual-container");
+
+        container.addEventListener("mousedown", (e) => {
+            if (e.button !== 0) return; // Left click only
+            isPanning = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+            e.preventDefault();
+        });
+
+        window.addEventListener("mousemove", (e) => {
+            if (!isPanning) return;
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            applyTransform();
+        });
+
+        window.addEventListener("mouseup", () => {
+            isPanning = false;
+        });
+
+        container.addEventListener("mouseleave", () => {
+            isPanning = false;
+        });
+
+        // Mouse Wheel Zooming
+        container.addEventListener("wheel", (e) => {
+            e.preventDefault();
+            const zoomFactor = 0.08;
+            if (e.deltaY < 0) {
+                zoom = Math.min(zoom + zoomFactor, 4.0);
+            } else {
+                zoom = Math.max(zoom - zoomFactor, 0.4);
+            }
+            applyTransform();
+        }, { passive: false });
+
+        // Run on initial page load
+        document.addEventListener("DOMContentLoaded", () => {
+            loadDiagram("diagram-1");
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+{
+  "agents": {
+    "Planner Agent": {
+      "id": "AGT-01",
+      "name": "Planner Agent",
+      "class": "Planner",
+      "capabilities": [
+        "plan_generation",
+        "estimation"
+      ],
+      "lifecycle_state": "active",
+      "trust_score": 95.0
+    },
+    "Orchestrator Agent": {
+      "id": "AGT-02",
+      "name": "Orchestrator Agent",
+      "class": "Orchestrator",
+      "capabilities": [
+        "workflow_orchestration"
+      ],
+      "lifecycle_state": "active",
+      "trust_score": 94.0
+    },
+    "Executor Agent": {
+      "id": "AGT-03",
+      "name": "Executor Agent",
+      "class": "Executor",
+      "capabilities": [
+        "code_execution"
+      ],
+      "lifecycle_state": "paused",
+      "trust_score": 92.0
+    },
+    "Reviewer Agent": {
+      "id": "AGT-04",
+      "name": "Reviewer Agent",
+      "class": "Reviewer",
+      "capabilities": [
+        "code_review"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 96.0
+    },
+    "Governor Agent": {
+      "id": "AGT-05",
+      "name": "Governor Agent",
+      "class": "Governor",
+      "capabilities": [
+        "policy_enforcement"
+      ],
+      "lifecycle_state": "active",
+      "trust_score": 95.0
+    },
+    "Learner Agent": {
+      "id": "AGT-06",
+      "name": "Learner Agent",
+      "class": "Learner",
+      "capabilities": [
+        "learning_optimization"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 90.0
+    },
+    "Knowledge Manager Agent": {
+      "id": "AGT-07",
+      "name": "Knowledge Manager Agent",
+      "class": "Knowledge Manager",
+      "capabilities": [
+        "memory_indexing"
+      ],
+      "lifecycle_state": "active",
+      "trust_score": 93.0
+    },
+    "Custom Planner": {
+      "id": "AGT-08",
+      "name": "Custom Planner",
+      "class": "Planner",
+      "capabilities": [
+        "planning"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 100.0
+    },
+    "Custom Orchestrator": {
+      "id": "AGT-09",
+      "name": "Custom Orchestrator",
+      "class": "Orchestrator",
+      "capabilities": [
+        "orchestration"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 100.0
+    },
+    "Custom Executor": {
+      "id": "AGT-10",
+      "name": "Custom Executor",
+      "class": "Executor",
+      "capabilities": [
+        "executing"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 100.0
+    },
+    "Custom Reviewer": {
+      "id": "AGT-11",
+      "name": "Custom Reviewer",
+      "class": "Reviewer",
+      "capabilities": [
+        "reviewing"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 100.0
+    },
+    "Custom Governor": {
+      "id": "AGT-12",
+      "name": "Custom Governor",
+      "class": "Governor",
+      "capabilities": [
+        "governing"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 100.0
+    },
+    "Custom Learner": {
+      "id": "AGT-13",
+      "name": "Custom Learner",
+      "class": "Learner",
+      "capabilities": [
+        "learning"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 100.0
+    },
+    "Custom KM": {
+      "id": "AGT-14",
+      "name": "Custom KM",
+      "class": "Knowledge Manager",
+      "capabilities": [
+        "indexing"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 100.0
+    },
+    "Capability Agent": {
+      "id": "AGT-15",
+      "name": "Capability Agent",
+      "class": "Executor",
+      "capabilities": [
+        "git_push",
+        "docker_build"
+      ],
+      "lifecycle_state": "idle",
+      "trust_score": 100.0
+    }
+  }
+}

@@ -523,6 +523,12 @@
                 </svg>
                 Roadmap Intelligence Center
             </a>
+            <a href="/architecture.html" class="btn" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%); border-color: rgba(79,70,229,0.3); color:#a5b4fc;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                Architecture Diagrams
+            </a>
             <button class="btn btn-accent" onclick="resetStudioState()">
                 Reset Studio State
             </button>
@@ -690,9 +696,10 @@
                 <section class="card" id="clarification-panel" style="display: none;">
                     <div class="section-title">
                         <span>5. Clarification Workflow</span>
-                        <div style="display: flex; gap: 8px;">
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <button class="btn btn-primary" onclick="submitAnswers()" style="padding: 6px 12px; font-size:0.75rem;">Submit Answers</button>
                             <button class="btn btn-accent" onclick="waiveQuestions()" style="padding: 6px 12px; font-size:0.75rem;">Authorize Waiver</button>
+                            <button class="btn btn-primary" onclick="directConsumeToBacklog()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; padding: 6px 12px; font-size:0.75rem;">Directly Consume to Backlog</button>
                         </div>
                     </div>
                     <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:1.25rem;">
@@ -806,6 +813,7 @@
         window.publishRoadmapItem = publishRoadmapItem;
         window.resetStudioState = resetStudioState;
         window.switchTab = switchTab;
+        window.directConsumeToBacklog = directConsumeToBacklog;
 
         let activeRequirementId = "";
         let activeRoadmapId = "";
@@ -1216,6 +1224,52 @@ Technical constraints:
                 }, 2000);
             } catch (err) {
                 showToast("Publishing error: " + err.message, true);
+            }
+        }
+
+        async function directConsumeToBacklog() {
+            if (!activeRequirementId) return;
+            const answers = {};
+            let answeredCount = 0;
+            document.querySelectorAll(".q-input").forEach(input => {
+                const qid = input.getAttribute("data-qid");
+                const val = input.value.trim();
+                answers[qid] = val || (waivedQuestions[qid] ? "[WAIVED BY USER]" : "");
+                if (answers[qid]) {
+                    answeredCount++;
+                }
+            });
+
+            const autoWaive = answeredCount < 10;
+            if (autoWaive) {
+                document.querySelectorAll(".q-input").forEach(input => {
+                    const qid = input.getAttribute("data-qid");
+                    if (!answers[qid]) {
+                        answers[qid] = "[WAIVED BY EXEC AUTHORITY]";
+                        input.value = "[WAIVED BY EXEC AUTHORITY]";
+                    }
+                });
+            }
+
+            try {
+                showToast("Directly consuming requirement into the backlog...");
+                const res = await fetch("/api/requirement/direct_ingest", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ requirement_id: activeRequirementId, answers, waive: autoWaive })
+                });
+
+                if (!res.ok) throw new Error("Direct ingestion failed");
+                const data = await res.json();
+                
+                showToast(`Requirement successfully consumed as candidate ${data.roadmap_id}. Redirecting to roadmap...`);
+                
+                // Redirect back to Roadmap Intelligence Center after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "/roadmap.html";
+                }, 2000);
+            } catch (err) {
+                showToast("Direct ingestion error: " + err.message, true);
             }
         }
 

@@ -1,0 +1,102 @@
+{
+  "assets": {
+    "KNW-101": {
+      "id": "KNW-101",
+      "title": "OAuth 2.0 Client Credentials Spec",
+      "content": "Use client_credentials flow for machine-to-machine authorization.",
+      "source_type": "document",
+      "source_uri": "s3://uawos-specs/oauth.pdf",
+      "provenance": "Imported from security catalog",
+      "confidence_score": 98.0,
+      "timestamp": 1780963292
+    },
+    "KNW-102": {
+      "id": "KNW-102",
+      "title": "Auto title",
+      "content": "content",
+      "source_type": "manual",
+      "source_uri": "uri",
+      "provenance": "prov",
+      "confidence_score": 100.0,
+      "timestamp": 1780986724
+    },
+    "KNW-103": {
+      "id": "KNW-103",
+      "title": "Doc: test.pdf",
+      "content": "Parsed text content",
+      "source_type": "document",
+      "source_uri": "c:/Users/rajaj/Projects/UAWOS/test.pdf",
+      "provenance": "GPLv3 Isolated Parser via c:/Users/rajaj/Projects/UAWOS/test.pdf",
+      "confidence_score": 100.0,
+      "timestamp": 1780986724
+    },
+    "KNW-104": {
+      "id": "KNW-104",
+      "title": "Chat between Alice, Bob. Thread length: 1",
+      "content": "Alice: Hi Bob",
+      "source_type": "conversation",
+      "source_uri": "slack://thread-1234",
+      "provenance": "Slack Ingest Gateway",
+      "confidence_score": 100.0,
+      "timestamp": 1780986724
+    },
+    "KNW-105": {
+      "id": "KNW-105",
+      "title": "Meeting: Weekly Standup",
+      "content": "Meeting notes line 1",
+      "source_type": "meeting",
+      "source_uri": "zoom://meeting-5678",
+      "provenance": "Zoom Transcriptor",
+      "confidence_score": 100.0,
+      "timestamp": 1780986724
+    },
+    "KNW-106": {
+      "id": "KNW-106",
+      "title": "Email: Project Status",
+      "content": "Everything is green",
+      "source_type": "email",
+      "source_uri": "mailto:ceo@enterprise.com",
+      "provenance": "IMAP Ingestion pipeline",
+      "confidence_score": 100.0,
+      "timestamp": 1780986724
+    },
+    "KNW-107": {
+      "id": "KNW-107",
+      "title": "Image OCR: mockup.png",
+      "content": "OCR text block",
+      "source_type": "image",
+      "source_uri": "c:/Users/rajaj/Projects/mockup.png",
+      "provenance": "Vision OCR service",
+      "confidence_score": 100.0,
+      "timestamp": 1780986724
+    },
+    "KNW-108": {
+      "id": "KNW-108",
+      "title": "Reconciled: OAuth 2.0 Client Credentials Spec & OAuth 2.0 Client Credentials Spec",
+      "content": "Use client_credentials flow for machine-to-machine authorization.",
+      "source_type": "reconciled",
+      "source_uri": "internal://reconciliation",
+      "provenance": "Reconciled from KNW-101 and KNW-101",
+      "confidence_score": 100.0,
+      "timestamp": 1780986724
+    }
+  },
+  "graph_relationships": [
+    {
+      "id": "REL-01",
+      "source": "KNW-101",
+      "relationship": "DEFINES_AUTH_FOR",
+      "target": "OBJ-101",
+      "confidence": 95.0,
+      "provenance": "Heuristic linker"
+    },
+    {
+      "id": "REL-02",
+      "source": "KNW-101",
+      "relationship": "LINKS_TO",
+      "target": "OBJ-101",
+      "confidence": 90.0,
+      "provenance": "Manual link"
+    }
+  ]
+}

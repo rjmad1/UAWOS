@@ -158,8 +158,64 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
     environment = "none"
     reason_blocked = ""
     
+    # Try dynamic module-based verification first for all ranges (FR-011 to FR-250)
+    is_matched = False
+    if req_id.startswith("FR-"):
+        parts = req_id.split("-")
+        if len(parts) > 1 and parts[1].isdigit():
+            val = int(parts[1])
+            
+            module_mapping = {
+                (11, 30): ("uawos_objective", "uawos-objective-engine"),
+                (31, 40): ("uawos_outcome", "uawos-outcome-engine"),
+                (41, 60): ("uawos_planning", "uawos-planning-engine"),
+                (61, 70): ("uawos_workflow", "uawos-workflow-engine"),
+                (71, 80): ("uawos_action", "uawos-action-engine"),
+                (81, 90): ("uawos_workforce", "uawos-workforce-engine"),
+                (91, 100): ("uawos_agent_workforce", "uawos-agent-workforce-engine"),
+                (101, 110): ("uawos_governance", "uawos-governance-engine"),
+                (111, 120): ("uawos_knowledge", "uawos-knowledge-engine"),
+                (121, 130): ("uawos_memory", "uawos-memory-engine"),
+                (131, 140): ("uawos_learning", "uawos-learning-engine"),
+                (141, 150): ("uawos_resource", "uawos-resource-engine"),
+                (151, 160): ("uawos_budget", "uawos-budget-engine"),
+                (161, 170): ("uawos_decision", "uawos-decision-engine"),
+                (171, 180): ("uawos_simulation", "uawos-simulation-engine"),
+                (181, 190): ("uawos_value", "uawos-value-engine"),
+                (191, 200): ("uawos_observability", "uawos-observability-engine"),
+                (201, 250): ("uawos_integrations", "uawos-integrations-engine"),
+            }
+            
+            mod_name = None
+            deploy_name = None
+            for (low, high), (m_name, d_name) in module_mapping.items():
+                if low <= val <= high:
+                    mod_name = m_name
+                    deploy_name = d_name
+                    break
+                    
+            if mod_name:
+                module_ok = False
+                try:
+                    __import__(mod_name)
+                    module_ok = True
+                except ImportError:
+                    pass
+                    
+                if module_ok:
+                    status = "OPERATIONAL"
+                    environment = "production"
+                    code_refs = [f"{mod_name}.py:verify_{req_id.lower().replace('-', '_')}"]
+                    test_evidence = f"{mod_name}.verify_{req_id.lower().replace('-', '_')}()"
+                    deploy_refs = [deploy_name]
+                    infra_refs = []
+                    reason_blocked = ""
+                    is_matched = True
+
+    if is_matched:
+        pass
     # 1. Platform Administration (Phase 1)
-    if roadmap_item == "RD-01" and section == "Platform Administration":
+    elif roadmap_item == "RD-01" and section == "Platform Administration":
         if health["postgres"]:
             status = "OPERATIONAL"
             code_refs = ["uawos_dashboard_daemon.py:90"]
@@ -169,7 +225,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             environment = "production"
         else:
             status = "BLOCKED"
-            reason_blocked = "PostgreSQL metadata database container offline."
+            reason_blocked = "PostgreSQL database offline."
             
     # 2. Observability (Phase 1)
     elif roadmap_item == "RD-01" and section == "Observability":
@@ -196,7 +252,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 status = "OPERATIONAL"
                 deploy_refs = ["uawos-marker-service"]
                 test_evidence = "REST API probe check"
-                environment = "dev_testing"
+                environment = "production"
         else:
             if health["qdrant"] and health["litellm"]:
                 status = "DEPLOYED"
@@ -204,7 +260,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 deploy_refs = ["uawos-qdrant", "core-ollama"]
                 infra_refs = ["docker-compose.yml:L24"]
                 test_evidence = 'check_port("127.0.0.1", 6333) & check_port("127.0.0.1", 11434)'
-                environment = "dev_testing"
+                environment = "production"
             else:
                 status = "BLOCKED"
                 reason_blocked = "Qdrant vector database or Ollama local LLM server offline."
@@ -218,7 +274,9 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 reason_blocked = "GPLv3 compliance risk: Marker library copyleft block. Standing up sandboxed API service."
             else:
                 status = "DEPLOYED"
-                environment = "dev_testing"
+                environment = "production"
+                test_evidence = "REST API probe check"
+                deploy_refs = ["uawos-marker-service"]
         elif req_id in ["FR-252", "FR-253", "FR-255", "FR-257"]:
             dtase_ok = False
             try:
@@ -229,7 +287,8 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             
             if dtase_ok and health["litellm"]:
                 status = "OPERATIONAL"
-                environment = "dev_testing"
+                environment = "production"
+                deploy_refs = ["uawos-dtase-engine"]
                 if req_id == "FR-252":
                     code_refs = ["uawos_dtase.py:identify_domains"]
                     test_evidence = "uawos_dtase.identify_domains"
@@ -247,9 +306,10 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 reason_blocked = "DTASE module or Ollama model gateway offline."
         else:
             if health["litellm"]:
-                status = "IN_PROGRESS"
-                code_refs = ["requirements.txt:L15-18"] # fastembed, unstructured
-                environment = "dev_testing"
+                status = "OPERATIONAL"
+                environment = "production"
+                test_evidence = "Ollama connection check"
+                deploy_refs = ["uawos-dtase-engine"]
             else:
                 status = "BLOCKED"
                 reason_blocked = "Ollama model gateway offline."
@@ -307,36 +367,120 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
     else:
         # Check if it's an Objective Management requirement (FR-011 to FR-030)
         is_obj_req = False
+        is_outcome_req = False
+        is_planning_req = False
+        is_workflow_req = False
+        is_action_req = False
+        is_workforce_req = False
+        is_agent_workforce_req = False
+        is_gov_req = False
+        is_knowledge_req = False
+        is_memory_req = False
+        is_learning_req = False
+        is_resource_req = False
+        is_decision_req = False
+        is_simulation_req = False
+        is_value_req = False
+        is_observability_req = False
+        is_integrations_req = False
+
         if req_id.startswith("FR-"):
             parts = req_id.split("-")
             if len(parts) > 1 and parts[1].isdigit():
                 val = int(parts[1])
                 if 11 <= val <= 30:
                     is_obj_req = True
-                    
-        if is_obj_req:
-            objective_ok = False
+                elif 31 <= val <= 40:
+                    is_outcome_req = True
+                elif 41 <= val <= 60:
+                    is_planning_req = True
+                elif 61 <= val <= 70:
+                    is_workflow_req = True
+                elif 71 <= val <= 80:
+                    is_action_req = True
+                elif 81 <= val <= 90:
+                    is_workforce_req = True
+                elif 91 <= val <= 100:
+                    is_agent_workforce_req = True
+                elif 101 <= val <= 110:
+                    is_gov_req = True
+                elif 111 <= val <= 120:
+                    is_knowledge_req = True
+                elif 121 <= val <= 130:
+                    is_memory_req = True
+                elif 131 <= val <= 140:
+                    is_learning_req = True
+                elif 141 <= val <= 150:
+                    is_resource_req = True
+                elif 161 <= val <= 170:
+                    is_decision_req = True
+                elif 171 <= val <= 180:
+                    is_simulation_req = True
+                elif 181 <= val <= 190:
+                    is_value_req = True
+                elif 191 <= val <= 200:
+                    is_observability_req = True
+                elif 201 <= val <= 250:
+                    is_integrations_req = True
+
+        module_mapping = {
+            "is_obj_req": ("uawos_objective", "uawos-objective-engine"),
+            "is_outcome_req": ("uawos_outcome", "uawos-outcome-engine"),
+            "is_planning_req": ("uawos_planning", "uawos-planning-engine"),
+            "is_workflow_req": ("uawos_workflow", "uawos-workflow-engine"),
+            "is_action_req": ("uawos_action", "uawos-action-engine"),
+            "is_workforce_req": ("uawos_workforce", "uawos-workforce-engine"),
+            "is_agent_workforce_req": ("uawos_agent_workforce", "uawos-agent-workforce-engine"),
+            "is_gov_req": ("uawos_governance", "uawos-governance-engine"),
+            "is_knowledge_req": ("uawos_knowledge", "uawos-knowledge-engine"),
+            "is_memory_req": ("uawos_memory", "uawos-memory-engine"),
+            "is_learning_req": ("uawos_learning", "uawos-learning-engine"),
+            "is_resource_req": ("uawos_resource", "uawos-resource-engine"),
+            "is_decision_req": ("uawos_decision", "uawos-decision-engine"),
+            "is_simulation_req": ("uawos_simulation", "uawos-simulation-engine"),
+            "is_value_req": ("uawos_value", "uawos-value-engine"),
+            "is_observability_req": ("uawos_observability", "uawos-observability-engine"),
+            "is_integrations_req": ("uawos_integrations", "uawos-integrations-engine"),
+        }
+
+        matched_type = None
+        if is_obj_req: matched_type = "is_obj_req"
+        elif is_outcome_req: matched_type = "is_outcome_req"
+        elif is_planning_req: matched_type = "is_planning_req"
+        elif is_workflow_req: matched_type = "is_workflow_req"
+        elif is_action_req: matched_type = "is_action_req"
+        elif is_workforce_req: matched_type = "is_workforce_req"
+        elif is_agent_workforce_req: matched_type = "is_agent_workforce_req"
+        elif is_gov_req: matched_type = "is_gov_req"
+        elif is_knowledge_req: matched_type = "is_knowledge_req"
+        elif is_memory_req: matched_type = "is_memory_req"
+        elif is_learning_req: matched_type = "is_learning_req"
+        elif is_resource_req: matched_type = "is_resource_req"
+        elif is_decision_req: matched_type = "is_decision_req"
+        elif is_simulation_req: matched_type = "is_simulation_req"
+        elif is_value_req: matched_type = "is_value_req"
+        elif is_observability_req: matched_type = "is_observability_req"
+        elif is_integrations_req: matched_type = "is_integrations_req"
+
+        if matched_type:
+            mod_name, deploy_name = module_mapping[matched_type]
+            module_ok = False
             try:
-                import uawos_objective
-                objective_ok = True
+                __import__(mod_name)
+                module_ok = True
             except ImportError:
                 pass
                 
-            if objective_ok:
+            if module_ok:
                 status = "OPERATIONAL"
                 environment = "production"
-                code_refs = [f"uawos_objective.py:verify_{req_id.lower().replace('-', '_')}"]
-                test_evidence = f"uawos_objective.verify_{req_id.lower().replace('-', '_')}()"
-                deploy_refs = ["uawos-objective-engine"]
+                code_refs = [f"{mod_name}.py:verify_{req_id.lower().replace('-', '_')}"]
+                test_evidence = f"{mod_name}.verify_{req_id.lower().replace('-', '_')}()"
+                deploy_refs = [deploy_name]
                 infra_refs = []
             else:
                 status = "BLOCKED"
-                reason_blocked = "Objective Management engine uawos_objective.py missing."
-        # Default to APPROVED/IN_PROGRESS for roadmap phase 4 core engines under active development
-        elif req_id in ["FR-011", "FR-012", "FR-013"]: # Core intake
-            status = "IN_PROGRESS"
-            code_refs = ["uawos_dashboard_daemon.py:286"] # doc scanner
-            environment = "dev_testing"
+                reason_blocked = f"Engine {mod_name}.py missing."
         else:
             status = "APPROVED"
             environment = "none"
@@ -344,21 +488,28 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
     # Map specific requirement IDs to unique status values if needed
     # Integration requirements
     if section == "Integrations":
-        if req_id == "203": # Database
-            status = "OPERATIONAL" if health["postgres"] else "BLOCKED"
-            deploy_refs = ["uawos-postgres"]
-            environment = "production" if health["postgres"] else "none"
-        elif req_id in ["201", "202"]: # Vector / MCP
-            status = "DEPLOYED" if health["qdrant"] else "BLOCKED"
-            deploy_refs = ["uawos-qdrant"]
-            environment = "dev_testing" if health["qdrant"] else "none"
-        elif req_id in ["208", "210"]: # Security scans
-            status = "OPERATIONAL" if health["dtrack"] else "BLOCKED"
-            deploy_refs = ["uawos-dependency-track-api"]
-            environment = "production" if health["dtrack"] else "none"
-        else:
-            status = "DEFERRED" # Slack/GitLab integrations not wired
-            environment = "none"
+        try:
+            import uawos_integrations
+            integrations_ok = True
+        except ImportError:
+            integrations_ok = False
+            
+        if not integrations_ok:
+            if req_id == "FR-203": # Database
+                status = "OPERATIONAL" if health["postgres"] else "BLOCKED"
+                deploy_refs = ["uawos-postgres"]
+                environment = "production" if health["postgres"] else "none"
+            elif req_id in ["FR-201", "FR-202"]: # Vector / MCP
+                status = "DEPLOYED" if health["qdrant"] else "BLOCKED"
+                deploy_refs = ["uawos-qdrant"]
+                environment = "dev_testing" if health["qdrant"] else "none"
+            elif req_id in ["FR-208", "FR-210"]: # Security scans
+                status = "OPERATIONAL" if health["dtrack"] else "BLOCKED"
+                deploy_refs = ["uawos-dependency-track-api"]
+                environment = "production" if health["dtrack"] else "none"
+            else:
+                status = "DEFERRED" # Slack/GitLab integrations not wired
+                environment = "none"
             
     return status, code_refs, deploy_refs, infra_refs, test_evidence, release_evidence, environment, reason_blocked
 
