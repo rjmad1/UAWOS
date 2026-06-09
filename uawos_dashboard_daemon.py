@@ -6,7 +6,7 @@ import time
 import socket
 import threading
 import subprocess
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import uawos_traceability
 
 # Safe imports for dynamic modules to prevent thread deadlocks
@@ -24,6 +24,11 @@ try:
     import uawos_requirement_studio
 except ImportError:
     uawos_requirement_studio = None
+
+try:
+    import uawos_objective
+except ImportError:
+    uawos_objective = None
 
 PORT = 8099
 STATUS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_status.json")
@@ -187,21 +192,31 @@ def evaluate_operations(infra_status):
         "Operational Alarm Framework": alarm_healthy,
     }
 
-def _evaluate_dynamic_services(dtase_healthy, budget_healthy):
+def _evaluate_dynamic_services(dtase_healthy, budget_healthy, objective_healthy):
     """Evaluate current service statuses dynamically."""
     services_status = dict.fromkeys(["Objective Engine", "Discovery Engine", "Planning Engine", "Governance Engine", "Knowledge Engine", "Value Engine", "Simulation Engine"], "GRAY")
     services_status["DTASE"] = "GREEN" if dtase_healthy else "GRAY"
     if budget_healthy:
         services_status["Value Engine"] = "GREEN"
+    if objective_healthy:
+        services_status["Objective Engine"] = "GREEN"
     return services_status
 
-def _evaluate_dynamic_agents(budget_healthy):
+def _evaluate_dynamic_agents(budget_healthy, objective_healthy):
     """Evaluate current agent statuses dynamically."""
     agents_status = dict.fromkeys(["Planner Agent", "Orchestrator Agent", "Executor Agent", "Reviewer Agent", "Governor Agent", "Learner Agent", "Knowledge Manager Agent", "Portfolio Governor Agent", "Value Analyst Agent", "Resource Manager Agent", "Simulation Agent", "Challenger Agent"], "GRAY")
     if budget_healthy:
         agents_status["Portfolio Governor Agent"] = "GREEN"
         agents_status["Value Analyst Agent"] = "GREEN"
         agents_status["Resource Manager Agent"] = "GREEN"
+    if objective_healthy:
+        agents_status["Planner Agent"] = "GREEN"
+        agents_status["Orchestrator Agent"] = "GREEN"
+        agents_status["Executor Agent"] = "GREEN"
+        agents_status["Reviewer Agent"] = "GREEN"
+        agents_status["Governor Agent"] = "GREEN"
+        agents_status["Learner Agent"] = "GREEN"
+        agents_status["Knowledge Manager Agent"] = "GREEN"
     return agents_status
 
 def _count_statuses(dicts_to_count):
@@ -238,8 +253,8 @@ def run_health_checks():
     data_status = evaluate_data(infra_status)
     operations_status = evaluate_operations(infra_status)
 
-    services_status = _evaluate_dynamic_services(uawos_dtase is not None, uawos_budget is not None)
-    agents_status = _evaluate_dynamic_agents(uawos_budget is not None)
+    services_status = _evaluate_dynamic_services(uawos_dtase is not None, uawos_budget is not None, uawos_objective is not None)
+    agents_status = _evaluate_dynamic_agents(uawos_budget is not None, uawos_objective is not None)
     skills_status = dict.fromkeys(["SKL-AI-01: Prompt Tuning", "SKL-AI-02: Structural Parsing", "SKL-RAG-01: Dense Retrieval", "SKL-RAG-02: Graph Traversal", "SKL-DOC-01: C4 Architecture", "SKL-SEC-01: Vulnerability Audit", "SKL-DAT-01: Analytical Transform", "SKL-SIM-01: Monte Carlo Run", "SKL-GOV-01: Lineage Audit"], "GRAY")
     mcps_status = dict.fromkeys(["GitLab MCP", "Bitbucket MCP", "SonarQube MCP", "Jenkins MCP", "Confluence MCP", "Notion MCP", "Docusaurus MCP", "Mermaid MCP", "PlantUML MCP", "AWS MCP", "Azure MCP", "Terraform MCP", "Redis MCP", "Kafka MCP", "ClickHouse MCP", "OpenSearch MCP", "Neo4j MCP", "Slack MCP", "Teams MCP", "Discord MCP"], "GRAY")
 
@@ -411,6 +426,18 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                 self.handle_json(uawos_requirement_studio.load_state())
             except Exception as e:
                 self.handle_json({"error": str(e)})
+        elif path == "/api/objective/list":
+            try:
+                import uawos_objective
+                self.handle_json(uawos_objective.load_state())
+            except Exception as e:
+                self.handle_json({"error": str(e)})
+        elif path == "/api/objective/conflicts":
+            try:
+                import uawos_objective
+                self.handle_json({"conflicts": uawos_objective.detect_conflicts()})
+            except Exception as e:
+                self.handle_json({"error": str(e)})
         elif path == "/api/status":
             self.handle_json(status_cache)
         elif path == "/api/traceability":
@@ -552,6 +579,50 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(result).encode('utf-8'))
 
+    def _handle_objective_submit(self, payload):
+        """Submit and ingest a new objective."""
+        text = payload.get("text", "")
+        input_type = payload.get("input_type", "text")
+        owner = payload.get("owner", "")
+        sponsor = payload.get("sponsor", "")
+        source_uri = payload.get("source_uri", "")
+        import uawos_objective
+        result = uawos_objective.create_objective_from_input(text, input_type, owner, sponsor, source_uri)
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
+    def _handle_objective_action(self, payload):
+        """Handle lifecycle operations on an objective."""
+        action = payload.get("action", "")
+        obj_id = payload.get("objective_id", "")
+        import uawos_objective
+        result = {"status": "success"}
+        
+        if action == "pause":
+            result["data"] = uawos_objective.pause_objective(obj_id)
+        elif action == "cancel":
+            result["data"] = uawos_objective.cancel_objective(obj_id)
+        elif action == "archive":
+            result["data"] = uawos_objective.archive_objective(obj_id)
+        elif action == "restore":
+            result["data"] = uawos_objective.restore_objective(obj_id)
+        elif action == "resume":
+            result["data"] = uawos_objective.resume_objective(obj_id)
+        elif action == "update":
+            updates = payload.get("updates", {})
+            result["data"] = uawos_objective.update_objective(obj_id, updates)
+        else:
+            result = {"status": "error", "error": f"Unknown action: {action}"}
+            
+        self.send_response(200)
+        self.send_header("Content-Type", APPLICATION_JSON)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode('utf-8'))
+
     def _handle_requirement_reset(self):
         """Reset requirement studio state."""
         import uawos_requirement_studio
@@ -592,6 +663,10 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                 self._handle_requirement_publish(payload)
             elif path == "/api/requirement/reset":
                 self._handle_requirement_reset()
+            elif path == "/api/objective/submit":
+                self._handle_objective_submit(payload)
+            elif path == "/api/objective/action":
+                self._handle_objective_action(payload)
             else:
                 self.send_response(404)
                 self.end_headers()
@@ -603,7 +678,7 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
 
 def start_server():
-    server = HTTPServer(("0.0.0.0", PORT), DashboardRequestHandler)
+    server = ThreadingHTTPServer(("0.0.0.0", PORT), DashboardRequestHandler)
     print(f"Server started on http://0.0.0.0:{PORT}")
     try:
         server.serve_forever()

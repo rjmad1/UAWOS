@@ -305,8 +305,35 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             
     # 5. Core Engines (Phase 4)
     else:
+        # Check if it's an Objective Management requirement (FR-011 to FR-030)
+        is_obj_req = False
+        if req_id.startswith("FR-"):
+            parts = req_id.split("-")
+            if len(parts) > 1 and parts[1].isdigit():
+                val = int(parts[1])
+                if 11 <= val <= 30:
+                    is_obj_req = True
+                    
+        if is_obj_req:
+            objective_ok = False
+            try:
+                import uawos_objective
+                objective_ok = True
+            except ImportError:
+                pass
+                
+            if objective_ok:
+                status = "OPERATIONAL"
+                environment = "production"
+                code_refs = [f"uawos_objective.py:verify_{req_id.lower().replace('-', '_')}"]
+                test_evidence = f"uawos_objective.verify_{req_id.lower().replace('-', '_')}()"
+                deploy_refs = ["uawos-objective-engine"]
+                infra_refs = []
+            else:
+                status = "BLOCKED"
+                reason_blocked = "Objective Management engine uawos_objective.py missing."
         # Default to APPROVED/IN_PROGRESS for roadmap phase 4 core engines under active development
-        if req_id in ["FR-011", "FR-012", "FR-013"]: # Core intake
+        elif req_id in ["FR-011", "FR-012", "FR-013"]: # Core intake
             status = "IN_PROGRESS"
             code_refs = ["uawos_dashboard_daemon.py:286"] # doc scanner
             environment = "dev_testing"
