@@ -49,9 +49,11 @@ def init_db():
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS uawos_state (
-                key VARCHAR(255) PRIMARY KEY,
+                key VARCHAR(255),
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
                 state JSONB NOT NULL,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (key, tenant_id)
             );
         """)
         cursor.execute("""
@@ -70,6 +72,7 @@ def init_db():
                 confidence_score DOUBLE PRECISION DEFAULT 100.0,
                 dependencies JSONB DEFAULT '[]',
                 history JSONB DEFAULT '[]',
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
@@ -88,6 +91,7 @@ def init_db():
                 target_state DOUBLE PRECISION DEFAULT 100.0,
                 current_state DOUBLE PRECISION,
                 forecasted_state DOUBLE PRECISION,
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
@@ -107,6 +111,7 @@ def init_db():
                 assumptions JSONB DEFAULT '[]',
                 is_alternative BOOLEAN DEFAULT FALSE,
                 history JSONB DEFAULT '[]',
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
@@ -121,6 +126,7 @@ def init_db():
                 version INT DEFAULT 1,
                 governed BOOLEAN DEFAULT TRUE,
                 history JSONB DEFAULT '[]',
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
@@ -136,9 +142,22 @@ def init_db():
                 deadline INT DEFAULT 0,
                 status VARCHAR(50) DEFAULT 'pending',
                 approval_required BOOLEAN DEFAULT FALSE,
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
+        # Dynamic schema updates to guarantee tenant_id column existence in pre-existing DBs
+        for table in ["uawos_objectives", "uawos_outcomes", "uawos_plans", "uawos_workflows", "uawos_actions"]:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS tenant_id VARCHAR(50) DEFAULT 'default_tenant';")
+        cursor.execute("ALTER TABLE uawos_state ADD COLUMN IF NOT EXISTS tenant_id VARCHAR(50) DEFAULT 'default_tenant';")
+        try:
+            cursor.execute("ALTER TABLE uawos_state DROP CONSTRAINT IF EXISTS uawos_state_pkey;")
+        except Exception:
+            pass
+        try:
+            cursor.execute("ALTER TABLE uawos_state ADD CONSTRAINT uawos_state_pkey PRIMARY KEY (key, tenant_id);")
+        except Exception:
+            pass
         conn.commit()
         cursor.close()
         conn.close()
@@ -203,13 +222,13 @@ def get_embedding(text: str) -> list:
 
 
 # PostgreSQL State Helpers
-def db_get_state(key: str, default_fn) -> dict:
+def db_get_state(key: str, default_fn, tenant_id: str = "default_tenant") -> dict:
     if not DB_AVAILABLE:
         return default_fn() if default_fn else None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT state FROM uawos_state WHERE key = %s;", (key,))
+        cursor.execute("SELECT state FROM uawos_state WHERE key = %s AND tenant_id = %s;", (key, tenant_id))
         row = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -219,11 +238,11 @@ def db_get_state(key: str, default_fn) -> dict:
                 return json.loads(state)
             return state
     except Exception as e:
-        print(f"Database error loading state for {key}: {e}")
+        print(f"Database error loading state for {key} under tenant {tenant_id}: {e}")
     return default_fn() if default_fn else None
 
 
-def db_save_state(key: str, state: dict):
+def db_save_state(key: str, state: dict, tenant_id: str = "default_tenant"):
     if not DB_AVAILABLE:
         return
     try:
@@ -231,18 +250,18 @@ def db_save_state(key: str, state: dict):
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO uawos_state (key, state, updated_at)
-            VALUES (%s, %s, CURRENT_TIMESTAMP)
-            ON CONFLICT (key) DO UPDATE
+            INSERT INTO uawos_state (key, tenant_id, state, updated_at)
+            VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+            ON CONFLICT (key, tenant_id) DO UPDATE
             SET state = EXCLUDED.state, updated_at = CURRENT_TIMESTAMP;
         """,
-            (key, json.dumps(state)),
+            (key, tenant_id, json.dumps(state)),
         )
         conn.commit()
         cursor.close()
         conn.close()
     except Exception as e:
-        print(f"Database error saving state for {key}: {e}")
+        print(f"Database error saving state for {key} under tenant {tenant_id}: {e}")
 
 
 # Qdrant Indexing Helpers
@@ -339,18 +358,20 @@ def db_save_objective(obj: dict):
     if not DB_AVAILABLE:
         return
     try:
+        tenant_id = obj.get("tenant_id", "default_tenant")
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO uawos_objectives (id, title, description, source_type, source_uri, owner, sponsor, priority, status, version, health_score, confidence_score, dependencies, history)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO uawos_objectives (id, title, description, source_type, source_uri, owner, sponsor, priority, status, version, health_score, confidence_score, dependencies, history, tenant_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE
             SET title = EXCLUDED.title, description = EXCLUDED.description, source_type = EXCLUDED.source_type,
                 source_uri = EXCLUDED.source_uri, owner = EXCLUDED.owner, sponsor = EXCLUDED.sponsor,
                 priority = EXCLUDED.priority, status = EXCLUDED.status, version = EXCLUDED.version,
                 health_score = EXCLUDED.health_score, confidence_score = EXCLUDED.confidence_score,
-                dependencies = EXCLUDED.dependencies, history = EXCLUDED.history, updated_at = CURRENT_TIMESTAMP;
+                dependencies = EXCLUDED.dependencies, history = EXCLUDED.history, tenant_id = EXCLUDED.tenant_id,
+                updated_at = CURRENT_TIMESTAMP;
         """,
             (
                 obj["id"],
@@ -367,6 +388,7 @@ def db_save_objective(obj: dict):
                 obj["confidence_score"],
                 json.dumps(obj["dependencies"]),
                 json.dumps(obj["history"]),
+                tenant_id,
             ),
         )
         conn.commit()
@@ -388,7 +410,7 @@ def db_load_objectives() -> dict:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, title, description, source_type, source_uri, owner, sponsor, priority, status, version, health_score, confidence_score, dependencies, history FROM uawos_objectives;"
+            "SELECT id, title, description, source_type, source_uri, owner, sponsor, priority, status, version, health_score, confidence_score, dependencies, history, tenant_id FROM uawos_objectives;"
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -419,6 +441,7 @@ def db_load_objectives() -> dict:
                     if isinstance(r[13], list)
                     else json.loads(r[13] if isinstance(r[13], str) else "[]")
                 ),
+                "tenant_id": r[14],
             }
         return {"objectives": objs}
     except Exception as e:
@@ -431,18 +454,19 @@ def db_save_outcome(out: dict):
     if not DB_AVAILABLE:
         return
     try:
+        tenant_id = out.get("tenant_id", "default_tenant")
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO uawos_outcomes (id, objective_id, title, metric, unit, weight, dependencies, confidence_score, owner, baseline_state, target_state, current_state, forecasted_state)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO uawos_outcomes (id, objective_id, title, metric, unit, weight, dependencies, confidence_score, owner, baseline_state, target_state, current_state, forecasted_state, tenant_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE
             SET objective_id = EXCLUDED.objective_id, title = EXCLUDED.title, metric = EXCLUDED.metric,
                 unit = EXCLUDED.unit, weight = EXCLUDED.weight, dependencies = EXCLUDED.dependencies,
                 confidence_score = EXCLUDED.confidence_score, owner = EXCLUDED.owner, baseline_state = EXCLUDED.baseline_state,
                 target_state = EXCLUDED.target_state, current_state = EXCLUDED.current_state, forecasted_state = EXCLUDED.forecasted_state,
-                updated_at = CURRENT_TIMESTAMP;
+                tenant_id = EXCLUDED.tenant_id, updated_at = CURRENT_TIMESTAMP;
         """,
             (
                 out["id"],
@@ -458,6 +482,7 @@ def db_save_outcome(out: dict):
                 out["target_state"],
                 out["current_state"],
                 out["forecasted_state"],
+                tenant_id,
             ),
         )
         conn.commit()
@@ -479,7 +504,7 @@ def db_load_outcomes() -> dict:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, objective_id, title, metric, unit, weight, dependencies, confidence_score, owner, baseline_state, target_state, current_state, forecasted_state FROM uawos_outcomes;"
+            "SELECT id, objective_id, title, metric, unit, weight, dependencies, confidence_score, owner, baseline_state, target_state, current_state, forecasted_state, tenant_id FROM uawos_outcomes;"
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -505,6 +530,7 @@ def db_load_outcomes() -> dict:
                 "target_state": float(r[10]),
                 "current_state": float(r[11]) if r[11] is not None else None,
                 "forecasted_state": float(r[12]) if r[12] is not None else None,
+                "tenant_id": r[13],
             }
         return {"outcomes": outs}
     except Exception as e:
@@ -517,19 +543,20 @@ def db_save_plan(plan: dict):
     if not DB_AVAILABLE:
         return
     try:
+        tenant_id = plan.get("tenant_id", "default_tenant")
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO uawos_plans (id, objective_id, title, steps, cost_estimate, duration_estimate, resource_requirements, success_probability, status, version, risks, assumptions, is_alternative, history)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO uawos_plans (id, objective_id, title, steps, cost_estimate, duration_estimate, resource_requirements, success_probability, status, version, risks, assumptions, is_alternative, history, tenant_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE
             SET objective_id = EXCLUDED.objective_id, title = EXCLUDED.title, steps = EXCLUDED.steps,
                 cost_estimate = EXCLUDED.cost_estimate, duration_estimate = EXCLUDED.duration_estimate,
                 resource_requirements = EXCLUDED.resource_requirements, success_probability = EXCLUDED.success_probability,
                 status = EXCLUDED.status, version = EXCLUDED.version, risks = EXCLUDED.risks,
                 assumptions = EXCLUDED.assumptions, is_alternative = EXCLUDED.is_alternative, history = EXCLUDED.history,
-                updated_at = CURRENT_TIMESTAMP;
+                tenant_id = EXCLUDED.tenant_id, updated_at = CURRENT_TIMESTAMP;
         """,
             (
                 plan["id"],
@@ -546,6 +573,7 @@ def db_save_plan(plan: dict):
                 json.dumps(plan["assumptions"]),
                 plan["is_alternative"],
                 json.dumps(plan["history"]),
+                tenant_id,
             ),
         )
         conn.commit()
@@ -567,7 +595,7 @@ def db_load_plans() -> dict:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, objective_id, title, steps, cost_estimate, duration_estimate, resource_requirements, success_probability, status, version, risks, assumptions, is_alternative, history FROM uawos_plans;"
+            "SELECT id, objective_id, title, steps, cost_estimate, duration_estimate, resource_requirements, success_probability, status, version, risks, assumptions, is_alternative, history, tenant_id FROM uawos_plans;"
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -610,6 +638,7 @@ def db_load_plans() -> dict:
                     if isinstance(r[13], list)
                     else json.loads(r[13] if isinstance(r[13], str) else "[]")
                 ),
+                "tenant_id": r[14],
             }
         return {"plans": plans}
     except Exception as e:
@@ -622,16 +651,18 @@ def db_save_workflow(wf: dict):
     if not DB_AVAILABLE:
         return
     try:
+        tenant_id = wf.get("tenant_id", "default_tenant")
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO uawos_workflows (id, plan_id, title, tasks, dependencies, state, version, governed, history)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO uawos_workflows (id, plan_id, title, tasks, dependencies, state, version, governed, history, tenant_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE
             SET plan_id = EXCLUDED.plan_id, title = EXCLUDED.title, tasks = EXCLUDED.tasks,
                 dependencies = EXCLUDED.dependencies, state = EXCLUDED.state, version = EXCLUDED.version,
-                governed = EXCLUDED.governed, history = EXCLUDED.history, updated_at = CURRENT_TIMESTAMP;
+                governed = EXCLUDED.governed, history = EXCLUDED.history, tenant_id = EXCLUDED.tenant_id,
+                updated_at = CURRENT_TIMESTAMP;
         """,
             (
                 wf["id"],
@@ -643,6 +674,7 @@ def db_save_workflow(wf: dict):
                 wf["version"],
                 wf["governed"],
                 json.dumps(wf["history"]),
+                tenant_id,
             ),
         )
         conn.commit()
@@ -664,7 +696,7 @@ def db_load_workflows() -> dict:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, plan_id, title, tasks, dependencies, state, version, governed, history FROM uawos_workflows;"
+            "SELECT id, plan_id, title, tasks, dependencies, state, version, governed, history, tenant_id FROM uawos_workflows;"
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -694,6 +726,7 @@ def db_load_workflows() -> dict:
                     if isinstance(r[8], list)
                     else json.loads(r[8] if isinstance(r[8], str) else "[]")
                 ),
+                "tenant_id": r[9],
             }
         return {"workflows": wfs}
     except Exception as e:
@@ -706,16 +739,18 @@ def db_save_action(act: dict):
     if not DB_AVAILABLE:
         return
     try:
+        tenant_id = act.get("tenant_id", "default_tenant")
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO uawos_actions (id, workflow_id, name, owner, dependencies, priority, budget, deadline, status, approval_required)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO uawos_actions (id, workflow_id, name, owner, dependencies, priority, budget, deadline, status, approval_required, tenant_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE
             SET workflow_id = EXCLUDED.workflow_id, name = EXCLUDED.name, owner = EXCLUDED.owner,
                 dependencies = EXCLUDED.dependencies, priority = EXCLUDED.priority, budget = EXCLUDED.budget,
-                deadline = EXCLUDED.deadline, status = EXCLUDED.status, approval_required = EXCLUDED.approval_required;
+                deadline = EXCLUDED.deadline, status = EXCLUDED.status, approval_required = EXCLUDED.approval_required,
+                tenant_id = EXCLUDED.tenant_id;
         """,
             (
                 act["id"],
@@ -728,6 +763,7 @@ def db_save_action(act: dict):
                 act["deadline"],
                 act["status"],
                 act["approval_required"],
+                tenant_id,
             ),
         )
         conn.commit()
@@ -749,7 +785,7 @@ def db_load_actions() -> dict:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, workflow_id, name, owner, dependencies, priority, budget, deadline, status, approval_required FROM uawos_actions;"
+            "SELECT id, workflow_id, name, owner, dependencies, priority, budget, deadline, status, approval_required, tenant_id FROM uawos_actions;"
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -772,6 +808,7 @@ def db_load_actions() -> dict:
                 "deadline": int(r[7]),
                 "status": r[8],
                 "approval_required": bool(r[9]),
+                "tenant_id": r[10],
             }
         return {"actions": acts}
     except Exception as e:

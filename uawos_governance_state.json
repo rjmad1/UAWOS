@@ -4,159 +4,192 @@
       "id": "POL-01",
       "name": "Token Limit Control",
       "rule": "token_consumption <= 5000000",
-      "category": "budget",
+      "status": "approved",
       "version": 1,
-      "status": "approved"
+      "category": "budget"
     },
     "POL-02": {
       "id": "POL-02",
       "name": "No Direct GPLv3 Imports",
       "rule": "import_marker == False",
-      "category": "licensing",
+      "status": "approved",
       "version": 1,
-      "status": "approved"
+      "category": "licensing"
     },
     "POL-03": {
       "id": "POL-03",
       "name": "New Policy",
       "rule": "x == y",
-      "category": "testing",
+      "status": "draft",
       "version": 1,
-      "status": "draft"
+      "category": "testing"
     },
     "POL-04": {
       "id": "POL-04",
       "name": "Draft Policy",
       "rule": "a == b",
-      "category": "auth",
+      "status": "approved",
       "version": 1,
-      "status": "approved"
-    }
-  },
-  "exceptions": {
-    "ACT-SSO": {
-      "id": "EXC-001",
-      "action_id": "ACT-SSO",
-      "reason": "Testing SSO exception",
-      "status": "Approved",
-      "timestamp": 1781144108
-    },
-    "ACT-GPL": {
-      "id": "EXC-002",
-      "action_id": "ACT-GPL",
-      "reason": "GPL exception for isolated staging sandbox",
-      "status": "Pending",
-      "timestamp": 1781144108
-    }
-  },
-  "risk_acceptances": {
-    "RSK-01": {
-      "risk_id": "RSK-01",
-      "justification": "Accepted for development lifecycle.",
-      "status": "Accepted",
-      "timestamp": 1781144108
+      "category": "auth"
     }
   },
   "audit_logs": [
     {
-      "event_type": "EVALUATION",
       "details": {
-        "action_id": "ACT-EXEC",
         "details": {
           "uses_marker_library": true
-        }
+        },
+        "action_id": "ACT-EXEC"
       },
-      "timestamp": 1781144108
+      "timestamp": 1781185577,
+      "event_type": "EVALUATION"
     },
     {
-      "event_type": "RISK_IDENTIFIED",
       "details": {
-        "risk_id": "RSK-01",
-        "impact": "High"
+        "impact": "High",
+        "risk_id": "RSK-01"
       },
-      "timestamp": 1781144108
+      "timestamp": 1781185577,
+      "event_type": "RISK_IDENTIFIED"
     },
     {
-      "event_type": "EVALUATION",
       "details": {
-        "action_id": "ACT-TEST",
         "details": {
           "estimated_tokens": 1000
-        }
+        },
+        "action_id": "ACT-TEST"
       },
-      "timestamp": 1781144108
+      "timestamp": 1781185577,
+      "event_type": "EVALUATION"
     },
     {
-      "event_type": "AUDIT_TEST",
       "details": {
         "msg": "Self test active"
       },
-      "timestamp": 1781144108
+      "timestamp": 1781185578,
+      "event_type": "AUDIT_TEST"
     },
     {
-      "event_type": "EVALUATION",
       "details": {
-        "action_id": "ACT-SOD",
         "details": {
           "owner": "Alice",
           "approver": "Alice"
-        }
+        },
+        "action_id": "ACT-SOD"
       },
-      "timestamp": 1781144108
+      "timestamp": 1781185578,
+      "event_type": "EVALUATION"
     },
     {
-      "event_type": "EVALUATION",
       "details": {
-        "action_id": "ACT-SOD-OK",
         "details": {
           "owner": "Alice",
           "approver": "Bob"
-        }
+        },
+        "action_id": "ACT-SOD-OK"
       },
-      "timestamp": 1781144108
+      "timestamp": 1781185578,
+      "event_type": "EVALUATION"
     },
     {
-      "event_type": "EVALUATION",
       "details": {
-        "action_id": "ACT-ROLE-BAD",
         "details": {
           "actor_role": "Hacker"
-        }
+        },
+        "action_id": "ACT-ROLE-BAD"
       },
-      "timestamp": 1781144108
+      "timestamp": 1781185578,
+      "event_type": "EVALUATION"
     },
     {
-      "event_type": "EVALUATION",
       "details": {
-        "action_id": "ACT-BUDGET-UNAUTH",
         "details": {
-          "actor_role": "Developer",
-          "category": "budget"
-        }
+          "category": "budget",
+          "actor_role": "Developer"
+        },
+        "action_id": "ACT-BUDGET-UNAUTH"
       },
-      "timestamp": 1781144108
+      "timestamp": 1781185578,
+      "event_type": "EVALUATION"
     },
     {
-      "event_type": "EVALUATION",
       "details": {
-        "action_id": "ACT-BUDGET-AUTH",
         "details": {
-          "actor_role": "CEO",
-          "category": "budget"
-        }
+          "category": "budget",
+          "actor_role": "CEO"
+        },
+        "action_id": "ACT-BUDGET-AUTH"
       },
-      "timestamp": 1781144108
+      "timestamp": 1781185578,
+      "event_type": "EVALUATION"
     },
     {
-      "event_type": "EVALUATION",
       "details": {
-        "action_id": "ACT-TEST-SOD",
+        "details": {
+          "owner": "Alice",
+          "category": "budget",
+          "actor_role": "CEO"
+        },
+        "action_id": "ACT-FGA-CEO"
+      },
+      "timestamp": 1781185579,
+      "event_type": "EVALUATION"
+    },
+    {
+      "details": {
+        "details": {
+          "owner": "Bob",
+          "category": "budget",
+          "actor_role": "Developer"
+        },
+        "action_id": "ACT-FGA-DEV"
+      },
+      "timestamp": 1781185579,
+      "event_type": "EVALUATION"
+    },
+    {
+      "details": {
+        "details": {
+          "owner": "Bob",
+          "category": "licensing",
+          "actor_role": "Developer"
+        },
+        "action_id": "ACT-FGA-DEV-OK"
+      },
+      "timestamp": 1781185579,
+      "event_type": "EVALUATION"
+    },
+    {
+      "details": {
         "details": {
           "owner": "Alice",
           "approver": "Alice"
-        }
+        },
+        "action_id": "ACT-TEST-SOD"
       },
-      "timestamp": 1781144114
+      "timestamp": 1781185602,
+      "event_type": "EVALUATION"
+    },
+    {
+      "details": {
+        "details": {
+          "estimated_tokens": 6000000
+        },
+        "action_id": "ACT-TOK"
+      },
+      "timestamp": 1781185602,
+      "event_type": "EVALUATION"
+    },
+    {
+      "details": {
+        "details": {
+          "owner": "Alice",
+          "approver": "Alice"
+        },
+        "action_id": "ACT-TEST-SOD"
+      },
+      "timestamp": 1781185603,
+      "event_type": "EVALUATION"
     },
     {
       "event_type": "EVALUATION",
@@ -166,28 +199,31 @@
           "estimated_tokens": 6000000
         }
       },
-      "timestamp": 1781144114
-    },
-    {
-      "event_type": "EVALUATION",
-      "details": {
-        "action_id": "ACT-TEST-SOD",
-        "details": {
-          "owner": "Alice",
-          "approver": "Alice"
-        }
-      },
-      "timestamp": 1781144114
-    },
-    {
-      "event_type": "EVALUATION",
-      "details": {
-        "action_id": "ACT-TOK",
-        "details": {
-          "estimated_tokens": 6000000
-        }
-      },
-      "timestamp": 1781144114
+      "timestamp": 1781185603
     }
-  ]
+  ],
+  "exceptions": {
+    "ACT-GPL": {
+      "id": "EXC-002",
+      "reason": "GPL exception for isolated staging sandbox",
+      "status": "Pending",
+      "action_id": "ACT-GPL",
+      "timestamp": 1781185577
+    },
+    "ACT-SSO": {
+      "id": "EXC-001",
+      "reason": "Testing SSO exception",
+      "status": "Approved",
+      "action_id": "ACT-SSO",
+      "timestamp": 1781185577
+    }
+  },
+  "risk_acceptances": {
+    "RSK-01": {
+      "status": "Accepted",
+      "risk_id": "RSK-01",
+      "timestamp": 1781185577,
+      "justification": "Accepted for development lifecycle."
+    }
+  }
 }

@@ -1,46 +1,4 @@
 {
-  "learnings": {
-    "LRN-101": {
-      "id": "LRN-101",
-      "opportunity": "Database query timeout during heavy loads",
-      "proposal": "Implement index on user_id and cache checkout calls",
-      "confidence_score": 92.0,
-      "status": "published",
-      "published_as_best_practice": true,
-      "traceability_source": "ACT-101",
-      "timestamp": 1780963292
-    },
-    "LRN-102": {
-      "id": "LRN-102",
-      "opportunity": "Query timeouts",
-      "proposal": "Add indexes",
-      "confidence_score": 90.0,
-      "status": "draft",
-      "published_as_best_practice": false,
-      "traceability_source": "ACT-101",
-      "timestamp": 1781144111
-    },
-    "LRN-103": {
-      "id": "LRN-103",
-      "opportunity": "Continuous feedback",
-      "proposal": "Refactor routing",
-      "confidence_score": 90.0,
-      "status": "draft",
-      "published_as_best_practice": false,
-      "traceability_source": "ACT-102",
-      "timestamp": 1781144111
-    },
-    "LRN-104": {
-      "id": "LRN-104",
-      "opportunity": "Timeout",
-      "proposal": "Fix",
-      "confidence_score": 95.0,
-      "status": "draft",
-      "published_as_best_practice": false,
-      "traceability_source": "ACT-101",
-      "timestamp": 1781144111
-    }
-  },
   "packs": {
     "LPK-01": {
       "id": "LPK-01",
@@ -55,6 +13,48 @@
       "learnings": [
         "LRN-101"
       ]
+    }
+  },
+  "learnings": {
+    "LRN-101": {
+      "id": "LRN-101",
+      "status": "published",
+      "proposal": "Implement index on user_id and cache checkout calls",
+      "timestamp": 1780963292,
+      "opportunity": "Database query timeout during heavy loads",
+      "confidence_score": 92.0,
+      "traceability_source": "ACT-101",
+      "published_as_best_practice": true
+    },
+    "LRN-102": {
+      "id": "LRN-102",
+      "status": "draft",
+      "proposal": "Add indexes",
+      "timestamp": 1781185586,
+      "opportunity": "Query timeouts",
+      "confidence_score": 90.0,
+      "traceability_source": "ACT-101",
+      "published_as_best_practice": false
+    },
+    "LRN-103": {
+      "id": "LRN-103",
+      "status": "draft",
+      "proposal": "Refactor routing",
+      "timestamp": 1781185586,
+      "opportunity": "Continuous feedback",
+      "confidence_score": 90.0,
+      "traceability_source": "ACT-102",
+      "published_as_best_practice": false
+    },
+    "LRN-104": {
+      "id": "LRN-104",
+      "status": "draft",
+      "proposal": "Fix",
+      "timestamp": 1781185586,
+      "opportunity": "Timeout",
+      "confidence_score": 95.0,
+      "traceability_source": "ACT-101",
+      "published_as_best_practice": false
     }
   }
 }

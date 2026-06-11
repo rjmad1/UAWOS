@@ -126,15 +126,39 @@ def update_agent_lifecycle(name: str, state_value: str) -> dict:
 
 
 def calculate_agent_trust(name: str) -> float:
-    """Track and compute agent trust score dynamically (FR-100)."""
+    """Track and compute agent trust score dynamically (FR-100) based on historical task outcomes in PostgreSQL."""
     state = load_state()
     agent = state["agents"].get(name)
     if not agent:
         raise ValueError(f"Agent {name} not found.")
-    # Simple dynamic trust score logic
+
     trust = 95.0
+
+    # Try dynamic calculation via Postgres uawos_actions
+    try:
+        import uawos_db
+        if uawos_db.DB_AVAILABLE:
+            conn = uawos_db.get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT status FROM uawos_actions WHERE owner = %s;", (name,))
+            rows = cursor.fetchall()
+            cursor.close()
+            conn.close()
+
+            if rows:
+                total = len(rows)
+                completed = sum(1 for r in rows if r[0] in ["success", "completed", "passed"])
+                success_rate = completed / total
+                trust = round(success_rate * 100.0, 1)
+            else:
+                # Default trust if no actions yet
+                trust = 95.0
+    except Exception:
+        pass
+
     if agent["lifecycle_state"] == "terminated":
         trust = 10.0
+
     agent["trust_score"] = trust
     state["agents"][name] = agent
     save_state(state)

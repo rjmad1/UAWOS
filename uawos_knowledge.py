@@ -14,6 +14,12 @@ STATE_FILE = os.path.join(
 )
 MARKER_BASE_URL = os.environ.get("MARKER_BASE_URL", "http://127.0.0.1:8000")
 
+# Neo4j Settings
+NEO4J_HOST = os.environ.get("NEO4J_HOST", "127.0.0.1")
+NEO4J_HTTP_PORT = int(os.environ.get("NEO4J_PORT_2", 7474))
+NEO4J_URL = f"http://{NEO4J_HOST}:{NEO4J_HTTP_PORT}"
+
+
 
 def get_default_state() -> dict:
     return {
@@ -41,7 +47,106 @@ def get_default_state() -> dict:
         ],
     }
 
+
+def execute_cypher(statement: str, parameters: dict = None) -> dict:
+    """Execute Cypher query on Neo4j HTTP API. Returns None if Neo4j is offline."""
+    url = f"{NEO4J_URL}/db/neo4j/tx/commit"
+    payload = {
+        "statements": [
+            {
+                "statement": statement,
+                "parameters": parameters or {}
+            }
+        ]
+    }
+    try:
+        req_data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=req_data,
+            headers={"Content-Type": "application/json", "Accept": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=1.0) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+    except Exception:
+        return None
+
+
+def _get_neo4j_label(entity_id: str) -> str:
+    if entity_id.startswith("KNW-"):
+        return "KnowledgeAsset"
+    elif entity_id.startswith("OBJ-"):
+        return "Objective"
+    elif entity_id.startswith("PLN-"):
+        return "Plan"
+    elif entity_id.startswith("OUT-"):
+        return "Outcome"
+    elif entity_id.startswith("WRK-"):
+        return "Workflow"
+    elif entity_id.startswith("ACT-"):
+        return "Action"
+    return "Entity"
+
+
+def sync_asset_to_neo4j(asset: dict) -> bool:
+    """Synchronize a knowledge asset to Neo4j."""
+    label = _get_neo4j_label(asset["id"])
+    query = f"""
+    MERGE (a:{label} {{id: $id}})
+    SET a.title = $title,
+        a.content = $content,
+        a.source_type = $source_type,
+        a.source_uri = $source_uri,
+        a.provenance = $provenance,
+        a.confidence_score = $confidence_score,
+        a.timestamp = $timestamp
+    """
+    res = execute_cypher(query, asset)
+    return res is not None and not res.get("errors")
+
+
+def sync_relationship_to_neo4j(rel: dict) -> bool:
+    """Synchronize a relationship to Neo4j."""
+    src_label = _get_neo4j_label(rel["source"])
+    tgt_label = _get_neo4j_label(rel["target"])
+    rel_type = rel["relationship"]
+    if not rel_type.replace("_", "").isalnum():
+        return False
+    
+    query = f"""
+    MERGE (s:{src_label} {{id: $source_id}})
+    MERGE (t:{tgt_label} {{id: $target_id}})
+    WITH s, t
+    MERGE (s)-[r:{rel_type}]->(t)
+    SET r.id = $rel_id,
+        r.confidence = $confidence,
+        r.provenance = $provenance
+    """
+    params = {
+        "source_id": rel["source"],
+        "target_id": rel["target"],
+        "rel_id": rel["id"],
+        "confidence": rel["confidence"],
+        "provenance": rel.get("provenance", "Sync link")
+    }
+    res = execute_cypher(query, params)
+    return res is not None and not res.get("errors")
+
+
+def sync_all_state_to_neo4j():
+    """Sync all current state assets and relationships to Neo4j if online."""
+    try:
+        state = load_state()
+        for asset in state.get("assets", {}).values():
+            sync_asset_to_neo4j(asset)
+        for rel in state.get("graph_relationships", []):
+            sync_relationship_to_neo4j(rel)
+    except Exception:
+        pass
+
+
 # FR-111 to FR-120: Create Knowledge Asset
+
 def create_knowledge_asset(
     title: str,
     content: str,
@@ -67,6 +172,7 @@ def create_knowledge_asset(
     state["assets"][aid] = asset
     save_state(state)
     uawos_db.index_knowledge(aid, title, content, source_type, provenance)
+    sync_asset_to_neo4j(asset)
     return state["assets"][aid]
 
 
@@ -164,6 +270,7 @@ def create_graph_relationship(
     }
     state["graph_relationships"].append(rel)
     save_state(state)
+    sync_relationship_to_neo4j(rel)
     return rel
 
 
@@ -266,6 +373,8 @@ def run_self_tests():
     print("Running Knowledge Management self tests...")
     state = get_default_state()
     save_state(state)
+    # Perform initial seed sync to Neo4j if online
+    sync_all_state_to_neo4j()
 
     tests = [
         ("FR-111", verify_fr_111),

@@ -75,8 +75,32 @@ def run_monte_carlo(iterations: int = 100) -> dict:
     runs = []
     # Seed random with constant for deterministic testing
     random.seed(42)
+
+    mean_prob = 92.0
+    # Try fetching active plan success probabilities from PG database
+    try:
+        import uawos_db
+        if uawos_db.DB_AVAILABLE:
+            conn = uawos_db.get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT success_probability FROM uawos_plans WHERE status = 'approved';")
+            rows = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            if rows:
+                probs = []
+                for r in rows:
+                    p = r[0]
+                    # if success probability is expressed as 0-1 instead of 0-100, normalize it
+                    if p <= 1.0:
+                        p = p * 100.0
+                    probs.append(p)
+                mean_prob = sum(probs) / len(probs)
+    except Exception:
+        pass
+
     for _ in range(iterations):
-        val = random.gauss(92.0, 3.5)
+        val = random.gauss(mean_prob, 3.5)
         runs.append(val)
 
     mean = sum(runs) / len(runs)
