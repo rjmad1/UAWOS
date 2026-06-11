@@ -1,4 +1,5 @@
 # uawos_resource.py
+import uawos_db
 import os
 import json
 import time
@@ -38,6 +39,14 @@ def get_default_state() -> dict:
     }
 
 def load_state() -> dict:
+    state = uawos_db.db_get_state("uawos_resource", None)
+    if state is not None:
+        try:
+            with open(STATE_FILE, "w") as f:
+                json.dump(state, f, indent=2)
+        except Exception:
+            pass
+        return state
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -53,8 +62,8 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving resource state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    uawos_db.db_save_state("uawos_resource", state)
 # Core API
 def create_resource(name: str, category: str, capacity: int, constraints: list = None) -> dict:
     """Manage platform resources (FR-141, FR-142, FR-149)."""

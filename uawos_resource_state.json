@@ -3,9 +3,9 @@
     "RES-01": {
       "id": "RES-01",
       "name": "GPU Compute Node 1",
-      "category": "compute",
-      "capacity": 100,
       "unit": "percent",
+      "capacity": 100,
+      "category": "compute",
       "constraints": [
         "Max allocation per agent is 40%"
       ]
@@ -13,9 +13,9 @@
     "RES-02": {
       "id": "RES-02",
       "name": "Principal Software Architect",
-      "category": "human_resource",
-      "capacity": 40,
       "unit": "hours",
+      "capacity": 40,
+      "category": "human_resource",
       "constraints": [
         "Cannot work overtime > 50 hours"
       ]
@@ -23,9 +23,9 @@
     "RES-03": {
       "id": "RES-03",
       "name": "Testing Server",
-      "category": "hardware",
-      "capacity": 100,
       "unit": "percent",
+      "capacity": 100,
+      "category": "hardware",
       "constraints": [
         "No constraints"
       ]
@@ -33,9 +33,9 @@
     "RES-04": {
       "id": "RES-04",
       "name": "Server X",
-      "category": "hardware",
-      "capacity": 200,
       "unit": "percent",
+      "capacity": 200,
+      "category": "hardware",
       "constraints": [
         "No constraints"
       ]
@@ -44,35 +44,35 @@
   "allocations": {
     "ALL-01": {
       "id": "ALL-01",
-      "resource_id": "RES-01",
       "task_id": "ACT-101",
-      "allocated_amount": 30,
+      "end_time": 1781049600,
       "start_time": 1780963292,
-      "end_time": 1781049600
+      "resource_id": "RES-01",
+      "allocated_amount": 30
     },
     "ALL-02": {
       "id": "ALL-02",
-      "resource_id": "RES-01",
       "task_id": "ACT-102",
-      "allocated_amount": 20,
+      "end_time": 174800,
       "start_time": 173800,
-      "end_time": 174800
+      "resource_id": "RES-01",
+      "allocated_amount": 20
     },
     "ALL-03": {
       "id": "ALL-03",
-      "resource_id": "RES-01",
       "task_id": "ACT-103",
-      "allocated_amount": 60,
+      "end_time": 174600,
       "start_time": 174300,
-      "end_time": 174600
+      "resource_id": "RES-01",
+      "allocated_amount": 60
     },
     "ALL-04": {
       "id": "ALL-04",
-      "resource_id": "RES-01",
       "task_id": "ACT-104",
-      "allocated_amount": 60,
+      "end_time": 174600,
       "start_time": 174300,
-      "end_time": 174600
+      "resource_id": "RES-01",
+      "allocated_amount": 60
     }
   }
 }

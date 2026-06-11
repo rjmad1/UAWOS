@@ -1,4 +1,5 @@
 # uawos_knowledge.py
+import uawos_db
 import os
 import json
 import urllib.request
@@ -6,6 +7,7 @@ import urllib.error
 import time
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_knowledge_state.json")
+MARKER_BASE_URL = os.environ.get("MARKER_BASE_URL", "http://127.0.0.1:8000")
 
 def get_default_state() -> dict:
     return {
@@ -34,6 +36,14 @@ def get_default_state() -> dict:
     }
 
 def load_state() -> dict:
+    state = uawos_db.db_get_state("uawos_knowledge", None)
+    if state is not None:
+        try:
+            with open(STATE_FILE, "w") as f:
+                json.dump(state, f, indent=2)
+        except Exception:
+            pass
+        return state
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -49,8 +59,8 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving knowledge state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    uawos_db.db_save_state("uawos_knowledge", state)
 # Core API
 def create_knowledge_asset(
     title: str,
@@ -76,6 +86,7 @@ def create_knowledge_asset(
     }
     state["assets"][aid] = asset
     save_state(state)
+    uawos_db.index_knowledge(aid, title, content, source_type, provenance)
     return state["assets"][aid]
 
 # FR-112: Ingest documents securely using the isolated marker-service REST container
@@ -90,7 +101,7 @@ def ingest_document(uri: str, mock_content: str = None) -> dict:
             # Send file content or URL to marker service container
             req_data = json.dumps({"pdf_uri": uri}).encode('utf-8')
             req = urllib.request.Request(
-                "http://127.0.0.1:8000/parse",
+                f"{MARKER_BASE_URL}/parse",
                 data=req_data,
                 headers={"Content-Type": "application/json"}
             )

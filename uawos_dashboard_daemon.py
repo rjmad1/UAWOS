@@ -6,7 +6,10 @@ import time
 import socket
 import threading
 import subprocess
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from fastapi import FastAPI, Request, Query, HTTPException, Header
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 import uawos_traceability
 
 # Safe imports for dynamic modules to prevent thread deadlocks
@@ -110,8 +113,48 @@ try:
 except ImportError:
     uawos_integrations = None
 
+try:
+    import uawos_pmcms
+except ImportError:
+    uawos_pmcms = None
+
 PORT = 8099
 STATUS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_status.json")
+
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "127.0.0.1")
+POSTGRES_PORT = int(os.environ.get("POSTGRES_PORT", 5435))
+QDRANT_HOST = os.environ.get("QDRANT_HOST", "127.0.0.1")
+QDRANT_PORT = int(os.environ.get("QDRANT_PORT", 6333))
+MARQUEZ_HOST = os.environ.get("MARQUEZ_HOST", "127.0.0.1")
+MARQUEZ_PORT = int(os.environ.get("MARQUEZ_PORT", 5000))
+SUPERSET_HOST = os.environ.get("SUPERSET_HOST", "127.0.0.1")
+SUPERSET_PORT = int(os.environ.get("SUPERSET_PORT", 8088))
+DTRACK_HOST = os.environ.get("DTRACK_HOST", "127.0.0.1")
+DTRACK_PORT = int(os.environ.get("DTRACK_PORT", 8081))
+DTRACK_UI_HOST = os.environ.get("DTRACK_UI_HOST", "127.0.0.1")
+DTRACK_UI_PORT = int(os.environ.get("DTRACK_UI_PORT", 8085))
+
+OPA_HOST = os.environ.get("OPA_HOST", "127.0.0.1")
+OPA_PORT = int(os.environ.get("OPA_PORT", 8181))
+OPENFGA_HOST = os.environ.get("OPENFGA_HOST", "127.0.0.1")
+OPENFGA_PORT = int(os.environ.get("OPENFGA_PORT", 8083))
+OPENMETADATA_HOST = os.environ.get("OPENMETADATA_HOST", "127.0.0.1")
+OPENMETADATA_PORT = int(os.environ.get("OPENMETADATA_PORT", 8585))
+
+CLICKHOUSE_HOST = os.environ.get("CLICKHOUSE_HOST", "127.0.0.1")
+CLICKHOUSE_PORT = int(os.environ.get("CLICKHOUSE_PORT", 8123))
+TELEMETRY_HOST = os.environ.get("TELEMETRY_HOST", "127.0.0.1")
+TELEMETRY_PORT = int(os.environ.get("TELEMETRY_PORT", 3000))
+ALARM_HOST = os.environ.get("ALARM_HOST", "127.0.0.1")
+ALARM_PORT = int(os.environ.get("ALARM_PORT", 9093))
+SANDBOX_HOST = os.environ.get("SANDBOX_HOST", "127.0.0.1")
+SANDBOX_PORT = int(os.environ.get("SANDBOX_PORT", 5001))
+
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "127.0.0.1")
+OLLAMA_PORT = int(os.environ.get("OLLAMA_PORT", 11434))
+NEO4J_HOST = os.environ.get("NEO4J_HOST", "127.0.0.1")
+NEO4J_PORT_1 = int(os.environ.get("NEO4J_PORT_1", 7687))
+NEO4J_PORT_2 = int(os.environ.get("NEO4J_PORT_2", 7474))
 HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_dashboard.html")
 DELIVERY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_delivery.html")
 ROADMAP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_roadmap.html")
@@ -121,6 +164,12 @@ ARCHITECTURE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ua
 # Global status cache
 status_cache = {}
 
+SECURE_TOKEN = "uawos-secure-token-2026"
+
+def verify_secure_token(x_uawos_token: str):
+    if x_uawos_token != SECURE_TOKEN:
+        raise HTTPException(status_code=401, detail="Unauthorized: Invalid or missing X-UAWOS-Token.")
+
 # Constants for duplicate literals
 QDRANT_VECTOR_DB = "Qdrant Vector DB"
 MARQUEZ_LINEAGE = "Marquez Lineage"
@@ -128,19 +177,6 @@ APACHE_SUPERSET = "Apache Superset"
 DEP_TRACK_API = "Dependency-Track API"
 APPLICATION_JSON = "application/json"
 TEXT_HTML_UTF8 = "text/html; charset=utf-8"
-
-STATIC_ROUTES = {
-    "/": (HTML_FILE, "text/html"),
-    "/index.html": (HTML_FILE, "text/html"),
-    "/delivery": (DELIVERY_FILE, TEXT_HTML_UTF8),
-    "/delivery.html": (DELIVERY_FILE, TEXT_HTML_UTF8),
-    "/roadmap": (ROADMAP_FILE, TEXT_HTML_UTF8),
-    "/roadmap.html": (ROADMAP_FILE, TEXT_HTML_UTF8),
-    "/requirement_studio": (REQUIREMENT_STUDIO_FILE, TEXT_HTML_UTF8),
-    "/requirement_studio.html": (REQUIREMENT_STUDIO_FILE, TEXT_HTML_UTF8),
-    "/architecture": (ARCHITECTURE_FILE, TEXT_HTML_UTF8),
-    "/architecture.html": (ARCHITECTURE_FILE, TEXT_HTML_UTF8),
-}
 
 def check_port(host, port):
     """Check if a TCP port is open."""
@@ -188,12 +224,12 @@ def check_semgrep_availability():
 
 def evaluate_infra(is_docker_running, running_containers, local_dev_healthy, ollama_running):
     infra_components = {
-        "Postgres DB": {"container": "uawos-postgres", "port": 5435},
-        QDRANT_VECTOR_DB: {"container": "uawos-qdrant", "port": 6333},
-        MARQUEZ_LINEAGE: {"container": "uawos-marquez", "port": 5000},
-        APACHE_SUPERSET: {"container": "uawos-superset", "port": 8088},
-        DEP_TRACK_API: {"container": "uawos-dependency-track-api", "port": 8081},
-        "Dependency-Track UI": {"container": "uawos-dependency-track-ui", "port": 8085},
+        "Postgres DB": {"container": "uawos-postgres", "host": POSTGRES_HOST, "port": POSTGRES_PORT},
+        QDRANT_VECTOR_DB: {"container": "uawos-qdrant", "host": QDRANT_HOST, "port": QDRANT_PORT},
+        MARQUEZ_LINEAGE: {"container": "uawos-marquez", "host": MARQUEZ_HOST, "port": MARQUEZ_PORT},
+        APACHE_SUPERSET: {"container": "uawos-superset", "host": SUPERSET_HOST, "port": SUPERSET_PORT},
+        DEP_TRACK_API: {"container": "uawos-dependency-track-api", "host": DTRACK_HOST, "port": DTRACK_PORT},
+        "Dependency-Track UI": {"container": "uawos-dependency-track-ui", "host": DTRACK_UI_HOST, "port": DTRACK_UI_PORT},
     }
     
     infra_status = {}
@@ -202,10 +238,11 @@ def evaluate_infra(is_docker_running, running_containers, local_dev_healthy, oll
     
     for name, cfg in infra_components.items():
         c_name = cfg["container"]
+        c_host = cfg["host"]
         c_port = cfg["port"]
         
         c_running = c_name in running_containers
-        port_open = check_port("127.0.0.1", c_port)
+        port_open = check_port(c_host, c_port)
 
         if c_running and port_open:
             infra_status[name] = "GREEN"
@@ -244,7 +281,7 @@ def evaluate_integrations(infra_status, venv_ok, is_semgrep_available, running_c
     }
 
 def evaluate_security(is_semgrep_available, is_docker_running, infra_status):
-    sandboxing_healthy = "GREEN" if check_port("127.0.0.1", 5001) else "GRAY"
+    sandboxing_healthy = "GREEN" if check_port(SANDBOX_HOST, SANDBOX_PORT) else "GRAY"
     return {
         "Semgrep SAST": "YELLOW" if not is_semgrep_available else "GREEN",
         "Trivy Container Scanner": "GREEN" if is_docker_running else "YELLOW",
@@ -255,9 +292,9 @@ def evaluate_security(is_semgrep_available, is_docker_running, infra_status):
 
 def evaluate_governance(infra_status):
     sbom_auditor_green = (infra_status.get(DEP_TRACK_API) == "GREEN")
-    opa_healthy = "GREEN" if check_port("127.0.0.1", 8181) else "YELLOW"
-    openfga_healthy = "GREEN" if check_port("127.0.0.1", 8083) else "YELLOW"
-    openmetadata_healthy = "GREEN" if check_port("127.0.0.1", 8585) else "GRAY"
+    opa_healthy = "GREEN" if check_port(OPA_HOST, OPA_PORT) else "YELLOW"
+    openfga_healthy = "GREEN" if check_port(OPENFGA_HOST, OPENFGA_PORT) else "YELLOW"
+    openmetadata_healthy = "GREEN" if check_port(OPENMETADATA_HOST, OPENMETADATA_PORT) else "GRAY"
     return {
         "License Governance Filters": "GREEN" if sbom_auditor_green else "YELLOW",
         "OpenLineage Execution Ingestion": "GREEN" if (infra_status.get(MARQUEZ_LINEAGE) == "GREEN") else "YELLOW",
@@ -271,12 +308,12 @@ def evaluate_data(infra_status):
     return {
         "Vector Storage (Qdrant)": "GREEN" if (infra_status.get(QDRANT_VECTOR_DB) == "GREEN") else "RED",
         "Relational Databases (Postgres)": "GREEN" if (infra_status.get("Postgres DB") == "GREEN") else "RED",
-        "Long-term Log Storage (ClickHouse)": "GREEN" if check_port("127.0.0.1", 8123) else "YELLOW",
+        "Long-term Log Storage (ClickHouse)": "GREEN" if check_port(CLICKHOUSE_HOST, CLICKHOUSE_PORT) else "YELLOW",
     }
 
 def evaluate_operations(infra_status):
-    telemetry_healthy = "GREEN" if check_port("127.0.0.1", 3000) else "YELLOW"
-    alarm_healthy = "GREEN" if check_port("127.0.0.1", 9093) else "GRAY"
+    telemetry_healthy = "GREEN" if check_port(TELEMETRY_HOST, TELEMETRY_PORT) else "YELLOW"
+    alarm_healthy = "GREEN" if check_port(ALARM_HOST, ALARM_PORT) else "GRAY"
     return {
         "Telemetry Collection": telemetry_healthy,
         "BI Reporting (Apache Superset)": "GREEN" if (infra_status.get(APACHE_SUPERSET) == "GREEN") else "RED",
@@ -294,6 +331,7 @@ def _evaluate_dynamic_services(dtase_healthy, budget_healthy, objective_healthy)
         "Value Engine": "GREEN" if (uawos_value is not None or uawos_budget is not None) else "GRAY",
         "Simulation Engine": "GREEN" if uawos_simulation is not None else "GRAY",
         "DTASE": "GREEN" if uawos_dtase is not None else "GRAY",
+        "Maturity Engine": "GREEN" if uawos_pmcms is not None else "GRAY",
     }
 
 def _evaluate_dynamic_agents(budget_healthy, objective_healthy):
@@ -338,7 +376,7 @@ def run_health_checks():
     is_semgrep_available = check_semgrep_availability()
 
     local_dev_healthy = os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".venv"))
-    ollama_running = check_port("127.0.0.1", 11434)
+    ollama_running = check_port(OLLAMA_HOST, OLLAMA_PORT)
 
     infra_status = evaluate_infra(is_docker_running, running_containers, local_dev_healthy, ollama_running)
     integrations = evaluate_integrations(infra_status, local_dev_healthy, is_semgrep_available, running_containers)
@@ -411,8 +449,8 @@ def run_health_checks():
     java_ok = shutil.which("java") is not None
     npm_ok = shutil.which("npm") is not None
 
-    neo4j_running = check_port("127.0.0.1", 7687) or check_port("127.0.0.1", 7474)
-    clickhouse_running = check_port("127.0.0.1", 8123)
+    neo4j_running = check_port(NEO4J_HOST, NEO4J_PORT_1) or check_port(NEO4J_HOST, NEO4J_PORT_2)
+    clickhouse_running = check_port(CLICKHOUSE_HOST, CLICKHOUSE_PORT)
 
     # SKL-AI-01: Prompt Tuning
     if dspy_ok and ollama_running:
@@ -580,8 +618,6 @@ def daemon_loop():
             print(f"Error in daemon checks: {e}", file=sys.stderr)
         time.sleep(5.0)
 
-import urllib.parse
-
 def get_documents():
     """Scan and categorize all markdown files in the Requirements Master directory."""
     docs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Requirements Master")
@@ -615,126 +651,190 @@ def get_documents():
         
     return categories
 
-class DashboardRequestHandler(BaseHTTPRequestHandler):
-    """Serve Dashboard HTTP requests."""
-    
-    def log_message(self, format, *args):
-        # Silence HTTP requests logging to stdout
-        pass
 
-    def handle_static(self, file_path, content_type):
-        self.send_response(200)
-        self.send_header("Content-Type", content_type)
-        self.end_headers()
+# Initialize FastAPI App
+app = FastAPI(title="UAWOS Operational Control Plane Daemon", version="1.0.0")
+
+# CORS Setup
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Static Dashboard View Routers
+@app.get("/", response_class=HTMLResponse)
+@app.get("/index.html", response_class=HTMLResponse)
+def serve_dashboard():
+    try:
+        with open(HTML_FILE, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Dashboard UI file not found.")
+
+@app.get("/delivery", response_class=HTMLResponse)
+@app.get("/delivery.html", response_class=HTMLResponse)
+def serve_delivery():
+    try:
+        with open(DELIVERY_FILE, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Delivery UI file not found.")
+
+@app.get("/roadmap", response_class=HTMLResponse)
+@app.get("/roadmap.html", response_class=HTMLResponse)
+def serve_roadmap():
+    try:
+        with open(ROADMAP_FILE, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Roadmap UI file not found.")
+
+@app.get("/requirement_studio", response_class=HTMLResponse)
+@app.get("/requirement_studio.html", response_class=HTMLResponse)
+def serve_requirement_studio():
+    try:
+        with open(REQUIREMENT_STUDIO_FILE, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Requirement Studio UI file not found.")
+
+@app.get("/architecture", response_class=HTMLResponse)
+@app.get("/architecture.html", response_class=HTMLResponse)
+def serve_architecture():
+    try:
+        with open(ARCHITECTURE_FILE, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Architecture UI file not found.")
+
+# REST API Endpoint Routers
+@app.get("/api/requirement/list")
+def get_requirement_list():
+    if uawos_requirement_studio is None:
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
+    try:
+        return uawos_requirement_studio.load_state()
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/objective/list")
+def get_objective_list():
+    if uawos_objective is None:
+        raise HTTPException(status_code=500, detail="Objective module unavailable.")
+    try:
+        return uawos_objective.load_state()
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/objective/conflicts")
+def get_objective_conflicts():
+    if uawos_objective is None:
+        raise HTTPException(status_code=500, detail="Objective module unavailable.")
+    try:
+        return {"conflicts": uawos_objective.detect_conflicts()}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/status")
+def get_status():
+    global status_cache
+    return status_cache
+
+@app.get("/api/pmcms")
+def get_pmcms():
+    if uawos_pmcms is None:
+        raise HTTPException(status_code=500, detail="PMCMS Maturity module unavailable.")
+    global status_cache
+    try:
+        return uawos_pmcms.get_maturity_assessment(status_cache)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/traceability")
+def get_traceability():
+    global status_cache
+    try:
+        matrix = uawos_traceability.get_traceability_matrix(status_cache)
+        health = uawos_traceability.get_delivery_health(matrix)
+        return {"matrix": matrix, "health": health}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/roadmap")
+def get_roadmap():
+    global status_cache
+    try:
+        matrix = uawos_traceability.get_traceability_matrix(status_cache)
+        return uawos_traceability.get_roadmap_data(matrix)
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/changes")
+def get_changes():
+    try:
+        return uawos_traceability.get_change_detection()
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/generate_prompt")
+def get_generate_prompt(roadmap_id: str = None):
+    global status_cache
+    try:
+        matrix = uawos_traceability.get_traceability_matrix(status_cache)
+        prompt = uawos_traceability.generate_antigravity_prompt(matrix, roadmap_id)
+        return {"prompt": prompt}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/docs")
+def get_docs():
+    return get_documents()
+
+@app.get("/api/docs/content", response_class=PlainTextResponse)
+def get_docs_content(file: str = ""):
+    file_name = os.path.basename(file)
+    docs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Requirements Master")
+    file_path = os.path.join(docs_dir, file_name)
+    if file_name and os.path.exists(file_path) and file_name.endswith(".md"):
         try:
             with open(file_path, "r", encoding="utf-8") as f:
-                self.wfile.write(f.read().encode("utf-8"))
-        except FileNotFoundError:
-            self.wfile.write(f"<h1>File not found: {os.path.basename(file_path)}</h1>".encode("utf-8"))
+                return f.read()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error reading file: {e}")
+    raise HTTPException(status_code=404, detail="Document not found or access denied.")
 
-    def handle_json(self, data):
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(data).encode("utf-8"))
+@app.get("/api/budget/status")
+def get_budget_status():
+    if uawos_budget is None:
+        raise HTTPException(status_code=500, detail="Budget module unavailable.")
+    try:
+        return uawos_budget.get_summary()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def handle_doc_content(self, query):
-        self.send_response(200)
-        self.send_header("Content-Type", "text/plain; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        
-        file_name = query.get("file", [""])[0]
-        file_name = os.path.basename(file_name)  # Sanitization against directory traversal
-        
-        docs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Requirements Master")
-        file_path = os.path.join(docs_dir, file_name)
-        
-        if file_name and os.path.exists(file_path) and file_name.endswith(".md"):
-            try:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    self.wfile.write(f.read().encode("utf-8"))
-            except Exception as e:
-                self.wfile.write(f"Error reading file: {e}".encode("utf-8"))
-        else:
-            self.wfile.write(b"Document not found or access denied.")
-
-    def do_GET(self):
-        global status_cache
-        parsed_url = urllib.parse.urlparse(self.path)
-        path = parsed_url.path
-        query = urllib.parse.parse_qs(parsed_url.query)
-        
-        if path in STATIC_ROUTES:
-            file_path, content_type = STATIC_ROUTES[path]
-            self.handle_static(file_path, content_type)
-        elif path == "/api/requirement/list":
-            try:
-                import uawos_requirement_studio
-                self.handle_json(uawos_requirement_studio.load_state())
-            except Exception as e:
-                self.handle_json({"error": str(e)})
-        elif path == "/api/objective/list":
-            try:
-                import uawos_objective
-                self.handle_json(uawos_objective.load_state())
-            except Exception as e:
-                self.handle_json({"error": str(e)})
-        elif path == "/api/objective/conflicts":
-            try:
-                import uawos_objective
-                self.handle_json({"conflicts": uawos_objective.detect_conflicts()})
-            except Exception as e:
-                self.handle_json({"error": str(e)})
-        elif path == "/api/status":
-            self.handle_json(status_cache)
-        elif path == "/api/traceability":
-            matrix = uawos_traceability.get_traceability_matrix(status_cache)
-            health = uawos_traceability.get_delivery_health(matrix)
-            self.handle_json({"matrix": matrix, "health": health})
-        elif path == "/api/roadmap":
-            matrix = uawos_traceability.get_traceability_matrix(status_cache)
-            roadmap = uawos_traceability.get_roadmap_data(matrix)
-            self.handle_json(roadmap)
-        elif path == "/api/changes":
-            self.handle_json(uawos_traceability.get_change_detection())
-        elif path == "/api/generate_prompt":
-            roadmap_id = query.get("roadmap_id", [None])[0]
-            matrix = uawos_traceability.get_traceability_matrix(status_cache)
-            prompt = uawos_traceability.generate_antigravity_prompt(matrix, roadmap_id)
-            self.handle_json({"prompt": prompt})
-        elif path == "/api/docs":
-            self.handle_json(get_documents())
-        elif path == "/api/docs/content":
-            self.handle_doc_content(query)
-        elif path == "/api/budget/status":
-            try:
-                import uawos_budget
-                self.handle_json(uawos_budget.get_summary())
-            except Exception as e:
-                import traceback
-                traceback.print_exc()
-                self.handle_json({"error": str(e)})
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-    def _handle_dtase_analyze(self, payload):
-        """Handle DTASE unstructured input analysis."""
+@app.post("/api/dtase/analyze")
+async def analyze_dtase(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_dtase is None:
+        raise HTTPException(status_code=500, detail="DTASE module unavailable.")
+    try:
+        payload = await request.json()
         text = payload.get("text", "")
-        import uawos_dtase
-        result = uawos_dtase.analyze_unstructured_input(text)
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+        return uawos_dtase.analyze_unstructured_input(text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def _handle_budget_action(self, payload):
-        """Handle budget actions and adjustments."""
+@app.post("/api/budget/action")
+async def budget_action(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_budget is None:
+        raise HTTPException(status_code=500, detail="Budget module unavailable.")
+    try:
+        payload = await request.json()
         action = payload.get("action", "")
-        import uawos_budget
         result = {"status": "success"}
         
         if action == "record_tokens":
@@ -762,105 +862,127 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
             result["gov"] = gov
             result["message"] = f"Evaluated governance for {obj_id}."
         else:
-            result = {"status": "error", "error": f"Unknown action: {action}"}
-            
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+            raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def _handle_requirement_submit(self, payload):
-        """Submit a new requirement to the intelligence studio."""
+@app.post("/api/requirement/submit")
+async def requirement_submit(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_requirement_studio is None:
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
+    try:
+        payload = await request.json()
         title = payload.get("title", "New Requirement")
         text = payload.get("text", "")
-        import uawos_requirement_studio
-        result = uawos_requirement_studio.submit_new_requirement(title, text)
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+        return uawos_requirement_studio.submit_new_requirement(title, text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def _handle_requirement_clarify(self, payload):
-        """Update answers to clarification questions."""
+@app.post("/api/requirement/clarify")
+async def requirement_clarify(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_requirement_studio is None:
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
+    try:
+        payload = await request.json()
         req_id = payload.get("requirement_id", "")
         answers = payload.get("answers", {})
         waive = payload.get("waive", False)
-        import uawos_requirement_studio
-        result = uawos_requirement_studio.update_clarifications(req_id, answers, waive)
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+        return uawos_requirement_studio.update_clarifications(req_id, answers, waive)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def _handle_requirement_author(self, payload):
-        """Author strategic proposition for a requirement."""
+@app.post("/api/requirement/author")
+async def requirement_author(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_requirement_studio is None:
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
+    try:
+        payload = await request.json()
         req_id = payload.get("requirement_id", "")
-        import uawos_requirement_studio
-        result = uawos_requirement_studio.author_proposition(req_id)
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+        return uawos_requirement_studio.author_proposition(req_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def _handle_requirement_absorb(self, payload):
-        """Absorb candidate and prioritize it against active roadmap."""
+@app.post("/api/requirement/absorb")
+async def requirement_absorb(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_requirement_studio is None:
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
+    try:
+        payload = await request.json()
         req_id = payload.get("requirement_id", "")
-        import uawos_requirement_studio
-        result = uawos_requirement_studio.absorb_requirement(req_id)
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+        return uawos_requirement_studio.absorb_requirement(req_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def _handle_requirement_publish(self, payload):
-        """Publish absorbed candidate to active roadmap portfolio."""
+@app.post("/api/requirement/publish")
+async def requirement_publish(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_requirement_studio is None:
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
+    try:
+        payload = await request.json()
         cand_id = payload.get("roadmap_id", "")
-        import uawos_requirement_studio
-        result = uawos_requirement_studio.publish_roadmap_item(cand_id)
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+        return uawos_requirement_studio.publish_roadmap_item(cand_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def _handle_requirement_direct_ingest(self, payload):
-        """Directly ingest requirement to active backlog in one go."""
+@app.post("/api/requirement/direct_ingest")
+async def requirement_direct_ingest(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_requirement_studio is None:
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
+    try:
+        payload = await request.json()
         req_id = payload.get("requirement_id", "")
         answers = payload.get("answers", {})
         waive = payload.get("waive", False)
-        import uawos_requirement_studio
-        result = uawos_requirement_studio.direct_ingest_to_backlog(req_id, answers, waive)
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+        return uawos_requirement_studio.direct_ingest_to_backlog(req_id, answers, waive)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def _handle_objective_submit(self, payload):
-        """Submit and ingest a new objective."""
+@app.post("/api/requirement/reset")
+def requirement_reset(x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_requirement_studio is None:
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
+    try:
+        state = uawos_requirement_studio.get_default_state()
+        uawos_requirement_studio.save_state(state)
+        if os.path.exists(uawos_requirement_studio.STATE_FILE):
+            os.remove(uawos_requirement_studio.STATE_FILE)
+        return {"status": "SUCCESS"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/objective/submit")
+async def objective_submit(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_objective is None:
+        raise HTTPException(status_code=500, detail="Objective module unavailable.")
+    try:
+        payload = await request.json()
         text = payload.get("text", "")
         input_type = payload.get("input_type", "text")
         owner = payload.get("owner", "")
         sponsor = payload.get("sponsor", "")
         source_uri = payload.get("source_uri", "")
-        import uawos_objective
-        result = uawos_objective.create_objective_from_input(text, input_type, owner, sponsor, source_uri)
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
+        return uawos_objective.create_objective_from_input(text, input_type, owner, sponsor, source_uri)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    def _handle_objective_action(self, payload):
-        """Handle lifecycle operations on an objective."""
+@app.post("/api/objective/action")
+async def objective_action(request: Request, x_uawos_token: str = Header(None)):
+    verify_secure_token(x_uawos_token)
+    if uawos_objective is None:
+        raise HTTPException(status_code=500, detail="Objective module unavailable.")
+    try:
+        payload = await request.json()
         action = payload.get("action", "")
         obj_id = payload.get("objective_id", "")
-        import uawos_objective
         result = {"status": "success"}
         
         if action == "pause":
@@ -877,84 +999,17 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
             updates = payload.get("updates", {})
             result["data"] = uawos_objective.update_objective(obj_id, updates)
         else:
-            result = {"status": "error", "error": f"Unknown action: {action}"}
-            
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
-
-    def _handle_requirement_reset(self):
-        """Reset requirement studio state."""
-        import uawos_requirement_studio
-        state = uawos_requirement_studio.get_default_state()
-        uawos_requirement_studio.save_state(state)
-        if os.path.exists(uawos_requirement_studio.STATE_FILE):
-            os.remove(uawos_requirement_studio.STATE_FILE)
-        self.send_response(200)
-        self.send_header("Content-Type", APPLICATION_JSON)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps({"status": "SUCCESS"}).encode('utf-8'))
-
-    def do_POST(self):
-        parsed_url = urllib.parse.urlparse(self.path)
-        path = parsed_url.path
-        
-        try:
-            content_length = int(self.headers.get('Content-Length', 0))
-            post_data = self.rfile.read(content_length)
-            payload = {}
-            if post_data:
-                payload = json.loads(post_data.decode('utf-8'))
-                
-            if path == "/api/dtase/analyze":
-                self._handle_dtase_analyze(payload)
-            elif path == "/api/budget/action":
-                self._handle_budget_action(payload)
-            elif path == "/api/requirement/submit":
-                self._handle_requirement_submit(payload)
-            elif path == "/api/requirement/clarify":
-                self._handle_requirement_clarify(payload)
-            elif path == "/api/requirement/author":
-                self._handle_requirement_author(payload)
-            elif path == "/api/requirement/absorb":
-                self._handle_requirement_absorb(payload)
-            elif path == "/api/requirement/publish":
-                self._handle_requirement_publish(payload)
-            elif path == "/api/requirement/direct_ingest":
-                self._handle_requirement_direct_ingest(payload)
-            elif path == "/api/requirement/reset":
-                self._handle_requirement_reset()
-            elif path == "/api/objective/submit":
-                self._handle_objective_submit(payload)
-            elif path == "/api/objective/action":
-                self._handle_objective_action(payload)
-            else:
-                self.send_response(404)
-                self.end_headers()
-        except Exception as e:
-            self.send_response(500)
-            self.send_header("Content-Type", APPLICATION_JSON)
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
+            raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 def start_server():
-    server = ThreadingHTTPServer(("0.0.0.0", PORT), DashboardRequestHandler)
-    print(f"Server started on http://0.0.0.0:{PORT}")
-    try:
-        server.serve_forever()
-        # Keep linter happy
-        return 0
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.server_close()
+    print(f"Starting server on http://0.0.0.0:{PORT}")
+    uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="warning")
+    return 0
 
 if __name__ == "__main__":
-    # Perform initial check before starting server
     print("Initializing UAWOS health monitors...")
     status_cache = run_health_checks()
     with open(STATUS_FILE, "w") as f:

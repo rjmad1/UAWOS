@@ -1,4 +1,5 @@
 # uawos_agent_workforce.py
+import uawos_db
 import os
 import json
 
@@ -18,6 +19,14 @@ def get_default_state() -> dict:
     }
 
 def load_state() -> dict:
+    state = uawos_db.db_get_state("uawos_agent_workforce", None)
+    if state is not None:
+        try:
+            with open(STATE_FILE, "w") as f:
+                json.dump(state, f, indent=2)
+        except Exception:
+            pass
+        return state
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -33,8 +42,8 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving agent workforce state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    uawos_db.db_save_state("uawos_agent_workforce", state)
 # Core API
 def register_agent(name: str, agent_class: str, capabilities: list, lifecycle_state: str = "idle") -> dict:
     """Register a new workforce agent (FR-091 to FR-097)."""
@@ -84,6 +93,11 @@ def calculate_agent_trust(name: str) -> float:
     state["agents"][name] = agent
     save_state(state)
     return trust
+
+def get_active_agents() -> list:
+    """Get list of active agent classes."""
+    state = load_state()
+    return [agent["class"] for agent in state["agents"].values() if agent.get("lifecycle_state") in ["active", "idle", "paused"]]
 
 # ----------------- VERIFICATION TESTS (FR-091 to FR-100) -----------------
 

@@ -1,120 +1,60 @@
 {
   "workflows": {
-    "WRK-101": {
-      "id": "WRK-101",
+    "WRK-105": {
+      "id": "WRK-105",
       "plan_id": "PLN-101",
-      "title": "Updated Workflow Title",
+      "title": "Workflow from plan PLN-101",
       "tasks": [
-        "Cache Configuration",
-        "DB Index Setup",
-        "Verification Tests"
+        "Orchestrate: Step 1",
+        "Orchestrate: Step 2"
       ],
       "dependencies": [],
-      "state": "terminated",
-      "version": 6,
-      "history": [
-        {
-          "timestamp": 1780986700.781061,
-          "state": {
-            "id": "WRK-101",
-            "plan_id": "PLN-101",
-            "title": "Optimized Funnel Refactor Workflow",
-            "tasks": [
-              "DB Index Setup",
-              "Cache Configuration",
-              "Verification Tests"
-            ],
-            "dependencies": [],
-            "state": "active",
-            "version": 1,
-            "governed": true
-          }
-        },
-        {
-          "timestamp": 1780986700.7846494,
-          "state": {
-            "id": "WRK-101",
-            "plan_id": "PLN-101",
-            "title": "Updated Workflow Title",
-            "tasks": [
-              "DB Index Setup",
-              "Cache Configuration",
-              "Verification Tests"
-            ],
-            "dependencies": [],
-            "state": "active",
-            "version": 2,
-            "governed": true
-          }
-        },
-        {
-          "timestamp": 1780986700.7846494,
-          "state": {
-            "id": "WRK-101",
-            "plan_id": "PLN-101",
-            "title": "Updated Workflow Title",
-            "tasks": [
-              "Cache Configuration",
-              "DB Index Setup",
-              "Verification Tests"
-            ],
-            "dependencies": [],
-            "state": "active",
-            "version": 3,
-            "governed": true
-          }
-        },
-        {
-          "timestamp": 1780986700.7861605,
-          "state": {
-            "id": "WRK-101",
-            "plan_id": "PLN-101",
-            "title": "Updated Workflow Title",
-            "tasks": [
-              "Cache Configuration",
-              "DB Index Setup",
-              "Verification Tests"
-            ],
-            "dependencies": [],
-            "state": "paused",
-            "version": 4,
-            "governed": true
-          }
-        },
-        {
-          "timestamp": 1780986700.7871697,
-          "state": {
-            "id": "WRK-101",
-            "plan_id": "PLN-101",
-            "title": "Updated Workflow Title",
-            "tasks": [
-              "Cache Configuration",
-              "DB Index Setup",
-              "Verification Tests"
-            ],
-            "dependencies": [],
-            "state": "active",
-            "version": 5,
-            "governed": true
-          }
-        }
+      "state": "active",
+      "version": 1,
+      "governed": true,
+      "history": []
+    },
+    "WRK-106": {
+      "id": "WRK-106",
+      "plan_id": "PLN-101",
+      "title": "T",
+      "tasks": [
+        "task"
       ],
-      "governed": true
+      "dependencies": [
+        "WRK-101"
+      ],
+      "state": "active",
+      "version": 1,
+      "governed": true,
+      "history": []
+    },
+    "WRK-107": {
+      "id": "WRK-107",
+      "plan_id": "PLN-101",
+      "title": "T",
+      "tasks": [
+        "task"
+      ],
+      "dependencies": [],
+      "state": "active",
+      "version": 1,
+      "governed": true,
+      "history": []
     },
     "WRK-102": {
       "id": "WRK-102",
       "plan_id": "PLN-101",
       "title": "Workflow from plan PLN-101",
       "tasks": [
-        "Orchestrate: Step 1: DB Query refactoring",
-        "Orchestrate: Step 2: Add cache headers",
-        "Orchestrate: Step 3: Setup conversion metrics"
+        "Orchestrate: Step 1",
+        "Orchestrate: Step 2"
       ],
       "dependencies": [],
       "state": "active",
       "version": 1,
-      "history": [],
-      "governed": true
+      "governed": true,
+      "history": []
     },
     "WRK-103": {
       "id": "WRK-103",
@@ -128,8 +68,8 @@
       ],
       "state": "active",
       "version": 1,
-      "history": [],
-      "governed": true
+      "governed": true,
+      "history": []
     },
     "WRK-104": {
       "id": "WRK-104",
@@ -141,8 +81,23 @@
       "dependencies": [],
       "state": "active",
       "version": 1,
-      "history": [],
-      "governed": true
+      "governed": true,
+      "history": []
+    },
+    "WRK-101": {
+      "id": "WRK-101",
+      "plan_id": "PLN-101",
+      "title": "Optimized Funnel Refactor Workflow",
+      "tasks": [
+        "DB Index Setup",
+        "Cache Configuration",
+        "Verification Tests"
+      ],
+      "dependencies": [],
+      "state": "active",
+      "version": 1,
+      "governed": true,
+      "history": []
     }
   }
 }

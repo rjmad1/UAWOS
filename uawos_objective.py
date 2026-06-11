@@ -1,4 +1,5 @@
 # uawos_objective.py
+import uawos_db
 import os
 import json
 import time
@@ -6,6 +7,7 @@ import urllib.request
 import urllib.error
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_objective_state.json")
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
 
 def get_default_state() -> dict:
     return {
@@ -13,6 +15,16 @@ def get_default_state() -> dict:
     }
 
 def load_state() -> dict:
+    if uawos_db.DB_AVAILABLE:
+        try:
+            state = uawos_db.db_load_objectives()
+            if state and state.get("objectives"):
+                with open(STATE_FILE, "w") as f:
+                    json.dump(state, f, indent=2)
+                return state
+        except Exception as e:
+            print(f"PostgreSQL load failed, falling back: {e}")
+
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -28,8 +40,12 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving objective state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    if uawos_db.DB_AVAILABLE:
+        try:
+            uawos_db.db_save_all_objectives(state.get("objectives", {}))
+        except Exception as e:
+            print(f"PostgreSQL save failed: {e}")
 # Core API for creating objectives
 def create_objective(
     title: str,
@@ -177,7 +193,7 @@ Output JSON format (strictly JSON, no extra text):
         }).encode('utf-8')
         
         req = urllib.request.Request(
-            "http://127.0.0.1:11434/api/generate",
+            f"{OLLAMA_BASE_URL}/api/generate",
             data=req_data,
             headers={"Content-Type": "application/json"}
         )

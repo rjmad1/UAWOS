@@ -1,4 +1,5 @@
 # uawos_memory.py
+import uawos_db
 import os
 import json
 import time
@@ -26,6 +27,14 @@ def get_default_state() -> dict:
     }
 
 def load_state() -> dict:
+    state = uawos_db.db_get_state("uawos_memory", None)
+    if state is not None:
+        try:
+            with open(STATE_FILE, "w") as f:
+                json.dump(state, f, indent=2)
+        except Exception:
+            pass
+        return state
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -41,8 +50,8 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving memory state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    uawos_db.db_save_state("uawos_memory", state)
 # Core API
 def append_memory(content: str, scope: str = "workspace", owner: str = "system", governance_check: bool = True) -> dict:
     """Maintain append-only memory (FR-121, FR-126, FR-128, FR-129)."""
@@ -63,6 +72,7 @@ def append_memory(content: str, scope: str = "workspace", owner: str = "system",
     }
     state["memory_logs"].append(entry)
     save_state(state)
+    uawos_db.index_memory(index, content, scope, owner)
     return entry
 
 # FR-122 & FR-130: Overlays
@@ -90,6 +100,7 @@ def curate_memory(index: int, updated_content: str) -> dict:
     
     state["memory_logs"][index] = entry
     save_state(state)
+    uawos_db.index_memory(index, updated_content, entry["scope"], entry["owner"])
     return entry
 
 # FR-125: Memory Export

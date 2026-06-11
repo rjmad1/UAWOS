@@ -1,4 +1,5 @@
 # uawos_governance.py
+import uawos_db
 import os
 import json
 import time
@@ -31,6 +32,14 @@ def get_default_state() -> dict:
     }
 
 def load_state() -> dict:
+    state = uawos_db.db_get_state("uawos_governance", None)
+    if state is not None:
+        try:
+            with open(STATE_FILE, "w") as f:
+                json.dump(state, f, indent=2)
+        except Exception:
+            pass
+        return state
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -46,8 +55,8 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving governance state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    uawos_db.db_save_state("uawos_governance", state)
 # Core API
 def create_policy(name: str, rule: str, category: str) -> dict:
     """Create a new policy ruleset (FR-101, FR-102)."""
@@ -88,6 +97,26 @@ def evaluate_action_governance(action_id: str, action_details: dict) -> dict:
     if tokens > 5000000:
         verdict = "REJECTED"
         reason = "Token consumption policy exceeded: request exceeds 5M tokens limit."
+        
+    # Check Separation of Duties (Separation of duties)
+    owner = action_details.get("owner") or action_details.get("actor")
+    approver = action_details.get("approver")
+    if owner and approver and owner == approver:
+        verdict = "REJECTED"
+        reason = "Separation of Duties violation: Action owner/actor cannot be the approver."
+        
+    # Check Actor Role Governance
+    actor_role = action_details.get("actor_role") or action_details.get("role")
+    if actor_role:
+        valid_roles = ["CEO", "Lead Engineer", "Database Expert", "Developer", "Executor Agent", "Senior Engineer", "Admin"]
+        if actor_role not in valid_roles:
+            verdict = "REJECTED"
+            reason = f"Role Governance violation: Unrecognized or unauthorized role '{actor_role}'."
+        else:
+            category = action_details.get("category")
+            if category == "budget" and actor_role not in ["CEO", "Lead Engineer", "Database Expert", "Admin"]:
+                verdict = "REJECTED"
+                reason = f"Role Governance violation: Role '{actor_role}' is not authorized for budget actions."
         
     # Check if there is an active exception override (FR-108)
     if action_id in state["exceptions"]:
@@ -232,6 +261,30 @@ def verify_fr_110():
     assert any(log["event_type"] == "AUDIT_TEST" for log in state["audit_logs"]), "Auditing failed."
     return True
 
+def verify_fr_111():
+    # Test separation of duties violation
+    res_sod = evaluate_action_governance("ACT-SOD", {"owner": "Alice", "approver": "Alice"})
+    assert res_sod["verdict"] == "REJECTED", "Separation of duties violation not blocked."
+    assert "Separation of Duties" in res_sod["reason"], "Incorrect rejection reason for Separation of Duties."
+    
+    # Test valid separation of duties
+    res_valid_sod = evaluate_action_governance("ACT-SOD-OK", {"owner": "Alice", "approver": "Bob"})
+    assert res_valid_sod["verdict"] == "APPROVED", "Valid separation of duties rejected."
+    
+    # Test unrecognized role
+    res_bad_role = evaluate_action_governance("ACT-ROLE-BAD", {"actor_role": "Hacker"})
+    assert res_bad_role["verdict"] == "REJECTED", "Unrecognized role not blocked."
+    
+    # Test unauthorized role for budget action
+    res_unauth_role = evaluate_action_governance("ACT-BUDGET-UNAUTH", {"actor_role": "Developer", "category": "budget"})
+    assert res_unauth_role["verdict"] == "REJECTED", "Unauthorized role for budget was not blocked."
+    
+    # Test authorized role for budget action
+    res_auth_role = evaluate_action_governance("ACT-BUDGET-AUTH", {"actor_role": "CEO", "category": "budget"})
+    assert res_auth_role["verdict"] == "APPROVED", "Authorized role for budget was rejected."
+    
+    return True
+
 def run_self_tests():
     print("Running Governance self tests...")
     state = get_default_state()
@@ -248,6 +301,7 @@ def run_self_tests():
         ("FR-108", verify_fr_108),
         ("FR-109", verify_fr_109),
         ("FR-110", verify_fr_110),
+        ("FR-111", verify_fr_111),
     ]
     
     for code, fn in tests:

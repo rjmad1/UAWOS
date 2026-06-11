@@ -3,6 +3,8 @@ import urllib.request
 import urllib.error
 import os
 
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
+
 PRODUCT_MGMT = "Product Management"
 GOVERNANCE_COMPLIANCE = "Governance & Compliance"
 
@@ -105,7 +107,7 @@ Output JSON format (strictly JSON, no extra text):
         }).encode('utf-8')
         
         req = urllib.request.Request(
-            "http://127.0.0.1:11434/api/generate",
+            f"{OLLAMA_BASE_URL}/api/generate",
             data=req_data,
             headers={"Content-Type": "application/json"}
         )

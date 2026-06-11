@@ -11,7 +11,10 @@ payload = json.dumps(data).encode("utf-8")
 req = urllib.request.Request(
     url,
     data=payload,
-    headers={"Content-Type": "application/json"}
+    headers={
+        "Content-Type": "application/json",
+        "X-UAWOS-Token": "uawos-secure-token-2026"
+    }
 )
 
 try:

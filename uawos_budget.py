@@ -1,4 +1,5 @@
 # uawos_budget.py
+import uawos_db
 import os
 import json
 import time
@@ -78,6 +79,14 @@ def get_default_state():
     }
 
 def load_state() -> dict:
+    state = uawos_db.db_get_state("uawos_budget", None)
+    if state is not None:
+        try:
+            with open(STATE_FILE, "w") as f:
+                json.dump(state, f, indent=2)
+        except Exception:
+            pass
+        return state
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -93,8 +102,8 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving budget state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    uawos_db.db_save_state("uawos_budget", state)
 # FR-151: Objective budgets
 def allocate_objective_budget(objective_id: str, name: str, budget: float) -> dict:
     state = load_state()

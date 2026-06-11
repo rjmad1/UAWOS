@@ -505,6 +505,14 @@
                 </svg>
                 Requirement Studio
             </a>
+            <button onclick="downloadAllMermaidCode()" class="btn" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%); border-color: rgba(99, 102, 241, 0.4); color: #f472b6;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download All Diagrams
+            </button>
         </div>
     </header>
 
@@ -1467,6 +1475,50 @@
                     console.error("Copy failed:", err);
                 });
             }
+        };
+
+        // Download all diagrams' Mermaid code and metadata at once into a markdown file
+        window.downloadAllMermaidCode = function() {
+            let markdown = `# UAWOS System Architecture & Design Blueprint\n\n`;
+            markdown += `Generated on: ${new Date().toLocaleString()}\n\n`;
+            markdown += `This document contains the Mermaid source code and architectural metadata for all 17 system design diagrams.\n\n`;
+            markdown += `---\n\n`;
+
+            for (const key in diagramsData) {
+                if (diagramsData.hasOwnProperty(key)) {
+                    const data = diagramsData[key];
+                    markdown += `## ${data.title}\n\n`;
+                    markdown += `### Metadata\n`;
+                    markdown += `- **Category/Level**: ${data.meta}\n`;
+                    markdown += `- **Purpose**: ${data.purpose}\n`;
+                    markdown += `- **Assumptions**: ${data.assumptions}\n`;
+                    markdown += `- **Key Insights**: ${data.insights}\n\n`;
+                    
+                    markdown += `### Mermaid Source Code\n`;
+                    markdown += `\`\`\`mermaid\n`;
+                    markdown += `${data.code.trim()}\n`;
+                    markdown += `\`\`\`\n\n`;
+
+                    markdown += `### Architectural Review Controls\n`;
+                    markdown += `- **Risks Identified**: ${data.risks}\n`;
+                    markdown += `- **Missing Information / Gaps**: ${data.missing}\n`;
+                    markdown += `- **Recommended Improvements**: ${data.improvements}\n\n`;
+
+                    markdown += `---\n\n`;
+                }
+            }
+
+            const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "uawos_architecture_diagrams.md");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast("All diagrams markdown downloaded successfully!");
         };
 
         // Show CSS Toast notification

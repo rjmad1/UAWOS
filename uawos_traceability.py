@@ -4,6 +4,19 @@ import sys
 import json
 import time
 
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "127.0.0.1")
+POSTGRES_PORT = int(os.environ.get("POSTGRES_PORT", 5435))
+MARQUEZ_HOST = os.environ.get("MARQUEZ_HOST", "127.0.0.1")
+MARQUEZ_PORT = int(os.environ.get("MARQUEZ_PORT", 5000))
+SUPERSET_HOST = os.environ.get("SUPERSET_HOST", "127.0.0.1")
+SUPERSET_PORT = int(os.environ.get("SUPERSET_PORT", 8088))
+QDRANT_HOST = os.environ.get("QDRANT_HOST", "127.0.0.1")
+QDRANT_PORT = int(os.environ.get("QDRANT_PORT", 6333))
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "127.0.0.1")
+OLLAMA_PORT = int(os.environ.get("OLLAMA_PORT", 11434))
+DTRACK_HOST = os.environ.get("DTRACK_HOST", "127.0.0.1")
+DTRACK_PORT = int(os.environ.get("DTRACK_PORT", 8081))
+
 BUDGET_COST_MGMT = "Budget & Cost Management"
 SECURITY_IDENTITY = "Security & Identity"
 KNOWLEDGE_MGMT = "Knowledge Management"
@@ -183,7 +196,9 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 (171, 180): ("uawos_simulation", "uawos-simulation-engine"),
                 (181, 190): ("uawos_value", "uawos-value-engine"),
                 (191, 200): ("uawos_observability", "uawos-observability-engine"),
-                (201, 250): ("uawos_integrations", "uawos-integrations-engine"),
+                (201, 235): ("uawos_integrations", "uawos-integrations-engine"),
+                (236, 236): ("uawos_pmcms", "uawos-pmcms-engine"),
+                (237, 250): ("uawos_integrations", "uawos-integrations-engine"),
             }
             
             mod_name = None
@@ -221,7 +236,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             code_refs = ["uawos_dashboard_daemon.py:90"]
             deploy_refs = ["uawos-postgres"]
             infra_refs = ["docker-compose.yml:L5"]
-            test_evidence = 'check_port("127.0.0.1", 5435)'
+            test_evidence = f'check_port("{POSTGRES_HOST}", {POSTGRES_PORT})'
             environment = "production"
         else:
             status = "BLOCKED"
@@ -234,7 +249,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             code_refs = ["uawos_dashboard_daemon.py:171", "uawos_dashboard.html:940"]
             deploy_refs = ["uawos-marquez", "uawos-superset"]
             infra_refs = ["docker-compose.yml:L40", "docker-compose.yml:L60"]
-            test_evidence = 'check_port("127.0.0.1", 5000) & check_port("127.0.0.1", 8088)'
+            test_evidence = f'check_port("{MARQUEZ_HOST}", {MARQUEZ_PORT}) & check_port("{SUPERSET_HOST}", {SUPERSET_PORT})'
             environment = "production"
         else:
             status = "DEGRADED"
@@ -259,7 +274,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 code_refs = ["requirements.txt:L12-19"] # pip packages mem0, graphiti, haystack
                 deploy_refs = ["uawos-qdrant", "core-ollama"]
                 infra_refs = ["docker-compose.yml:L24"]
-                test_evidence = 'check_port("127.0.0.1", 6333) & check_port("127.0.0.1", 11434)'
+                test_evidence = f'check_port("{QDRANT_HOST}", {QDRANT_PORT}) & check_port("{OLLAMA_HOST}", {OLLAMA_PORT})'
                 environment = "production"
             else:
                 status = "BLOCKED"
@@ -325,7 +340,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 reason_blocked = "OpenFGA container is not deployed (Authorization rules degraded)."
                 deploy_refs = ["uawos-dependency-track-api"]
                 infra_refs = ["docker-compose.yml:L71"]
-                test_evidence = 'check_port("127.0.0.1", 8081)'
+                test_evidence = f'check_port("{DTRACK_HOST}", {DTRACK_PORT})'
                 environment = "dev_testing"
         else:
             status = "BLOCKED"
@@ -384,6 +399,8 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         is_observability_req = False
         is_integrations_req = False
 
+        is_pmcms_req = False
+        
         if req_id.startswith("FR-"):
             parts = req_id.split("-")
             if len(parts) > 1 and parts[1].isdigit():
@@ -421,7 +438,10 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 elif 191 <= val <= 200:
                     is_observability_req = True
                 elif 201 <= val <= 250:
-                    is_integrations_req = True
+                    if val == 236:
+                        is_pmcms_req = True
+                    else:
+                        is_integrations_req = True
 
         module_mapping = {
             "is_obj_req": ("uawos_objective", "uawos-objective-engine"),
@@ -441,6 +461,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             "is_value_req": ("uawos_value", "uawos-value-engine"),
             "is_observability_req": ("uawos_observability", "uawos-observability-engine"),
             "is_integrations_req": ("uawos_integrations", "uawos-integrations-engine"),
+            "is_pmcms_req": ("uawos_pmcms", "uawos-pmcms-engine"),
         }
 
         matched_type = None
@@ -461,6 +482,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         elif is_value_req: matched_type = "is_value_req"
         elif is_observability_req: matched_type = "is_observability_req"
         elif is_integrations_req: matched_type = "is_integrations_req"
+        elif is_pmcms_req: matched_type = "is_pmcms_req"
 
         if matched_type:
             mod_name, deploy_name = module_mapping[matched_type]

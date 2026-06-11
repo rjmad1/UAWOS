@@ -10,13 +10,19 @@ def post_json(path, data):
     req = urllib.request.Request(
         f"{URL_BASE}{path}",
         data=req_data,
-        headers={"Content-Type": "application/json"}
+        headers={
+            "Content-Type": "application/json",
+            "X-UAWOS-Token": "uawos-secure-token-2026"
+        }
     )
     with urllib.request.urlopen(req, timeout=5.0) as response:
         return json.loads(response.read().decode('utf-8'))
 
 def get_json(path):
-    req = urllib.request.Request(f"{URL_BASE}{path}")
+    req = urllib.request.Request(
+        f"{URL_BASE}{path}",
+        headers={"X-UAWOS-Token": "uawos-secure-token-2026"}
+    )
     with urllib.request.urlopen(req, timeout=5.0) as response:
         return json.loads(response.read().decode('utf-8'))
 

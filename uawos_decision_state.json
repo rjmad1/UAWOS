@@ -2,97 +2,97 @@
   "claims": {
     "CLM-01": {
       "id": "CLM-01",
-      "content": "Query indexes will reduce checkout API latency under 100ms.",
-      "status": "asserted"
+      "status": "asserted",
+      "content": "Query indexes will reduce checkout API latency under 100ms."
     },
     "CLM-02": {
       "id": "CLM-02",
-      "content": "Claim Statement",
-      "status": "asserted"
+      "status": "asserted",
+      "content": "Claim Statement"
     }
   },
   "evidence": {
     "EVI-01": {
       "id": "EVI-01",
-      "claim_id": "CLM-01",
+      "text": "Heuristics show 40% cart abandonment on late shipping reveal.",
       "source": "uawos_dtase",
-      "text": "Heuristics show 40% cart abandonment on late shipping reveal."
+      "claim_id": "CLM-01"
     },
     "EVI-02": {
       "id": "EVI-02",
-      "claim_id": "CLM-01",
+      "text": "Testing evidence text",
       "source": "Source A",
-      "text": "Testing evidence text"
+      "claim_id": "CLM-01"
+    }
+  },
+  "decisions": {
+    "DEC-01": {
+      "id": "DEC-01",
+      "timestamp": 1780963292,
+      "justification": "Allows immediate deployment with minimal API signature changes.",
+      "explainability": "The decision was selected because Alt B satisfies latency limits while staying inside the $500 token budget constraint.",
+      "recommendation_id": "REC-01",
+      "chosen_alternative": "Alt B: Cached query optimizations"
+    },
+    "DEC-02": {
+      "id": "DEC-02",
+      "timestamp": 1781095038,
+      "justification": "Justify",
+      "explainability": "The decision for Alt B was taken because: Justify.",
+      "recommendation_id": "REC-01",
+      "chosen_alternative": "Alt B"
     }
   },
   "recommendations": {
     "REC-01": {
       "id": "REC-01",
       "title": "Database Cache Refactoring Strategy",
+      "assumptions": [
+        "Redis container is healthy"
+      ],
       "description": "Refactor database query rules to include client credentials cache rules.",
       "alternatives": [
         "Alt A: Full checkout rewrite",
         "Alt B: Cached query optimizations"
-      ],
-      "assumptions": [
-        "Redis container is healthy"
       ],
       "confidence_score": 94.0
     },
     "REC-02": {
       "id": "REC-02",
       "title": "T",
+      "assumptions": [
+        "Assump 1"
+      ],
       "description": "D",
       "alternatives": [
         "Alt A"
-      ],
-      "assumptions": [
-        "Assump 1"
       ],
       "confidence_score": 90.0
     },
     "REC-03": {
       "id": "REC-03",
       "title": "T",
+      "assumptions": [
+        "Assumption X"
+      ],
       "description": "D",
       "alternatives": [
         "Alt A"
-      ],
-      "assumptions": [
-        "Assumption X"
       ],
       "confidence_score": 90.0
     },
     "REC-04": {
       "id": "REC-04",
       "title": "T",
+      "assumptions": [
+        "Assump"
+      ],
       "description": "D",
       "alternatives": [
         "Alt 1",
         "Alt 2"
       ],
-      "assumptions": [
-        "Assump"
-      ],
       "confidence_score": 90.0
-    }
-  },
-  "decisions": {
-    "DEC-01": {
-      "id": "DEC-01",
-      "recommendation_id": "REC-01",
-      "chosen_alternative": "Alt B: Cached query optimizations",
-      "justification": "Allows immediate deployment with minimal API signature changes.",
-      "explainability": "The decision was selected because Alt B satisfies latency limits while staying inside the $500 token budget constraint.",
-      "timestamp": 1780963292
-    },
-    "DEC-02": {
-      "id": "DEC-02",
-      "recommendation_id": "REC-01",
-      "chosen_alternative": "Alt B",
-      "justification": "Justify",
-      "explainability": "The decision for Alt B was taken because: Justify.",
-      "timestamp": 1780986749
     }
   }
 }

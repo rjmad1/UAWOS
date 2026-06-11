@@ -1,4 +1,5 @@
 # uawos_learning.py
+import uawos_db
 import os
 import json
 import time
@@ -29,6 +30,14 @@ def get_default_state() -> dict:
     }
 
 def load_state() -> dict:
+    state = uawos_db.db_get_state("uawos_learning", None)
+    if state is not None:
+        try:
+            with open(STATE_FILE, "w") as f:
+                json.dump(state, f, indent=2)
+        except Exception:
+            pass
+        return state
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -44,8 +53,8 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving learning state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    uawos_db.db_save_state("uawos_learning", state)
 # Core API
 def detect_opportunities(action_logs: list) -> list:
     """Scan execution logs to recognize patterns and detect learning opportunities (FR-131, FR-136)."""

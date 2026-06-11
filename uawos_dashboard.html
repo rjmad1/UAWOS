@@ -665,6 +665,7 @@
                     <button class="tab-btn" onclick="switchTab(event, 'tab-sec-gov')">Sec & Gov</button>
                     <button class="tab-btn" onclick="switchTab(event, 'tab-dtase')">DTASE Engine</button>
                     <button class="tab-btn" onclick="switchTab(event, 'tab-budget')">Budget & Cost</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-pmcms')">Platform Maturity (PMCMS)</button>
                     <button class="tab-btn" onclick="switchTab(event, 'tab-docs')">Documentation</button>
                     <a href="/roadmap.html" class="tab-btn" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Roadmap Intelligence ↗</a>
                     <a href="/architecture.html" class="tab-btn" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Architecture Diagrams ↗</a>
@@ -771,6 +772,84 @@
                             <!-- Dynamic -->
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Platform Maturity (PMCMS) Tab -->
+                <div id="tab-pmcms" class="tab-content">
+                    <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; min-height: 600px;">
+                        
+                        <!-- Left Panel: Score Ring and Matrix -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            
+                            <!-- Overall Maturity Index Card -->
+                            <div class="glass" style="padding: 1.5rem; display: flex; align-items: center; justify-content: space-around; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15);">
+                                <div class="health-ring-container" style="width: 140px; height: 140px;">
+                                    <svg class="health-svg" width="140" height="140" viewBox="0 0 160 160">
+                                        <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                                        <circle class="health-ring-fill" id="pmcms-ring-fill" cx="80" cy="80" r="70" style="stroke: #818cf8; filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.4));" />
+                                    </svg>
+                                    <div class="health-percentage-text">
+                                        <span class="health-pct" id="pmcms-overall-score" style="font-size: 2.1rem; color: #a5b4fc;">0.00</span>
+                                        <span class="health-label" style="font-size: 0.68rem; letter-spacing: 0.5px;">MATURITY</span>
+                                    </div>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px; max-width: 60%;">
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Platform Maturity Stage</span>
+                                    <h2 id="pmcms-maturity-level-desc" style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; color: white;">Calculating...</h2>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
+                                        Normative evaluation score calculated dynamically in real-time based on the 9 maturity dimensions of the Platform Maturity & Capability Model Standard (PMCMS).
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Dimensions Grid Matrix -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                        <rect x="3" y="3" width="7" height="9" rx="1"/>
+                                        <rect x="14" y="3" width="7" height="5" rx="1"/>
+                                        <rect x="14" y="12" width="7" height="9" rx="1"/>
+                                        <rect x="3" y="16" width="7" height="5" rx="1"/>
+                                    </svg>
+                                    <span>Maturity Dimensions Matrix</span>
+                                </h3>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;" id="pmcms-matrix-grid">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Dimension Details Inspector -->
+                        <div class="glass" id="pmcms-inspector" style="padding: 1.8rem; background: rgba(18, 22, 35, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 1.25rem;">
+                            <div style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                <h3 id="pmcms-inspector-title" style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; color: #a5b4fc; font-weight: 700;">Dimension Details</h3>
+                                <span class="status-pill green" id="pmcms-inspector-badge" style="font-size: 0.75rem; padding: 2px 8px;">Level 1</span>
+                            </div>
+                            <p id="pmcms-inspector-desc" style="font-size: 0.88rem; line-height: 1.45; color: var(--text-secondary);"></p>
+                            
+                            <div>
+                                <h4 style="font-size: 0.8rem; font-weight: 600; color: white; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Live Evidence & Capabilities</h4>
+                                <div id="pmcms-inspector-evidence" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 style="font-size: 0.8rem; font-weight: 600; color: #fca5a5; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Identified Gaps</h4>
+                                <ul id="pmcms-inspector-gaps" style="padding-left: 14px; font-size: 0.82rem; color: #fca5a5; line-height: 1.45; display: flex; flex-direction: column; gap: 6px;">
+                                    <!-- Dynamic -->
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 style="font-size: 0.8rem; font-weight: 600; color: #93c5fd; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Next Investment Recommendations</h4>
+                                <div id="pmcms-inspector-recs" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
                 <!-- Documentation Tab -->
@@ -1284,6 +1363,9 @@
         window.clearDtase = clearDtase;
         window.switchPersonaTab = switchPersonaTab;
 
+        let selectedPmcmsDimension = "Strategy";
+        let lastPmcmsData = null;
+
         const presets = {
             overtime: "I worked 12 hours overtime this week on the product launch, but my supervisor denied my overtime compensation claim and threatened that if I escalated it to HR, I would be terminated immediately. This is totally illegal and violating my contract.",
             headaches: "I have been getting severe tension headaches every evening after finishing work. The symptoms usually start around 6 PM, causing head pain and fatigue. I am not taking any medications and need a clinical evaluation plan.",
@@ -1520,6 +1602,16 @@
                     await fetchBudgetStatus();
                 } catch (budgetErr) {
                     console.error("Budget fetch failed: ", budgetErr);
+                }
+                
+                try {
+                    const pmcmsRes = await fetch("/api/pmcms");
+                    if (pmcmsRes.ok) {
+                        const pmcmsData = await pmcmsRes.json();
+                        updatePmcms(pmcmsData);
+                    }
+                } catch (pmcmsErr) {
+                    console.error("PMCMS fetch failed: ", pmcmsErr);
                 }
                 
                 const indicator = document.getElementById("live-indicator");
@@ -1787,6 +1879,195 @@
                     ul.appendChild(li);
                 }
                 container.appendChild(ul);
+            }
+        }
+
+        function updatePmcms(data) {
+            if (!data || !data.dimensions) return;
+            lastPmcmsData = data;
+            
+            // 1. Update overall gauge
+            const score = data.overall_score;
+            document.getElementById("pmcms-overall-score").textContent = score.toFixed(2);
+            document.getElementById("pmcms-maturity-level-desc").textContent = data.maturity_level;
+            
+            const circle = document.getElementById("pmcms-ring-fill");
+            if (circle) {
+                const circumference = circle.r.baseVal.value * 2 * Math.PI;
+                circle.style.strokeDasharray = `${circumference} ${circumference}`;
+                circle.style.strokeDashoffset = circumference - (score / 5.0) * circumference;
+                
+                // Change color of the ring fill based on overall score
+                if (score >= 4.0) {
+                    circle.style.stroke = "#10b981";
+                    circle.style.filter = "drop-shadow(0 0 8px rgba(16, 185, 129, 0.4))";
+                    document.getElementById("pmcms-overall-score").style.color = "#34d399";
+                } else if (score >= 3.0) {
+                    circle.style.stroke = "#fbbf24";
+                    circle.style.filter = "drop-shadow(0 0 8px rgba(251, 191, 36, 0.4))";
+                    document.getElementById("pmcms-overall-score").style.color = "#fcd34d";
+                } else {
+                    circle.style.stroke = "#ef4444";
+                    circle.style.filter = "drop-shadow(0 0 8px rgba(239, 68, 68, 0.4))";
+                    document.getElementById("pmcms-overall-score").style.color = "#f87171";
+                }
+            }
+            
+            // 2. Render matrix grid
+            const grid = document.getElementById("pmcms-matrix-grid");
+            if (grid) {
+                grid.innerHTML = "";
+                
+                Object.keys(data.dimensions).forEach(key => {
+                    const dim = data.dimensions[key];
+                    const dimScore = dim.score;
+                    
+                    let statusClass = "green";
+                    let cardBg = "rgba(16, 185, 129, 0.04)";
+                    let cardBorder = "rgba(16, 185, 129, 0.25)";
+                    
+                    if (dimScore >= 4.0) {
+                        statusClass = "green";
+                        cardBg = "rgba(16, 185, 129, 0.04)";
+                        cardBorder = "rgba(16, 185, 129, 0.25)";
+                    } else if (dimScore >= 3.0) {
+                        statusClass = "yellow";
+                        cardBg = "rgba(245, 158, 11, 0.04)";
+                        cardBorder = "rgba(245, 158, 11, 0.25)";
+                    } else {
+                        statusClass = "red";
+                        cardBg = "rgba(239, 68, 68, 0.04)";
+                        cardBorder = "rgba(239, 68, 68, 0.25)";
+                    }
+                    
+                    const isSelected = key === selectedPmcmsDimension;
+                    if (isSelected) {
+                        cardBg = dimScore >= 4.0 ? "rgba(16, 185, 129, 0.15)" : (dimScore >= 3.0 ? "rgba(245, 158, 11, 0.15)" : "rgba(239, 68, 68, 0.15)");
+                        cardBorder = dimScore >= 4.0 ? "rgba(16, 185, 129, 0.6)" : (dimScore >= 3.0 ? "rgba(245, 158, 11, 0.6)" : "rgba(239, 68, 68, 0.6)");
+                    }
+                    
+                    const card = document.createElement("div");
+                    card.className = "glass";
+                    card.style.padding = "1.2rem";
+                    card.style.background = cardBg;
+                    card.style.border = `1px solid ${cardBorder}`;
+                    card.style.borderRadius = "10px";
+                    card.style.cursor = "pointer";
+                    card.style.transition = "all 0.2s ease";
+                    if (isSelected) {
+                        card.style.transform = "scale(1.02)";
+                        card.style.boxShadow = "0 8px 24px rgba(0,0,0,0.2)";
+                    }
+                    
+                    card.onclick = () => {
+                        selectedPmcmsDimension = key;
+                        updatePmcms(data);
+                    };
+                    
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <span style="font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700; color: white;">${key}</span>
+                            <span class="status-pill ${statusClass}" style="font-size: 0.68rem; padding: 2px 6px;">${dim.level}</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 4px;">
+                            <span style="font-size: 1.25rem; font-weight: 700; color: ${statusClass === 'green' ? '#34d399' : (statusClass === 'yellow' ? '#fcd34d' : '#f87171')}">${dimScore.toFixed(2)}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">/ 5.0</span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+            
+            // 3. Update inspector details
+            updateInspector(selectedPmcmsDimension, data.dimensions[selectedPmcmsDimension]);
+        }
+
+        function updateInspector(name, dim) {
+            if (!dim) return;
+            
+            const title = document.getElementById("pmcms-inspector-title");
+            if (title) title.textContent = name;
+            
+            const badge = document.getElementById("pmcms-inspector-badge");
+            if (badge) {
+                badge.textContent = dim.level;
+                badge.className = "status-pill " + (dim.score >= 4.0 ? "green" : (dim.score >= 3.0 ? "yellow" : "red"));
+            }
+            
+            const desc = document.getElementById("pmcms-inspector-desc");
+            if (desc) desc.textContent = dim.description;
+            
+            // Render evidence
+            const evidenceContainer = document.getElementById("pmcms-inspector-evidence");
+            if (evidenceContainer) {
+                evidenceContainer.innerHTML = "";
+                if (dim.evidence && dim.evidence.length > 0) {
+                    dim.evidence.forEach(item => {
+                        const ev = document.createElement("div");
+                        ev.style.display = "flex";
+                        ev.style.alignItems = "start";
+                        ev.style.gap = "8px";
+                        ev.style.fontSize = "0.82rem";
+                        ev.style.color = "var(--text-secondary)";
+                        ev.style.background = "rgba(255,255,255,0.02)";
+                        ev.style.border = "1px solid rgba(255,255,255,0.04)";
+                        ev.style.padding = "8px 12px";
+                        ev.style.borderRadius = "6px";
+                        ev.innerHTML = `
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" style="margin-top: 2px; flex-shrink: 0;">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>${item}</span>
+                        `;
+                        evidenceContainer.appendChild(ev);
+                    });
+                } else {
+                    evidenceContainer.innerHTML = `<span style="font-size: 0.82rem; color: var(--text-secondary); font-style: italic;">No evidence recorded.</span>`;
+                }
+            }
+            
+            // Render gaps
+            const gapsContainer = document.getElementById("pmcms-inspector-gaps");
+            if (gapsContainer) {
+                gapsContainer.innerHTML = "";
+                if (dim.gaps && dim.gaps.length > 0) {
+                    dim.gaps.forEach(item => {
+                        const gap = document.createElement("li");
+                        gap.textContent = item;
+                        gapsContainer.appendChild(gap);
+                    });
+                } else {
+                    gapsContainer.innerHTML = `<span style="font-size: 0.82rem; color: var(--text-secondary); font-style: italic;">No gaps identified.</span>`;
+                }
+            }
+            
+            // Render recommendations
+            const recsContainer = document.getElementById("pmcms-inspector-recs");
+            if (recsContainer) {
+                recsContainer.innerHTML = "";
+                if (dim.recommendations && dim.recommendations.length > 0) {
+                    dim.recommendations.forEach(item => {
+                        const rec = document.createElement("div");
+                        rec.style.display = "flex";
+                        rec.style.alignItems = "start";
+                        rec.style.gap = "8px";
+                        rec.style.fontSize = "0.82rem";
+                        rec.style.color = "white";
+                        rec.style.background = "rgba(147, 197, 253, 0.05)";
+                        rec.style.border = "1px solid rgba(147, 197, 253, 0.2)";
+                        rec.style.padding = "8px 12px";
+                        rec.style.borderRadius = "6px";
+                        rec.innerHTML = `
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                            <span>${item}</span>
+                        `;
+                        recsContainer.appendChild(rec);
+                    });
+                } else {
+                    recsContainer.innerHTML = `<span style="font-size: 0.82rem; color: var(--text-secondary); font-style: italic;">No investment recommendations.</span>`;
+                }
             }
         }
 

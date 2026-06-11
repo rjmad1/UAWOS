@@ -1,4 +1,5 @@
 # uawos_outcome.py
+import uawos_db
 import os
 import json
 import time
@@ -42,6 +43,16 @@ def get_default_state() -> dict:
     }
 
 def load_state() -> dict:
+    if uawos_db.DB_AVAILABLE:
+        try:
+            state = uawos_db.db_load_outcomes()
+            if state and state.get("outcomes"):
+                with open(STATE_FILE, "w") as f:
+                    json.dump(state, f, indent=2)
+                return state
+        except Exception as e:
+            print(f"PostgreSQL load failed, falling back: {e}")
+
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -57,8 +68,12 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving outcome state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    if uawos_db.DB_AVAILABLE:
+        try:
+            uawos_db.db_save_all_outcomes(state.get("outcomes", {}))
+        except Exception as e:
+            print(f"PostgreSQL save failed: {e}")
 # Core API for creating Outcomes
 def create_outcome(
     objective_id: str,
@@ -223,6 +238,26 @@ def verify_fr_040():
 
 def run_self_tests():
     print("Running Outcome Management self tests...")
+    if uawos_db.DB_AVAILABLE:
+        try:
+            uawos_db.db_save_objective({
+                "id": "OBJ-101",
+                "title": "Default Objective for Testing",
+                "description": "Test objective description",
+                "source_type": "text",
+                "source_uri": "",
+                "owner": "Product Owner",
+                "sponsor": "CEO",
+                "priority": "High",
+                "status": "active",
+                "version": 1,
+                "health_score": 80.0,
+                "confidence_score": 90.0,
+                "dependencies": [],
+                "history": []
+            })
+        except Exception as e:
+            print(f"Failed to seed objective OBJ-101: {e}")
     state = get_default_state()
     save_state(state)
     

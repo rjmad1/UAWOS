@@ -2,18 +2,172 @@
   "requirements": {
     "REQ-001": {
       "id": "REQ-001",
-      "title": "Multi-tenant SSO Integration",
+      "title": "Enterprise SSO Integration",
+      "status": "ABSORBED",
+      "critique": {
+        "risks": [
+          "Undocumented system and package dependencies."
+        ],
+        "strengths": [
+          "Strong alignment with core UAWOS objective-centric execution architecture."
+        ],
+        "weaknesses": [
+          "Heuristic parsing might overlook hidden technical complexities in high-load scenarios."
+        ],
+        "missing_information": [
+          "Resource utilization capacity estimates for concurrent agent operations."
+        ],
+        "suggested_improvements": [
+          "Link the requirement with the existing platform capability catalogs."
+        ]
+      },
       "raw_text": "Add multi-tenant SSO support to the enterprise control plane to solve the security vulnerability problem. Scope includes SAML and OIDC protocol interfaces, and excludes legacy LDAP protocols. Success metrics: user sign-in latency under 100ms. Business constraints: must deploy within the next 3 weeks with a budget of $5000. Technical constraints: must integrate with our Postgres database.",
-      "timestamp": 1780986778.8157988,
+      "timestamp": 1781099097.3417857,
       "ingestion_analysis": {
-        "completeness_score": 100,
-        "readiness_score": 89,
         "checklist": {
-          "has_problem_statement": true,
           "has_clear_scope": true,
           "has_success_metrics": true,
+          "has_problem_statement": true,
           "has_business_constraints": true,
           "has_technical_constraints": true
+        },
+        "parsed_scope": [
+          "General capability deployment"
+        ],
+        "parsed_problem": "Inferred problem context",
+        "readiness_score": 85,
+        "completeness_score": 100,
+        "parsed_constraints": [
+          "Requires UAWOS governance approval"
+        ]
+      },
+      "strategic_analysis": {
+        "aligned_themes": [
+          "Enterprise (Large Organizations)"
+        ],
+        "vision_aligned": true,
+        "alignment_score": 55,
+        "mission_aligned": true,
+        "user_value_score": 75,
+        "business_value_score": 55,
+        "strategic_impact_score": 55
+      },
+      "product_proposition": {
+        "M_Risks": "Token depletion due to long requirement document sizes; mapping failures under complex multi-dependency networks.",
+        "G_Personas": "Chief Product Officer (CPO), Portfolio Management Lead, Enterprise Business Analyst, Principal Software Architect.",
+        "P_MVP_Scope": "Web submission panel, heuristics scoring matrix, 10 questions UI, prioritization rank calculation, and state file sync.",
+        "F_User_Value": "Empowers product managers, CPOs, and enterprise architects with live visual feedback, detailed critique logs, and real-time portfolio sequencing.",
+        "N_Assumptions": "Local Ollama daemon is running with 'tinyllama' model; budget engine contains sufficient allocated tokens.",
+        "J_User_Stories": [
+          "As a CPO, I want to submit raw requirement documents so that I can automatically evaluate their strategic impact.",
+          "As a Product Strategist, I want to answer clarification questions to increase the requirement readiness score."
+        ],
+        "L_Dependencies": "Requires Qdrant vector index for RAG queries; requires SQLite/Postgres for state persistence; requires uawos_traceability integration.",
+        "E_Business_Value": "Reduces operational friction, minimizes tech debt growth, and increases ROI by enabling automated priority audit logs.",
+        "O_Success_Metrics": "Readiness score > 90%; 100% absorption of approved candidates into the Roadmap table; zero licensing contamination.",
+        "A_Executive_Summary": "This proposition outlines the strategic implementation of 'Enterprise SSO Integration' inside the UAWOS ecosystem. It establishes a governance-native, objective-centric framework to support this feature.",
+        "B_Problem_Statement": "Currently, the platform lacks dedicated support for 'Enterprise SSO Integration', leading to manual overhead, isolated capabilities, and gaps in strategic product management governance.",
+        "D_Strategic_Alignment": "Directly aligns with UAWOS Strategic Themes, supporting enterprise scaling, governed AI workflows, and single-source-of-truth roadmap alignment.",
+        "K_Acceptance_Criteria": "Completeness score must exceed 80% to publish; all clarification questions must be answered or waived; candidate must receive portfolio rank placement.",
+        "Q_Future_Enhancements": "Multi-model LLM consensus engine; deep scenario simulation runs using Monte Carlo projections.",
+        "C_Opportunity_Statement": "By integrating 'Enterprise SSO Integration', UAWOS can automate execution, capture structured metadata, and increase value-to-cost efficiency by 25% across corresponding workspaces.",
+        "H_Functional_Requirements": [
+          "REQ-REQ-001-01: The system shall provide an interactive intake interface for 'Enterprise SSO Integration' raw data.",
+          "REQ-REQ-001-02: The system shall parse and output strategic alignment and completeness metrics.",
+          "REQ-REQ-001-03: The system shall generate exactly 10 clarification questions with risk analysis.",
+          "REQ-REQ-001-04: The system shall auto-calculate relative prioritization against existing commitments."
+        ],
+        "I_Non_Functional_Requirements": "Latency < 200ms for analysis API endpoints; compatibility with docker sandboxed execution; zero-trust access control policy compliance."
+      },
+      "clarification_waiver": true,
+      "clarification_answers": {},
+      "clarification_questions": [
+        {
+          "id": "Q1",
+          "risk": "Poor system responsiveness under load, causing agent workflow time-outs.",
+          "question": "What are the specific performance constraints (latency, throughput) for this new capability?",
+          "rationale": "Enables engineering to set correct CPU/Memory reservations and index caching parameters.",
+          "impact_level": "High"
+        },
+        {
+          "id": "Q2",
+          "risk": "Security audit failure due to unexpected outbound traffic flows.",
+          "question": "Which identity federation protocols (SAML, OIDC) should be enabled for auth?",
+          "rationale": "Ensures integration with Okta or Azure AD schemas.",
+          "impact_level": "High"
+        },
+        {
+          "id": "Q3",
+          "risk": "IP violation lawsuits or forced open-sourcing of proprietary modules.",
+          "question": "Are there any licensing restrictions on libraries used by this capability (e.g. GPLv3)?",
+          "rationale": "Protects platform proprietary IP from copyleft contamination risks.",
+          "impact_level": "High"
+        },
+        {
+          "id": "Q4",
+          "risk": "UX misalignment leading to low platform adoption.",
+          "question": "Which specific user personas (CEO, Product Owner, Developer) will utilize this studio dashboard?",
+          "rationale": "Guides UI layout density, data aggregation levels, and access controls.",
+          "impact_level": "Medium"
+        },
+        {
+          "id": "Q5",
+          "risk": "Database connection exhaustion leading to command center downtime.",
+          "question": "What is the expected transaction volume and peak database write frequency?",
+          "rationale": "Determines Qdrant vector sizing and Postgres metadata connection pool allocations.",
+          "impact_level": "High"
+        },
+        {
+          "id": "Q6",
+          "risk": "Total feature failure if network connectivity drops in strict local environments.",
+          "question": "Should this capability support offline operation or local models exclusively?",
+          "rationale": "Configures HAYSTACK pipelines to target local Ollama gateway vs cloud-based Gemini/OpenAI routers.",
+          "impact_level": "Medium"
+        },
+        {
+          "id": "Q7",
+          "risk": "Runaway agent loops consuming excessive tokens without budget warnings.",
+          "question": "What are the specific OPA governance policy limits on token consumption or budgets for this module?",
+          "rationale": "Allows the Value Engine to enforce budget block limits dynamically.",
+          "impact_level": "High"
+        },
+        {
+          "id": "Q8",
+          "risk": "Total roadmap misalignment and manual recalculation overhead.",
+          "question": "What is the expected rollback strategy if requirement absorption causes portfolio sequencing conflicts?",
+          "rationale": "Prevents permanent corruption of active roadmap sequences.",
+          "impact_level": "Medium"
+        },
+        {
+          "id": "Q9",
+          "risk": "Scope bloat and late delivery of the core platform phases.",
+          "question": "What is the target completion timeline and release milestone mapping for this requirement?",
+          "rationale": "Allows the sequencing planner to map delivery efforts to corresponding roadmap releases.",
+          "impact_level": "Medium"
+        },
+        {
+          "id": "Q10",
+          "risk": "Compliance failure during external platform capability audits.",
+          "question": "How should this module audit and log user changes for executive governance?",
+          "rationale": "Addresses security auditing and traceability matrix update standards.",
+          "impact_level": "High"
+        }
+      ]
+    },
+    "REQ-002": {
+      "id": "REQ-002",
+      "title": "New Requirement",
+      "raw_text": "",
+      "timestamp": 1781099117.8966131,
+      "ingestion_analysis": {
+        "completeness_score": 0,
+        "readiness_score": 10,
+        "checklist": {
+          "has_problem_statement": false,
+          "has_clear_scope": false,
+          "has_success_metrics": false,
+          "has_business_constraints": false,
+          "has_technical_constraints": false
         },
         "parsed_problem": "Inferred problem context",
         "parsed_scope": [
@@ -27,9 +181,9 @@
         "alignment_score": 55,
         "strategic_impact_score": 55,
         "business_value_score": 55,
-        "user_value_score": 75,
+        "user_value_score": 60,
         "aligned_themes": [
-          "Enterprise (Large Organizations)"
+          "Foundation (Individuals & Small Teams)"
         ],
         "vision_aligned": true,
         "mission_aligned": true
@@ -39,15 +193,19 @@
           "Strong alignment with core UAWOS objective-centric execution architecture."
         ],
         "weaknesses": [
-          "Heuristic parsing might overlook hidden technical complexities in high-load scenarios."
+          "Submission is very brief, lacking necessary operational details."
         ],
         "missing_information": [
-          "Resource utilization capacity estimates for concurrent agent operations."
+          "Detailed technical integration scopes and user interaction flows.",
+          "OPA policy controls and verification checks."
         ],
         "risks": [
+          "Lacks explicit security governance bounds or rego policy declarations.",
           "Undocumented system and package dependencies."
         ],
         "suggested_improvements": [
+          "Elaborate on specific inputs, triggers, and expected outputs of this capability.",
+          "Incorporate explicit security compliance requirements and check rules.",
           "Link the requirement with the existing platform capability catalogs."
         ]
       },
@@ -61,8 +219,8 @@
         },
         {
           "id": "Q2",
-          "question": "Which identity federation protocols (SAML, OIDC) should be enabled for auth?",
-          "rationale": "Ensures integration with Okta or Azure AD schemas.",
+          "question": "Which specific third-party APIs or MCP servers must this module interface with?",
+          "rationale": "Required to configure correct outbound network routes and sandbox rules in Docker.",
           "risk": "Security audit failure due to unexpected outbound traffic flows.",
           "impact_level": "High"
         },
@@ -123,117 +281,88 @@
           "impact_level": "High"
         }
       ],
-      "clarification_answers": {
-        "Q1": "Latency must be < 50ms",
-        "Q2": "Supports Okta OIDC"
-      },
+      "clarification_answers": {},
       "clarification_waiver": false,
-      "product_proposition": {
-        "A_Executive_Summary": "This proposition outlines the strategic implementation of 'Multi-tenant SSO Integration' inside the UAWOS ecosystem. It establishes a governance-native, objective-centric framework to support this feature. [Clarified Q1: Latency must be < 50ms] [Clarified Q2: Supports Okta OIDC]",
-        "B_Problem_Statement": "Currently, the platform lacks dedicated support for 'Multi-tenant SSO Integration', leading to manual overhead, isolated capabilities, and gaps in strategic product management governance.",
-        "C_Opportunity_Statement": "By integrating 'Multi-tenant SSO Integration', UAWOS can automate execution, capture structured metadata, and increase value-to-cost efficiency by 25% across corresponding workspaces.",
-        "D_Strategic_Alignment": "Directly aligns with UAWOS Strategic Themes, supporting enterprise scaling, governed AI workflows, and single-source-of-truth roadmap alignment.",
-        "E_Business_Value": "Reduces operational friction, minimizes tech debt growth, and increases ROI by enabling automated priority audit logs.",
-        "F_User_Value": "Empowers product managers, CPOs, and enterprise architects with live visual feedback, detailed critique logs, and real-time portfolio sequencing.",
-        "G_Personas": "Chief Product Officer (CPO), Portfolio Management Lead, Enterprise Business Analyst, Principal Software Architect.",
-        "H_Functional_Requirements": [
-          "REQ-REQ-001-01: The system shall provide an interactive intake interface for 'Multi-tenant SSO Integration' raw data.",
-          "REQ-REQ-001-02: The system shall parse and output strategic alignment and completeness metrics.",
-          "REQ-REQ-001-03: The system shall generate exactly 10 clarification questions with risk analysis.",
-          "REQ-REQ-001-04: The system shall auto-calculate relative prioritization against existing commitments."
-        ],
-        "I_Non_Functional_Requirements": "Latency < 200ms for analysis API endpoints; compatibility with docker sandboxed execution; zero-trust access control policy compliance.",
-        "J_User_Stories": [
-          "As a CPO, I want to submit raw requirement documents so that I can automatically evaluate their strategic impact.",
-          "As a Product Strategist, I want to answer clarification questions to increase the requirement readiness score."
-        ],
-        "K_Acceptance_Criteria": "Completeness score must exceed 80% to publish; all clarification questions must be answered or waived; candidate must receive portfolio rank placement.",
-        "L_Dependencies": "Requires Qdrant vector index for RAG queries; requires SQLite/Postgres for state persistence; requires uawos_traceability integration.",
-        "M_Risks": "Token depletion due to long requirement document sizes; mapping failures under complex multi-dependency networks.",
-        "N_Assumptions": "Local Ollama daemon is running with 'tinyllama' model; budget engine contains sufficient allocated tokens.",
-        "O_Success_Metrics": "Readiness score > 90%; 100% absorption of approved candidates into the Roadmap table; zero licensing contamination.",
-        "P_MVP_Scope": "Web submission panel, heuristics scoring matrix, 10 questions UI, prioritization rank calculation, and state file sync.",
-        "Q_Future_Enhancements": "Multi-model LLM consensus engine; deep scenario simulation runs using Monte Carlo projections."
-      },
-      "status": "ABSORBED"
-    }
-  },
-  "roadmap_candidates": {
-    "RD-05": {
-      "roadmap_id": "RD-05",
-      "origin_requirement_id": "REQ-001",
-      "priority_score": 68.4,
-      "strategic_score": 55,
-      "ranking_position": 0,
-      "status": "PUBLISHED",
-      "factors": {
-        "strategic_alignment": 5,
-        "business_impact": 5,
-        "customer_impact": 7,
-        "revenue_impact": 4,
-        "risk_reduction": 7,
-        "technical_complexity": 4,
-        "delivery_effort": 3,
-        "dependencies": 5,
-        "resource_availability": 8,
-        "regulatory_requirements": 6,
-        "innovation_potential": 7
-      }
+      "product_proposition": {},
+      "status": "INGESTED"
     }
   },
   "published_items": [
     "RD-05"
   ],
+  "roadmap_candidates": {
+    "RD-05": {
+      "status": "PUBLISHED",
+      "factors": {
+        "dependencies": 5,
+        "revenue_impact": 4,
+        "risk_reduction": 7,
+        "business_impact": 5,
+        "customer_impact": 7,
+        "delivery_effort": 3,
+        "strategic_alignment": 5,
+        "innovation_potential": 7,
+        "technical_complexity": 4,
+        "resource_availability": 8,
+        "regulatory_requirements": 6
+      },
+      "roadmap_id": "RD-05",
+      "priority_score": 68.4,
+      "strategic_score": 55,
+      "ranking_position": 0,
+      "origin_requirement_id": "REQ-001"
+    }
+  },
   "resequenced_portfolio": [
     {
       "id": "RD-01",
       "name": "Local Enablement",
-      "previous_position": 1,
-      "new_position": 1,
       "movement": "\u2194",
-      "delivery_effort": 15,
+      "new_position": 1,
       "capacity_impact": "15% of capacity allocation",
-      "milestone_impact": "On Schedule"
+      "delivery_effort": 15,
+      "milestone_impact": "On Schedule",
+      "previous_position": 1
     },
     {
       "id": "RD-03",
       "name": "Security & Governance Enforcement",
-      "previous_position": 2,
-      "new_position": 2,
       "movement": "\u2194",
-      "delivery_effort": 20,
+      "new_position": 2,
       "capacity_impact": "20% of capacity allocation",
-      "milestone_impact": "On Schedule"
+      "delivery_effort": 20,
+      "milestone_impact": "On Schedule",
+      "previous_position": 2
     },
     {
       "id": "RD-02",
       "name": "RAG & Memory Integration",
-      "previous_position": 3,
-      "new_position": 3,
       "movement": "\u2194",
-      "delivery_effort": 25,
+      "new_position": 3,
       "capacity_impact": "25% of capacity allocation",
-      "milestone_impact": "On Schedule"
+      "delivery_effort": 25,
+      "milestone_impact": "On Schedule",
+      "previous_position": 3
     },
     {
       "id": "RD-05",
-      "name": "Multi-tenant SSO Integration",
-      "previous_position": null,
-      "new_position": 4,
+      "name": "Enterprise SSO Integration",
       "movement": "\u2194",
-      "delivery_effort": 15,
+      "new_position": 4,
       "capacity_impact": "15% of capacity allocation",
-      "milestone_impact": "On Schedule"
+      "delivery_effort": 15,
+      "milestone_impact": "On Schedule",
+      "previous_position": null
     },
     {
       "id": "RD-04",
       "name": "Full Enterprise Production Rollout",
-      "previous_position": 4,
-      "new_position": 5,
       "movement": "\u2193",
-      "delivery_effort": 35,
+      "new_position": 5,
       "capacity_impact": "35% of capacity allocation",
-      "milestone_impact": "Milestone Delayed (Capacity Exhausted)"
+      "delivery_effort": 35,
+      "milestone_impact": "Milestone Delayed (Capacity Exhausted)",
+      "previous_position": 4
     }
   ]
 }

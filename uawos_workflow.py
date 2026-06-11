@@ -1,4 +1,5 @@
 # uawos_workflow.py
+import uawos_db
 import os
 import json
 import time
@@ -23,6 +24,16 @@ def get_default_state() -> dict:
     }
 
 def load_state() -> dict:
+    if uawos_db.DB_AVAILABLE:
+        try:
+            state = uawos_db.db_load_workflows()
+            if state and state.get("workflows"):
+                with open(STATE_FILE, "w") as f:
+                    json.dump(state, f, indent=2)
+                return state
+        except Exception as e:
+            print(f"PostgreSQL load failed, falling back: {e}")
+
     if os.path.exists(STATE_FILE):
         try:
             with open(STATE_FILE, "r") as f:
@@ -38,8 +49,12 @@ def save_state(state: dict):
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"Error saving workflow state: {e}")
-
+        print(f"Error saving local state cache: {e}")
+    if uawos_db.DB_AVAILABLE:
+        try:
+            uawos_db.db_save_all_workflows(state.get("workflows", {}))
+        except Exception as e:
+            print(f"PostgreSQL save failed: {e}")
 # Core API
 def create_workflow(
     plan_id: str,
@@ -206,6 +221,42 @@ def verify_fr_070():
 
 def run_self_tests():
     print("Running Workflow Management self tests...")
+    if uawos_db.DB_AVAILABLE:
+        try:
+            uawos_db.db_save_objective({
+                "id": "OBJ-101",
+                "title": "Default Objective for Testing",
+                "description": "Test objective description",
+                "source_type": "text",
+                "source_uri": "",
+                "owner": "Product Owner",
+                "sponsor": "CEO",
+                "priority": "High",
+                "status": "active",
+                "version": 1,
+                "health_score": 80.0,
+                "confidence_score": 90.0,
+                "dependencies": [],
+                "history": []
+            })
+            uawos_db.db_save_plan({
+                "id": "PLN-101",
+                "objective_id": "OBJ-101",
+                "title": "Optimized Funnel Refactor Plan",
+                "steps": ["Step 1", "Step 2"],
+                "cost_estimate": 1000.0,
+                "duration_estimate": 120.0,
+                "resource_requirements": {},
+                "success_probability": 95.0,
+                "status": "approved",
+                "version": 1,
+                "risks": [],
+                "assumptions": [],
+                "is_alternative": False,
+                "history": []
+            })
+        except Exception as e:
+            print(f"Failed to seed dependencies in self-test setup: {e}")
     state = get_default_state()
     save_state(state)
     
