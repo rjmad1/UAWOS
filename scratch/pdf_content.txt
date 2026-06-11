@@ -1,0 +1,84 @@
+﻿python : Could not get FontBBox from font descriptor because None cannot be parsed as 4 floats
+At line:1 char:1
++ python -c "
++ ~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Could not get F...sed as 4 floats:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Could not get FontBBox from font descriptor because None cannot be parsed as 4 floats
+Could not get FontBBox from font descriptor because None cannot be parsed as 4 floats
+Could not get FontBBox from font descriptor because None cannot be parsed as 4 floats
+Could not get FontBBox from font descriptor because None cannot be parsed as 4 floats
+Could not get FontBBox from font descriptor because None cannot be parsed as 4 floats
+Total pages: 2
+--- PAGE 1 ---
+Minimal System Diagram Set (Product ΓÇó Architecture ΓÇó QA ΓÇó DevOps ΓÇó SRE ΓÇó
+Design ΓÇó Engineering)
+Diagram Primary Must Include Typical Common Most Useful
+Purpose (Minimum Questions Mistakes to For (Teams)
+Fields) This Diagram Avoid
+Answers
+System Define System name, Who are the Mixing Product,
+Context boundary. external users? What╩╝s internals Design,
+Diagram (C4- Show who actors, in/out of (services/DBs Architecture,
+L1) interacts and external scope? What ) into context. QA, SRE
+what systems, upstream/dow Missing
+connects. high-level nstream ownership
+flows systems boundaries.
+exist?
+Container Explain major UI apps, What are the Over- Architecture,
+Diagram (C4- internal gateway/BFF, major granularity Engineering,
+L2) components core services, components? (too many QA, SRE,
+and datastores, Who owns boxes). No DevOps
+responsibilitie queue/broker, what? Where clear
+s. integrations does data responsibility
+live? labels.
+E2E Make Trigger, hops, What happens Only showing QA,
+Sequence execution flow reads/writes, when user services but Engineering,
+Diagram explicit across external calls, clicks X? not data SRE, Product
+(Happy Path) services. response Where can writes. No
+path, timeouts latency timeout/retry
+happen? What semantics.
+breaks if Y is
+slow?
+Domain Shared Context What is an Turning it into Product,
+Model language for boundaries, Order vs DB schema. Engineering,
+Diagram business key entities, Checkout? Unbounded Architecture,
+(Bounded logic. Prevent relationships, Who owns ΓÇ£god domainΓÇ¥. QA
+Pricing? What
+
+--- PAGE 2 ---
+Context + mismatch in source-of- is canonical
+Entities) assumptions. truth truth?
+State Define States, What Skipping QA, SRE,
+Machine lifecycle and transitions, transitions are edge/failure Product,
+Diagram allowable invalid allowed? What states. Not Engineering
+(Critical transitions. transitions, states cause marking
+Object) triggers/action stuck orders? terminal
+s, terminal What can be states clearly.
+states retried?
+Data Flow Security/comp PII tags, trust Where is PII Hand-wavy SRE, DevOps,
+Diagram (PII liance truth. boundaries, stored? Who ΓÇ£data is QA,
++ Trust Data encryption in- can access it? secureΓÇ¥. Not Architecture,
+Boundaries) movement transit/at-rest, Where do we labeling PII. Product
+clarity. audit logging, encrypt/mask No
+retention ? retention/delet
+ion flow.
+Deployment Runtime Environments, Where does it Showing DevOps, SRE,
+Architecture reality of the regions/AZs, run? HA logical view Engineering,
+Diagram system. ingress/LB, strategy? only (same as QA
+compute Blast radius? container
+placement, How do diagram). No
+DB/cache/bro releases roll AZ/region
+ker out? separation.
+placement,
+network
+controls
+Observability Make it SLIs/SLOs, How do we Alerts without SRE, DevOps,
++ Operations operable, metrics/logs/tr detect issues? SLOs. No Engineering
+Diagram measurable, aces flow, What triggers runbooks. No
+supportable. alerts, a page? ownership
+dashboards, What╩╝s our routing.
+runbooks, SLO and error
+escalation budget?
+
