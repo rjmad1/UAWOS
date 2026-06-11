@@ -40,7 +40,7 @@
               "Frontend Dev"
             ]
           },
-          "timestamp": 1781185601.2465246
+          "timestamp": 1781193469.003918
         },
         {
           "state": {
@@ -69,7 +69,7 @@
               "Frontend Dev"
             ]
           },
-          "timestamp": 1781185601.3384993
+          "timestamp": 1781193469.1636543
         },
         {
           "state": {
@@ -98,7 +98,7 @@
               "Frontend Dev"
             ]
           },
-          "timestamp": 1781185601.4177027
+          "timestamp": 1781193469.271852
         },
         {
           "state": {
@@ -127,7 +127,7 @@
               "Frontend Dev"
             ]
           },
-          "timestamp": 1781185601.5013583
+          "timestamp": 1781193469.3674088
         }
       ],
       "version": 5,
@@ -147,7 +147,7 @@
     "PLN-102": {
       "id": "PLN-102",
       "objective_id": "OBJ-101",
-      "title": "Replanned strategy due to: Testing replan",
+      "title": "Replanned strategy due to: Governance Cost Warning",
       "steps": [
         "Step R1: Address constraints",
         "Step R2: Resume execution"

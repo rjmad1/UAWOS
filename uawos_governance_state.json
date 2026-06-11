@@ -41,7 +41,7 @@
         },
         "action_id": "ACT-EXEC"
       },
-      "timestamp": 1781185577,
+      "timestamp": 1781193461,
       "event_type": "EVALUATION"
     },
     {
@@ -49,7 +49,7 @@
         "impact": "High",
         "risk_id": "RSK-01"
       },
-      "timestamp": 1781185577,
+      "timestamp": 1781193462,
       "event_type": "RISK_IDENTIFIED"
     },
     {
@@ -59,14 +59,14 @@
         },
         "action_id": "ACT-TEST"
       },
-      "timestamp": 1781185577,
+      "timestamp": 1781193462,
       "event_type": "EVALUATION"
     },
     {
       "details": {
         "msg": "Self test active"
       },
-      "timestamp": 1781185578,
+      "timestamp": 1781193462,
       "event_type": "AUDIT_TEST"
     },
     {
@@ -77,7 +77,7 @@
         },
         "action_id": "ACT-SOD"
       },
-      "timestamp": 1781185578,
+      "timestamp": 1781193462,
       "event_type": "EVALUATION"
     },
     {
@@ -88,7 +88,7 @@
         },
         "action_id": "ACT-SOD-OK"
       },
-      "timestamp": 1781185578,
+      "timestamp": 1781193462,
       "event_type": "EVALUATION"
     },
     {
@@ -98,7 +98,7 @@
         },
         "action_id": "ACT-ROLE-BAD"
       },
-      "timestamp": 1781185578,
+      "timestamp": 1781193463,
       "event_type": "EVALUATION"
     },
     {
@@ -109,7 +109,7 @@
         },
         "action_id": "ACT-BUDGET-UNAUTH"
       },
-      "timestamp": 1781185578,
+      "timestamp": 1781193463,
       "event_type": "EVALUATION"
     },
     {
@@ -120,7 +120,7 @@
         },
         "action_id": "ACT-BUDGET-AUTH"
       },
-      "timestamp": 1781185578,
+      "timestamp": 1781193463,
       "event_type": "EVALUATION"
     },
     {
@@ -132,7 +132,7 @@
         },
         "action_id": "ACT-FGA-CEO"
       },
-      "timestamp": 1781185579,
+      "timestamp": 1781193463,
       "event_type": "EVALUATION"
     },
     {
@@ -144,62 +144,20 @@
         },
         "action_id": "ACT-FGA-DEV"
       },
-      "timestamp": 1781185579,
-      "event_type": "EVALUATION"
-    },
-    {
-      "details": {
-        "details": {
-          "owner": "Bob",
-          "category": "licensing",
-          "actor_role": "Developer"
-        },
-        "action_id": "ACT-FGA-DEV-OK"
-      },
-      "timestamp": 1781185579,
-      "event_type": "EVALUATION"
-    },
-    {
-      "details": {
-        "details": {
-          "owner": "Alice",
-          "approver": "Alice"
-        },
-        "action_id": "ACT-TEST-SOD"
-      },
-      "timestamp": 1781185602,
-      "event_type": "EVALUATION"
-    },
-    {
-      "details": {
-        "details": {
-          "estimated_tokens": 6000000
-        },
-        "action_id": "ACT-TOK"
-      },
-      "timestamp": 1781185602,
-      "event_type": "EVALUATION"
-    },
-    {
-      "details": {
-        "details": {
-          "owner": "Alice",
-          "approver": "Alice"
-        },
-        "action_id": "ACT-TEST-SOD"
-      },
-      "timestamp": 1781185603,
+      "timestamp": 1781193463,
       "event_type": "EVALUATION"
     },
     {
       "event_type": "EVALUATION",
       "details": {
-        "action_id": "ACT-TOK",
+        "action_id": "ACT-FGA-DEV-OK",
         "details": {
-          "estimated_tokens": 6000000
+          "owner": "Bob",
+          "actor_role": "Developer",
+          "category": "licensing"
         }
       },
-      "timestamp": 1781185603
+      "timestamp": 1781193463
     }
   ],
   "exceptions": {
@@ -208,21 +166,21 @@
       "reason": "GPL exception for isolated staging sandbox",
       "status": "Pending",
       "action_id": "ACT-GPL",
-      "timestamp": 1781185577
+      "timestamp": 1781193462
     },
     "ACT-SSO": {
       "id": "EXC-001",
       "reason": "Testing SSO exception",
       "status": "Approved",
       "action_id": "ACT-SSO",
-      "timestamp": 1781185577
+      "timestamp": 1781193462
     }
   },
   "risk_acceptances": {
     "RSK-01": {
       "status": "Accepted",
       "risk_id": "RSK-01",
-      "timestamp": 1781185577,
+      "timestamp": 1781193462,
       "justification": "Accepted for development lifecycle."
     }
   }

@@ -13,8 +13,9 @@ def _get_db_key(state_file: str) -> str:
 
 
 def load_state(state_file: str = None, default_state_func: Callable[[], Any] = None, tenant_id: str = "default_tenant"):
-    """Load state from PostgreSQL database if online, falling back to local JSON file."""
+    """Load state from PostgreSQL database, throwing error if offline."""
     import inspect
+    from uawos_context import get_tenant_id
 
     # Resolve state_file if not provided
     if state_file is None:
@@ -29,52 +30,33 @@ def load_state(state_file: str = None, default_state_func: Callable[[], Any] = N
             "STATE_FILE and get_default_state must be defined in the caller module or passed explicitly."
         )
 
-    # Try database first
-    db_ok = False
+    if tenant_id == "default_tenant":
+        tenant_id = get_tenant_id()
+
+    # Try database
     try:
         import uawos_db
         if uawos_db.DB_AVAILABLE:
             key = _get_db_key(state_file)
-            conn = uawos_db.get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute("SELECT state FROM uawos_state WHERE key = %s AND tenant_id = %s;", (key, tenant_id))
-            row = cursor.fetchone()
-            cursor.close()
-            conn.close()
-            db_ok = True
-            if row:
-                state = row[0]
-                if isinstance(state, str):
-                    return json.loads(state)
+            state = uawos_db.db_get_state(key, None, tenant_id)
+            if state is not None:
                 return state
-    except Exception:
-        pass
+        else:
+            raise RuntimeError("PostgreSQL database is offline.")
+    except Exception as e:
+        raise RuntimeError(f"Database error loading state: {e}")
 
-    # Fallback to local JSON file
-    if os.path.exists(state_file):
-        try:
-            with open(state_file, "r", encoding="utf-8") as f:
-                state = json.load(f)
-                # If DB is online but has no state record, seed it
-                if db_ok:
-                    try:
-                        import uawos_db
-                        uawos_db.db_save_state(_get_db_key(state_file), state, tenant_id)
-                    except Exception:
-                        pass
-                return state
-        except Exception:
-            pass
-
-    # Fallback to default state
+    # Plaintext file fallbacks are decommissioned in Wave 1.
+    # Seed default state if not found in database, then save it to database.
     state = default_state_func()
     save_state(state_file, state, tenant_id)
     return state
 
 
 def save_state(state_file: str = None, state: Any = None, tenant_id: str = "default_tenant"):
-    """Save state to PostgreSQL database and local JSON file."""
+    """Save state to PostgreSQL database."""
     import inspect
+    from uawos_context import get_tenant_id
 
     # Handle backward‑compatible signature where only state is provided
     if state is None and isinstance(state_file, dict):
@@ -88,22 +70,16 @@ def save_state(state_file: str = None, state: Any = None, tenant_id: str = "defa
     if state_file is None or state is None:
         raise ValueError("STATE_FILE and state must be provided to save_state.")
 
+    if tenant_id == "default_tenant":
+        tenant_id = get_tenant_id()
+
     # Try saving to DB
-    db_saved = False
     try:
         import uawos_db
         if uawos_db.DB_AVAILABLE:
-            conn = uawos_db.get_db_connection()
-            conn.close()
             uawos_db.db_save_state(_get_db_key(state_file), state, tenant_id)
-            db_saved = True
-    except Exception:
-        pass
-
-    # Dual-write/fallback to JSON file
-    try:
-        with open(state_file, "w", encoding="utf-8") as f:
-            json.dump(state, f, indent=2)
+            return
+        else:
+            raise RuntimeError("PostgreSQL database is offline.")
     except Exception as e:
-        if not db_saved:
-            print(f"Error saving state to file (and DB was unavailable): {e}")
+        raise RuntimeError(f"Database error saving state: {e}")

@@ -12,7 +12,7 @@
       "id": "SIM-02",
       "scenario": "SSO Load",
       "cost_mean": 200.0,
-      "timestamp": 1781185605,
+      "timestamp": 1781192532,
       "risk_probability": 0.15,
       "success_rate_mean": 90.0
     },
@@ -20,7 +20,7 @@
       "id": "SIM-03",
       "scenario": "What-if baseline",
       "cost_mean": 200.0,
-      "timestamp": 1781185605,
+      "timestamp": 1781192532,
       "risk_probability": 0.45,
       "success_rate_mean": 70.0
     },
@@ -28,14 +28,14 @@
       "id": "SIM-04",
       "scenario": "What-if alternative",
       "cost_mean": 200.0,
-      "timestamp": 1781185606,
+      "timestamp": 1781192532,
       "risk_probability": 0.15,
       "success_rate_mean": 85.0
     }
   },
   "forecast_validations": [
     {
-      "timestamp": 1781185606,
+      "timestamp": 1781192532,
       "mean_absolute_percentage_error": 4.2,
       "status": "Valid"
     }

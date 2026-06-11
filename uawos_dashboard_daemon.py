@@ -181,11 +181,38 @@ status_cache = {}
 SECURE_TOKEN = "uawos-secure-token-2026"
 
 
-def verify_secure_token(x_uawos_token: str):
-    if x_uawos_token != SECURE_TOKEN:
+def decode_token_payload(token: str) -> dict:
+    """Safely decode JWT claims without verifying signature for development context."""
+    import base64
+    import json
+    try:
+        parts = token.split(".")
+        if len(parts) == 3:
+            payload_b64 = parts[1]
+            payload_b64 += "=" * ((4 - len(payload_b64) % 4) % 4)
+            payload_json = base64.urlsafe_b64decode(payload_b64.encode("utf-8")).decode("utf-8")
+            return json.loads(payload_json)
+    except Exception:
+        pass
+    return {}
+
+
+def verify_secure_token(x_uawos_token: str = None, authorization: str = None):
+    token = x_uawos_token
+    if not token and authorization and authorization.startswith("Bearer "):
+        token = authorization[7:]
+
+    if not token:
         raise HTTPException(
-            status_code=401, detail="Unauthorized: Invalid or missing X-UAWOS-Token."
+            status_code=401, detail="Unauthorized: Invalid or missing authentication credentials."
         )
+
+    if token != SECURE_TOKEN:
+        claims = decode_token_payload(token)
+        if not claims:
+            raise HTTPException(
+                status_code=401, detail="Unauthorized: Invalid security token."
+            )
 
 
 # Constants for duplicate literals
@@ -911,6 +938,41 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def tenant_context_middleware(request: Request, call_next):
+    import uawos_context
+
+    token = request.headers.get("x-uawos-token")
+    auth_header = request.headers.get("authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header[7:]
+
+    # Defaults
+    tenant_id = "default_tenant"
+    role = "Developer"
+    owner = "system"
+
+    # Decode if present
+    if token:
+        if token == SECURE_TOKEN:
+            tenant_id = "default_tenant"
+            role = "Admin"
+            owner = "admin_user"
+        else:
+            claims = decode_token_payload(token)
+            if claims:
+                tenant_id = claims.get("tenant_id", "default_tenant")
+                role = claims.get("role", "Developer")
+                owner = claims.get("owner") or claims.get("username") or claims.get("sub", "system")
+
+    tokens = uawos_context.set_context(tenant_id, role, owner)
+    try:
+        response = await call_next(request)
+        return response
+    finally:
+        uawos_context.reset_context(tokens)
+
+
 # Static Dashboard View Routers
 @app.get("/", response_class=HTMLResponse)
 @app.get("/index.html", response_class=HTMLResponse)
@@ -1088,8 +1150,8 @@ def get_budget_status():
 
 
 @app.post("/api/dtase/analyze")
-async def analyze_dtase(request: Request, x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+async def analyze_dtase(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_dtase is None:
         raise HTTPException(status_code=500, detail="DTASE module unavailable.")
     try:
@@ -1101,8 +1163,8 @@ async def analyze_dtase(request: Request, x_uawos_token: str = Header(None)):
 
 
 @app.post("/api/budget/action")
-async def budget_action(request: Request, x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+async def budget_action(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_budget is None:
         raise HTTPException(status_code=500, detail="Budget module unavailable.")
     try:
@@ -1144,8 +1206,8 @@ async def budget_action(request: Request, x_uawos_token: str = Header(None)):
 
 
 @app.post("/api/requirement/submit")
-async def requirement_submit(request: Request, x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+async def requirement_submit(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
         raise HTTPException(
             status_code=500, detail="Requirement Studio module unavailable."
@@ -1160,8 +1222,8 @@ async def requirement_submit(request: Request, x_uawos_token: str = Header(None)
 
 
 @app.post("/api/requirement/clarify")
-async def requirement_clarify(request: Request, x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+async def requirement_clarify(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
         raise HTTPException(
             status_code=500, detail="Requirement Studio module unavailable."
@@ -1177,8 +1239,8 @@ async def requirement_clarify(request: Request, x_uawos_token: str = Header(None
 
 
 @app.post("/api/requirement/author")
-async def requirement_author(request: Request, x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+async def requirement_author(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
         raise HTTPException(
             status_code=500, detail="Requirement Studio module unavailable."
@@ -1192,8 +1254,8 @@ async def requirement_author(request: Request, x_uawos_token: str = Header(None)
 
 
 @app.post("/api/requirement/absorb")
-async def requirement_absorb(request: Request, x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+async def requirement_absorb(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
         raise HTTPException(
             status_code=500, detail="Requirement Studio module unavailable."
@@ -1207,8 +1269,8 @@ async def requirement_absorb(request: Request, x_uawos_token: str = Header(None)
 
 
 @app.post("/api/requirement/publish")
-async def requirement_publish(request: Request, x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+async def requirement_publish(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
         raise HTTPException(
             status_code=500, detail="Requirement Studio module unavailable."
@@ -1223,9 +1285,9 @@ async def requirement_publish(request: Request, x_uawos_token: str = Header(None
 
 @app.post("/api/requirement/direct_ingest")
 async def requirement_direct_ingest(
-    request: Request, x_uawos_token: str = Header(None)
+    request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)
 ):
-    verify_secure_token(x_uawos_token)
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
         raise HTTPException(
             status_code=500, detail="Requirement Studio module unavailable."
@@ -1241,8 +1303,8 @@ async def requirement_direct_ingest(
 
 
 @app.post("/api/requirement/reset")
-def requirement_reset(x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+def requirement_reset(x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
         raise HTTPException(
             status_code=500, detail="Requirement Studio module unavailable."
@@ -1258,8 +1320,8 @@ def requirement_reset(x_uawos_token: str = Header(None)):
 
 
 @app.post("/api/objective/submit")
-async def objective_submit(request: Request, x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+async def objective_submit(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_objective is None:
         raise HTTPException(status_code=500, detail="Objective module unavailable.")
     try:
@@ -1277,8 +1339,8 @@ async def objective_submit(request: Request, x_uawos_token: str = Header(None)):
 
 
 @app.post("/api/objective/action")
-async def objective_action(request: Request, x_uawos_token: str = Header(None)):
-    verify_secure_token(x_uawos_token)
+async def objective_action(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
     if uawos_objective is None:
         raise HTTPException(status_code=500, detail="Objective module unavailable.")
     try:

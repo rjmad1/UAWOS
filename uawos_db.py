@@ -226,6 +226,9 @@ def db_get_state(key: str, default_fn, tenant_id: str = "default_tenant") -> dic
     if not DB_AVAILABLE:
         return default_fn() if default_fn else None
     try:
+        if tenant_id == "default_tenant":
+            from uawos_context import get_tenant_id
+            tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT state FROM uawos_state WHERE key = %s AND tenant_id = %s;", (key, tenant_id))
@@ -246,6 +249,9 @@ def db_save_state(key: str, state: dict, tenant_id: str = "default_tenant"):
     if not DB_AVAILABLE:
         return
     try:
+        if tenant_id == "default_tenant":
+            from uawos_context import get_tenant_id
+            tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -269,6 +275,8 @@ def index_memory(memory_id: int, content: str, scope: str, owner: str):
     if not QDRANT_AVAILABLE:
         return
     try:
+        from uawos_context import get_tenant_id
+        tenant_id = get_tenant_id()
         client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         embedding = get_embedding(content)
         client.upsert(
@@ -282,6 +290,7 @@ def index_memory(memory_id: int, content: str, scope: str, owner: str):
                         "scope": scope,
                         "owner": owner,
                         "timestamp": int(time.time()),
+                        "tenant_id": tenant_id,
                     },
                 )
             ],
@@ -296,6 +305,8 @@ def index_knowledge(
     if not QDRANT_AVAILABLE:
         return
     try:
+        from uawos_context import get_tenant_id
+        tenant_id = get_tenant_id()
         client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         embedding = get_embedding(content)
         import uuid
@@ -314,6 +325,7 @@ def index_knowledge(
                         "source_type": source_type,
                         "provenance": provenance,
                         "timestamp": int(time.time()),
+                        "tenant_id": tenant_id,
                     },
                 )
             ],
@@ -326,13 +338,27 @@ def search_memory(query: str, limit: int = 5) -> list:
     if not QDRANT_AVAILABLE:
         return []
     try:
+        from uawos_context import get_tenant_id
+        tenant_id = get_tenant_id()
+        from qdrant_client.models import Filter, FieldCondition, MatchValue
         client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         embedding = get_embedding(query)
-        results = client.search(
-            collection_name="uawos_memory", query_vector=embedding, limit=limit
+        results = client.query_points(
+            collection_name="uawos_memory",
+            query=embedding,
+            query_filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="tenant_id",
+                        match=MatchValue(value=tenant_id)
+                    )
+                ]
+            ),
+            limit=limit,
         )
-        return [r.payload for r in results]
-    except Exception:
+        return [r.payload for r in results.points]
+    except Exception as e:
+        print(f"search_memory exception: {e}")
         return []
 
 
@@ -340,13 +366,27 @@ def search_knowledge(query: str, limit: int = 5) -> list:
     if not QDRANT_AVAILABLE:
         return []
     try:
+        from uawos_context import get_tenant_id
+        tenant_id = get_tenant_id()
+        from qdrant_client.models import Filter, FieldCondition, MatchValue
         client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         embedding = get_embedding(query)
-        results = client.search(
-            collection_name="uawos_knowledge", query_vector=embedding, limit=limit
+        results = client.query_points(
+            collection_name="uawos_knowledge",
+            query=embedding,
+            query_filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="tenant_id",
+                        match=MatchValue(value=tenant_id)
+                    )
+                ]
+            ),
+            limit=limit,
         )
-        return [r.payload for r in results]
-    except Exception:
+        return [r.payload for r in results.points]
+    except Exception as e:
+        print(f"search_knowledge exception: {e}")
         return []
 
 
@@ -358,7 +398,10 @@ def db_save_objective(obj: dict):
     if not DB_AVAILABLE:
         return
     try:
-        tenant_id = obj.get("tenant_id", "default_tenant")
+        tenant_id = obj.get("tenant_id")
+        if not tenant_id or tenant_id == "default_tenant":
+            from uawos_context import get_tenant_id
+            tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -407,10 +450,13 @@ def db_load_objectives() -> dict:
     if not DB_AVAILABLE:
         return {"objectives": {}}
     try:
+        from uawos_context import get_tenant_id
+        tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, title, description, source_type, source_uri, owner, sponsor, priority, status, version, health_score, confidence_score, dependencies, history, tenant_id FROM uawos_objectives;"
+            "SELECT id, title, description, source_type, source_uri, owner, sponsor, priority, status, version, health_score, confidence_score, dependencies, history, tenant_id FROM uawos_objectives WHERE tenant_id = %s;",
+            (tenant_id,)
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -454,7 +500,10 @@ def db_save_outcome(out: dict):
     if not DB_AVAILABLE:
         return
     try:
-        tenant_id = out.get("tenant_id", "default_tenant")
+        tenant_id = out.get("tenant_id")
+        if not tenant_id or tenant_id == "default_tenant":
+            from uawos_context import get_tenant_id
+            tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -501,10 +550,13 @@ def db_load_outcomes() -> dict:
     if not DB_AVAILABLE:
         return {"outcomes": {}}
     try:
+        from uawos_context import get_tenant_id
+        tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, objective_id, title, metric, unit, weight, dependencies, confidence_score, owner, baseline_state, target_state, current_state, forecasted_state, tenant_id FROM uawos_outcomes;"
+            "SELECT id, objective_id, title, metric, unit, weight, dependencies, confidence_score, owner, baseline_state, target_state, current_state, forecasted_state, tenant_id FROM uawos_outcomes WHERE tenant_id = %s;",
+            (tenant_id,)
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -543,7 +595,10 @@ def db_save_plan(plan: dict):
     if not DB_AVAILABLE:
         return
     try:
-        tenant_id = plan.get("tenant_id", "default_tenant")
+        tenant_id = plan.get("tenant_id")
+        if not tenant_id or tenant_id == "default_tenant":
+            from uawos_context import get_tenant_id
+            tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -592,10 +647,13 @@ def db_load_plans() -> dict:
     if not DB_AVAILABLE:
         return {"plans": {}}
     try:
+        from uawos_context import get_tenant_id
+        tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, objective_id, title, steps, cost_estimate, duration_estimate, resource_requirements, success_probability, status, version, risks, assumptions, is_alternative, history, tenant_id FROM uawos_plans;"
+            "SELECT id, objective_id, title, steps, cost_estimate, duration_estimate, resource_requirements, success_probability, status, version, risks, assumptions, is_alternative, history, tenant_id FROM uawos_plans WHERE tenant_id = %s;",
+            (tenant_id,)
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -651,7 +709,10 @@ def db_save_workflow(wf: dict):
     if not DB_AVAILABLE:
         return
     try:
-        tenant_id = wf.get("tenant_id", "default_tenant")
+        tenant_id = wf.get("tenant_id")
+        if not tenant_id or tenant_id == "default_tenant":
+            from uawos_context import get_tenant_id
+            tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -693,10 +754,13 @@ def db_load_workflows() -> dict:
     if not DB_AVAILABLE:
         return {"workflows": {}}
     try:
+        from uawos_context import get_tenant_id
+        tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, plan_id, title, tasks, dependencies, state, version, governed, history, tenant_id FROM uawos_workflows;"
+            "SELECT id, plan_id, title, tasks, dependencies, state, version, governed, history, tenant_id FROM uawos_workflows WHERE tenant_id = %s;",
+            (tenant_id,)
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -739,7 +803,10 @@ def db_save_action(act: dict):
     if not DB_AVAILABLE:
         return
     try:
-        tenant_id = act.get("tenant_id", "default_tenant")
+        tenant_id = act.get("tenant_id")
+        if not tenant_id or tenant_id == "default_tenant":
+            from uawos_context import get_tenant_id
+            tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -782,10 +849,13 @@ def db_load_actions() -> dict:
     if not DB_AVAILABLE:
         return {"actions": {}}
     try:
+        from uawos_context import get_tenant_id
+        tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT id, workflow_id, name, owner, dependencies, priority, budget, deadline, status, approval_required, tenant_id FROM uawos_actions;"
+            "SELECT id, workflow_id, name, owner, dependencies, priority, budget, deadline, status, approval_required, tenant_id FROM uawos_actions WHERE tenant_id = %s;",
+            (tenant_id,)
         )
         rows = cursor.fetchall()
         cursor.close()

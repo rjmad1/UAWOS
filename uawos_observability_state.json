@@ -19,7 +19,7 @@
   "anomalies": [],
   "digital_twin": {
     "status": "synchronized",
-    "last_sync": 1781185598,
+    "last_sync": 1781192525,
     "NODE-01": {
       "status": "online"
     }
@@ -37,7 +37,7 @@
         "msg": "ok"
       },
       "event_id": "TEL-02",
-      "timestamp": 1781185598
+      "timestamp": 1781192524
     }
   ]
 }
