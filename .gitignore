@@ -5,9 +5,35 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+dist/
+build/
 
 # Logs
 *.log
 
 # Dashboard runtime status
 uawos_status.json
+
+# Environment and secrets
+.env
+*.tfvars
+!terraform/terraform.tfvars.example
+
+# IDE settings (user-specific)
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS artifacts
+Thumbs.db
+.DS_Store
+
+# Test output
+test_out.txt
+test_out_utf8.txt
+htmlcov/
+.coverage
+.pytest_cache/

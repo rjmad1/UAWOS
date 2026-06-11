@@ -4,7 +4,10 @@
 $TaskName = "UAWOS_Dashboard_Daemon"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if (-not $ScriptDir) {
-    $ScriptDir = "C:\Users\rajaj\Projects\UAWOS"
+    $ScriptDir = $PSScriptRoot
+}
+if (-not $ScriptDir) {
+    $ScriptDir = Get-Location
 }
 $ScriptPath = Join-Path $ScriptDir "run-daemon-persistent.ps1"
 

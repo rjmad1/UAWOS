@@ -4,7 +4,10 @@
 # Ensure we are in the correct directory
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if (-not $ScriptDir) {
-    $ScriptDir = "C:\Users\rajaj\Projects\UAWOS"
+    $ScriptDir = $PSScriptRoot
+}
+if (-not $ScriptDir) {
+    $ScriptDir = Get-Location
 }
 Set-Location $ScriptDir
 

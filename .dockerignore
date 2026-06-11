@@ -1,0 +1,37 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Logs
+*.log
+
+# Environment and secrets
+.env
+*.tfvars
+!terraform.tfvars.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Docker build context exclusions
+.git/
+.github/
+wiki_repo/
+scratch/
+diagrams/
+Requirements Master/claudedirectory_imports/
+*.md
+!README.md

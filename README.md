@@ -1,6 +1,61 @@
 # Universal AI Workforce Operating System (UAWOS)
 
+[![CI](https://github.com/rjmad1/UAWOS/actions/workflows/ci.yml/badge.svg)](https://github.com/rjmad1/UAWOS/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](./LICENSE)
+[![Status: MVP Validated](https://img.shields.io/badge/Status-MVP%20Validated-brightgreen.svg)](#status)
+
 > Transforming Objectives into Measurable Value through Governed Human and AI Workforce Execution.
+
+---
+
+## ⚡ Quick Start
+
+```powershell
+# 1. Clone the repository
+git clone https://github.com/rjmad1/UAWOS.git
+cd UAWOS
+
+# 2. One-command setup (Windows)
+.\bootstrap.ps1
+
+# --- OR manually ---
+# Create virtual environment
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
+copy .env.example .env    # then edit .env with your settings
+
+# Start infrastructure
+docker compose --profile core up -d
+
+# Start the dashboard
+python uawos_dashboard_daemon.py
+```
+
+**macOS / Linux:**
+```bash
+chmod +x bootstrap.sh && ./bootstrap.sh
+# or: source .venv/bin/activate && python uawos_dashboard_daemon.py
+```
+
+Open **http://localhost:8099** in your browser.
+
+| Interface | URL |
+|-----------|-----|
+| Main Dashboard | http://localhost:8099 |
+| API Status | http://localhost:8099/api/status |
+| Roadmap | http://localhost:8099/roadmap |
+| Requirement Studio | http://localhost:8099/requirement_studio |
+| Architecture | http://localhost:8099/architecture |
+
+> **Full installation guide:** [wiki/Installation-Guide](https://github.com/rjmad1/UAWOS/wiki/Installation-Guide)
+
+---
 
 ## Overview
 

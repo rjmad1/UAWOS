@@ -1,5 +1,14 @@
-# UAWOS Delta Ecosystem - Python Library Dependencies
-# Phase 2 Accelerators
+# UAWOS - Universal AI Workforce Operating System
+# Python Library Dependencies
+# ============================================================
+
+# --- Core Runtime (REQUIRED) ---
+# These packages are mandatory for the UAWOS dashboard daemon to start.
+fastapi>=0.104.0
+uvicorn>=0.24.0
+psycopg2-binary>=2.9.9
+qdrant-client>=1.7.0
+networkx>=3.3
 
 # --- AI Engineering Platform Layer ---
 pydantic-ai>=0.0.18
@@ -21,7 +30,6 @@ unstructured[all-docs]>=0.14.0
 # --- Data & Analytics Engineering ---
 dbt-core>=1.8.0
 meltano>=3.4.0
-networkx>=3.3
 
 # --- Digital Twin & Agent Simulation ---
 mesa>=2.2.0

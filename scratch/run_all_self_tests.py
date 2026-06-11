@@ -17,8 +17,8 @@ def run_module_tests(module_name):
         traceback.print_exc()
 
 
-# Ensure project root is in path
-project_root = r"C:/Users/rajaj/Projects/UAWOS"
+# Ensure project root is in path (resolve dynamically relative to this script)
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 

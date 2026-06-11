@@ -29,13 +29,6 @@ def get_default_state() -> dict:
         "optimizations": [],
     }
 
-    try:
-        with open(STATE_FILE, "w") as f:
-            json.dump(state, f, indent=2)
-    except Exception as e:
-        print(f"Error saving local state cache: {e}")
-    uawos_db.db_save_state("uawos_integrations", state)
-
 
 # ----------------- FR-201 to FR-210: Integrations -----------------
 def setup_api_integration(name: str) -> dict:
@@ -133,7 +126,12 @@ def write_security_audit(user: str, action: str):
 
 
 def encrypt_data(plain: str) -> str:
-    # Caesar cipher mock encryption
+    """SECURITY WARNING: Development-only mock encryption using Caesar cipher.
+
+    This function MUST NOT be used in production. Replace with a
+    cryptographically secure implementation (e.g., ``cryptography.fernet``)
+    before any production deployment.
+    """
     return "".join(chr(ord(c) + 1) for c in plain)
 
 

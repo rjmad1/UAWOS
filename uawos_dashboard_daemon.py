@@ -178,7 +178,14 @@ ARCHITECTURE_FILE = os.path.join(
 # Global status cache
 status_cache = {}
 
-SECURE_TOKEN = "uawos-secure-token-2026"
+SECURE_TOKEN = os.environ.get("UAWOS_SECURE_TOKEN", "uawos-secure-token-change-me")
+_DEFAULT_TOKENS = {"uawos-secure-token-2026", "uawos-secure-token-change-me"}
+if SECURE_TOKEN in _DEFAULT_TOKENS:
+    print(
+        "WARNING: Using default development SECURE_TOKEN. "
+        "Set UAWOS_SECURE_TOKEN environment variable for production deployments.",
+        file=sys.stderr,
+    )
 
 
 def decode_token_payload(token: str) -> dict:
