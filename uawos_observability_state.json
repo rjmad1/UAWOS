@@ -1,43 +1,43 @@
 {
-  "metrics": {
-    "value": {
-      "estimated_roi_usd": 1250.0
+  "telemetry_events": [
+    {
+      "event_id": "TEL-01",
+      "name": "system_startup",
+      "details": "UAWOS system components initialized.",
+      "timestamp": 1780963292
     },
-    "workforce": {
-      "allocated_hours": 45,
-      "total_capacity_hours": 140
+    {
+      "event_id": "TEL-02",
+      "name": "test_event",
+      "details": {
+        "msg": "ok"
+      },
+      "timestamp": 1781144114
+    }
+  ],
+  "metrics": {
+    "operational": {
+      "active_agents": 4,
+      "completed_actions": 12
     },
     "governance": {
       "policies_evaluated": 42,
       "violations_blocked": 1
     },
-    "operational": {
-      "active_agents": 4,
-      "completed_actions": 12
+    "workforce": {
+      "total_capacity_hours": 140,
+      "allocated_hours": 45
+    },
+    "value": {
+      "estimated_roi_usd": 1250.0
     }
   },
   "anomalies": [],
   "digital_twin": {
+    "last_sync": 1781144114,
     "status": "synchronized",
-    "last_sync": 1781095039,
     "NODE-01": {
       "status": "online"
     }
-  },
-  "telemetry_events": [
-    {
-      "name": "system_startup",
-      "details": "UAWOS system components initialized.",
-      "event_id": "TEL-01",
-      "timestamp": 1780963292
-    },
-    {
-      "name": "test_event",
-      "details": {
-        "msg": "ok"
-      },
-      "event_id": "TEL-02",
-      "timestamp": 1781095039
-    }
-  ]
+  }
 }

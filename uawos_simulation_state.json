@@ -3,39 +3,39 @@
     "SIM-01": {
       "id": "SIM-01",
       "scenario": "Peak Traffic checkout conversion",
+      "success_rate_mean": 94.2,
       "cost_mean": 450.0,
-      "timestamp": 1780963292,
       "risk_probability": 0.12,
-      "success_rate_mean": 94.2
+      "timestamp": 1780963292
     },
     "SIM-02": {
       "id": "SIM-02",
       "scenario": "SSO Load",
+      "success_rate_mean": 90.0,
       "cost_mean": 200.0,
-      "timestamp": 1781095038,
       "risk_probability": 0.15,
-      "success_rate_mean": 90.0
+      "timestamp": 1781144114
     },
     "SIM-03": {
       "id": "SIM-03",
       "scenario": "What-if baseline",
+      "success_rate_mean": 70.0,
       "cost_mean": 200.0,
-      "timestamp": 1781095038,
       "risk_probability": 0.45,
-      "success_rate_mean": 70.0
+      "timestamp": 1781144114
     },
     "SIM-04": {
       "id": "SIM-04",
       "scenario": "What-if alternative",
+      "success_rate_mean": 85.0,
       "cost_mean": 200.0,
-      "timestamp": 1781095038,
       "risk_probability": 0.15,
-      "success_rate_mean": 85.0
+      "timestamp": 1781144114
     }
   },
   "forecast_validations": [
     {
-      "timestamp": 1781095038,
+      "timestamp": 1781144114,
       "mean_absolute_percentage_error": 4.2,
       "status": "Valid"
     }

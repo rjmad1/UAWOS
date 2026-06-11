@@ -1,6 +1,6 @@
+import os
 import subprocess
 import sys
-import os
 
 test_files = [
     "uawos_objective.py",
@@ -10,7 +10,7 @@ test_files = [
     "uawos_workflow.py",
     "uawos_action.py",
     "uawos_outcome.py",
-    "uawos_memory.py"
+    "uawos_memory.py",
 ]
 
 print("==================================================")
@@ -27,7 +27,9 @@ results = {}
 for f in test_files:
     print(f"\nRunning tests in {f}...")
     try:
-        res = subprocess.run([python_exe, f], capture_output=True, text=True, timeout=75.0)
+        res = subprocess.run(
+            [python_exe, f], capture_output=True, text=True, timeout=75.0
+        )
         if res.returncode == 0:
             print(f"  [PASS] {f}")
             results[f] = "PASS"

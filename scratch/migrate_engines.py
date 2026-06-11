@@ -21,7 +21,7 @@ engines = [
     "uawos_value",
     "uawos_observability",
     "uawos_integrations",
-    "uawos_requirement_studio"
+    "uawos_requirement_studio",
 ]
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,11 +31,11 @@ for engine in engines:
     if not os.path.exists(file_path):
         print(f"Skipping {engine}.py (not found)")
         continue
-        
+
     print(f"Migrating {engine}.py...")
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
-        
+
     # Inject import uawos_db if not present
     if "import uawos_db" not in content:
         # Insert at line 2 (after initial comment or first import)
@@ -49,12 +49,12 @@ for engine in engines:
         if not inserted:
             lines.insert(1, "import uawos_db")
         content = "\n".join(lines) + "\n"
-        
+
     # Replace load_state and save_state
     # We will look for def load_state and replace the whole block up to the next def or comment
     # Let's use a regex to identify the load_state and save_state functions
     pattern = r"(def load_state\(\)(?:\s*->\s*\w+)?:\s*[\s\S]*?)(def save_state\([\s\S]*?:\s*[\s\S]*?)(?=\n#|\ndef|\nif __name__)"
-    
+
     new_load_save = f"""def load_state() -> dict:
     state = uawos_db.db_get_state("{engine}", None)
     if state is not None:

@@ -1,12 +1,13 @@
 # scratch/debug_hang.py
-import sys
 import os
+import sys
 import threading
 import time
 import traceback
 
 # Add project root to sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 def dump_stack():
     time.sleep(5)
@@ -15,6 +16,7 @@ def dump_stack():
         print(f"\nThread ID: {thread_id}")
         traceback.print_stack(stack)
     sys.exit(1)
+
 
 # Start monitor thread
 t = threading.Thread(target=dump_stack, daemon=True)

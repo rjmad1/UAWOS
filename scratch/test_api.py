@@ -1,6 +1,6 @@
 # scratch/test_api.py
-import urllib.request
 import json
+import urllib.request
 
 url = "http://127.0.0.1:8099/api/dtase/analyze"
 data = {
@@ -13,8 +13,8 @@ req = urllib.request.Request(
     data=payload,
     headers={
         "Content-Type": "application/json",
-        "X-UAWOS-Token": "uawos-secure-token-2026"
-    }
+        "X-UAWOS-Token": "uawos-secure-token-2026",
+    },
 )
 
 try:

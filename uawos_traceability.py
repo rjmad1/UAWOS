@@ -1,7 +1,7 @@
 # uawos_traceability.py
+import json
 import os
 import sys
-import json
 import time
 
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "127.0.0.1")
@@ -29,6 +29,7 @@ STATUS_IN_PROGRESS = "🔵 In Progress"
 STATUS_PARTIALLY_IMPLEMENTED = "🟡 Partially Implemented"
 STATUS_BLOCKED = "⚫ Blocked"
 
+
 def _parse_requirement_description(lines, start_idx):
     """Fetch description starting from start_idx in lines."""
     desc = ""
@@ -43,33 +44,42 @@ def _parse_requirement_description(lines, start_idx):
         j += 1
     return desc
 
+
 def parse_prd_requirements():
     """Parse PRD 2.md functional requirements dynamically."""
-    prd_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Requirements Master", "PRD 2.md")
+    prd_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "Requirements Master", "PRD 2.md"
+    )
     requirements = {}
-    
+
     if not os.path.exists(prd_path):
         # Fallback dictionary if document not found (for safety)
         return {
             f"FR-{i:03d}": {
                 "id": f"FR-{i:03d}",
                 "section": "General",
-                "description": f"System requirement {i}"
-            } for i in range(11, 258)
+                "description": f"System requirement {i}",
+            }
+            for i in range(11, 258)
         }
-        
+
     current_section = "Unknown"
     try:
         with open(prd_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
-            
+
         i = 0
         while i < len(lines):
             line = lines[i].strip()
             # Parse sections
-            if line.startswith("# ") and not any(x in line.lower() for x in ["universal", "product", "volume", "functional"]):
+            if line.startswith("# ") and not any(
+                x in line.lower()
+                for x in ["universal", "product", "volume", "functional"]
+            ):
                 current_section = line[2:].strip()
-            elif line.startswith("## ") and not any(x in line.lower() for x in ["version", "status"]):
+            elif line.startswith("## ") and not any(
+                x in line.lower() for x in ["version", "status"]
+            ):
                 current_section = line[3:].strip()
             elif line.startswith("### FR-"):
                 req_id = line[7:].strip() if line.startswith("### FR-") else ""
@@ -78,35 +88,41 @@ def parse_prd_requirements():
                     parts = line.split("FR-")
                     if len(parts) > 1:
                         req_id = parts[1].strip()
-                
+
                 # Fetch description
                 desc = _parse_requirement_description(lines, i + 1)
-                
+
                 full_id = f"FR-{req_id}"
                 requirements[full_id] = {
                     "id": full_id,
                     "section": current_section,
-                    "description": desc
+                    "description": desc,
                 }
             i += 1
     except Exception as e:
         print(f"Error parsing PRD 2: {e}", file=sys.stderr)
-        
+
     return requirements
+
 
 def _resolve_roadmap_mapping(section):
     """Determine capability category, roadmap phase, epic, and design document based on section."""
     category = "Technical Capability"
-    if section in ["Objective Management", "Outcome Management", BUDGET_COST_MGMT, "Value Realization"]:
+    if section in [
+        "Objective Management",
+        "Outcome Management",
+        BUDGET_COST_MGMT,
+        "Value Realization",
+    ]:
         category = "Business Capability"
     elif section in ["Integrations", SECURITY_IDENTITY]:
         category = "Infrastructure Capability"
-        
+
     # Determine Roadmap Phase Mapping
     roadmap_item = "RD-04"  # Default to Phase 4 (Full GA rollout)
     epic = "EP-01: Execution Engine Setup"
     design_doc = "PRD 2.md"
-    
+
     if section == "Platform Administration":
         roadmap_item = "RD-01"
         epic = "EP-16: Workspace Administration"
@@ -115,7 +131,12 @@ def _resolve_roadmap_mapping(section):
         roadmap_item = "RD-01"
         epic = "EP-13: System Observability"
         design_doc = "OTDTS & SDD"
-    elif section in [KNOWLEDGE_MGMT, MEMORY_MGMT, DECISION_INT, "Domain Translation & Artifact Synthesis (DTASE)"]:
+    elif section in [
+        KNOWLEDGE_MGMT,
+        MEMORY_MGMT,
+        DECISION_INT,
+        "Domain Translation & Artifact Synthesis (DTASE)",
+    ]:
         roadmap_item = "RD-02"
         design_doc = "COS, FGKAS & SDD"
         if section == KNOWLEDGE_MGMT or section == MEMORY_MGMT:
@@ -157,8 +178,9 @@ def _resolve_roadmap_mapping(section):
             epic = "EP-12: Value Realization Ingestion"
         elif section == "Packs & Extensibility":
             epic = "EP-15: Pack Ecosystem"
-            
+
     return category, roadmap_item, epic, design_doc
+
 
 def _resolve_requirement_status(req_id, section, roadmap_item, health):
     """Determine requirement status and related references dynamically based on system health state."""
@@ -170,14 +192,14 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
     release_evidence = "Adoption Roadmap v1.0"
     environment = "none"
     reason_blocked = ""
-    
+
     # Try dynamic module-based verification first for all ranges (FR-011 to FR-250)
     is_matched = False
     if req_id.startswith("FR-"):
         parts = req_id.split("-")
         if len(parts) > 1 and parts[1].isdigit():
             val = int(parts[1])
-            
+
             module_mapping = {
                 (11, 30): ("uawos_objective", "uawos-objective-engine"),
                 (31, 40): ("uawos_outcome", "uawos-outcome-engine"),
@@ -200,7 +222,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 (236, 236): ("uawos_pmcms", "uawos-pmcms-engine"),
                 (237, 250): ("uawos_integrations", "uawos-integrations-engine"),
             }
-            
+
             mod_name = None
             deploy_name = None
             for (low, high), (m_name, d_name) in module_mapping.items():
@@ -208,7 +230,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                     mod_name = m_name
                     deploy_name = d_name
                     break
-                    
+
             if mod_name:
                 module_ok = False
                 try:
@@ -216,12 +238,16 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                     module_ok = True
                 except ImportError:
                     pass
-                    
+
                 if module_ok:
                     status = "OPERATIONAL"
                     environment = "production"
-                    code_refs = [f"{mod_name}.py:verify_{req_id.lower().replace('-', '_')}"]
-                    test_evidence = f"{mod_name}.verify_{req_id.lower().replace('-', '_')}()"
+                    code_refs = [
+                        f"{mod_name}.py:verify_{req_id.lower().replace('-', '_')}"
+                    ]
+                    test_evidence = (
+                        f"{mod_name}.verify_{req_id.lower().replace('-', '_')}()"
+                    )
                     deploy_refs = [deploy_name]
                     infra_refs = []
                     reason_blocked = ""
@@ -241,7 +267,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         else:
             status = "BLOCKED"
             reason_blocked = "PostgreSQL database offline."
-            
+
     # 2. Observability (Phase 1)
     elif roadmap_item == "RD-01" and section == "Observability":
         if health["marquez"] and health["superset"]:
@@ -254,9 +280,13 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         else:
             status = "DEGRADED"
             reason_blocked = "Marquez Lineage or Superset UI container offline."
-            
+
     # 3. RAG, Knowledge & Memory (Phase 2)
-    elif roadmap_item == "RD-02" and section in [KNOWLEDGE_MGMT, MEMORY_MGMT, DECISION_INT]:
+    elif roadmap_item == "RD-02" and section in [
+        KNOWLEDGE_MGMT,
+        MEMORY_MGMT,
+        DECISION_INT,
+    ]:
         # Check for GPLv3 Marker risk for document ingestion
         if req_id == "FR-112":
             if not health["marker"]:
@@ -271,17 +301,24 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         else:
             if health["qdrant"] and health["litellm"]:
                 status = "DEPLOYED"
-                code_refs = ["requirements.txt:L12-19"] # pip packages mem0, graphiti, haystack
+                code_refs = [
+                    "requirements.txt:L12-19"
+                ]  # pip packages mem0, graphiti, haystack
                 deploy_refs = ["uawos-qdrant", "core-ollama"]
                 infra_refs = ["docker-compose.yml:L24"]
                 test_evidence = f'check_port("{QDRANT_HOST}", {QDRANT_PORT}) & check_port("{OLLAMA_HOST}", {OLLAMA_PORT})'
                 environment = "production"
             else:
                 status = "BLOCKED"
-                reason_blocked = "Qdrant vector database or Ollama local LLM server offline."
-                
+                reason_blocked = (
+                    "Qdrant vector database or Ollama local LLM server offline."
+                )
+
     # DTASE requirements (Phase 2)
-    elif roadmap_item == "RD-02" and section == "Domain Translation & Artifact Synthesis (DTASE)":
+    elif (
+        roadmap_item == "RD-02"
+        and section == "Domain Translation & Artifact Synthesis (DTASE)"
+    ):
         if req_id in ["FR-251", "FR-254", "FR-256"]:
             # Multimodal and artifact synthesis requires PDF/doc parsing
             if not health["marker"]:
@@ -296,10 +333,11 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             dtase_ok = False
             try:
                 import uawos_dtase
+
                 dtase_ok = True
             except ImportError:
                 pass
-            
+
             if dtase_ok and health["litellm"]:
                 status = "OPERATIONAL"
                 environment = "production"
@@ -311,7 +349,9 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                     code_refs = ["uawos_dtase.py:apply_domain_frameworks"]
                     test_evidence = "uawos_dtase.apply_domain_frameworks"
                 elif req_id == "FR-255":
-                    code_refs = ["uawos_dtase.py:discover_opportunities_risks_anomalies"]
+                    code_refs = [
+                        "uawos_dtase.py:discover_opportunities_risks_anomalies"
+                    ]
                     test_evidence = "uawos_dtase.discover_opportunities_risks_anomalies"
                 elif req_id == "FR-257":
                     code_refs = ["uawos_dtase.py:generate_multi_persona_outputs"]
@@ -328,7 +368,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             else:
                 status = "BLOCKED"
                 reason_blocked = "Ollama model gateway offline."
-                
+
     # 4. Security & Governance (Phase 3)
     elif roadmap_item == "RD-03" and section == SECURITY_IDENTITY:
         if health["dtrack"] and health["gitleaks"]:
@@ -337,7 +377,9 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 environment = "production"
             else:
                 status = "PARTIALLY_IMPLEMENTED"
-                reason_blocked = "OpenFGA container is not deployed (Authorization rules degraded)."
+                reason_blocked = (
+                    "OpenFGA container is not deployed (Authorization rules degraded)."
+                )
                 deploy_refs = ["uawos-dependency-track-api"]
                 infra_refs = ["docker-compose.yml:L71"]
                 test_evidence = f'check_port("{DTRACK_HOST}", {DTRACK_PORT})'
@@ -345,7 +387,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         else:
             status = "BLOCKED"
             reason_blocked = "Dependency-Track API server offline."
-            
+
     elif roadmap_item == "RD-03" and section == "Governance":
         if health["opa"]:
             status = "DEPLOYED"
@@ -355,15 +397,16 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             reason_blocked = "OPA/Rego Policy Engine daemon offline (Policies initialized in Git but not active in memory)."
             code_refs = ["uawos_dashboard_daemon.py:174"]
             environment = "dev_testing"
-            
+
     elif roadmap_item == "RD-03" and section == BUDGET_COST_MGMT:
         budget_ok = False
         try:
             import uawos_budget
+
             budget_ok = True
         except ImportError:
             pass
-        
+
         if budget_ok and health["postgres"] and health["superset"]:
             status = "OPERATIONAL"
             environment = "production"
@@ -377,7 +420,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         else:
             status = "BLOCKED"
             reason_blocked = "Budget & Cost Management engine uawos_budget.py missing."
-            
+
     # 5. Core Engines (Phase 4)
     else:
         # Check if it's an Objective Management requirement (FR-011 to FR-030)
@@ -400,7 +443,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         is_integrations_req = False
 
         is_pmcms_req = False
-        
+
         if req_id.startswith("FR-"):
             parts = req_id.split("-")
             if len(parts) > 1 and parts[1].isdigit():
@@ -450,7 +493,10 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             "is_workflow_req": ("uawos_workflow", "uawos-workflow-engine"),
             "is_action_req": ("uawos_action", "uawos-action-engine"),
             "is_workforce_req": ("uawos_workforce", "uawos-workforce-engine"),
-            "is_agent_workforce_req": ("uawos_agent_workforce", "uawos-agent-workforce-engine"),
+            "is_agent_workforce_req": (
+                "uawos_agent_workforce",
+                "uawos-agent-workforce-engine",
+            ),
             "is_gov_req": ("uawos_governance", "uawos-governance-engine"),
             "is_knowledge_req": ("uawos_knowledge", "uawos-knowledge-engine"),
             "is_memory_req": ("uawos_memory", "uawos-memory-engine"),
@@ -459,30 +505,51 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
             "is_decision_req": ("uawos_decision", "uawos-decision-engine"),
             "is_simulation_req": ("uawos_simulation", "uawos-simulation-engine"),
             "is_value_req": ("uawos_value", "uawos-value-engine"),
-            "is_observability_req": ("uawos_observability", "uawos-observability-engine"),
+            "is_observability_req": (
+                "uawos_observability",
+                "uawos-observability-engine",
+            ),
             "is_integrations_req": ("uawos_integrations", "uawos-integrations-engine"),
             "is_pmcms_req": ("uawos_pmcms", "uawos-pmcms-engine"),
         }
 
         matched_type = None
-        if is_obj_req: matched_type = "is_obj_req"
-        elif is_outcome_req: matched_type = "is_outcome_req"
-        elif is_planning_req: matched_type = "is_planning_req"
-        elif is_workflow_req: matched_type = "is_workflow_req"
-        elif is_action_req: matched_type = "is_action_req"
-        elif is_workforce_req: matched_type = "is_workforce_req"
-        elif is_agent_workforce_req: matched_type = "is_agent_workforce_req"
-        elif is_gov_req: matched_type = "is_gov_req"
-        elif is_knowledge_req: matched_type = "is_knowledge_req"
-        elif is_memory_req: matched_type = "is_memory_req"
-        elif is_learning_req: matched_type = "is_learning_req"
-        elif is_resource_req: matched_type = "is_resource_req"
-        elif is_decision_req: matched_type = "is_decision_req"
-        elif is_simulation_req: matched_type = "is_simulation_req"
-        elif is_value_req: matched_type = "is_value_req"
-        elif is_observability_req: matched_type = "is_observability_req"
-        elif is_integrations_req: matched_type = "is_integrations_req"
-        elif is_pmcms_req: matched_type = "is_pmcms_req"
+        if is_obj_req:
+            matched_type = "is_obj_req"
+        elif is_outcome_req:
+            matched_type = "is_outcome_req"
+        elif is_planning_req:
+            matched_type = "is_planning_req"
+        elif is_workflow_req:
+            matched_type = "is_workflow_req"
+        elif is_action_req:
+            matched_type = "is_action_req"
+        elif is_workforce_req:
+            matched_type = "is_workforce_req"
+        elif is_agent_workforce_req:
+            matched_type = "is_agent_workforce_req"
+        elif is_gov_req:
+            matched_type = "is_gov_req"
+        elif is_knowledge_req:
+            matched_type = "is_knowledge_req"
+        elif is_memory_req:
+            matched_type = "is_memory_req"
+        elif is_learning_req:
+            matched_type = "is_learning_req"
+        elif is_resource_req:
+            matched_type = "is_resource_req"
+        elif is_decision_req:
+            matched_type = "is_decision_req"
+        elif is_simulation_req:
+            matched_type = "is_simulation_req"
+        elif is_value_req:
+            matched_type = "is_value_req"
+        elif is_observability_req:
+            matched_type = "is_observability_req"
+        elif is_integrations_req:
+            matched_type = "is_integrations_req"
+        elif is_pmcms_req:
+            matched_type = "is_pmcms_req"
 
         if matched_type:
             mod_name, deploy_name = module_mapping[matched_type]
@@ -492,12 +559,14 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
                 module_ok = True
             except ImportError:
                 pass
-                
+
             if module_ok:
                 status = "OPERATIONAL"
                 environment = "production"
                 code_refs = [f"{mod_name}.py:verify_{req_id.lower().replace('-', '_')}"]
-                test_evidence = f"{mod_name}.verify_{req_id.lower().replace('-', '_')}()"
+                test_evidence = (
+                    f"{mod_name}.verify_{req_id.lower().replace('-', '_')}()"
+                )
                 deploy_refs = [deploy_name]
                 infra_refs = []
             else:
@@ -506,48 +575,59 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         else:
             status = "APPROVED"
             environment = "none"
-            
+
     # Map specific requirement IDs to unique status values if needed
     # Integration requirements
     if section == "Integrations":
         try:
             import uawos_integrations
+
             integrations_ok = True
         except ImportError:
             integrations_ok = False
-            
+
         if not integrations_ok:
-            if req_id == "FR-203": # Database
+            if req_id == "FR-203":  # Database
                 status = "OPERATIONAL" if health["postgres"] else "BLOCKED"
                 deploy_refs = ["uawos-postgres"]
                 environment = "production" if health["postgres"] else "none"
-            elif req_id in ["FR-201", "FR-202"]: # Vector / MCP
+            elif req_id in ["FR-201", "FR-202"]:  # Vector / MCP
                 status = "DEPLOYED" if health["qdrant"] else "BLOCKED"
                 deploy_refs = ["uawos-qdrant"]
                 environment = "dev_testing" if health["qdrant"] else "none"
-            elif req_id in ["FR-208", "FR-210"]: # Security scans
+            elif req_id in ["FR-208", "FR-210"]:  # Security scans
                 status = "OPERATIONAL" if health["dtrack"] else "BLOCKED"
                 deploy_refs = ["uawos-dependency-track-api"]
                 environment = "production" if health["dtrack"] else "none"
             else:
-                status = "DEFERRED" # Slack/GitLab integrations not wired
+                status = "DEFERRED"  # Slack/GitLab integrations not wired
                 environment = "none"
-            
-    return status, code_refs, deploy_refs, infra_refs, test_evidence, release_evidence, environment, reason_blocked
+
+    return (
+        status,
+        code_refs,
+        deploy_refs,
+        infra_refs,
+        test_evidence,
+        release_evidence,
+        environment,
+        reason_blocked,
+    )
+
 
 def get_traceability_matrix(status_data):
     """
-    Generate requirements traceability matrix by combining static requirement structures 
+    Generate requirements traceability matrix by combining static requirement structures
     with dynamic system health states.
     """
     raw_reqs = parse_prd_requirements()
-    
+
     # Extract health flags from daemon probe data
     infra = status_data.get("domains", {}).get("Infrastructure", {})
     sec = status_data.get("domains", {}).get("Security", {})
     gov = status_data.get("domains", {}).get("Governance", {})
     ints = status_data.get("domains", {}).get("Integrations", {})
-    
+
     health = {
         "qdrant": infra.get("Qdrant Vector DB") == "GREEN",
         "postgres": infra.get("Postgres DB") == "GREEN",
@@ -560,17 +640,25 @@ def get_traceability_matrix(status_data):
         "openfga": gov.get("OpenFGA Authorization") == "GREEN",
         "gitleaks": sec.get("Gitleaks Secret Detection") == "GREEN",
     }
-    
+
     matrix = {}
-    
+
     for req_id, req in raw_reqs.items():
         # Determine Capability Category
         section = req["section"]
         category, roadmap_item, epic, design_doc = _resolve_roadmap_mapping(section)
-        
-        status, code_refs, deploy_refs, infra_refs, test_evidence, release_evidence, environment, reason_blocked = \
-            _resolve_requirement_status(req_id, section, roadmap_item, health)
-            
+
+        (
+            status,
+            code_refs,
+            deploy_refs,
+            infra_refs,
+            test_evidence,
+            release_evidence,
+            environment,
+            reason_blocked,
+        ) = _resolve_requirement_status(req_id, section, roadmap_item, health)
+
         matrix[req_id] = {
             "id": req_id,
             "description": req["description"],
@@ -586,11 +674,13 @@ def get_traceability_matrix(status_data):
             "test_evidence": test_evidence,
             "release_evidence": release_evidence,
             "environment": environment,
-            "reason_blocked": reason_blocked
+            "reason_blocked": reason_blocked,
         }
-        
+
     # Load requirement studio candidates dynamically
-    state_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json")
+    state_file = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json"
+    )
     if os.path.exists(state_file):
         try:
             with open(state_file, "r") as f:
@@ -601,7 +691,7 @@ def get_traceability_matrix(status_data):
                     req = state["requirements"].get(req_id, {})
                     prop = req.get("product_proposition", {})
                     func_reqs = prop.get("H_Functional_Requirements", [])
-                    
+
                     # Add child functional requirements to the traceability matrix
                     for idx, fr_desc in enumerate(func_reqs):
                         fr_id = f"FR-{req_id}-{idx+1:03d}"
@@ -613,19 +703,28 @@ def get_traceability_matrix(status_data):
                             "roadmap_item": cid,
                             "epic": "EP-18: Requirement Ingestion Services",
                             "technical_design": "Strategic Proposition A-Q",
-                            "status": "OPERATIONAL" if cand["status"] == "PUBLISHED" else "APPROVED",
+                            "status": (
+                                "OPERATIONAL"
+                                if cand["status"] == "PUBLISHED"
+                                else "APPROVED"
+                            ),
                             "code_references": ["uawos_requirement_studio.py"],
                             "deployment_references": ["uawos-requirement-studio-api"],
                             "infrastructure_references": [],
                             "test_evidence": "Self-testing suite validated",
                             "release_evidence": "Adoption Roadmap v1.0",
-                            "environment": "production" if cand["status"] == "PUBLISHED" else "none",
-                            "reason_blocked": ""
+                            "environment": (
+                                "production"
+                                if cand["status"] == "PUBLISHED"
+                                else "none"
+                            ),
+                            "reason_blocked": "",
                         }
         except Exception as e:
             print(f"Error loading candidates in get_traceability_matrix: {e}")
- 
+
     return matrix
+
 
 def _get_default_roadmap():
     """Return the default structure for master roadmap milestones."""
@@ -650,7 +749,7 @@ def _get_default_roadmap():
             "status": STATUS_NOT_IMPLEMENTED,
             "planned_scope": "Docker, ports, venv, local dashboard setup",
             "delivered_scope": "",
-            "remaining_scope": ""
+            "remaining_scope": "",
         },
         "RD-02": {
             "id": "RD-02",
@@ -672,7 +771,7 @@ def _get_default_roadmap():
             "status": STATUS_NOT_IMPLEMENTED,
             "planned_scope": "Qdrant semantic index, Graphiti memory overlays, local LLMs",
             "delivered_scope": "",
-            "remaining_scope": ""
+            "remaining_scope": "",
         },
         "RD-03": {
             "id": "RD-03",
@@ -694,7 +793,7 @@ def _get_default_roadmap():
             "status": STATUS_NOT_IMPLEMENTED,
             "planned_scope": "OPA rego authorization rules, Dependency-Track CI blocking, FGA access structures",
             "delivered_scope": "",
-            "remaining_scope": ""
+            "remaining_scope": "",
         },
         "RD-04": {
             "id": "RD-04",
@@ -716,13 +815,16 @@ def _get_default_roadmap():
             "status": STATUS_NOT_IMPLEMENTED,
             "planned_scope": "Custom engines (Planning, Execution, Workflow), packs, value accounting, learning loops",
             "delivered_scope": "",
-            "remaining_scope": ""
-        }
+            "remaining_scope": "",
+        },
     }
+
 
 def _load_roadmap_candidates(roadmap):
     """Load and add dynamically published roadmap candidates."""
-    state_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json")
+    state_file = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json"
+    )
     if os.path.exists(state_file):
         try:
             with open(state_file, "r") as f:
@@ -738,9 +840,19 @@ def _load_roadmap_candidates(roadmap):
                         "priority": f"P1 (Score: {cand['priority_score']})",
                         "release": "v1.1.0-delta",
                         "owner": "CPO & Strategist",
-                        "business_value": int(req.get("strategic_analysis", {}).get("business_value_score", 70)),
-                        "technical_value": int(req.get("strategic_analysis", {}).get("strategic_impact_score", 70)),
-                        "infrastructure_value": int(req.get("strategic_analysis", {}).get("alignment_score", 70)),
+                        "business_value": int(
+                            req.get("strategic_analysis", {}).get(
+                                "business_value_score", 70
+                            )
+                        ),
+                        "technical_value": int(
+                            req.get("strategic_analysis", {}).get(
+                                "strategic_impact_score", 70
+                            )
+                        ),
+                        "infrastructure_value": int(
+                            req.get("strategic_analysis", {}).get("alignment_score", 70)
+                        ),
                         "req_count": 0,
                         "impl_count": 0,
                         "open_count": 0,
@@ -748,28 +860,45 @@ def _load_roadmap_candidates(roadmap):
                         "test_pct": 0,
                         "deploy_pct": 0,
                         "prod_readiness_pct": 0,
-                        "status": STATUS_FULLY_IMPLEMENTED if cand["status"] == "PUBLISHED" else STATUS_IN_PROGRESS,
+                        "status": (
+                            STATUS_FULLY_IMPLEMENTED
+                            if cand["status"] == "PUBLISHED"
+                            else STATUS_IN_PROGRESS
+                        ),
                         "planned_scope": req.get("raw_text", "")[:100] + "...",
                         "delivered_scope": "",
-                        "remaining_scope": ""
+                        "remaining_scope": "",
                     }
         except Exception as e:
             print(f"Error loading state in get_roadmap_data: {e}")
+
 
 def _calculate_item_metrics(r_id, item, traceability_matrix):
     """Calculate progress percentages and overall status for a roadmap item."""
     total = item["req_count"]
     impl = item["impl_count"]
-    
+
     if total > 0:
         impl_pct = round((impl / total) * 100, 1)
         item["impl_pct"] = impl_pct
-        
+
         # Simulated testing/deployment metric breakdowns based on exact status ratios
-        test_count = sum(1 for req in traceability_matrix.values() if req["roadmap_item"] == r_id and req["test_evidence"])
-        deploy_count = sum(1 for req in traceability_matrix.values() if req["roadmap_item"] == r_id and req["deployment_references"])
-        prod_count = sum(1 for req in traceability_matrix.values() if req["roadmap_item"] == r_id and req["environment"] == "production")
-        
+        test_count = sum(
+            1
+            for req in traceability_matrix.values()
+            if req["roadmap_item"] == r_id and req["test_evidence"]
+        )
+        deploy_count = sum(
+            1
+            for req in traceability_matrix.values()
+            if req["roadmap_item"] == r_id and req["deployment_references"]
+        )
+        prod_count = sum(
+            1
+            for req in traceability_matrix.values()
+            if req["roadmap_item"] == r_id and req["environment"] == "production"
+        )
+
         item["test_pct"] = round((test_count / total) * 100, 1)
         item["deploy_pct"] = round((deploy_count / total) * 100, 1)
         item["prod_readiness_pct"] = round((prod_count / total) * 100, 1)
@@ -778,11 +907,15 @@ def _calculate_item_metrics(r_id, item, traceability_matrix):
         item["test_pct"] = 0
         item["deploy_pct"] = 0
         item["prod_readiness_pct"] = 0
-        
+
     # Determine overall status indicator string
     pct = item["impl_pct"]
-    blocked_count = sum(1 for req in traceability_matrix.values() if req["roadmap_item"] == r_id and req["status"] == "BLOCKED")
-    
+    blocked_count = sum(
+        1
+        for req in traceability_matrix.values()
+        if req["roadmap_item"] == r_id and req["status"] == "BLOCKED"
+    )
+
     if blocked_count > 0:
         item["status"] = STATUS_BLOCKED
     elif pct >= 100.0:
@@ -793,18 +926,33 @@ def _calculate_item_metrics(r_id, item, traceability_matrix):
         item["status"] = STATUS_IN_PROGRESS
     else:
         item["status"] = STATUS_NOT_IMPLEMENTED
-        
+
     # Describe scopes dynamically
-    delivered_reqs = [r["id"] for r in traceability_matrix.values() if r["roadmap_item"] == r_id and r["status"] in ["OPERATIONAL", "DEPLOYED"]]
-    blocked_reqs = [r["id"] for r in traceability_matrix.values() if r["roadmap_item"] == r_id and r["status"] == "BLOCKED"]
-    remaining_reqs = [r["id"] for r in traceability_matrix.values() if r["roadmap_item"] == r_id and r["status"] not in ["OPERATIONAL", "DEPLOYED", "BLOCKED"]]
-    
+    delivered_reqs = [
+        r["id"]
+        for r in traceability_matrix.values()
+        if r["roadmap_item"] == r_id and r["status"] in ["OPERATIONAL", "DEPLOYED"]
+    ]
+    blocked_reqs = [
+        r["id"]
+        for r in traceability_matrix.values()
+        if r["roadmap_item"] == r_id and r["status"] == "BLOCKED"
+    ]
+    remaining_reqs = [
+        r["id"]
+        for r in traceability_matrix.values()
+        if r["roadmap_item"] == r_id
+        and r["status"] not in ["OPERATIONAL", "DEPLOYED", "BLOCKED"]
+    ]
+
     if delivered_reqs:
         suffix = "..." if len(delivered_reqs) > 5 else ""
-        item["delivered_scope"] = f"Implemented: {', '.join(delivered_reqs[:5])}{suffix}"
+        item["delivered_scope"] = (
+            f"Implemented: {', '.join(delivered_reqs[:5])}{suffix}"
+        )
     else:
         item["delivered_scope"] = "None"
-        
+
     rem_str = []
     if blocked_reqs:
         rem_str.append(f"Blocked: {', '.join(blocked_reqs[:5])}")
@@ -812,33 +960,35 @@ def _calculate_item_metrics(r_id, item, traceability_matrix):
         rem_str.append(f"Pending: {', '.join(remaining_reqs[:5])}")
     item["remaining_scope"] = "; ".join(rem_str) if rem_str else "None"
 
+
 def get_roadmap_data(traceability_matrix):
     """
-    Rollup traceability details into roadmap item progress metrics 
+    Rollup traceability details into roadmap item progress metrics
     and value realizations.
     """
     roadmap = _get_default_roadmap()
     _load_roadmap_candidates(roadmap)
-    
+
     # Traceability rollups
     for req in traceability_matrix.values():
         r_id = req["roadmap_item"]
         if r_id not in roadmap:
             continue
-            
+
         roadmap[r_id]["req_count"] += 1
-        
+
         status = req["status"]
         if status in ["OPERATIONAL", "DEPLOYED", "TESTED"]:
             roadmap[r_id]["impl_count"] += 1
         else:
             roadmap[r_id]["open_count"] += 1
-            
+
     # Calculate percentages and status
     for r_id, item in roadmap.items():
         _calculate_item_metrics(r_id, item, traceability_matrix)
-        
+
     return roadmap
+
 
 def _classify_health_score(health_score):
     """Return health classification description based on score."""
@@ -852,6 +1002,7 @@ def _classify_health_score(health_score):
         return "High Risk"
     return "Critical Risk"
 
+
 def get_delivery_health(traceability_matrix):
     """
     Calculate Delivery Health Score based on requirement coverage, implementation metrics,
@@ -860,13 +1011,13 @@ def get_delivery_health(traceability_matrix):
     total = len(traceability_matrix)
     if total == 0:
         return {"score": 0.0, "classification": "Critical Risk"}
-        
+
     implemented = 0
     tested = 0
     deployed = 0
     operational = 0
     blocked = 0
-    
+
     for req in traceability_matrix.values():
         status = req["status"]
         if status in ["OPERATIONAL", "DEPLOYED", "TESTED"]:
@@ -879,22 +1030,24 @@ def get_delivery_health(traceability_matrix):
             operational += 1
         if status == "BLOCKED":
             blocked += 1
-            
+
     # Calculate coverage weights
     impl_cov = implemented / total
     test_cov = tested / total
     deploy_cov = deployed / total
     oper_cov = operational / total
-    
+
     # Blocker penalty: deduct 15 points per active blocker in Phase 1-3
     blocker_penalty = (blocked / total) * 100.0
-    
-    health_score = (0.4 * impl_cov + 0.2 * test_cov + 0.2 * deploy_cov + 0.2 * oper_cov) * 100.0
+
+    health_score = (
+        0.4 * impl_cov + 0.2 * test_cov + 0.2 * deploy_cov + 0.2 * oper_cov
+    ) * 100.0
     health_score = max(0.0, min(100.0, health_score - blocker_penalty))
     health_score = round(health_score, 1)
-    
+
     classification = _classify_health_score(health_score)
-        
+
     return {
         "score": health_score,
         "classification": classification,
@@ -904,27 +1057,31 @@ def get_delivery_health(traceability_matrix):
             "test_coverage": round(test_cov * 100, 1),
             "deployment_readiness": round(deploy_cov * 100, 1),
             "operational_readiness": round(oper_cov * 100, 1),
-            "blocker_ratio": round((blocked / total) * 100, 1)
-        }
+            "blocker_ratio": round((blocked / total) * 100, 1),
+        },
     }
+
 
 def get_change_detection():
     """
-    Compare current baseline (with DTASE requirements) against 
+    Compare current baseline (with DTASE requirements) against
     previous baseline to identify scope creep and unplanned work.
     """
     # Simulate previous release baseline (v0.2.0-beta did not have packs, multi-persona output, etc.)
-    previous_baseline_reqs = [f"FR-{i:03d}" for i in range(11, 201)] # FR-011 to FR-200
+    previous_baseline_reqs = [f"FR-{i:03d}" for i in range(11, 201)]  # FR-011 to FR-200
     current_reqs = [f"FR-{i:03d}" for i in range(11, 258)]
-    
+
     added = [r for r in current_reqs if r not in previous_baseline_reqs]
     # Added scope creep: packs and domain translation engine (DTASE) requirements added late
-    changed = ["FR-011", "FR-101"] # Intake changed to multimodal, governance changed to strict Rego
-    removed = ["FR-078"] # Old duplicate traceability task removed
-    
+    changed = [
+        "FR-011",
+        "FR-101",
+    ]  # Intake changed to multimodal, governance changed to strict Rego
+    removed = ["FR-078"]  # Old duplicate traceability task removed
+
     # Technical Debt: GPLv3 copyleft risk growth
-    tech_debt_growth = 15.0 # represented as a percentage growth
-    
+    tech_debt_growth = 15.0  # represented as a percentage growth
+
     return {
         "added": added,
         "changed": changed,
@@ -932,23 +1089,24 @@ def get_change_detection():
         "scope_creep_ratio": round((len(added) / len(previous_baseline_reqs)) * 100, 1),
         "unplanned_work_count": len(added),
         "tech_debt_growth_percentage": tech_debt_growth,
-        "description": "Scope creep identified during Phase 2. Ingestion of the DTASE engine and packs & extensibility requirements added 57 functional requirements to the delivery baseline."
+        "description": "Scope creep identified during Phase 2. Ingestion of the DTASE engine and packs & extensibility requirements added 57 functional requirements to the delivery baseline.",
     }
+
 
 def generate_antigravity_prompt(traceability_matrix, roadmap_id=None):
     """
-    Generate an execution-ready Antigravity prompt incorporating complete, 
+    Generate an execution-ready Antigravity prompt incorporating complete,
     real-time implementation state awareness.
     """
     # Filter by roadmap item if specified
     reqs = traceability_matrix.values()
     if roadmap_id:
         reqs = [r for r in reqs if r["roadmap_item"] == roadmap_id]
-        
+
     implemented = []
     not_implemented = []
     blocked = []
-    
+
     for r in reqs:
         item = f"- **{r['id']}**: {r['description']} (Section: {r['section']}, Design: {r['technical_design']})"
         if r["status"] in ["OPERATIONAL", "DEPLOYED", "TESTED"]:
@@ -957,31 +1115,31 @@ def generate_antigravity_prompt(traceability_matrix, roadmap_id=None):
             blocked.append(item + f" [BLOCKED - Reason: {r['reason_blocked']}]")
         else:
             not_implemented.append(item)
-            
+
     # Compile constraints
     constraints = [
         "- **GPLv3 Compliance Constraint**: The `marker` library contains a GPLv3 copyleft license. To avoid IP contamination, do NOT import `marker` directly in Python scripts. It must be strictly isolated inside a separate REST container service.",
         "- **Zero-Trust Access Constraint**: Executor agents must run in restricted Docker sandbox containers with internet-access limits. All operations must route through Model Context Protocol (MCP) gateways.",
-        "- **Cost Controls**: To control token spending, all agent planners must validate execution plans against token limits using DSPy/Outlines constraints."
+        "- **Cost Controls**: To control token spending, all agent planners must validate execution plans against token limits using DSPy/Outlines constraints.",
     ]
-    
+
     # Compile dependencies
     tech_deps = [
         "Haystack RAG framework",
         "LlamaIndex document parsing pipeline",
         "Graphiti Temporal Memory Engine",
         "Pydantic AI structural LLM parser",
-        "dbt-core analytical mapping"
+        "dbt-core analytical mapping",
     ]
-    
+
     infra_deps = [
         "Qdrant Vector DB (Port 6333)",
         "PostgreSQL Metadata DB (Port 5435)",
         "Marquez Lineage Ingest (Port 5000)",
         "Apache Superset BI dashboards (Port 8088)",
-        "Dependency-Track SBOM Scanner (Port 8081)"
+        "Dependency-Track SBOM Scanner (Port 8081)",
     ]
-    
+
     prompt = f"""# ANTIGRAVITY EXECUTION PROMPT
 # Living Source of Truth Plan - Recalculated on {time.strftime("%Y-%m-%d %H:%M:%S")}
 

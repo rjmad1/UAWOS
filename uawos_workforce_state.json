@@ -1,39 +1,12 @@
 {
-  "teams": {
-    "Dev Team": [
-      "Lead Engineer"
-    ],
-    "Core Execution Team": [
-      "Lead Engineer",
-      "Executor Agent"
-    ]
-  },
   "entities": {
-    "QA Agent": {
-      "id": "WRK-A-04",
-      "name": "QA Agent",
-      "type": "agent",
-      "capacity": 100,
-      "trust_score": 100.0,
-      "utilization": 0.0,
-      "performance_score": 100.0
-    },
-    "QA Engineer": {
-      "id": "WRK-H-03",
-      "name": "QA Engineer",
-      "type": "human",
-      "capacity": 100,
-      "trust_score": 100.0,
-      "utilization": 0.0,
-      "performance_score": 100.0
-    },
     "Lead Engineer": {
       "id": "WRK-H-01",
       "name": "Lead Engineer",
       "type": "human",
       "capacity": 100,
-      "trust_score": 98.0,
       "utilization": 80.0,
+      "trust_score": 98.0,
       "performance_score": 95.0
     },
     "Executor Agent": {
@@ -41,18 +14,45 @@
       "name": "Executor Agent",
       "type": "agent",
       "capacity": 80,
-      "trust_score": 100.0,
       "utilization": 75.0,
+      "trust_score": 100.0,
       "performance_score": 92.5
+    },
+    "QA Engineer": {
+      "id": "WRK-H-03",
+      "name": "QA Engineer",
+      "type": "human",
+      "capacity": 100,
+      "utilization": 0.0,
+      "trust_score": 100.0,
+      "performance_score": 100.0
+    },
+    "QA Agent": {
+      "id": "WRK-A-04",
+      "name": "QA Agent",
+      "type": "agent",
+      "capacity": 100,
+      "utilization": 0.0,
+      "trust_score": 100.0,
+      "performance_score": 100.0
     }
+  },
+  "teams": {
+    "Core Execution Team": [
+      "Lead Engineer",
+      "Executor Agent"
+    ],
+    "Dev Team": [
+      "Lead Engineer"
+    ]
   },
   "assignments": {
     "ACT-101": "Lead Engineer"
   },
   "delegations": [
     {
-      "to": "Executor Agent",
       "from": "Lead Engineer",
+      "to": "Executor Agent",
       "task": "Build database script",
       "timestamp": 0
     }

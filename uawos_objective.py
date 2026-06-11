@@ -1,10 +1,13 @@
 # uawos_objective.py
-import uawos_db
-import os
 import json
+import os
 import time
-import urllib.request
 import urllib.error
+import urllib.request
+
+from uawos_state_utils import load_state, save_state
+
+import uawos_db
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_objective_state.json")
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
@@ -14,60 +17,21 @@ def get_default_state() -> dict:
         "objectives": {}
     }
 
-def load_state() -> dict:
-    if uawos_db.DB_AVAILABLE:
-        try:
-            state = uawos_db.db_load_objectives()
-            if state and state.get("objectives"):
-                with open(STATE_FILE, "w") as f:
-                    json.dump(state, f, indent=2)
-                return state
-        except Exception as e:
-            print(f"PostgreSQL load failed, falling back: {e}")
-
-    if os.path.exists(STATE_FILE):
-        try:
-            with open(STATE_FILE, "r") as f:
-                return json.load(f)
-        except Exception:
-            pass
-    state = get_default_state()
-    save_state(state)
-    return state
-
-def save_state(state: dict):
-    try:
-        with open(STATE_FILE, "w") as f:
-            json.dump(state, f, indent=2)
-    except Exception as e:
-        print(f"Error saving local state cache: {e}")
-    if uawos_db.DB_AVAILABLE:
-        try:
-            uawos_db.db_save_all_objectives(state.get("objectives", {}))
-        except Exception as e:
-            print(f"PostgreSQL save failed: {e}")
-# Core API for creating objectives
+# FR-011 to FR-020: Create a structured Objective
 def create_objective(
     title: str,
     description: str,
-    source_type: str,
-    source_uri: str,
-    owner: str,
-    sponsor: str,
-    priority: str,
+    source_type: str = "text",
+    source_uri: str = "",
+    owner: str = "",
+    sponsor: str = "",
+    priority: str = "Medium",
     dependencies: list = None
 ) -> dict:
-    """Create a new objective record and save it to the state database."""
+    """Create and persist a new Objective."""
     state = load_state()
-    
-    # ID Generation
-    existing_ids = [int(k[4:]) for k in state["objectives"].keys() if k.startswith("OBJ-") and k[4:].isdigit()]
-    next_id_num = max(existing_ids) + 1 if existing_ids else 201  # Start custom objectives at OBJ-201
-    objective_id = f"OBJ-{next_id_num}"
-    
-    if dependencies is None:
-        dependencies = []
-        
+    objective_id = f"OBJ-{len(state['objectives']) + 101:03d}"
+    dependencies = dependencies or []
     objective = {
         "id": objective_id,
         "title": title,
@@ -84,10 +48,10 @@ def create_objective(
         "health_score": 100.0,
         "confidence_score": 100.0
     }
-    
+
     state["objectives"][objective_id] = objective
     save_state(state)
-    
+
     # Update scores dynamically
     recalculate_scores(objective_id)
     state = load_state()

@@ -1,8 +1,11 @@
 # uawos_planning.py
-import uawos_db
-import os
 import json
+import os
 import time
+
+from uawos_state_utils import load_state, save_state
+
+import uawos_db
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_planning_state.json")
 
@@ -44,39 +47,7 @@ def get_default_state() -> dict:
         }
     }
 
-def load_state() -> dict:
-    if uawos_db.DB_AVAILABLE:
-        try:
-            state = uawos_db.db_load_plans()
-            if state and state.get("plans"):
-                with open(STATE_FILE, "w") as f:
-                    json.dump(state, f, indent=2)
-                return state
-        except Exception as e:
-            print(f"PostgreSQL load failed, falling back: {e}")
-
-    if os.path.exists(STATE_FILE):
-        try:
-            with open(STATE_FILE, "r") as f:
-                return json.load(f)
-        except Exception:
-            pass
-    state = get_default_state()
-    save_state(state)
-    return state
-
-def save_state(state: dict):
-    try:
-        with open(STATE_FILE, "w") as f:
-            json.dump(state, f, indent=2)
-    except Exception as e:
-        print(f"Error saving local state cache: {e}")
-    if uawos_db.DB_AVAILABLE:
-        try:
-            uawos_db.db_save_all_plans(state.get("plans", {}))
-        except Exception as e:
-            print(f"PostgreSQL save failed: {e}")
-# Core API
+# FR-040 to FR-056: Create a plan
 def create_plan(
     objective_id: str,
     title: str,
@@ -89,17 +60,9 @@ def create_plan(
     assumptions: list = None,
     is_alternative: bool = False
 ) -> dict:
-    """Create a new plan. Enforces UCA Law 3 (No plan without an objective)."""
+    """Create and persist a new Plan for a given objective."""
     state = load_state()
-    
-    # Enforce Law 3
-    if not objective_id:
-        raise ValueError("Constitutional Law 3 Violation: Plan must be linked to an Objective ID.")
-        
-    existing_ids = [int(k[4:]) for k in state["plans"].keys() if k.startswith("PLN-") and k[4:].isdigit()]
-    next_id_num = max(existing_ids) + 1 if existing_ids else 201
-    plan_id = f"PLN-{next_id_num}"
-    
+    plan_id = f"PLN-{len(state['plans']) + 100:03d}"
     plan = {
         "id": plan_id,
         "objective_id": objective_id,
@@ -116,7 +79,7 @@ def create_plan(
         "assumptions": assumptions or ["Required resources are available"],  # FR-050
         "is_alternative": is_alternative  # FR-056
     }
-    
+
     state["plans"][plan_id] = plan
     save_state(state)
     return state["plans"][plan_id]

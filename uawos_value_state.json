@@ -2,45 +2,45 @@
   "hypotheses": {
     "HYP-01": {
       "id": "HYP-01",
-      "metric": "Checkout Conversion Rate",
-      "status": "active",
       "objective_id": "OBJ-101",
+      "metric": "Checkout Conversion Rate",
+      "target_improvement": 15.0,
       "confidence_score": 90.0,
-      "target_improvement": 15.0
+      "status": "active"
     },
     "HYP-02": {
       "id": "HYP-02",
-      "metric": "Convers",
-      "status": "active",
       "objective_id": "OBJ-101",
+      "metric": "Convers",
+      "target_improvement": 10.0,
       "confidence_score": 90.0,
-      "target_improvement": 10.0
+      "status": "active"
     }
   },
   "value_ledger": [
     {
       "ledger_id": "LDG-01",
-      "timestamp": 1780963292,
       "hypothesis_id": "HYP-01",
-      "realized_value_usd": 1250.0,
       "measured_improvement": 5.0,
-      "attribution_percentage": 75.0
+      "attribution_percentage": 75.0,
+      "realized_value_usd": 1250.0,
+      "timestamp": 1780963292
     },
     {
       "ledger_id": "LDG-02",
-      "timestamp": 1781095038,
       "hypothesis_id": "HYP-01",
-      "realized_value_usd": 1600.0,
       "measured_improvement": 8.0,
-      "attribution_percentage": 80.0
+      "attribution_percentage": 80.0,
+      "realized_value_usd": 1600.0,
+      "timestamp": 1781144114
     },
     {
       "ledger_id": "LDG-03",
-      "timestamp": 1781095038,
       "hypothesis_id": "HYP-01",
-      "realized_value_usd": 625.0,
       "measured_improvement": 5.0,
-      "attribution_percentage": 50.0
+      "attribution_percentage": 50.0,
+      "realized_value_usd": 625.0,
+      "timestamp": 1781144114
     }
   ]
 }

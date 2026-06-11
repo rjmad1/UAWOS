@@ -1,7 +1,8 @@
 # uawos_workforce.py
-import uawos_db
-import os
 import json
+import os
+
+import uawos_db
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_workforce_state.json")
 
@@ -18,32 +19,9 @@ def get_default_state() -> dict:
         "delegations": []
     }
 
-def load_state() -> dict:
-    state = uawos_db.db_get_state("uawos_workforce", None)
-    if state is not None:
-        try:
-            with open(STATE_FILE, "w") as f:
-                json.dump(state, f, indent=2)
-        except Exception:
-            pass
-        return state
-    if os.path.exists(STATE_FILE):
-        try:
-            with open(STATE_FILE, "r") as f:
-                return json.load(f)
-        except Exception:
-            pass
-    state = get_default_state()
-    save_state(state)
-    return state
+# State handling via shared utilities
+from uawos_state_utils import load_state, save_state
 
-def save_state(state: dict):
-    try:
-        with open(STATE_FILE, "w") as f:
-            json.dump(state, f, indent=2)
-    except Exception as e:
-        print(f"Error saving local state cache: {e}")
-    uawos_db.db_save_state("uawos_workforce", state)
 # Core API
 def add_workforce_entity(name: str, entity_type: str, capacity: int = 100) -> dict:
     """Manage human (FR-081) or agent (FR-082) workforce entities."""

@@ -591,9 +591,9 @@
                 
                 <!-- Diagram Visual Output Canvas -->
                 <div class="diagram-container" id="visual-container">
-                    <pre class="mermaid" id="diagram-canvas">
+                    <div class="mermaid" id="diagram-canvas"></div>
                         <!-- Rendered by Mermaid dynamically -->
-                    </pre>
+                    
                 </div>
 
                 <!-- Zoom Controls -->
@@ -1398,6 +1398,57 @@
 
         // Render selected diagram to screen
         window.loadDiagram = async function(id) {
+        console.log('Loading diagram', id);
+        currentDiagramId = id;
+        // Highlight active navigation item
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = Array.from(document.querySelectorAll('.nav-item')).find(b => b.getAttribute('onclick').includes(id));
+        if (activeBtn) activeBtn.classList.add('active');
+        const data = diagramsData[id];
+        if (!data) {
+            console.error('Diagram data not found for id', id);
+            return;
+        }
+        // Update Text descriptions
+        document.getElementById("diagram-title").textContent = data.title;
+        document.getElementById("diagram-meta").textContent = data.meta;
+        document.getElementById("diagram-purpose").textContent = data.purpose;
+        document.getElementById("diagram-assumptions").textContent = data.assumptions;
+        document.getElementById("diagram-insights").textContent = data.insights;
+        document.getElementById("diagram-risks").textContent = data.risks;
+        document.getElementById("diagram-missing").textContent = data.missing;
+        document.getElementById("diagram-improvements").textContent = data.improvements;
+        // Render visual diagram or code block depending on mode
+        const visualContainer = document.getElementById("visual-container");
+        const sourceContainer = document.getElementById("source-container");
+        const zoomControls = document.getElementById("zoom-controls-wrapper");
+        if (isCodeView) {
+            visualContainer.style.display = "none";
+            sourceContainer.style.display = "block";
+            if (zoomControls) zoomControls.style.display = "none";
+        } else {
+            visualContainer.style.display = "flex";
+            sourceContainer.style.display = "none";
+            if (zoomControls) zoomControls.style.display = "flex";
+            // Compile and draw visual SVG using mermaid.render
+            const canvas = document.getElementById("diagram-canvas");
+            canvas.removeAttribute("data-processed");
+            try {
+                const { svg } = await mermaid.render(`mermaid-${id}`, data.code);
+                console.log('Rendered SVG length:', svg.length);
+                canvas.innerHTML = svg;
+            } catch (err) {
+                console.error('Mermaid render failed, falling back to mermaid.run:', err);
+                canvas.innerHTML = `<p style="color:var(--red); font-weight:600; padding: 1.5rem;">[Mermaid Render Error]: ${err.message}</p>`;
+                // Fallback: attempt mermaid.run on the container
+                try {
+                    await mermaid.run({ nodes: [canvas] });
+                } catch (fallbackErr) {
+                    console.error('Mermaid fallback run also failed:', fallbackErr);
+                }
+            }
+        }
+    }
             currentDiagramId = id;
             
             // Highlight active navigation item
@@ -1437,13 +1488,12 @@
                 sourceContainer.style.display = "none";
                 if (zoomControls) zoomControls.style.display = "flex";
                 
-                // Compile and draw visual SVG dynamically
+                // Compile and draw visual SVG using mermaid.render
                 const canvas = document.getElementById("diagram-canvas");
                 canvas.removeAttribute("data-processed");
-                canvas.innerHTML = data.code;
-                
                 try {
-                    await mermaid.run({ nodes: [canvas] });
+                    const { svg } = await mermaid.render(`mermaid-${id}`, data.code);
+                    canvas.innerHTML = svg;
                 } catch (err) {
                     console.error("Mermaid compilation failed:", err);
                     canvas.innerHTML = `<p style="color:var(--red); font-weight:600; padding: 1.5rem;">[Mermaid Parse Error]: ${err.message}</p>`;
