@@ -196,6 +196,7 @@ def analyze_unstructured_input(text: str) -> dict:
 
     # 2. Try LLM enrichment via local Ollama gateway (tinyllama)
     try:
+        import uawos_weaverouter
         prompt = f"""[INST] You are the UAWOS Domain Translation & Artifact Synthesis Engine (DTASE).
 Analyze this unstructured human input and output a structured JSON analysis.
 Input: "{text}"
@@ -213,51 +214,44 @@ Output JSON format (strictly JSON, no extra text):
   "summary": "one-sentence professional summary"
 }}
 [/INST]"""
-        req_data = json.dumps({"model": "tinyllama", "prompt": prompt, "stream": False, "format": "json"}).encode(
-            "utf-8"
+        
+        llm_text = uawos_weaverouter.uawos_generate_response(
+            prompt=prompt,
+            model="tinyllama",
+            format="json",
+            agent_name="DTASE Agent"
         )
 
-        req = urllib.request.Request(
-            f"{OLLAMA_BASE_URL}/api/generate",
-            data=req_data,
-            headers={"Content-Type": "application/json"},
-        )
+        # Parse LLM response
+        llm_analysis = json.loads(llm_text)
 
-        with urllib.request.urlopen(req, timeout=4.0) as response:
-            resp_body = response.read().decode("utf-8")
-            resp_json = json.loads(resp_body)
-            llm_text = resp_json.get("response", "")
+        # Merge LLM results with heuristics
+        if llm_analysis.get("title"):
+            result["title"] = llm_analysis["title"]
+        if llm_analysis.get("description"):
+            result["description"] = llm_analysis["description"]
+        if llm_analysis.get("priority") in ["Critical", "High", "Medium", "Low"]:
+            result["priority"] = llm_analysis["priority"]
+        if llm_analysis.get("dependencies"):
+            result["dependencies"] = [d.upper() for d in llm_analysis["dependencies"]]
+        if llm_analysis.get("detected_domains"):
+            result["detected_domains"] = list(set(result["detected_domains"] + llm_analysis["detected_domains"]))
+        if llm_analysis.get("opportunities"):
+            result["opportunities"] = list(set(result["opportunities"] + llm_analysis["opportunities"]))
+        if llm_analysis.get("risks"):
+            result["risks"] = list(set(result["risks"] + llm_analysis["risks"]))
+        if llm_analysis.get("anomalies"):
+            result["anomalies"] = list(set(result["anomalies"] + llm_analysis["anomalies"]))
 
-            # Parse LLM response
-            llm_analysis = json.loads(llm_text)
-
-            # Merge LLM results with heuristics
-            if llm_analysis.get("title"):
-                result["title"] = llm_analysis["title"]
-            if llm_analysis.get("description"):
-                result["description"] = llm_analysis["description"]
-            if llm_analysis.get("priority") in ["Critical", "High", "Medium", "Low"]:
-                result["priority"] = llm_analysis["priority"]
-            if llm_analysis.get("dependencies"):
-                result["dependencies"] = [d.upper() for d in llm_analysis["dependencies"]]
-            if llm_analysis.get("detected_domains"):
-                result["detected_domains"] = list(set(result["detected_domains"] + llm_analysis["detected_domains"]))
-            if llm_analysis.get("opportunities"):
-                result["opportunities"] = list(set(result["opportunities"] + llm_analysis["opportunities"]))
-            if llm_analysis.get("risks"):
-                result["risks"] = list(set(result["risks"] + llm_analysis["risks"]))
-            if llm_analysis.get("anomalies"):
-                result["anomalies"] = list(set(result["anomalies"] + llm_analysis["anomalies"]))
-
-            if "LLM Professional View" not in result["persona_translations"] and llm_analysis.get("summary"):
-                result["persona_translations"]["LLM Professional View"] = {
-                    "summary": llm_analysis["summary"],
-                    "action_items": [
-                        "Assess generated professional requirements",
-                        "Register findings with knowledge engine",
-                    ],
-                }
-            result["traceability"]["confidence_score"] = 0.95
+        if "LLM Professional View" not in result["persona_translations"] and llm_analysis.get("summary"):
+            result["persona_translations"]["LLM Professional View"] = {
+                "summary": llm_analysis["summary"],
+                "action_items": [
+                    "Assess generated professional requirements",
+                    "Register findings with knowledge engine",
+                ],
+            }
+        result["traceability"]["confidence_score"] = 0.95
     except Exception:
         # Fallback to pure heuristics
         pass

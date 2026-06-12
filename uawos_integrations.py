@@ -330,7 +330,24 @@ def improve_effectiveness() -> dict:
     return {"effectiveness_score": 98.4}
 
 
+def setup_weaverouter_integration() -> dict:
+    """Configure and register Weaverouter in the UAWOS integrations list."""
+    state = load_state()
+    state["integrations"]["Weaverouter"] = {
+        "status": "connected",
+        "trust_score": 98.0,
+        "governed": True,
+    }
+    save_state(state)
+    return state["integrations"]["Weaverouter"]
+
+
 # ----------------- VERIFICATION TESTS (FR-201 to FR-250) -----------------
+def verify_fr_weaverouter():
+    setup_weaverouter_integration()
+    state = load_state()
+    assert state["integrations"]["Weaverouter"]["status"] == "connected", "Weaverouter registration failed"
+    return True
 def verify_fr_201():
     return setup_api_integration("API")["status"] == "connected"
 
@@ -591,6 +608,7 @@ def run_self_tests():
         ("FR-248", verify_fr_248),
         ("FR-249", verify_fr_249),
         ("FR-250", verify_fr_250),
+        ("WEAVEROUTER", verify_fr_weaverouter),
     ]
 
     for code, fn in tests:

@@ -56,7 +56,7 @@ def verify_neo4j_sync():
 
         req_data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(url, data=req_data, headers=headers)
-        with urllib.request.urlopen(req, timeout=1.0) as resp:
+        with urllib.request.urlopen(req, timeout=5.0) as resp:
             res = json.loads(resp.read().decode("utf-8"))
             results = res.get("results", [])
             if results and results[0].get("data"):

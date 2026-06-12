@@ -417,16 +417,13 @@ def reflect_on_episode(episode_id: str) -> dict:
     events_summary = " ".join([f"{e['actor_id']} - {e['content']}" for e in timeline])
     reflection_text = f"Continuous learning summary of events: {events_summary[:200]}"
     try:
+        import uawos_weaverouter
         prompt = f"Summarize these workflow events into a technical best practice rule: {events_summary[:300]}"
-        req_data = json.dumps({"model": "tinyllama", "prompt": prompt, "stream": False}).encode("utf-8")
-        req = urllib.request.Request(
-            f"{uawos_db.OLLAMA_BASE_URL}/api/generate",
-            data=req_data,
-            headers={"Content-Type": "application/json"},
+        reflection_text = uawos_weaverouter.uawos_generate_response(
+            prompt=prompt,
+            model="tinyllama",
+            agent_name="Memory Consolidation Agent"
         )
-        with urllib.request.urlopen(req, timeout=2.0) as response:
-            resp = json.loads(response.read().decode("utf-8"))
-            reflection_text = resp.get("response", reflection_text)
     except Exception:
         pass
 

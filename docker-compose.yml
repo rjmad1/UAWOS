@@ -236,7 +236,7 @@ services:
       - "7233:7233"
       - "8233:8233"
     environment:
-      - DB=postgresql
+      - DB=postgres12
       - DB_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER:-marquez}
       - POSTGRES_PWD=${POSTGRES_PASSWORD:-marquez}
@@ -247,9 +247,116 @@ services:
     restart: unless-stopped
     profiles: ["full"]
 
+  # Weaverouter Database Sidecar
+  weaverouter-db:
+    image: postgres:15-alpine
+    container_name: uawos-weaverouter-db
+    environment:
+      POSTGRES_USER: router
+      POSTGRES_PASSWORD: router
+      POSTGRES_DB: router
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U router -d router"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - weaverouter_db_data:/var/lib/postgresql/data
+      - ./weaverouter/db/init:/docker-entrypoint-initdb.d:ro
+    profiles: ["core", "full"]
+
+  # Weaverouter Pub/Sub Emulator for Cache Invalidation
+  weaverouter-pubsub:
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+    container_name: uawos-weaverouter-pubsub
+    entrypoint: ["/entrypoint.sh"]
+    ports:
+      - "8085:8085"
+    environment:
+      PUBSUB_PROJECT_ID: router-local
+      PUBSUB_TOPIC_ROUTER_INVALIDATION: router-installation-invalidate
+    volumes:
+      - ./weaverouter/db/pubsub/entrypoint.sh:/entrypoint.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8085 >/dev/null || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    profiles: ["core", "full"]
+
+  # Weaverouter Database Migrations Runner
+  weaverouter-migrate:
+    image: migrate/migrate:v4.17.1
+    container_name: uawos-weaverouter-migrate
+    depends_on:
+      weaverouter-db:
+        condition: service_healthy
+    volumes:
+      - ./weaverouter/db/migrations:/migrations
+    command:
+      - "-path=/migrations"
+      - "-database=postgres://router:router@weaverouter-db:5432/router?sslmode=disable&search_path=router"
+      - "up"
+    restart: "no"
+    profiles: ["core", "full"]
+
+  # Weaverouter Core Server Proxy
+  weaverouter-server:
+    build:
+      context: ./weaverouter
+    container_name: uawos-weaverouter-server
+    depends_on:
+      weaverouter-db:
+        condition: service_healthy
+      weaverouter-migrate:
+        condition: service_completed_successfully
+      weaverouter-pubsub:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgres://router:router@weaverouter-db:5432/router?sslmode=disable
+      PORT: "8080"
+      ROUTER_ONNX_ASSETS_DIR: /opt/router/assets
+      ROUTER_ONNX_LIBRARY_DIR: /usr/lib
+      PUBSUB_EMULATOR_HOST: weaverouter-pubsub:8085
+      PUBSUB_PROJECT_ID: router-local
+      PUBSUB_TOPIC_ROUTER_INVALIDATION: router-installation-invalidate
+      PUBSUB_SUBSCRIPTION_ROUTER_INVALIDATION: router-installation-invalidate
+    ports:
+      - "8092:8080" # Map host port 8092 to container port 8080
+    restart: unless-stopped
+    profiles: ["core", "full"]
+
+  # Weaverouter Automatic Database Seeder (Seeds rk_uawos_dev_key)
+  weaverouter-seed:
+    image: golang:1.25-bookworm
+    container_name: uawos-weaverouter-seed
+    working_dir: /app
+    volumes:
+      - ./weaverouter:/app
+      - go_modules:/go/pkg/mod
+    depends_on:
+      weaverouter-db:
+        condition: service_healthy
+      weaverouter-migrate:
+        condition: service_completed_successfully
+    environment:
+      CGO_ENABLED: "0"
+      DATABASE_URL: postgres://router:router@weaverouter-db:5432/router?sslmode=disable
+      SEED_API_KEY: rk_uawos_dev_key
+    command: ["go", "run", "./cmd/seed"]
+    restart: "no"
+    profiles: ["core", "full"]
+
 volumes:
   postgres_data:
   qdrant_data:
   dtrack_data:
   neo4j_data:
   clickhouse_data:
+  weaverouter_db_data:
+  go_modules:
