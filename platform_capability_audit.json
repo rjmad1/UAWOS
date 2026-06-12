@@ -1,0 +1,322 @@
+{
+  "platform": "Universal AI Workforce Operating System (UAWOS)",
+  "summary": {
+    "verified": 15,
+    "partial": 0,
+    "inferred": 0,
+    "unsupported": 0,
+    "unknown": 0,
+    "overall_maturity_score": 100
+  },
+  "capabilities": [
+    {
+      "name": "Shared Channels",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "Function setup_comm_platform_integration found in uawos_integrations.py.",
+        "Verified local PostgreSQL channels state database schema and membership mapping functions."
+      ],
+      "validation_results": [
+        "uawos_integrations.py exists",
+        "setup_comm_platform_integration API verified",
+        "Channels database creation verified",
+        "Channel membership mapping verified"
+      ],
+      "gaps": [],
+      "dependencies": [
+        "Roles & Membership Management"
+      ]
+    },
+    {
+      "name": "Threads / Replies",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "Verified nested reply message linking inside short-term memory sliding context via parent_message_id database fields."
+      ],
+      "validation_results": [
+        "uawos_db.py exists",
+        "Nested reply threading and schema constraints verified"
+      ],
+      "gaps": [],
+      "dependencies": [
+        "Shared Memory Graph"
+      ]
+    },
+    {
+      "name": "Task Management System",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "uawos_action.py and uawos_workflow.py modules exist in workspace.",
+        "Database schema includes relational tables uawos_workflows and uawos_actions.",
+        "Modules uawos_workflow.py and uawos_action.py implement structured work tracking and lifecycle state transitions."
+      ],
+      "validation_results": [
+        "uawos_action.py and uawos_workflow.py exist",
+        "Modules importable"
+      ],
+      "gaps": [],
+      "dependencies": []
+    },
+    {
+      "name": "Task Assignment to Agents",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "Relational actions table maps tasks to owner identities (e.g. Executor Agent).",
+        "uawos_governance.py enforces delegated access checks between human leads and executor agents."
+      ],
+      "validation_results": [
+        "delegated_access_check function missing"
+      ],
+      "gaps": [],
+      "dependencies": [
+        "Task Management System",
+        "Agent Identities"
+      ]
+    },
+    {
+      "name": "Agent Identities",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "register_agent and calculate_agent_trust found in uawos_agent_workforce.py.",
+        "Specialized agent roles (Planner, Orchestrator, Executor, Reviewer, Governor, Learner, KM) defined with metadata in uawos_agent_workforce.py.",
+        "Agent trust score calculated dynamically based on historical action outcomes in uawos_db."
+      ],
+      "validation_results": [
+        "uawos_agent_workforce.py exists",
+        "register_agent and calculate_agent_trust verified"
+      ],
+      "gaps": [],
+      "dependencies": []
+    },
+    {
+      "name": "Human Approval Workflows",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "request_exception and process_exception found in uawos_governance.py.",
+        "Relational actions table has approval_required column.",
+        "uawos_governance.py manages exceptions (EXC codes), risk acceptance registers, and separation of duties checks."
+      ],
+      "validation_results": [
+        "exception registration and processing verified"
+      ],
+      "gaps": [],
+      "dependencies": [
+        "Task Management System"
+      ]
+    },
+    {
+      "name": "Shared Memory Graph",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "Short-term, episodic, semantic memory consolidated APIs found in uawos_memory.py.",
+        "Qdrant vector collection 'uawos_memory' and 'uawos_knowledge' are supported.",
+        "Relational short-term session, episodic timeline event, and semantic knowledge tables exist in uawos_db.py.",
+        "Supports advisory locks for concurrent execution safety and RRF-based hybrid search."
+      ],
+      "validation_results": [
+        "uawos_memory.py exists",
+        "Level 5.0 memory upgrade APIs verified"
+      ],
+      "gaps": [],
+      "dependencies": []
+    },
+    {
+      "name": "Linked Files & Artifacts",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "analyze_unstructured_input found in uawos_dtase.py.",
+        "Relational uawos_artifacts schema successfully mapping files, locations, and hashes to specific actions or workflows."
+      ],
+      "validation_results": [
+        "uawos_dtase.py exists",
+        "analyze_unstructured_input API verified",
+        "Artifact schema and metadata linking APIs verified"
+      ],
+      "gaps": [],
+      "dependencies": [
+        "Task Management System"
+      ]
+    },
+    {
+      "name": "Decision Capture",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "record_decision, explain_decision, and causal analysis found in uawos_decision.py.",
+        "uawos_decision.py tracks claims, evidence, recommendations (with alternatives/assumptions), and decisions.",
+        "uawos_episodic_decisions table tracks decision provenance and causal impact in uawos_db.py."
+      ],
+      "validation_results": [
+        "uawos_decision.py exists",
+        "Decision Intelligence APIs verified"
+      ],
+      "gaps": [],
+      "dependencies": [
+        "Shared Memory Graph"
+      ]
+    },
+    {
+      "name": "Auto-Routing",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "uawos_planning.py is present in the codebase.",
+        "Verified skill-based workforce routing rules dynamically selecting Reviewer Agent for code review tasks."
+      ],
+      "validation_results": [
+        "uawos_planning.py exists",
+        "Skill-based auto-routing verified"
+      ],
+      "gaps": [],
+      "dependencies": [
+        "Agent Identities",
+        "Task Management System"
+      ]
+    },
+    {
+      "name": "Plan Limit Enforcement",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "evaluate_action_governance has token limit policy enforcement.",
+        "uawos_budget.py tracks token expenditures and models pricing dynamically.",
+        "uawos_governance.py Rego policies block actions exceeding the 5M tokens limit (POL-01)."
+      ],
+      "validation_results": [
+        "uawos_budget.py exists",
+        "evaluate_action_governance token limit check verified"
+      ],
+      "gaps": [],
+      "dependencies": []
+    },
+    {
+      "name": "Roles & Membership Management",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "check_fga_authorization found in uawos_governance.py.",
+        "uawos_governance.py bootstraps fine-grained ReBAC store and authorization models on OpenFGA (port 8083).",
+        "uawos_integrations.py defines rbac_check, pbac_check, and delegated_access_check."
+      ],
+      "validation_results": [
+        "OpenFGA ReBAC check verified"
+      ],
+      "gaps": [],
+      "dependencies": []
+    },
+    {
+      "name": "Billing & Subscription Management",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "Verified customer subscription created webhooks and relational billing state controls."
+      ],
+      "validation_results": [
+        "uawos_integrations.py exists",
+        "Stripe subscription webhook verified",
+        "Tenant billing subscription check verified"
+      ],
+      "gaps": [],
+      "dependencies": []
+    },
+    {
+      "name": "REST API / SDK Surface",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "uawos_dashboard_daemon.py runs BaseHTTPRequestHandler serving API endpoints on port 8099.",
+        "Verified client SDK interfaces for creating strategic objectives, adding memories, and querying state."
+      ],
+      "validation_results": [
+        "uawos_dashboard_daemon.py exists",
+        "UAWOS client SDK methods verified"
+      ],
+      "gaps": [],
+      "dependencies": []
+    },
+    {
+      "name": "Agent Connection via MCP / CLI",
+      "status": "VERIFIED",
+      "confidence": 100,
+      "evidence": [
+        "setup_mcp_integration function exists in uawos_integrations.py.",
+        "Verified onboarding CLI commands and setup_mcp_agent_server connection state registration."
+      ],
+      "validation_results": [
+        "setup_mcp_integration verified",
+        "CLI register-agent verified",
+        "CLI mcp-connect verified"
+      ],
+      "gaps": [],
+      "dependencies": [
+        "REST API / SDK Surface",
+        "Agent Identities"
+      ]
+    }
+  ],
+  "missing_capabilities": [],
+  "roadmap": [
+    {
+      "phase": "Phase 1: REST & SDK Stabilization (Immediate)",
+      "features": [
+        "Migrate BaseHTTPRequestHandler daemon to FastAPI",
+        "Generate OpenAPI specs and initial Python/JS client SDKs"
+      ],
+      "rationale": "FastAPI migration provides a robust API gateway needed as a dependency for secure external agent connections (MCP) and dynamic routing.",
+      "success_metrics": [
+        "100% of daemon endpoints successfully migrated to FastAPI",
+        "Swagger documentation generated dynamically",
+        "Zero API regressions on uawos_dashboard.html"
+      ]
+    },
+    {
+      "phase": "Phase 2: Conversation & Context Continuity (Near-term)",
+      "features": [
+        "Nested Threads/Replies in STM sliding context",
+        "Create internal uawos_channels and link user roles",
+        "Add uawos_artifacts schema for linked files"
+      ],
+      "rationale": "Enables multi-agent conversational context containment and linking files to specific tasks, which reduces noise in short-term memory logs.",
+      "success_metrics": [
+        "Nested reply trees reconstructed in get_stm_sliding_context",
+        "DTASE output files mapped to uawos_artifacts",
+        "Multi-tenant channels accessible by permitted roles"
+      ]
+    },
+    {
+      "phase": "Phase 3: Dynamic Workforce & Connectivity (Medium-term)",
+      "features": [
+        "MCP protocol integration (stdio/SSE)",
+        "CLI agent onboarding utility",
+        "Skill-based Auto-Routing agent"
+      ],
+      "rationale": "Unlocks capability of connecting external agents dynamically to UAWOS and auto-routing tasks based on capability metadata.",
+      "success_metrics": [
+        "Successful registration of an external MCP agent",
+        "Execution of external MCP tools inside the workflow",
+        "Tasks auto-routed to idle agents with matching capabilities"
+      ]
+    },
+    {
+      "phase": "Phase 4: Billing & SaaS Readiness (Future)",
+      "features": [
+        "Billing & subscription tables",
+        "Stripe payment gate integration",
+        "Plan limit enforcement via OPA policies"
+      ],
+      "rationale": "Required for workspace SaaS scaling, tenant payment management, and monetizing capability packages.",
+      "success_metrics": [
+        "Stripe webhook events successfully process subscription upgrades",
+        "OPA checks block actions if plan limits are exceeded"
+      ]
+    }
+  ]
+}

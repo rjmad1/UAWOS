@@ -165,14 +165,21 @@ def calculate_agent_trust(name: str) -> float:
     return trust
 
 
-def get_active_agents() -> list:
-    """Get list of active agent classes."""
+def get_agent_skills(name: str) -> list:
+    """Retrieve capabilities/skills for an agent."""
     state = load_state()
-    return [
-        agent["class"]
-        for agent in state["agents"].values()
-        if agent.get("lifecycle_state") in ["active", "idle", "paused"]
-    ]
+    agent = state["agents"].get(name)
+    return agent["capabilities"] if agent else []
+
+
+def get_agents_by_skill(skill: str) -> list:
+    """Find agents that possess a given capability/skill."""
+    state = load_state()
+    matching = []
+    for name, agent in state["agents"].items():
+        if skill in agent.get("capabilities", []):
+            matching.append(name)
+    return matching
 
 
 # ----------------- VERIFICATION TESTS (FR-091 to FR-100) -----------------

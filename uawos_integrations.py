@@ -46,6 +46,47 @@ def setup_mcp_integration(name: str) -> dict:
     return setup_api_integration(name)
 
 
+def setup_mcp_agent_server(agent_id: str, mcp_url: str) -> dict:
+    """Register an external agent connection dynamically using MCP."""
+    state = load_state()
+    if "mcp_agents" not in state:
+        state["mcp_agents"] = {}
+    state["mcp_agents"][agent_id] = {
+        "mcp_url": mcp_url,
+        "registered_at": int(time.time()),
+        "status": "connected"
+    }
+    save_state(state)
+    return state["mcp_agents"][agent_id]
+
+
+def verify_subscription(tenant_id: str) -> bool:
+    """Check subscription state in the database."""
+    sub = uawos_db.db_get_subscription(tenant_id)
+    if sub and sub.get("status") == "active":
+        return True
+    return False
+
+
+def mock_stripe_webhook_handler(payload: dict) -> dict:
+    """Mock webhook processing for subscription updates."""
+    event_type = payload.get("type")
+    data = payload.get("data", {})
+    object_data = data.get("object", {})
+    tenant_id = object_data.get("client_reference_id") or object_data.get("metadata", {}).get("tenant_id") or "default_tenant"
+    
+    if event_type in ["customer.subscription.created", "customer.subscription.updated"]:
+        plan_type = object_data.get("plan", {}).get("id") or "SaaS Standard"
+        status = object_data.get("status") or "active"
+        expires_at_ts = object_data.get("current_period_end")
+        uawos_db.db_save_subscription(tenant_id, plan_type, status, expires_at_ts)
+        return {"status": "success", "action": "subscribed", "tenant_id": tenant_id}
+    elif event_type == "customer.subscription.deleted":
+        uawos_db.db_save_subscription(tenant_id, "None", "canceled")
+        return {"status": "success", "action": "canceled", "tenant_id": tenant_id}
+    return {"status": "ignored", "event_type": event_type}
+
+
 def setup_database_integration(name: str) -> dict:
     return setup_api_integration(name)
 

@@ -565,6 +565,27 @@
             background: #23275c;
             border-left: 3px solid #6366f1;
         }
+
+        /* WCAG 2.1 AA keyboard focus outline styles */
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        a:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 2px solid #818cf8;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.4);
+        }
+        
+        tr:focus-visible td {
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+
+        tr:focus-visible {
+            outline: 2px solid #818cf8;
+            outline-offset: -2px;
+        }
     </style>
 </head>
 <body>
@@ -656,24 +677,24 @@
 
             <!-- Tabbed Components Lists -->
             <div class="glass tabs-card">
-                <div class="tab-headers">
-                    <button class="tab-btn active" onclick="switchTab(event, 'tab-services')">Core Services</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'tab-agents')">Agents</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'tab-mcps')">MCPs</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'tab-skills')">Skills</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'tab-integrations')">Integrations</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'tab-sec-gov')">Sec & Gov</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'tab-dtase')">DTASE Engine</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'tab-budget')">Budget & Cost</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'tab-pmcms')">Platform Maturity (PMCMS)</button>
-                    <button class="tab-btn" onclick="switchTab(event, 'tab-docs')">Documentation</button>
-                    <a href="/roadmap.html" class="tab-btn" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Roadmap Intelligence ↗</a>
-                    <a href="/architecture.html" class="tab-btn" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Architecture Diagrams ↗</a>
+                <div class="tab-headers" role="tablist" aria-label="Operational Categories">
+                    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-services" id="btn-tab-services" onclick="switchTab(event, 'tab-services')">Core Services</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-agents" id="btn-tab-agents" onclick="switchTab(event, 'tab-agents')">Agents</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-mcps" id="btn-tab-mcps" onclick="switchTab(event, 'tab-mcps')">MCPs</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-skills" id="btn-tab-skills" onclick="switchTab(event, 'tab-skills')">Skills</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-integrations" id="btn-tab-integrations" onclick="switchTab(event, 'tab-integrations')">Integrations</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-sec-gov" id="btn-tab-sec-gov" onclick="switchTab(event, 'tab-sec-gov')">Sec & Gov</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-dtase" id="btn-tab-dtase" onclick="switchTab(event, 'tab-dtase')">DTASE Engine</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-budget" id="btn-tab-budget" onclick="switchTab(event, 'tab-budget')">Budget & Cost</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-pmcms" id="btn-tab-pmcms" onclick="switchTab(event, 'tab-pmcms')">Platform Maturity (PMCMS)</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-docs" id="btn-tab-docs" onclick="switchTab(event, 'tab-docs')">Documentation</button>
+                    <a href="/roadmap.html" class="tab-btn" role="link" aria-label="Roadmap Intelligence (opens in new page)" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Roadmap Intelligence ↗</a>
+                    <a href="/architecture.html" class="tab-btn" role="link" aria-label="Architecture Diagrams (opens in new page)" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Architecture Diagrams ↗</a>
                 </div>
 
                 <!-- Services Tab -->
-                <div id="tab-services" class="tab-content active">
-                    <table>
+                <div id="tab-services" class="tab-content active" role="tabpanel" aria-labelledby="btn-tab-services">
+                    <table aria-label="Core Services Status">
                         <thead>
                             <tr>
                                 <th>Service Engine</th>
@@ -690,8 +711,8 @@
                 </div>
 
                 <!-- Agents Tab -->
-                <div id="tab-agents" class="tab-content">
-                    <table>
+                <div id="tab-agents" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-agents">
+                    <table aria-label="Agents Operations">
                         <thead>
                             <tr>
                                 <th>Agent</th>
@@ -707,8 +728,8 @@
                 </div>
 
                 <!-- MCPs Tab -->
-                <div id="tab-mcps" class="tab-content">
-                    <table>
+                <div id="tab-mcps" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-mcps">
+                    <table aria-label="Model Context Protocol Servers">
                         <thead>
                             <tr>
                                 <th>Model Context Server (MCP)</th>
@@ -724,8 +745,8 @@
                 </div>
 
                 <!-- Skills Tab -->
-                <div id="tab-skills" class="tab-content">
-                    <table>
+                <div id="tab-skills" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-skills">
+                    <table aria-label="Agent Capabilities and Skills">
                         <thead>
                             <tr>
                                 <th>Skill ID / Name</th>
@@ -741,8 +762,8 @@
                 </div>
 
                 <!-- Integrations Tab -->
-                <div id="tab-integrations" class="tab-content">
-                    <table>
+                <div id="tab-integrations" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-integrations">
+                    <table aria-label="System Integrations">
                         <thead>
                             <tr>
                                 <th>Integration Code</th>
@@ -758,8 +779,8 @@
                 </div>
 
                 <!-- Sec & Gov Tab -->
-                <div id="tab-sec-gov" class="tab-content">
-                    <table>
+                <div id="tab-sec-gov" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-sec-gov">
+                    <table aria-label="Security and Governance Controls">
                         <thead>
                             <tr>
                                 <th>Governance / Security Control</th>
@@ -775,7 +796,7 @@
                 </div>
 
                 <!-- Platform Maturity (PMCMS) Tab -->
-                <div id="tab-pmcms" class="tab-content">
+                <div id="tab-pmcms" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-pmcms">
                     <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; min-height: 600px;">
                         
                         <!-- Left Panel: Score Ring and Matrix -->
@@ -853,7 +874,7 @@
                 </div>
 
                 <!-- Documentation Tab -->
-                <div id="tab-docs" class="tab-content">
+                <div id="tab-docs" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-docs">
                     <div style="display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; height: 620px;">
                         
                         <!-- Doc categories side-list -->
@@ -878,7 +899,7 @@
                 </div>
 
                 <!-- Budget & Cost Management Tab -->
-                <div id="tab-budget" class="tab-content">
+                <div id="tab-budget" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-budget">
                     <!-- Top metrics grid -->
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
                         <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;">
@@ -929,7 +950,7 @@
                                     <span>Objective Budgets & Variance</span>
                                 </h3>
                                 <div class="table-container" style="max-height: 300px;">
-                                    <table>
+                                    <table aria-label="Objective Budgets and Variance">
                                         <thead>
                                             <tr>
                                                 <th>Objective ID</th>
@@ -957,7 +978,7 @@
                                     <span>Decomposed Action Budgets</span>
                                 </h3>
                                 <div class="table-container" style="max-height: 250px;">
-                                    <table>
+                                    <table aria-label="Action Budgets Allocation">
                                         <thead>
                                             <tr>
                                                 <th>Action ID</th>
@@ -985,7 +1006,7 @@
                                     <span>Value-to-Cost (ROI) Analysis</span>
                                 </h3>
                                 <div class="table-container">
-                                    <table>
+                                    <table aria-label="Value-to-Cost ROI Analysis">
                                         <thead>
                                             <tr>
                                                 <th>Objective ID</th>
@@ -1036,23 +1057,25 @@
                                         </select>
                                     </div>
                                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
-                                        <input type="number" id="play-tokens-in" placeholder="Input Tokens" value="50000" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" />
-                                        <input type="number" id="play-tokens-out" placeholder="Output Tokens" value="20000" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" />
-                                        <input type="number" id="play-tokens-re" placeholder="Reasoning" value="0" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" />
+                                        <input type="number" id="play-tokens-in" placeholder="Input Tokens" min="0" value="50000" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Input Tokens" />
+                                        <input type="number" id="play-tokens-out" placeholder="Output Tokens" min="0" value="20000" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Output Tokens" />
+                                        <input type="number" id="play-tokens-re" placeholder="Reasoning" min="0" value="0" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Reasoning Tokens" />
                                     </div>
-                                    <button onclick="recordSimulatedTokens()" class="action-btn" style="background: #4f46e5; border-color: #6366f1; font-size: 0.78rem; padding: 6px 0;">Inject Token Event</button>
+                                    <div id="play-tokens-alert" style="display: none; color: #f87171; font-size: 0.75rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); padding: 6px; border-radius: 4px; margin-top: 4px;" role="alert"></div>
+                                    <button onclick="recordSimulatedTokens()" class="action-btn" style="background: #4f46e5; border-color: #6366f1; font-size: 0.78rem; padding: 6px 0;" aria-label="Inject Token Event">Inject Token Event</button>
                                 </div>
 
                                 <!-- Adjust Budget Form -->
                                 <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                                     <span style="font-size: 0.8rem; font-weight: 600; color: #a5b4fc;">Adjust Objective Budget Limit</span>
                                     <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
-                                        <select id="play-obj-select" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;">
+                                        <select id="play-obj-select" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Select Objective to Adjust">
                                             <!-- Dynamic -->
                                         </select>
-                                        <input type="number" id="play-obj-budget" placeholder="Amount ($)" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" />
+                                        <input type="number" id="play-obj-budget" placeholder="Amount ($)" min="0" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Budget Amount in Dollars" />
                                     </div>
-                                    <button onclick="adjustObjectiveBudget()" class="action-btn" style="background: #e11d48; border-color: #f43f5e; font-size: 0.78rem; padding: 6px 0;">Adjust Objective Budget</button>
+                                    <div id="play-budget-alert" style="display: none; color: #f87171; font-size: 0.75rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); padding: 6px; border-radius: 4px; margin-top: 4px;" role="alert"></div>
+                                    <button onclick="adjustObjectiveBudget()" class="action-btn" style="background: #e11d48; border-color: #f43f5e; font-size: 0.78rem; padding: 6px 0;" aria-label="Adjust Objective Budget">Adjust Objective Budget</button>
                                 </div>
 
                                 <!-- Approvals Workflow -->
@@ -1081,7 +1104,7 @@
                                     <span>Agent Workforce Cost Ledger</span>
                                 </h3>
                                 <div class="table-container" style="max-height: 200px;">
-                                    <table>
+                                    <table aria-label="Agent Workforce Cost Ledger">
                                         <thead>
                                             <tr>
                                                 <th>Agent Profile</th>
@@ -1097,7 +1120,7 @@
                                 </div>
 
                                 <div class="table-container" style="max-height: 200px;">
-                                    <table>
+                                    <table aria-label="Model Token Consumption ledger">
                                         <thead>
                                             <tr>
                                                 <th>Model Endpoint</th>
@@ -1124,7 +1147,7 @@
                                     <span>Portfolio Cost Attribution</span>
                                 </h3>
                                 <div class="table-container">
-                                    <table>
+                                    <table aria-label="Portfolio Cost Attribution">
                                         <thead>
                                             <tr>
                                                 <th>Strategic Portfolio</th>
@@ -1144,7 +1167,7 @@
                 </div>
 
                 <!-- DTASE Engine Tab -->
-                <div id="tab-dtase" class="tab-content">
+                <div id="tab-dtase" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-dtase">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; min-height: 600px;">
                         
                         <!-- Left Panel: Input & Controls -->
@@ -1158,19 +1181,19 @@
                             <div>
                                 <span style="font-size:0.8rem; font-weight:600; color:#a5b4fc; display:block; margin-bottom:8px;">Load Unstructured Narrative Preset:</span>
                                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('overtime')">Overtime Retaliation (Legal/Comp)</button>
-                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('headaches')">Evening Headaches (Clinical)</button>
-                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('checkout')">Checkout Abandonment (Product/Res)</button>
-                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('latency')">API Gateway Latency (Eng)</button>
-                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('rego')">Rego Security Bypass (Gov)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('overtime')" aria-label="Load preset: Overtime Retaliation">Overtime Retaliation (Legal/Comp)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('headaches')" aria-label="Load preset: Evening Headaches">Evening Headaches (Clinical)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('checkout')" aria-label="Load preset: Checkout Abandonment">Checkout Abandonment (Product/Res)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('latency')" aria-label="Load preset: API Gateway Latency">API Gateway Latency (Eng)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('rego')" aria-label="Load preset: Rego Security Bypass">Rego Security Bypass (Gov)</button>
                                 </div>
                             </div>
                             
-                            <textarea id="dtase-raw-input" style="flex-grow: 1; min-height: 250px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--text-primary); padding: 12px; font-size: 0.88rem; font-family: sans-serif; resize: none; line-height: 1.45;" placeholder="Type or paste unstructured text narrative here..."></textarea>
+                            <textarea id="dtase-raw-input" style="flex-grow: 1; min-height: 250px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--text-primary); padding: 12px; font-size: 0.88rem; font-family: sans-serif; resize: none; line-height: 1.45;" placeholder="Type or paste unstructured text narrative here..." aria-label="Unstructured Narrative Input Textarea"></textarea>
                             
                             <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <button class="action-btn" id="dtase-btn-analyze" onclick="runDtaseAnalysis()" style="background:#4f46e5; border-color:#6366f1; width:200px; padding: 10px 0;">Run DTASE Analysis</button>
-                                <button class="tab-btn" onclick="clearDtase()" style="font-size:0.8rem;">Clear Input</button>
+                                <button class="action-btn" id="dtase-btn-analyze" onclick="runDtaseAnalysis()" style="background:#4f46e5; border-color:#6366f1; width:200px; padding: 10px 0;" aria-label="Run DTASE Analysis">Run DTASE Analysis</button>
+                                <button class="tab-btn" onclick="clearDtase()" style="font-size:0.8rem;" aria-label="Clear DTASE Input">Clear Input</button>
                             </div>
                         </div>
 
@@ -1203,17 +1226,17 @@
                             <span id="dtase-traceability-lbl" style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">Traceability ID: None</span>
                         </div>
                         
-                        <div style="display:flex; gap:6px; margin-bottom:1rem; overflow-x:auto;" id="dtase-persona-tabs">
-                            <button class="tab-btn active" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Executive Summary')">Executive Summary</button>
-                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Legal Assessment')">Legal Assessment</button>
-                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Product Requirement')">Product Requirement</button>
-                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Compliance Review')">Compliance Review</button>
-                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Technical Specification')">Technical Specification</button>
-                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Clinical Intake')">Clinical Intake</button>
-                            <button class="tab-btn" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Research Analysis')">Research Analysis</button>
+                        <div style="display:flex; gap:6px; margin-bottom:1rem; overflow-x:auto;" id="dtase-persona-tabs" role="tablist" aria-label="Persona Syntheses">
+                            <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Executive Summary')">Executive Summary</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Legal Assessment')">Legal Assessment</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Product Requirement')">Product Requirement</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Compliance Review')">Compliance Review</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Technical Specification')">Technical Specification</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Clinical Intake')">Clinical Intake</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Research Analysis')">Research Analysis</button>
                         </div>
                         
-                        <div id="dtase-synthesis-body" style="font-size:0.92rem; line-height:1.65; color:#e5e7eb; overflow-y:auto; flex-grow:1; background:rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding:1.2rem; border-radius:8px;">
+                        <div id="dtase-synthesis-body" role="tabpanel" aria-label="Persona Synthesis Content" style="font-size:0.92rem; line-height:1.65; color:#e5e7eb; overflow-y:auto; flex-grow:1; background:rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding:1.2rem; border-radius:8px;">
                             <p style="color:var(--text-secondary); font-style:italic;">Synthesized outputs for multiple professional personas will be displayed here.</p>
                         </div>
                     </div>
@@ -1335,7 +1358,7 @@
                     </svg>
                     <span>Operational Actions</span>
                 </div>
-                <button class="action-btn" onclick="forceRefresh()">Force Probe Refresh</button>
+                <button class="action-btn" onclick="forceRefresh()" aria-label="Force Probe Refresh">Force Probe Refresh</button>
                 <div style="margin-top: 10px;">
                     <p style="font-size:0.75rem; color:var(--text-secondary); line-height: 1.4;">
                         For troubleshooting: run the following in terminal:
@@ -1343,7 +1366,7 @@
                     <code style="display:block; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.75rem; color:#a5b4fc; font-family:monospace; margin-top:6px; word-break:break-all;">
                         docker compose up -d
                     </code>
-                    <span class="troubleshoot-links" role="button" tabindex="0" onclick="shareTelemetry()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { shareTelemetry(); event.preventDefault(); }">
+                    <span class="troubleshoot-links" role="button" tabindex="0" aria-label="Share Telemetry with AI coding assistant" onclick="shareTelemetry()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { shareTelemetry(); event.preventDefault(); }">
                         Share Telemetry with AI coding assistant
                     </span>
                 </div>
@@ -1555,8 +1578,10 @@
             tabs.forEach(tab => {
                 if (tab.textContent.trim() === personaName) {
                     tab.classList.add("active");
+                    tab.setAttribute("aria-selected", "true");
                 } else {
                     tab.classList.remove("active");
+                    tab.setAttribute("aria-selected", "false");
                 }
             });
             
@@ -1576,9 +1601,15 @@
             }
             for (const btn of document.getElementsByClassName("tab-btn")) {
                 btn.classList.remove("active");
+                if (btn.hasAttribute("aria-selected")) {
+                    btn.setAttribute("aria-selected", "false");
+                }
             }
             document.getElementById(tabId).classList.add("active");
             evt.currentTarget.classList.add("active");
+            if (evt.currentTarget.hasAttribute("aria-selected")) {
+                evt.currentTarget.setAttribute("aria-selected", "true");
+            }
         }
 
         async function fetchStatus() {
@@ -1718,6 +1749,8 @@
             for (const [name, status] of Object.entries(services)) {
                 const info = serviceData[name] || { severity: "Low", deps: "None", issue: "Unknown" };
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Service: ${name}, Status: ${status}, Severity: ${info.severity}, Dependencies: ${info.deps}, Current Issue: ${info.issue}`);
                 row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${info.severity}</td><td>${info.deps}</td><td>${info.issue}</td>`;
                 tbody.appendChild(row);
             }
@@ -1744,6 +1777,8 @@
             for (const [name, status] of Object.entries(agents)) {
                 const dep = agentData[name] || "None";
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Agent: ${name}, Status: ${status}, Dependencies: ${dep}, Operational Risk: Pending`);
                 row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${dep}</td><td>Pending</td>`;
                 tbody.appendChild(row);
             }
@@ -1778,6 +1813,8 @@
             for (const [name, status] of Object.entries(mcps)) {
                 const desc = mcpData[name] || "Ecosystem connector";
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `MCP Server: ${name}, Status: ${status}, Description: ${desc}`);
                 row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${desc}</td>`;
                 tbody.appendChild(row);
             }
@@ -1801,6 +1838,8 @@
             for (const [name, status] of Object.entries(skills)) {
                 const desc = skillData[name] || "Agent skill capability";
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Skill: ${name}, Status: ${status}, Description: ${desc}`);
                 row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${desc}</td>`;
                 tbody.appendChild(row);
             }
@@ -1829,7 +1868,9 @@
             for (const [name, val] of Object.entries(integrations)) {
                 const dep = integrationData[name] || "None";
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
                 const issueText = (val === "RED") ? "Critical failure" : (val === "YELLOW") ? "Configuration degraded" : "Implementation pending";
+                row.setAttribute("aria-label", `Integration: ${name}, Status: ${val}, Dependency: ${dep}, Issue: ${issueText}`);
                 row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${val.toLowerCase()}">${val}</span></td><td>${dep}</td><td>${issueText}</td>`;
                 tbody.appendChild(row);
             }
@@ -2090,6 +2131,8 @@
 
             for (const [name, val] of Object.entries({...sec, ...gov})) {
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Security/Gov Control: ${name}, Status: ${val}, Scope: ${meta[name] || "System"}, Action Required: Action required`);
                 row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${val.toLowerCase()}">${val}</span></td><td>${meta[name] || "System"}</td><td>Action required</td>`;
                 tbody.appendChild(row);
             }
@@ -2325,6 +2368,8 @@
                 const varColor = variance > 0 ? "var(--red)" : "var(--green)";
                 
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Objective ${id}: ${o.name}, Budget: $${o.budget.toFixed(2)}, Actual Spend: $${o.actual.toFixed(2)}, Variance: ${varText}`);
                 row.innerHTML = `
                     <td><strong>${id}</strong></td>
                     <td style="color:#a5b4fc;">${o.name}</td>
@@ -2332,7 +2377,7 @@
                     <td>$${o.actual.toFixed(2)}</td>
                     <td style="color:${varColor};">${varText}</td>
                     <td>
-                        <button class="action-btn action-btn-primary" style="font-size:0.7rem; padding: 2px 6px;" onclick="runGovCheck('${id}')">Audit Gov</button>
+                        <button class="action-btn action-btn-primary" style="font-size:0.7rem; padding: 2px 6px;" onclick="runGovCheck('${id}')" aria-label="Audit Governance for ${id}">Audit Gov</button>
                     </td>
                 `;
                 objTbody.appendChild(row);
@@ -2346,6 +2391,8 @@
             actTbody.innerHTML = "";
             for (const [id, a] of Object.entries(data.action_budgets)) {
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Action ${id}: ${a.name}, Parent Objective: ${a.objective_id}, Budget: $${a.budget.toFixed(2)}, Actual Spend: $${a.actual.toFixed(2)}`);
                 row.innerHTML = `
                     <td><strong>${id}</strong></td>
                     <td>${a.name}</td>
@@ -2375,6 +2422,8 @@
                 }
                 
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `ROI for Objective ${id}: Value Score: ${score}/100.0, Cost: $${cost}, ROI Ratio: ${roi}x, Rating: ${rating}`);
                 row.innerHTML = `
                     <td><strong>${id}</strong></td>
                     <td>${score} / 100.0</td>
@@ -2390,6 +2439,8 @@
             agentTbody.innerHTML = "";
             for (const [name, a] of Object.entries(data.agent_costs)) {
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Agent profile: ${name}, Call Count: ${a.call_count}, Token Count: ${a.token_count.toLocaleString()}, Total Spend: $${a.cost.toFixed(2)}`);
                 row.innerHTML = `
                     <td><strong>${name}</strong></td>
                     <td>${a.call_count}</td>
@@ -2404,6 +2455,8 @@
             tokensTbody.innerHTML = "";
             for (const [model, tc] of Object.entries(data.token_consumption)) {
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Model: ${model}, Input Tokens: ${tc.input_tokens.toLocaleString()}, Output Tokens: ${tc.output_tokens.toLocaleString()}, Cumulative Cost: $${tc.cost.toFixed(2)}`);
                 row.innerHTML = `
                     <td><strong>${model}</strong></td>
                     <td>${tc.input_tokens.toLocaleString()}</td>
@@ -2418,6 +2471,8 @@
             attrTbody.innerHTML = "";
             for (const [id, p] of Object.entries(data.portfolio_attribution)) {
                 const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Portfolio: ${p.name}, Cost: $${p.cost.toFixed(2)}, Attribution Percentage: ${p.percentage.toFixed(1)}%`);
                 row.innerHTML = `
                     <td><strong>${p.name}</strong></td>
                     <td>$${p.cost.toFixed(2)}</td>
@@ -2450,8 +2505,8 @@
                             <span style="color:var(--text-secondary); font-size:0.7rem;">By ${app.requested_by}</span>
                         </div>
                         <div style="display:flex; gap:4px;">
-                            <button onclick="processApproval('${app.id}', 'Approved')" class="action-btn" style="background:var(--green); border:none; padding:2px 6px; font-size:0.7rem; color:black; font-weight:bold;">Approve</button>
-                            <button onclick="processApproval('${app.id}', 'Rejected')" class="action-btn" style="background:var(--red); border:none; padding:2px 6px; font-size:0.7rem; color:white; font-weight:bold;">Deny</button>
+                            <button onclick="processApproval('${app.id}', 'Approved')" class="action-btn" style="background:var(--green); border:none; padding:2px 6px; font-size:0.7rem; color:black; font-weight:bold;" aria-label="Approve request ${app.id}">Approve</button>
+                            <button onclick="processApproval('${app.id}', 'Rejected')" class="action-btn" style="background:var(--red); border:none; padding:2px 6px; font-size:0.7rem; color:white; font-weight:bold;" aria-label="Deny request ${app.id}">Deny</button>
                         </div>
                     `;
                     approvalsList.appendChild(div);
@@ -2462,9 +2517,17 @@
         async function recordSimulatedTokens() {
             const agent = document.getElementById("play-agent-select").value;
             const model = document.getElementById("play-model-select").value;
-            const inTok = parseInt(document.getElementById("play-tokens-in").value) || 0;
-            const outTok = parseInt(document.getElementById("play-tokens-out").value) || 0;
-            const reTok = parseInt(document.getElementById("play-tokens-re").value) || 0;
+            const inTok = parseInt(document.getElementById("play-tokens-in").value);
+            const outTok = parseInt(document.getElementById("play-tokens-out").value);
+            const reTok = parseInt(document.getElementById("play-tokens-re").value);
+            
+            const alertEl = document.getElementById("play-tokens-alert");
+            if (isNaN(inTok) || isNaN(outTok) || isNaN(reTok) || inTok < 0 || outTok < 0 || reTok < 0) {
+                alertEl.textContent = "Error: Input, output, and reasoning tokens cannot be negative.";
+                alertEl.style.display = "block";
+                return;
+            }
+            alertEl.style.display = "none";
             
             try {
                 const res = await fetch("/api/budget/action", {
@@ -2490,11 +2553,15 @@
 
         async function adjustObjectiveBudget() {
             const objId = document.getElementById("play-obj-select").value;
-            const amount = parseFloat(document.getElementById("play-obj-budget").value) || 0;
-            if (amount <= 0) {
-                alert("Please enter a valid positive budget amount.");
+            const amount = parseFloat(document.getElementById("play-obj-budget").value);
+            
+            const alertEl = document.getElementById("play-budget-alert");
+            if (isNaN(amount) || amount <= 0) {
+                alertEl.textContent = "Error: Please enter a valid positive budget amount.";
+                alertEl.style.display = "block";
                 return;
             }
+            alertEl.style.display = "none";
             
             try {
                 const res = await fetch("/api/budget/action", {

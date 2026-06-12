@@ -16,8 +16,27 @@ def analyze_unstructured_input(text: str) -> dict:
     risks = []
     anomalies = []
     personas = {}
+    
+    title = f"New Objective from Input"
+    description = text
+    priority = "Medium"
+    dependencies = []
 
     text_lower = text.lower()
+
+    # Priority heuristics
+    if any(w in text_lower for w in ["urgent", "critical", "immediate", "highest", "blocker"]):
+        priority = "Critical"
+    elif any(w in text_lower for w in ["high", "important", "soon"]):
+        priority = "High"
+    elif any(w in text_lower for w in ["low", "minor", "deferred"]):
+        priority = "Low"
+
+    # Dependency heuristics
+    import re
+    dep_matches = re.findall(r"obj-\d+", text_lower)
+    if dep_matches:
+        dependencies = [m.upper() for m in dep_matches]
 
     # Domain heuristics
     is_legal = any(
@@ -160,6 +179,10 @@ def analyze_unstructured_input(text: str) -> dict:
     result = {
         "status": "Success",
         "input_text": text,
+        "title": title,
+        "description": description,
+        "priority": priority,
+        "dependencies": dependencies,
         "detected_domains": detected_domains,
         "opportunities": opportunities,
         "risks": risks,
@@ -180,6 +203,10 @@ Input: "{text}"
 
 Output JSON format (strictly JSON, no extra text):
 {{
+  "title": "short descriptive title",
+  "description": "expanded professional description",
+  "priority": "Critical, High, Medium, or Low",
+  "dependencies": ["OBJ-XXX"],
   "detected_domains": ["domain"],
   "opportunities": ["opportunity"],
   "risks": ["risk"],
@@ -206,6 +233,14 @@ Output JSON format (strictly JSON, no extra text):
             llm_analysis = json.loads(llm_text)
 
             # Merge LLM results with heuristics
+            if llm_analysis.get("title"):
+                result["title"] = llm_analysis["title"]
+            if llm_analysis.get("description"):
+                result["description"] = llm_analysis["description"]
+            if llm_analysis.get("priority") in ["Critical", "High", "Medium", "Low"]:
+                result["priority"] = llm_analysis["priority"]
+            if llm_analysis.get("dependencies"):
+                result["dependencies"] = [d.upper() for d in llm_analysis["dependencies"]]
             if llm_analysis.get("detected_domains"):
                 result["detected_domains"] = list(
                     set(result["detected_domains"] + llm_analysis["detected_domains"])

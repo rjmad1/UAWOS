@@ -227,6 +227,47 @@ def get_planning_traceability(plan_id: str) -> dict:
         "traceability_chain": f"OBJ -> {plan['objective_id']} -> PLAN -> {plan_id} -> STEPS -> {', '.join(plan['steps'])}"
     }
 
+def route_action_to_agent(action_id: str, tenant_id: str = "default_tenant") -> str:
+    """Dynamically route an action to the best-matching workforce agent based on required skills/capabilities."""
+    import uawos_agent_workforce
+    
+    # 1. Fetch action details from DB (or state)
+    actions_data = uawos_db.db_load_actions()
+    actions = actions_data.get("actions", {})
+    action = actions.get(action_id)
+        
+    # Heuristic required skill map based on action name or metadata
+    req_skill = "code_execution"  # default
+    action_name = action.get("name", "").lower() if action else ""
+    if "plan" in action_name or "estimate" in action_name:
+        req_skill = "plan_generation"
+    elif "review" in action_name or "qa" in action_name:
+        req_skill = "code_review"
+    elif "policy" in action_name or "governance" in action_name:
+        req_skill = "policy_enforcement"
+    elif "index" in action_name or "knowledge" in action_name:
+        req_skill = "memory_indexing"
+        
+    # Find agents matching the skill
+    candidates = uawos_agent_workforce.get_agents_by_skill(req_skill)
+    if candidates:
+        # Route to candidate (optionally selecting the one with the highest trust score)
+        best_candidate = candidates[0]
+        max_trust = -1.0
+        for cand in candidates:
+            try:
+                trust = uawos_agent_workforce.calculate_agent_trust(cand)
+                if trust > max_trust:
+                    max_trust = trust
+                    best_candidate = cand
+            except Exception:
+                pass
+        return best_candidate
+    
+    # Fallback to general Executor Agent
+    return "Executor Agent"
+
+
 # ----------------- VERIFICATION TESTS (FR-041 to FR-060) -----------------
 
 def verify_fr_041():

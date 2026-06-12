@@ -109,15 +109,14 @@ def create_objective_from_input(
     sponsor: str = "",
     source_uri: str = ""
 ) -> dict:
-    """Create a structured Objective from unstructured input by parsing it via LLM."""
+    """Create a structured Objective from unstructured input by parsing it via DTASE."""
     
-    # Default fallbacks
+    # Default heuristics fallbacks
     title = f"New Objective from {input_type.capitalize()}"
     description = text
     priority = "Medium"
     dependencies = []
     
-    # Heuristics parsing
     text_lower = text.lower()
     if any(w in text_lower for w in ["urgent", "critical", "immediate", "highest", "blocker"]):
         priority = "Critical"
@@ -126,8 +125,6 @@ def create_objective_from_input(
     elif any(w in text_lower for w in ["low", "minor", "deferred"]):
         priority = "Low"
         
-    # Dependency heuristics
-    # E.g. "requires OBJ-102" -> ["OBJ-102"]
     import re
     dep_matches = re.findall(r"obj-\d+", text_lower)
     if dep_matches:
@@ -135,47 +132,20 @@ def create_objective_from_input(
 
     parser_confidence = 70.0
     
-    # LLM Parsing via Ollama
     try:
-        prompt = f"""[INST] You are the UAWOS Objective Parser.
-Analyze this raw objective intake of type '{input_type}' and output a structured JSON analysis.
-Raw Input: "{text}"
-
-Output JSON format (strictly JSON, no extra text):
-{{
-  "title": "short descriptive title",
-  "description": "expanded professional description",
-  "priority": "Critical, High, Medium, or Low",
-  "dependencies": ["OBJ-XXX"]
-}}
-[/INST]"""
-        req_data = json.dumps({
-            "model": "tinyllama",
-            "prompt": prompt,
-            "stream": False,
-            "format": "json"
-        }).encode('utf-8')
-        
-        req = urllib.request.Request(
-            f"{OLLAMA_BASE_URL}/api/generate",
-            data=req_data,
-            headers={"Content-Type": "application/json"}
-        )
-        with urllib.request.urlopen(req, timeout=4.0) as response:
-            resp = json.loads(response.read().decode('utf-8'))
-            llm_result = json.loads(resp.get("response", "{}"))
-            
-            if llm_result.get("title"):
-                title = llm_result["title"]
-            if llm_result.get("description"):
-                description = llm_result["description"]
-            if llm_result.get("priority") in ["Critical", "High", "Medium", "Low"]:
-                priority = llm_result["priority"]
-            if llm_result.get("dependencies"):
-                dependencies = [d.upper() for d in llm_result["dependencies"]]
-            parser_confidence = 95.0
+        import uawos_dtase
+        analysis = uawos_dtase.analyze_unstructured_input(text)
+        if analysis.get("status") == "Success":
+            if analysis.get("title"):
+                title = analysis["title"]
+            if analysis.get("description"):
+                description = analysis["description"]
+            if analysis.get("priority") in ["Critical", "High", "Medium", "Low"]:
+                priority = analysis["priority"]
+            if analysis.get("dependencies"):
+                dependencies = [d.upper() for d in analysis["dependencies"]]
+            parser_confidence = int(analysis["traceability"].get("confidence_score", 0.95) * 100)
     except Exception:
-        # Gracefully handle Ollama timeouts or failures with heuristics
         pass
 
     if not owner:
@@ -196,7 +166,7 @@ Output JSON format (strictly JSON, no extra text):
     
     # Update confidence score directly incorporating the parser confidence
     state = load_state()
-    state["objectives"][obj["id"]]["confidence_score"] = parser_confidence
+    state["objectives"][obj["id"]]["confidence_score"] = float(parser_confidence)
     save_state(state)
     recalculate_scores(obj["id"])
     

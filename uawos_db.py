@@ -158,6 +158,147 @@ def init_db():
             cursor.execute("ALTER TABLE uawos_state ADD CONSTRAINT uawos_state_pkey PRIMARY KEY (key, tenant_id);")
         except Exception:
             pass
+
+        # STM, Episodic, Semantic tables for Level 5.0 Memory Upgrade
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_stm_sessions (
+                session_id VARCHAR(255) PRIMARY KEY,
+                tenant_id VARCHAR(50) NOT NULL,
+                actor_owner VARCHAR(255) NOT NULL,
+                status VARCHAR(50) DEFAULT 'active',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_stm_sliding_context (
+                id SERIAL PRIMARY KEY,
+                session_id VARCHAR(255) REFERENCES uawos_stm_sessions(session_id) ON DELETE CASCADE,
+                sender VARCHAR(255) NOT NULL,
+                message_content TEXT NOT NULL,
+                token_count INT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_stm_agent_scratchpad (
+                agent_id VARCHAR(255) PRIMARY KEY,
+                session_id VARCHAR(255) REFERENCES uawos_stm_sessions(session_id) ON DELETE CASCADE,
+                thought_process TEXT,
+                active_plan_step VARCHAR(255),
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_episodic_episodes (
+                episode_id VARCHAR(255) PRIMARY KEY,
+                session_id VARCHAR(255) REFERENCES uawos_stm_sessions(session_id) ON DELETE SET NULL,
+                objective_id VARCHAR(255) NOT NULL,
+                status VARCHAR(50) DEFAULT 'in_progress',
+                summary TEXT,
+                start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                end_time TIMESTAMP
+            );
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_episodic_events (
+                event_id SERIAL PRIMARY KEY,
+                episode_id VARCHAR(255) REFERENCES uawos_episodic_episodes(episode_id) ON DELETE CASCADE,
+                actor_id VARCHAR(255) NOT NULL,
+                event_type VARCHAR(100) NOT NULL,
+                content TEXT NOT NULL,
+                telemetry JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_episodic_decisions (
+                decision_id VARCHAR(255) PRIMARY KEY,
+                episode_id VARCHAR(255) REFERENCES uawos_episodic_episodes(episode_id) ON DELETE CASCADE,
+                recommendation_id VARCHAR(255) NOT NULL,
+                chosen_alternative TEXT NOT NULL,
+                justification TEXT NOT NULL,
+                causal_impact JSONB DEFAULT '{}',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_semantic_knowledge (
+                asset_id VARCHAR(255) PRIMARY KEY,
+                tenant_id VARCHAR(50) NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                content_hash VARCHAR(64) NOT NULL,
+                content TEXT NOT NULL,
+                source_type VARCHAR(100) DEFAULT 'document',
+                provenance TEXT,
+                confidence_score DOUBLE PRECISION DEFAULT 100.0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        try:
+            cursor.execute("ALTER TABLE uawos_semantic_knowledge DROP CONSTRAINT IF EXISTS uawos_semantic_knowledge_content_hash_key;")
+        except Exception:
+            pass
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_semantic_chunks (
+                chunk_id VARCHAR(255) PRIMARY KEY,
+                asset_id VARCHAR(255) REFERENCES uawos_semantic_knowledge(asset_id) ON DELETE CASCADE,
+                chunk_index INT NOT NULL,
+                content TEXT NOT NULL,
+                vector_id VARCHAR(255) UNIQUE NOT NULL
+            );
+        """)
+
+        # Add parent_message_id to STM sliding context
+        cursor.execute("""
+            ALTER TABLE uawos_stm_sliding_context 
+            ADD COLUMN IF NOT EXISTS parent_message_id INTEGER REFERENCES uawos_stm_sliding_context(id) ON DELETE SET NULL;
+        """)
+
+        # Create Shared Channels and membership tables
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_channels (
+                channel_id VARCHAR(255) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_channel_members (
+                channel_id VARCHAR(255) REFERENCES uawos_channels(channel_id) ON DELETE CASCADE,
+                user_id VARCHAR(255) NOT NULL,
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
+                joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (channel_id, user_id)
+            );
+        """)
+
+        # Create Linked Files and Artifacts table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_artifacts (
+                artifact_id VARCHAR(255) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                file_path VARCHAR(555) NOT NULL,
+                file_hash VARCHAR(64) NOT NULL,
+                objective_id VARCHAR(255),
+                action_id VARCHAR(255),
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+
+        # Create Billing & Subscription table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_subscriptions (
+                tenant_id VARCHAR(50) PRIMARY KEY,
+                plan_type VARCHAR(50) NOT NULL,
+                status VARCHAR(50) NOT NULL,
+                expires_at TIMESTAMP
+            );
+        """)
+
         conn.commit()
         cursor.close()
         conn.close()
@@ -242,6 +383,7 @@ def db_get_state(key: str, default_fn, tenant_id: str = "default_tenant") -> dic
             return state
     except Exception as e:
         print(f"Database error loading state for {key} under tenant {tenant_id}: {e}")
+        raise e
     return default_fn() if default_fn else None
 
 
@@ -268,6 +410,7 @@ def db_save_state(key: str, state: dict, tenant_id: str = "default_tenant"):
         conn.close()
     except Exception as e:
         print(f"Database error saving state for {key} under tenant {tenant_id}: {e}")
+        raise e
 
 
 # Qdrant Indexing Helpers
@@ -299,19 +442,84 @@ def index_memory(memory_id: int, content: str, scope: str, owner: str):
         print(f"Error indexing memory in Qdrant: {e}")
 
 
+def db_save_semantic_knowledge(asset_id: str, tenant_id: str, title: str, content: str, source_type: str, provenance: str, confidence_score: float = 100.0):
+    if not DB_AVAILABLE:
+        return
+    try:
+        import hashlib
+        content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO uawos_semantic_knowledge (asset_id, tenant_id, title, content_hash, content, source_type, provenance, confidence_score, updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+            ON CONFLICT (asset_id) DO UPDATE
+            SET tenant_id = EXCLUDED.tenant_id, title = EXCLUDED.title, content_hash = EXCLUDED.content_hash, content = EXCLUDED.content,
+                source_type = EXCLUDED.source_type, provenance = EXCLUDED.provenance, confidence_score = EXCLUDED.confidence_score, updated_at = CURRENT_TIMESTAMP;
+            """,
+            (asset_id, tenant_id, title, content_hash, content, source_type, provenance, confidence_score)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"db_save_semantic_knowledge error: {e}")
+
+
+def db_save_semantic_chunk(asset_id: str, chunk_index: int, content: str, vector_id: str):
+    if not DB_AVAILABLE:
+        return
+    try:
+        chunk_id = f"{asset_id}-chunk-{chunk_index}"
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO uawos_semantic_chunks (chunk_id, asset_id, chunk_index, content, vector_id)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (chunk_id) DO UPDATE
+            SET content = EXCLUDED.content, chunk_index = EXCLUDED.chunk_index, vector_id = EXCLUDED.vector_id;
+            """,
+            (chunk_id, asset_id, chunk_index, content, vector_id)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"db_save_semantic_chunk error: {e}")
+
+
 def index_knowledge(
     asset_id: str, title: str, content: str, source_type: str, provenance: str
 ):
+    from uawos_context import get_tenant_id
+    tenant_id = get_tenant_id()
+    
+    # Save to SQL database
+    db_save_semantic_knowledge(
+        asset_id=asset_id,
+        tenant_id=tenant_id,
+        title=title,
+        content=content,
+        source_type=source_type,
+        provenance=provenance
+    )
+    
+    import uuid
+    point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, asset_id))
+    db_save_semantic_chunk(
+        asset_id=asset_id,
+        chunk_index=0,
+        content=content,
+        vector_id=point_id
+    )
+
     if not QDRANT_AVAILABLE:
         return
     try:
-        from uawos_context import get_tenant_id
-        tenant_id = get_tenant_id()
         client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         embedding = get_embedding(content)
-        import uuid
-
-        point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, asset_id))
         client.upsert(
             collection_name="uawos_knowledge",
             points=[
@@ -388,6 +596,97 @@ def search_knowledge(query: str, limit: int = 5) -> list:
     except Exception as e:
         print(f"search_knowledge exception: {e}")
         return []
+
+
+def hybrid_search_knowledge(query: str, tenant_id: str = "default_tenant", limit: int = 5) -> list:
+    """Hybrid lexical-vector search utilizing BM25-like ILIKE search in PostgreSQL and vector search in Qdrant, merged via Reciprocal Rank Fusion (RRF)."""
+    if tenant_id == "default_tenant":
+        try:
+            from uawos_context import get_tenant_id
+            tenant_id = get_tenant_id()
+        except ImportError:
+            pass
+
+    lexical_results = []
+    if DB_AVAILABLE:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            words = [f"%{w}%" for w in query.split() if len(w) > 2]
+            if not words:
+                words = [f"%{query}%"]
+            
+            like_clauses = " OR ".join(["sc.content ILIKE %s" for _ in words])
+            sql = f"""
+                SELECT sc.asset_id, sc.content, sk.title, sk.source_type, sk.provenance, sk.confidence_score
+                FROM uawos_semantic_chunks sc
+                JOIN uawos_semantic_knowledge sk ON sc.asset_id = sk.asset_id
+                WHERE sk.tenant_id = %s AND ({like_clauses})
+                LIMIT 20;
+            """
+            cursor.execute(sql, [tenant_id] + words)
+            rows = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            for r in rows:
+                lexical_results.append({
+                    "id": r[0],
+                    "content": r[1],
+                    "title": r[2],
+                    "source_type": r[3],
+                    "provenance": r[4],
+                    "confidence_score": float(r[5]),
+                    "tenant_id": tenant_id
+                })
+        except Exception as e:
+            print(f"Lexical search failed: {e}")
+
+    vector_results = []
+    if QDRANT_AVAILABLE:
+        try:
+            from qdrant_client.models import Filter, FieldCondition, MatchValue
+            client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+            embedding = get_embedding(query)
+            results = client.query_points(
+                collection_name="uawos_knowledge",
+                query=embedding,
+                query_filter=Filter(
+                    must=[
+                        FieldCondition(
+                            key="tenant_id",
+                            match=MatchValue(value=tenant_id)
+                        )
+                    ]
+                ),
+                limit=20,
+            )
+            for r in results.points:
+                vector_results.append(r.payload)
+        except Exception as e:
+            print(f"Vector search in hybrid failed: {e}")
+
+    # RRF merging
+    rrf_scores = {}
+    
+    def add_to_rrf(results_list):
+        seen_in_list = set()
+        for rank, item in enumerate(results_list):
+            content_key = item.get("content", "")
+            if not content_key:
+                continue
+            if content_key in seen_in_list:
+                continue
+            seen_in_list.add(content_key)
+            if content_key not in rrf_scores:
+                rrf_scores[content_key] = {"item": item, "score": 0.0}
+            rrf_scores[content_key]["score"] += 1.0 / (60.0 + (rank + 1))
+
+    add_to_rrf(lexical_results)
+    add_to_rrf(vector_results)
+
+    sorted_rrf = sorted(rrf_scores.values(), key=lambda x: x["score"], reverse=True)
+    merged = [x["item"] for x in sorted_rrf[:limit]]
+    return merged
 
 
 # ----------------- UAWOS Relational SQL Helpers -----------------
@@ -821,15 +1120,15 @@ def db_save_action(act: dict):
         """,
             (
                 act["id"],
-                act["workflow_id"],
+                act.get("workflow_id", ""),
                 act["name"],
-                act["owner"],
-                json.dumps(act["dependencies"]),
-                act["priority"],
-                act["budget"],
-                act["deadline"],
-                act["status"],
-                act["approval_required"],
+                act.get("owner", "Unassigned"),
+                json.dumps(act.get("dependencies", [])),
+                act.get("priority", "Medium"),
+                act.get("budget", 0.0),
+                act.get("deadline", 0),
+                act.get("status", "pending"),
+                act.get("approval_required", False),
                 tenant_id,
             ),
         )
@@ -838,6 +1137,7 @@ def db_save_action(act: dict):
         conn.close()
     except Exception as e:
         print(f"Database error saving action {act.get('id')}: {e}")
+        raise e
 
 
 def db_save_all_actions(actions: dict):
@@ -884,6 +1184,200 @@ def db_load_actions() -> dict:
     except Exception as e:
         print(f"Database error loading actions: {e}")
         return {"actions": {}}
+# Channels
+def db_create_channel(channel_id: str, name: str, tenant_id: str = "default_tenant") -> dict:
+    if not DB_AVAILABLE:
+        return {}
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO uawos_channels (channel_id, name, tenant_id)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (channel_id) DO UPDATE
+            SET name = EXCLUDED.name, tenant_id = EXCLUDED.tenant_id;
+            """,
+            (channel_id, name, tenant_id)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return {"channel_id": channel_id, "name": name, "tenant_id": tenant_id}
+    except Exception as e:
+        print(f"db_create_channel error: {e}")
+        return {}
+
+def db_add_channel_member(channel_id: str, user_id: str, tenant_id: str = "default_tenant") -> bool:
+    if not DB_AVAILABLE:
+        return False
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO uawos_channel_members (channel_id, user_id, tenant_id)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (channel_id, user_id) DO NOTHING;
+            """,
+            (channel_id, user_id, tenant_id)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"db_add_channel_member error: {e}")
+        return False
+
+def db_get_channel_members(channel_id: str) -> list:
+    if not DB_AVAILABLE:
+        return []
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT user_id FROM uawos_channel_members WHERE channel_id = %s;",
+            (channel_id,)
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return [r[0] for r in rows]
+    except Exception as e:
+        print(f"db_get_channel_members error: {e}")
+        return []
+
+def db_get_channels(tenant_id: str = "default_tenant") -> list:
+    if not DB_AVAILABLE:
+        return []
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT channel_id, name FROM uawos_channels WHERE tenant_id = %s;",
+            (tenant_id,)
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return [{"channel_id": r[0], "name": r[1]} for r in rows]
+    except Exception as e:
+        print(f"db_get_channels error: {e}")
+        return []
+
+# Artifacts
+def db_save_artifact(artifact_id: str, name: str, file_path: str, file_hash: str, objective_id: str = None, action_id: str = None, tenant_id: str = "default_tenant") -> dict:
+    if not DB_AVAILABLE:
+        return {}
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO uawos_artifacts (artifact_id, name, file_path, file_hash, objective_id, action_id, tenant_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (artifact_id) DO UPDATE
+            SET name = EXCLUDED.name, file_path = EXCLUDED.file_path, file_hash = EXCLUDED.file_hash,
+                objective_id = EXCLUDED.objective_id, action_id = EXCLUDED.action_id, tenant_id = EXCLUDED.tenant_id;
+            """,
+            (artifact_id, name, file_path, file_hash, objective_id, action_id, tenant_id)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return {
+            "artifact_id": artifact_id,
+            "name": name,
+            "file_path": file_path,
+            "file_hash": file_hash,
+            "objective_id": objective_id,
+            "action_id": action_id,
+            "tenant_id": tenant_id
+        }
+    except Exception as e:
+        print(f"db_save_artifact error: {e}")
+        return {}
+
+def db_get_action_artifacts(action_id: str) -> list:
+    if not DB_AVAILABLE:
+        return []
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT artifact_id, name, file_path, file_hash, objective_id, action_id, tenant_id FROM uawos_artifacts WHERE action_id = %s;",
+            (action_id,)
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return [
+            {
+                "artifact_id": r[0],
+                "name": r[1],
+                "file_path": r[2],
+                "file_hash": r[3],
+                "objective_id": r[4],
+                "action_id": r[5],
+                "tenant_id": r[6]
+            }
+            for r in rows
+        ]
+    except Exception as e:
+        print(f"db_get_action_artifacts error: {e}")
+        return []
+
+# Subscriptions
+def db_save_subscription(tenant_id: str, plan_type: str, status: str, expires_at_timestamp: float = None) -> dict:
+    if not DB_AVAILABLE:
+        return {}
+    try:
+        import datetime
+        expires_at = datetime.datetime.fromtimestamp(expires_at_timestamp) if expires_at_timestamp else None
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO uawos_subscriptions (tenant_id, plan_type, status, expires_at)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (tenant_id) DO UPDATE
+            SET plan_type = EXCLUDED.plan_type, status = EXCLUDED.status, expires_at = EXCLUDED.expires_at;
+            """,
+            (tenant_id, plan_type, status, expires_at)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return {"tenant_id": tenant_id, "plan_type": plan_type, "status": status, "expires_at": str(expires_at) if expires_at else None}
+    except Exception as e:
+        print(f"db_save_subscription error: {e}")
+        return {}
+
+def db_get_subscription(tenant_id: str) -> dict:
+    if not DB_AVAILABLE:
+        return {}
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT tenant_id, plan_type, status, expires_at FROM uawos_subscriptions WHERE tenant_id = %s;",
+            (tenant_id,)
+        )
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if row:
+            return {
+                "tenant_id": row[0],
+                "plan_type": row[1],
+                "status": row[2],
+                "expires_at": str(row[3]) if row[3] else None
+            }
+        return {}
+    except Exception as e:
+        print(f"db_get_subscription error: {e}")
+        return {}
 
 
 # Initialize immediately when imported

@@ -85,6 +85,24 @@ def _get_neo4j_label(entity_id: str) -> str:
         return "Workflow"
     elif entity_id.startswith("ACT-"):
         return "Action"
+    elif entity_id.startswith("AGT-"):
+        return "Agent"
+    elif entity_id.startswith("USR-"):
+        return "User"
+    elif entity_id.startswith("DEC-"):
+        return "Decision"
+    elif entity_id.startswith("EVI-"):
+        return "Evidence"
+    elif entity_id.startswith("CLM-"):
+        return "Claim"
+    elif entity_id.startswith("LRN-"):
+        return "Learning"
+    elif entity_id.startswith("SES-"):
+        return "Session"
+    elif entity_id.startswith("EPS-"):
+        return "Episode"
+    elif entity_id.startswith("EVT-"):
+        return "Event"
     return "Entity"
 
 
@@ -281,7 +299,55 @@ def reconcile_contradictions(
     """Resolve discrepancies between contradictory knowledge assets."""
     state = load_state()
     a1 = state["assets"].get(asset_id_1)
+    if not a1 and uawos_db.DB_AVAILABLE:
+        try:
+            conn = uawos_db.get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT title, content, source_type, provenance, confidence_score, EXTRACT(EPOCH FROM updated_at) FROM uawos_semantic_knowledge WHERE asset_id = %s;",
+                (asset_id_1,)
+            )
+            row = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            if row:
+                a1 = {
+                    "id": asset_id_1,
+                    "title": row[0],
+                    "content": row[1],
+                    "source_type": row[2],
+                    "provenance": row[3],
+                    "confidence_score": float(row[4]),
+                    "timestamp": int(row[5])
+                }
+        except Exception as e:
+            print(f"Database fetch error for {asset_id_1}: {e}")
+
     a2 = state["assets"].get(asset_id_2)
+    if not a2 and uawos_db.DB_AVAILABLE:
+        try:
+            conn = uawos_db.get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT title, content, source_type, provenance, confidence_score, EXTRACT(EPOCH FROM updated_at) FROM uawos_semantic_knowledge WHERE asset_id = %s;",
+                (asset_id_2,)
+            )
+            row = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            if row:
+                a2 = {
+                    "id": asset_id_2,
+                    "title": row[0],
+                    "content": row[1],
+                    "source_type": row[2],
+                    "provenance": row[3],
+                    "confidence_score": float(row[4]),
+                    "timestamp": int(row[5])
+                }
+        except Exception as e:
+            print(f"Database fetch error for {asset_id_2}: {e}")
+
     if not a1 or not a2:
         raise ValueError("One or both knowledge assets not found.")
 

@@ -7,6 +7,22 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.6.0] — 2026-06-12 — Level 5.0 Memory Upgrade & Client SDK
+
+### Added
+- **Level 5.0 Memory Management**: Upgraded `uawos_memory.py` with PostgreSQL session-backed short-term memory (STM), episodic timelines, advisory locks for thread-safe concurrency, RRF-based hybrid search, continuous reflection, and automatic semantic consolidation.
+- **Client SDK**: Added `uawos_sdk.py` programmatically exposing UAWOS objective, memory, and search features to third-party integrations.
+- **Admin CLI**: Added `uawos_cli.py` commands (`register-agent` and `mcp-connect`) for onboarding and connecting agents.
+- **Validation Framework**: Added `validate_capabilities.py` auditing all 15 key platform capabilities with 100% verification confidence.
+- **Memory Verification Suite**: Added `verify_upgraded_memory.py` self-tests.
+- **Billing & Subscription**: Added `verify_subscription` and mock Stripe webhook handler in `uawos_integrations.py`.
+
+### Changed
+- **Objective Ingestion**: Integrated `uawos_dtase` to analyze unstructured intake inputs.
+- **Dynamic Routing**: Implemented dynamic workforce auto-routing based on required agent capabilities and trust metrics in `uawos_planning.py`.
+
+---
+
 ## [0.5.0] — 2026-06-11 — MVP Fully Validated
 
 ### Added

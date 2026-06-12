@@ -281,9 +281,9 @@ A governed, continuously learning environment where human and AI workforce entit
 
 ## Status
 
-Current Stage: **MVP Implementation — Fully Validated**
+Current Stage: **Release 0.6.0 — Fully Validated**
 
-All engines are implemented, self-tested, and verified against their FR (Functional Requirements) specifications.
+All engines are implemented, self-tested, and verified against their FR (Functional Requirements) specifications. Additionally, all 15 key platform capabilities are fully verified with a platform capability maturity score of 100%.
 
 ### Implemented & Verified Engines
 
@@ -310,11 +310,56 @@ All engines are implemented, self-tested, and verified against their FR (Functio
 | Requirement Intelligence Studio | `uawos_requirement_studio.py` | Full pipeline | ✅ Pass |
 | PMCMS Maturity | `uawos_pmcms.py` | PMCMS + FR-236 | ✅ Pass |
 
-All changes are fully verified using self-test suites (`scratch/run_all_self_tests.py`) and mapped dynamically into the roadmap and traceability matrices on the dashboard UI.
+All changes are fully verified using self-test suites and mapped dynamically into the roadmap and traceability matrices on the dashboard UI.
 
-### Running Tests
+---
+
+## 🛠️ CLI and SDK Usage
+
+### UAWOS Python Client SDK (`uawos_sdk.py`)
+Exposes UAWOS capabilities to external applications programmatically:
+```python
+from uawos_sdk import UAWOSClientSDK
+
+# Initialize SDK
+sdk = UAWOSClientSDK(tenant_id="tenant-hybrid-test")
+
+# Create objective
+objective = sdk.create_objective(
+    title="SSO Integration",
+    description="Implement Okta SSO for authentication.",
+    priority="High"
+)
+
+# Search knowledge graph
+results = sdk.search_knowledge("SSO credentials")
+```
+
+### UAWOS Admin CLI (`uawos_cli.py`)
+Allows dynamic agent onboarding and connection configuration:
+```powershell
+# Onboard a new agent
+.venv\Scripts\python.exe uawos_cli.py register-agent --name "Custom-Executor" --class "Executor" --capabilities "code_execution"
+
+# Connect to an external MCP server
+.venv\Scripts\python.exe uawos_cli.py mcp-connect --agent "Custom-Executor" --mcp-url "http://localhost:9999"
+```
+
+---
+
+## 🧪 Verification & Testing
+
+Verify system engines and platform capabilities:
 
 ```powershell
+# 1. Run all engine self-tests
 .venv\Scripts\python.exe scratch\run_all_self_tests.py
+
+# 2. Run upgraded memory suite tests (Level 5.0)
+.venv\Scripts\python.exe verify_upgraded_memory.py
+
+# 3. Execute platform capability validation audit
+.venv\Scripts\python.exe validate_capabilities.py
 ```
+
 
