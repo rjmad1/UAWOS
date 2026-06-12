@@ -16,8 +16,8 @@ def analyze_unstructured_input(text: str) -> dict:
     risks = []
     anomalies = []
     personas = {}
-    
-    title = f"New Objective from Input"
+
+    title = "New Objective from Input"
     description = text
     priority = "Medium"
     dependencies = []
@@ -34,6 +34,7 @@ def analyze_unstructured_input(text: str) -> dict:
 
     # Dependency heuristics
     import re
+
     dep_matches = re.findall(r"obj-\d+", text_lower)
     if dep_matches:
         dependencies = [m.upper() for m in dep_matches]
@@ -132,9 +133,7 @@ def analyze_unstructured_input(text: str) -> dict:
         }
     if is_product:
         detected_domains.append(PRODUCT_MGMT)
-        opportunities.append(
-            "Optimize checkout shipping cost transparency to reduce abandonment"
-        )
+        opportunities.append("Optimize checkout shipping cost transparency to reduce abandonment")
         personas["Product Owner"] = {
             "summary": "User friction identified at checkout phase during shipping cost revelation. Suggests requirement for upfront pricing estimation.",
             "action_items": [
@@ -214,9 +213,9 @@ Output JSON format (strictly JSON, no extra text):
   "summary": "one-sentence professional summary"
 }}
 [/INST]"""
-        req_data = json.dumps(
-            {"model": "tinyllama", "prompt": prompt, "stream": False, "format": "json"}
-        ).encode("utf-8")
+        req_data = json.dumps({"model": "tinyllama", "prompt": prompt, "stream": False, "format": "json"}).encode(
+            "utf-8"
+        )
 
         req = urllib.request.Request(
             f"{OLLAMA_BASE_URL}/api/generate",
@@ -242,23 +241,15 @@ Output JSON format (strictly JSON, no extra text):
             if llm_analysis.get("dependencies"):
                 result["dependencies"] = [d.upper() for d in llm_analysis["dependencies"]]
             if llm_analysis.get("detected_domains"):
-                result["detected_domains"] = list(
-                    set(result["detected_domains"] + llm_analysis["detected_domains"])
-                )
+                result["detected_domains"] = list(set(result["detected_domains"] + llm_analysis["detected_domains"]))
             if llm_analysis.get("opportunities"):
-                result["opportunities"] = list(
-                    set(result["opportunities"] + llm_analysis["opportunities"])
-                )
+                result["opportunities"] = list(set(result["opportunities"] + llm_analysis["opportunities"]))
             if llm_analysis.get("risks"):
                 result["risks"] = list(set(result["risks"] + llm_analysis["risks"]))
             if llm_analysis.get("anomalies"):
-                result["anomalies"] = list(
-                    set(result["anomalies"] + llm_analysis["anomalies"])
-                )
+                result["anomalies"] = list(set(result["anomalies"] + llm_analysis["anomalies"]))
 
-            if "LLM Professional View" not in result[
-                "persona_translations"
-            ] and llm_analysis.get("summary"):
+            if "LLM Professional View" not in result["persona_translations"] and llm_analysis.get("summary"):
                 result["persona_translations"]["LLM Professional View"] = {
                     "summary": llm_analysis["summary"],
                     "action_items": [

@@ -5,20 +5,16 @@ import time
 import urllib.error
 import urllib.request
 
+import uawos_db
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_knowledge_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_knowledge_state.json")
 MARKER_BASE_URL = os.environ.get("MARKER_BASE_URL", "http://127.0.0.1:8000")
 
 # Neo4j Settings
 NEO4J_HOST = os.environ.get("NEO4J_HOST", "127.0.0.1")
 NEO4J_HTTP_PORT = int(os.environ.get("NEO4J_PORT_2", 7474))
 NEO4J_URL = f"http://{NEO4J_HOST}:{NEO4J_HTTP_PORT}"
-
 
 
 def get_default_state() -> dict:
@@ -51,23 +47,14 @@ def get_default_state() -> dict:
 def execute_cypher(statement: str, parameters: dict = None) -> dict:
     """Execute Cypher query on Neo4j HTTP API. Returns None if Neo4j is offline."""
     url = f"{NEO4J_URL}/db/neo4j/tx/commit"
-    payload = {
-        "statements": [
-            {
-                "statement": statement,
-                "parameters": parameters or {}
-            }
-        ]
-    }
+    payload = {"statements": [{"statement": statement, "parameters": parameters or {}}]}
     try:
         req_data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
-            url,
-            data=req_data,
-            headers={"Content-Type": "application/json", "Accept": "application/json"}
+            url, data=req_data, headers={"Content-Type": "application/json", "Accept": "application/json"}
         )
         with urllib.request.urlopen(req, timeout=1.0) as resp:
-            return json.loads(resp.read().decode('utf-8'))
+            return json.loads(resp.read().decode("utf-8"))
     except Exception:
         return None
 
@@ -130,7 +117,7 @@ def sync_relationship_to_neo4j(rel: dict) -> bool:
     rel_type = rel["relationship"]
     if not rel_type.replace("_", "").isalnum():
         return False
-    
+
     query = f"""
     MERGE (s:{src_label} {{id: $source_id}})
     MERGE (t:{tgt_label} {{id: $target_id}})
@@ -145,7 +132,7 @@ def sync_relationship_to_neo4j(rel: dict) -> bool:
         "target_id": rel["target"],
         "rel_id": rel["id"],
         "confidence": rel["confidence"],
-        "provenance": rel.get("provenance", "Sync link")
+        "provenance": rel.get("provenance", "Sync link"),
     }
     res = execute_cypher(query, params)
     return res is not None and not res.get("errors")
@@ -164,6 +151,7 @@ def sync_all_state_to_neo4j():
 
 
 # FR-111 to FR-120: Create Knowledge Asset
+
 
 def create_knowledge_asset(
     title: str,
@@ -273,9 +261,7 @@ def ingest_image(ocr_text: str, image_uri: str) -> dict:
 
 
 # FR-117: Knowledge Graph creation
-def create_graph_relationship(
-    source_id: str, relationship: str, target_id: str, confidence: float = 90.0
-) -> dict:
+def create_graph_relationship(source_id: str, relationship: str, target_id: str, confidence: float = 90.0) -> dict:
     state = load_state()
     rel_id = f"REL-{len(state['graph_relationships']) + 1:02d}"
     rel = {
@@ -293,9 +279,7 @@ def create_graph_relationship(
 
 
 # FR-120: Knowledge reconciliation
-def reconcile_contradictions(
-    asset_id_1: str, asset_id_2: str, resolution_strategy: str = "latest_timestamp"
-) -> dict:
+def reconcile_contradictions(asset_id_1: str, asset_id_2: str, resolution_strategy: str = "latest_timestamp") -> dict:
     """Resolve discrepancies between contradictory knowledge assets."""
     state = load_state()
     a1 = state["assets"].get(asset_id_1)
@@ -305,7 +289,7 @@ def reconcile_contradictions(
             cursor = conn.cursor()
             cursor.execute(
                 "SELECT title, content, source_type, provenance, confidence_score, EXTRACT(EPOCH FROM updated_at) FROM uawos_semantic_knowledge WHERE asset_id = %s;",
-                (asset_id_1,)
+                (asset_id_1,),
             )
             row = cursor.fetchone()
             cursor.close()
@@ -318,7 +302,7 @@ def reconcile_contradictions(
                     "source_type": row[2],
                     "provenance": row[3],
                     "confidence_score": float(row[4]),
-                    "timestamp": int(row[5])
+                    "timestamp": int(row[5]),
                 }
         except Exception as e:
             print(f"Database fetch error for {asset_id_1}: {e}")
@@ -330,7 +314,7 @@ def reconcile_contradictions(
             cursor = conn.cursor()
             cursor.execute(
                 "SELECT title, content, source_type, provenance, confidence_score, EXTRACT(EPOCH FROM updated_at) FROM uawos_semantic_knowledge WHERE asset_id = %s;",
-                (asset_id_2,)
+                (asset_id_2,),
             )
             row = cursor.fetchone()
             cursor.close()
@@ -343,7 +327,7 @@ def reconcile_contradictions(
                     "source_type": row[2],
                     "provenance": row[3],
                     "confidence_score": float(row[4]),
-                    "timestamp": int(row[5])
+                    "timestamp": int(row[5]),
                 }
         except Exception as e:
             print(f"Database fetch error for {asset_id_2}: {e}")
@@ -378,17 +362,13 @@ def verify_fr_111():
 
 
 def verify_fr_112():
-    asset = ingest_document(
-        "c:/Users/rajaj/Projects/UAWOS/test.pdf", mock_content="Parsed text content"
-    )
+    asset = ingest_document("c:/Users/rajaj/Projects/UAWOS/test.pdf", mock_content="Parsed text content")
     assert "Parsed text content" in asset["content"], "Document ingestion failed."
     return True
 
 
 def verify_fr_113():
-    asset = ingest_conversation(
-        ["Alice", "Bob"], [{"sender": "Alice", "text": "Hi Bob"}]
-    )
+    asset = ingest_conversation(["Alice", "Bob"], [{"sender": "Alice", "text": "Hi Bob"}])
     assert "Alice: Hi Bob" in asset["content"], "Conversation ingestion failed."
     return True
 

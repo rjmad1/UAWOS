@@ -1,15 +1,11 @@
 # uawos_integrations.py
-import json
 import os
 import time
 
+import uawos_db
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_integrations_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_integrations_state.json")
 
 
 def get_default_state() -> dict:
@@ -51,11 +47,7 @@ def setup_mcp_agent_server(agent_id: str, mcp_url: str) -> dict:
     state = load_state()
     if "mcp_agents" not in state:
         state["mcp_agents"] = {}
-    state["mcp_agents"][agent_id] = {
-        "mcp_url": mcp_url,
-        "registered_at": int(time.time()),
-        "status": "connected"
-    }
+    state["mcp_agents"][agent_id] = {"mcp_url": mcp_url, "registered_at": int(time.time()), "status": "connected"}
     save_state(state)
     return state["mcp_agents"][agent_id]
 
@@ -73,8 +65,10 @@ def mock_stripe_webhook_handler(payload: dict) -> dict:
     event_type = payload.get("type")
     data = payload.get("data", {})
     object_data = data.get("object", {})
-    tenant_id = object_data.get("client_reference_id") or object_data.get("metadata", {}).get("tenant_id") or "default_tenant"
-    
+    tenant_id = (
+        object_data.get("client_reference_id") or object_data.get("metadata", {}).get("tenant_id") or "default_tenant"
+    )
+
     if event_type in ["customer.subscription.created", "customer.subscription.updated"]:
         plan_type = object_data.get("plan", {}).get("id") or "SaaS Standard"
         status = object_data.get("status") or "active"

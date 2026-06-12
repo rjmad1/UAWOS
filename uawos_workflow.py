@@ -1,15 +1,11 @@
 # uawos_workflow.py
-import json
 import os
 import time
 
+import uawos_db
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_workflow_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_workflow_state.json")
 
 
 def get_default_state() -> dict:
@@ -126,9 +122,7 @@ def simulate_workflow(workflow_id: str) -> dict:
     return {
         "workflow_id": workflow_id,
         "estimated_duration_seconds": len(workflow["tasks"]) * 3600,
-        "bottlenecks": [
-            "Dependency check bottleneck" if workflow["dependencies"] else "None"
-        ],
+        "bottlenecks": ["Dependency check bottleneck" if workflow["dependencies"] else "None"],
         "simulation_verdict": "Success predicted",
     }
 
@@ -148,6 +142,7 @@ def optimize_workflow(workflow_id: str) -> dict:
 def check_temporal_worker_queues() -> bool:
     """Check if Temporal worker queues are active (with fallback/mock support)."""
     import socket
+
     for port in [7233, 8233]:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -157,7 +152,7 @@ def check_temporal_worker_queues() -> bool:
             return True
         except Exception:
             pass
-            
+
     # Mock/simulated activation for local development/testing
     if os.environ.get("TEMPORAL_MOCK_ACTIVE", "true").lower() == "true":
         return True

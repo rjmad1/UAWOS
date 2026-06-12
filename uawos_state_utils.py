@@ -3,9 +3,9 @@
 These helpers replace duplicated code across many uawos_*.py modules.
 """
 
-import json
 import os
-from typing import Callable, Any
+from collections.abc import Callable
+from typing import Any
 
 
 def _get_db_key(state_file: str) -> str:
@@ -15,6 +15,7 @@ def _get_db_key(state_file: str) -> str:
 def load_state(state_file: str = None, default_state_func: Callable[[], Any] = None, tenant_id: str = "default_tenant"):
     """Load state from PostgreSQL database, throwing error if offline."""
     import inspect
+
     from uawos_context import get_tenant_id
 
     # Resolve state_file if not provided
@@ -26,9 +27,7 @@ def load_state(state_file: str = None, default_state_func: Callable[[], Any] = N
         caller_globals = inspect.stack()[1].frame.f_globals
         default_state_func = caller_globals.get("get_default_state")
     if state_file is None or default_state_func is None:
-        raise ValueError(
-            "STATE_FILE and get_default_state must be defined in the caller module or passed explicitly."
-        )
+        raise ValueError("STATE_FILE and get_default_state must be defined in the caller module or passed explicitly.")
 
     if tenant_id == "default_tenant":
         tenant_id = get_tenant_id()
@@ -36,6 +35,7 @@ def load_state(state_file: str = None, default_state_func: Callable[[], Any] = N
     # Try database
     try:
         import uawos_db
+
         if uawos_db.DB_AVAILABLE:
             key = _get_db_key(state_file)
             state = uawos_db.db_get_state(key, None, tenant_id)
@@ -56,6 +56,7 @@ def load_state(state_file: str = None, default_state_func: Callable[[], Any] = N
 def save_state(state_file: str = None, state: Any = None, tenant_id: str = "default_tenant"):
     """Save state to PostgreSQL database."""
     import inspect
+
     from uawos_context import get_tenant_id
 
     # Handle backward‑compatible signature where only state is provided
@@ -76,6 +77,7 @@ def save_state(state_file: str = None, state: Any = None, tenant_id: str = "defa
     # Try saving to DB
     try:
         import uawos_db
+
         if uawos_db.DB_AVAILABLE:
             uawos_db.db_save_state(_get_db_key(state_file), state, tenant_id)
             return

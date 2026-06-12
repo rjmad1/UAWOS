@@ -7,6 +7,19 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.7.0] — 2026-06-12 — Agent Framework Integration (Waves 0-6)
+
+### Added
+- **LangGraph Adapter**: Integrated `uawos_langgraph_adapter.py` compiling state graphs with per-node interceptors, workflow state machines, and a PostgreSQL checkpointer backend.
+- **Semantic Kernel Adapter**: Integrated `uawos_semantic_kernel_adapter.py` providing Microsoft Copilot kernel orchestrations, function invocation filters, and a vector memory bridge to Qdrant.
+- **AutoGen Adapter**: Integrated `uawos_autogen_adapter.py` enabling conversable agents and group chats with Docker-based sandboxed code execution, conversational message auditors, and Rego-governed speaker selection policies.
+- **Traceability Event Bus**: Added `uawos_event_bus.py` schema-validating ESLS events, managing tenant-aware correlation/causation ID propagation, and supporting event replay.
+- **Sandbox Runtime**: Added `uawos_sandbox_runtime.py` with `UAWOSSandboxToolExecutor` routing to isolated environments, the `UAWOSSecretsManager` vault with regex secret redaction, and tool registries.
+- **Audit and Replay Ledger**: Added `uawos_audit_ledger.py` supporting immutable append-only ledgers, SQL checkpointers with time-travel replay, Marquez-compatible OpenLineage emitters, and explainability reports.
+- **Unified Interfaces**: Added `uawos_agent_runtime.py` defining abstract contracts for adapters (`IPolicyEvaluator`, `IAuditProvider`, `ITraceProvider`, `IToolExecutor`, `IAgentRuntime`, `IWorkflowRuntime`).
+
+---
+
 ## [0.6.0] — 2026-06-12 — Level 5.0 Memory Upgrade & Client SDK
 
 ### Added

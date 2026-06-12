@@ -1,16 +1,11 @@
 # uawos_simulation.py
-import json
 import os
 import random
 import time
 
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_simulation_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_simulation_state.json")
 
 
 def get_default_state() -> dict:
@@ -28,6 +23,7 @@ def get_default_state() -> dict:
         "forecast_validations": [],
     }
 
+
 # FR-171: Scenario modeling
 def run_scenario_model(scenario_name: str, parameters: dict) -> dict:
     """Run a named scenario simulation model (FR-171)."""
@@ -35,12 +31,8 @@ def run_scenario_model(scenario_name: str, parameters: dict) -> dict:
     sid = f"SIM-{len(state['simulation_runs']) + 1:02d}"
 
     # Simple simulated metrics
-    success_rate = parameters.get("base_success", 90.0) + (
-        5.0 if parameters.get("has_cache", False) else -10.0
-    )
-    cost = parameters.get("base_cost", 200.0) + (
-        50.0 if parameters.get("full_logs", False) else 0.0
-    )
+    success_rate = parameters.get("base_success", 90.0) + (5.0 if parameters.get("has_cache", False) else -10.0)
+    cost = parameters.get("base_cost", 200.0) + (50.0 if parameters.get("full_logs", False) else 0.0)
 
     run = {
         "id": sid,
@@ -80,6 +72,7 @@ def run_monte_carlo(iterations: int = 100) -> dict:
     # Try fetching active plan success probabilities from PG database
     try:
         import uawos_db
+
         if uawos_db.DB_AVAILABLE:
             conn = uawos_db.get_db_connection()
             cursor = conn.cursor()

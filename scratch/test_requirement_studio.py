@@ -21,9 +21,7 @@ def post_json(path, data):
 
 
 def get_json(path):
-    req = urllib.request.Request(
-        f"{URL_BASE}{path}", headers={"X-UAWOS-Token": "uawos-secure-token-2026"}
-    )
+    req = urllib.request.Request(f"{URL_BASE}{path}", headers={"X-UAWOS-Token": "uawos-secure-token-2026"})
     with urllib.request.urlopen(req, timeout=5.0) as response:
         return json.loads(response.read().decode("utf-8"))
 
@@ -46,12 +44,10 @@ def verify_end_to_end():
     req_id = submit_res.get("requirement_id")
     print(f"    Created requirement: {req_id}")
     assert req_id == "REQ-001", f"Unexpected requirement ID: {req_id}"
-    assert (
-        submit_res["completeness_score"] == 100
-    ), f"Expected 100% completeness, got: {submit_res['completeness_score']}"
-    assert (
-        len(submit_res["clarification_questions"]) == 10
-    ), "Should generate exactly 10 questions."
+    assert submit_res["completeness_score"] == 100, (
+        f"Expected 100% completeness, got: {submit_res['completeness_score']}"
+    )
+    assert len(submit_res["clarification_questions"]) == 10, "Should generate exactly 10 questions."
 
     # 3. Complete clarifications (waive them)
     print("  Applying CPO executive waiver on questions...")
@@ -59,19 +55,13 @@ def verify_end_to_end():
         "/api/requirement/clarify",
         {"requirement_id": req_id, "answers": {}, "waive": True},
     )
-    assert (
-        clarify_res["readiness_score"] >= 85
-    ), "Readiness score should be boosted after waiver."
+    assert clarify_res["readiness_score"] >= 85, "Readiness score should be boosted after waiver."
 
     # 4. Author strategic product proposition
     print("  Compiling authored strategic proposition (A to Q)...")
     author_res = post_json("/api/requirement/author", {"requirement_id": req_id})
-    assert (
-        "A_Executive_Summary" in author_res
-    ), "Strategic proposition missing Section A."
-    assert (
-        "Q_Future_Enhancements" in author_res
-    ), "Strategic proposition missing Section Q."
+    assert "A_Executive_Summary" in author_res, "Strategic proposition missing Section A."
+    assert "Q_Future_Enhancements" in author_res, "Strategic proposition missing Section Q."
     print("    Proposition sections A to Q successfully compiled.")
 
     # 5. Absorb and prioritize
@@ -96,13 +86,9 @@ def verify_end_to_end():
         assert key in absorb_res, f"Output contract missing key: {key}"
 
     cand = absorb_res["roadmap_candidate"]
-    assert (
-        cand["roadmap_id"] == "RD-05"
-    ), f"Expected candidate RD-05, got {cand['roadmap_id']}"
+    assert cand["roadmap_id"] == "RD-05", f"Expected candidate RD-05, got {cand['roadmap_id']}"
     assert cand["priority_score"] > 0, "Candidate priority score must be > 0."
-    assert (
-        absorb_res["portfolio_comparison"]["new_rank"] > 0
-    ), "Should receive portfolio rank placement."
+    assert absorb_res["portfolio_comparison"]["new_rank"] > 0, "Should receive portfolio rank placement."
 
     print(
         f"    Candidate generated: {cand['roadmap_id']} with Priority Score: {cand['priority_score']} at Rank: {absorb_res['portfolio_comparison']['new_rank']}"
@@ -116,12 +102,8 @@ def verify_end_to_end():
     # 7. Verify in master roadmap API
     print("  Verifying candidate presence in master roadmap...")
     roadmap_data = get_json("/api/roadmap")
-    assert (
-        "RD-05" in roadmap_data
-    ), "Published candidate RD-05 missing from roadmap rollup data."
-    assert (
-        roadmap_data["RD-05"]["name"] == "Enterprise SSO Integration"
-    ), "Roadmap name mismatch."
+    assert "RD-05" in roadmap_data, "Published candidate RD-05 missing from roadmap rollup data."
+    assert roadmap_data["RD-05"]["name"] == "Enterprise SSO Integration", "Roadmap name mismatch."
 
     # 8. Verify child requirements in traceability matrix
     print("  Verifying child requirements trace in matrix...")
@@ -129,16 +111,10 @@ def verify_end_to_end():
     matrix = trace_data["matrix"]
 
     # Child ID format: FR-REQ-001-001
-    assert (
-        "FR-REQ-001-001" in matrix
-    ), "Child functional requirement missing from traceability matrix."
-    assert (
-        matrix["FR-REQ-001-001"]["roadmap_item"] == "RD-05"
-    ), "Child requirement mapped to wrong roadmap item."
+    assert "FR-REQ-001-001" in matrix, "Child functional requirement missing from traceability matrix."
+    assert matrix["FR-REQ-001-001"]["roadmap_item"] == "RD-05", "Child requirement mapped to wrong roadmap item."
 
-    print(
-        "All verification steps passed successfully! End-to-end API compliance confirmed."
-    )
+    print("All verification steps passed successfully! End-to-end API compliance confirmed.")
 
 
 if __name__ == "__main__":

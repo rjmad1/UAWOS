@@ -6,11 +6,7 @@ import time
 
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_pmcms_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_pmcms_state.json")
 
 
 def get_default_state() -> dict:
@@ -65,13 +61,29 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     dtrack_port = int(os.environ.get("DTRACK_PORT", 8081))
 
     opa_online = check_port(opa_host, opa_port) or os.environ.get("OPA_MOCK_ACTIVE", "true").lower() == "true"
-    openfga_online = check_port(openfga_host, openfga_port) or os.environ.get("OPENFGA_MOCK_ACTIVE", "true").lower() == "true"
-    qdrant_online = check_port(qdrant_host, qdrant_port) or os.environ.get("QDRANT_MOCK_ACTIVE", "true").lower() == "true"
-    postgres_online = check_port(postgres_host, postgres_port) or os.environ.get("POSTGRES_MOCK_ACTIVE", "true").lower() == "true"
-    clickhouse_online = check_port(clickhouse_host, 8124) or check_port(clickhouse_host, clickhouse_port) or os.environ.get("CLICKHOUSE_MOCK_ACTIVE", "true").lower() == "true"
-    marquez_online = check_port(marquez_host, marquez_port) or os.environ.get("MARQUEZ_MOCK_ACTIVE", "true").lower() == "true"
-    superset_online = check_port(superset_host, superset_port) or os.environ.get("SUPERSET_MOCK_ACTIVE", "true").lower() == "true"
-    dtrack_online = check_port(dtrack_host, dtrack_port) or os.environ.get("DTRACK_MOCK_ACTIVE", "true").lower() == "true"
+    openfga_online = (
+        check_port(openfga_host, openfga_port) or os.environ.get("OPENFGA_MOCK_ACTIVE", "true").lower() == "true"
+    )
+    qdrant_online = (
+        check_port(qdrant_host, qdrant_port) or os.environ.get("QDRANT_MOCK_ACTIVE", "true").lower() == "true"
+    )
+    postgres_online = (
+        check_port(postgres_host, postgres_port) or os.environ.get("POSTGRES_MOCK_ACTIVE", "true").lower() == "true"
+    )
+    clickhouse_online = (
+        check_port(clickhouse_host, 8124)
+        or check_port(clickhouse_host, clickhouse_port)
+        or os.environ.get("CLICKHOUSE_MOCK_ACTIVE", "true").lower() == "true"
+    )
+    marquez_online = (
+        check_port(marquez_host, marquez_port) or os.environ.get("MARQUEZ_MOCK_ACTIVE", "true").lower() == "true"
+    )
+    superset_online = (
+        check_port(superset_host, superset_port) or os.environ.get("SUPERSET_MOCK_ACTIVE", "true").lower() == "true"
+    )
+    dtrack_online = (
+        check_port(dtrack_host, dtrack_port) or os.environ.get("DTRACK_MOCK_ACTIVE", "true").lower() == "true"
+    )
 
     # Engine import checks
     has_obj = check_module("uawos_objective")
@@ -115,6 +127,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     objectives_active = False
     try:
         import uawos_objective
+
         state = uawos_objective.load_state()
         if state and state.get("objectives"):
             objectives_active = True
@@ -128,6 +141,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     has_priority_graph = False
     try:
         import uawos_objective
+
         if hasattr(uawos_objective, "detect_conflicts"):
             has_priority_graph = True
     except Exception:
@@ -140,19 +154,11 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     if strat_score >= 5.0:
         strat_score = 5.0
     elif strat_score >= 4.0:
-        strat_gaps.append(
-            "Portfolio-level cross-objective dependency priority alignment is static."
-        )
-        strat_recs.append(
-            "Configure dynamic portfolio-level priority graph checks via the Challenger agent."
-        )
+        strat_gaps.append("Portfolio-level cross-objective dependency priority alignment is static.")
+        strat_recs.append("Configure dynamic portfolio-level priority graph checks via the Challenger agent.")
     else:
-        strat_gaps.append(
-            "Objective lifecycle status tracking or requirements tracing is not fully active."
-        )
-        strat_recs.append(
-            "Verify uawos_objective.py and uawos_traceability.py are loaded successfully."
-        )
+        strat_gaps.append("Objective lifecycle status tracking or requirements tracing is not fully active.")
+        strat_recs.append("Verify uawos_objective.py and uawos_traceability.py are loaded successfully.")
 
     dimensions["Strategy"] = {
         "score": round(strat_score, 2),
@@ -183,9 +189,8 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     sod_active = False
     try:
         import uawos_governance
-        res = uawos_governance.evaluate_action_governance(
-            "ACT-TEST-SOD", {"owner": "Alice", "approver": "Alice"}
-        )
+
+        res = uawos_governance.evaluate_action_governance("ACT-TEST-SOD", {"owner": "Alice", "approver": "Alice"})
         if res.get("verdict") == "REJECTED":
             sod_active = True
     except Exception:
@@ -193,13 +198,12 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 
     if sod_active:
         gov_score += 0.8
-        gov_evidence.append(
-            "Separation of Duties (SoD) and Role Governance constraints evaluated at runtime."
-        )
+        gov_evidence.append("Separation of Duties (SoD) and Role Governance constraints evaluated at runtime.")
 
     has_audit_analysis = False
     try:
         import uawos_governance
+
         if hasattr(uawos_governance, "run_governor_audit_analysis"):
             proposals = uawos_governance.run_governor_audit_analysis()
             if proposals:
@@ -215,16 +219,10 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
         gov_score = 5.0
     elif gov_score >= 4.0:
         gov_gaps.append("Predictive governance compliance audits are rule-based.")
-        gov_recs.append(
-            "Deploy Governor Agent to analyze audit logs and propose policy modifications."
-        )
+        gov_recs.append("Deploy Governor Agent to analyze audit logs and propose policy modifications.")
     else:
-        gov_gaps.append(
-            "OPA policy daemon or OpenFGA authorization container is offline."
-        )
-        gov_recs.append(
-            "Ensure OPA (port 8181) and OpenFGA (port 8083) docker containers are running."
-        )
+        gov_gaps.append("OPA policy daemon or OpenFGA authorization container is offline.")
+        gov_recs.append("Ensure OPA (port 8181) and OpenFGA (port 8083) docker containers are running.")
 
     dimensions["Governance"] = {
         "score": round(gov_score, 2),
@@ -255,6 +253,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     replanning_active = False
     try:
         import uawos_planning
+
         rp = uawos_planning.trigger_replanning("OBJ-101", "Testing replan")
         if rp and "Replanned" in rp.get("title", ""):
             replanning_active = True
@@ -263,13 +262,12 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 
     if replanning_active:
         exec_score += 0.8
-        exec_evidence.append(
-            "Dynamic replanning triggers active on execution failures."
-        )
+        exec_evidence.append("Dynamic replanning triggers active on execution failures.")
 
     has_temporal_worker = False
     try:
         import uawos_workflow
+
         if hasattr(uawos_workflow, "check_temporal_worker_queues"):
             if uawos_workflow.check_temporal_worker_queues():
                 has_temporal_worker = True
@@ -283,19 +281,11 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     if exec_score >= 5.0:
         exec_score = 5.0
     elif exec_score >= 4.0:
-        exec_gaps.append(
-            "Asynchronous task runtime lacks distributed state orchestration."
-        )
-        exec_recs.append(
-            "Integrate Temporal worker queues for fault-tolerant agent executor state rollbacks."
-        )
+        exec_gaps.append("Asynchronous task runtime lacks distributed state orchestration.")
+        exec_recs.append("Integrate Temporal worker queues for fault-tolerant agent executor state rollbacks.")
     else:
-        exec_gaps.append(
-            "Postgres database is offline or workflow runtime modules are missing."
-        )
-        exec_recs.append(
-            "Start Postgres container on port 5435 and verify planning modules."
-        )
+        exec_gaps.append("Postgres database is offline or workflow runtime modules are missing.")
+        exec_recs.append("Start Postgres container on port 5435 and verify planning modules.")
 
     dimensions["Execution"] = {
         "score": round(exec_score, 2),
@@ -326,6 +316,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     rag_active = False
     try:
         import uawos_db
+
         if uawos_db.QDRANT_AVAILABLE or qdrant_online:
             rag_active = True
     except Exception:
@@ -333,9 +324,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 
     if rag_active:
         kn_score += 0.8
-        kn_evidence.append(
-            "Qdrant Dense retrieval vector indexing and RAG pipeline active."
-        )
+        kn_evidence.append("Qdrant Dense retrieval vector indexing and RAG pipeline active.")
 
     # Check Neo4j integration status
     neo4j_online = False
@@ -368,16 +357,10 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     if kn_score >= 5.0:
         kn_score = 5.0
     elif kn_score >= 4.0:
-        kn_gaps.append(
-            "Knowledge graph ontologies are local-first and not synchronized to central Neo4j clusters."
-        )
-        kn_recs.append(
-            "Initialize Neo4j connection mappings and configure graph schema sync listener."
-        )
+        kn_gaps.append("Knowledge graph ontologies are local-first and not synchronized to central Neo4j clusters.")
+        kn_recs.append("Initialize Neo4j connection mappings and configure graph schema sync listener.")
     else:
-        kn_gaps.append(
-            "Qdrant vector database is offline or knowledge engines fail to import."
-        )
+        kn_gaps.append("Qdrant vector database is offline or knowledge engines fail to import.")
         kn_recs.append("Verify Qdrant docker service is healthy on port 6333.")
 
     dimensions["Knowledge"] = {
@@ -406,6 +389,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     agents_active = False
     try:
         import uawos_agent_workforce
+
         active_classes = uawos_agent_workforce.get_active_agents()
         if "Planner" in active_classes and "Executor" in active_classes:
             agents_active = True
@@ -414,13 +398,12 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 
     if agents_active:
         wf_score += 1.8
-        wf_evidence.append(
-            "Agent workforce coordinate loop (Planners, Orchestrators, Executors, Reviewers) active."
-        )
+        wf_evidence.append("Agent workforce coordinate loop (Planners, Orchestrators, Executors, Reviewers) active.")
 
     has_dynamic_trust = False
     try:
         import uawos_agent_workforce
+
         trust = uawos_agent_workforce.calculate_agent_trust("Governor Agent")
         if trust is not None:
             has_dynamic_trust = True
@@ -435,16 +418,10 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
         wf_score = 5.0
     elif wf_score >= 4.0:
         wf_gaps.append("Agent reputation status and trust scores are static.")
-        wf_recs.append(
-            "Implement dynamic agent reputation calculations based on historical task outcomes."
-        )
+        wf_recs.append("Implement dynamic agent reputation calculations based on historical task outcomes.")
     else:
-        wf_gaps.append(
-            "Coordinated agent workforce classes are not registered in uawos_agent_workforce.py."
-        )
-        wf_recs.append(
-            "Verify workforce agent roles are registered and imported successfully."
-        )
+        wf_gaps.append("Coordinated agent workforce classes are not registered in uawos_agent_workforce.py.")
+        wf_recs.append("Verify workforce agent roles are registered and imported successfully.")
 
     dimensions["Workforce"] = {
         "score": round(wf_score, 2),
@@ -472,9 +449,8 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     limits_checked = False
     try:
         import uawos_governance
-        res = uawos_governance.evaluate_action_governance(
-            "ACT-TOK", {"estimated_tokens": 6000000}
-        )
+
+        res = uawos_governance.evaluate_action_governance("ACT-TOK", {"estimated_tokens": 6000000})
         if res.get("verdict") == "REJECTED":
             limits_checked = True
     except Exception:
@@ -482,13 +458,12 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 
     if limits_checked:
         res_score += 1.8
-        res_evidence.append(
-            "Compute/token consumption policies enforced dynamically via OPA rules."
-        )
+        res_evidence.append("Compute/token consumption policies enforced dynamically via OPA rules.")
 
     has_predictive_forecasting = False
     try:
         import uawos_resource
+
         if hasattr(uawos_resource, "run_predictive_budget_forecasting"):
             fore = uawos_resource.run_predictive_budget_forecasting()
             if fore:
@@ -504,9 +479,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
         res_score = 5.0
     elif res_score >= 4.0:
         res_gaps.append("Cross-portfolio token/compute cost allocations are reactive.")
-        res_recs.append(
-            "Configure the Resource Manager Agent to run predictive budget forecasting."
-        )
+        res_recs.append("Configure the Resource Manager Agent to run predictive budget forecasting.")
     else:
         res_gaps.append("Resource allocation or budget management modules are missing.")
         res_recs.append("Ensure uawos_resource.py and uawos_budget.py are loaded.")
@@ -537,6 +510,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     ledger_active = False
     try:
         import uawos_value
+
         rollup = uawos_value.get_portfolio_value_rollup()
         if rollup is not None:
             ledger_active = True
@@ -545,13 +519,12 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 
     if ledger_active:
         val_score += 1.8
-        val_evidence.append(
-            "Value Ledger, hypothesis tracking, and portfolio ROI rollups active."
-        )
+        val_evidence.append("Value Ledger, hypothesis tracking, and portfolio ROI rollups active.")
 
     has_clickhouse_telemetry = False
     try:
         import uawos_value
+
         if hasattr(uawos_value, "wire_clickhouse_telemetry"):
             telemetry = uawos_value.wire_clickhouse_telemetry()
             if telemetry:
@@ -567,9 +540,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
         val_score = 5.0
     elif val_score >= 4.0:
         val_gaps.append("Value metrics telemetry depends on mock API integrations.")
-        val_recs.append(
-            "Wire ClickHouse logging and Apache Superset datasets to the Value ledger in real-time."
-        )
+        val_recs.append("Wire ClickHouse logging and Apache Superset datasets to the Value ledger in real-time.")
     else:
         val_gaps.append("Value realization ledger or hypothesis databases are missing.")
         val_recs.append("Verify uawos_value.py is imported and initialized.")
@@ -591,9 +562,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 
     if has_decision:
         intel_score += 1.0
-        intel_evidence.append(
-            "Decision Intelligence recommendation and reasoning engine active."
-        )
+        intel_evidence.append("Decision Intelligence recommendation and reasoning engine active.")
     if has_simulation:
         intel_score += 1.0
         intel_evidence.append("Simulation and Scenario Forecasting engine active.")
@@ -602,6 +571,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     decision_analytics_active = False
     try:
         import uawos_decision
+
         exp = uawos_decision.explain_decision("DEC-01")
         if exp:
             decision_analytics_active = True
@@ -610,13 +580,12 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 
     if decision_analytics_active:
         intel_score += 1.8
-        intel_evidence.append(
-            "Causal dependency mapping and decision explainability engines active."
-        )
+        intel_evidence.append("Causal dependency mapping and decision explainability engines active.")
 
     has_dynamic_simulation = False
     try:
         import uawos_simulation
+
         mc = uawos_simulation.run_monte_carlo(5)
         if mc:
             has_dynamic_simulation = True
@@ -631,16 +600,10 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
         intel_score = 5.0
     elif intel_score >= 4.0:
         intel_gaps.append("Dynamic scenario simulations are run in isolation.")
-        intel_recs.append(
-            "Configure the Challenger Agent to run active Monte Carlo simulations at plan checkpoints."
-        )
+        intel_recs.append("Configure the Challenger Agent to run active Monte Carlo simulations at plan checkpoints.")
     else:
-        intel_gaps.append(
-            "Decision intelligence reasoning or simulation engine modules are missing."
-        )
-        intel_recs.append(
-            "Verify uawos_decision.py and uawos_simulation.py are loaded."
-        )
+        intel_gaps.append("Decision intelligence reasoning or simulation engine modules are missing.")
+        intel_recs.append("Verify uawos_decision.py and uawos_simulation.py are loaded.")
 
     dimensions["Intelligence"] = {
         "score": round(intel_score, 2),
@@ -665,14 +628,13 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
         aut_evidence.append("Supervised human-in-the-loop approvals gate active.")
     if opa_online:
         aut_score += 1.0
-        aut_evidence.append(
-            "Governed autonomous execution with OPA budget thresholds active or mock active."
-        )
+        aut_evidence.append("Governed autonomous execution with OPA budget thresholds active or mock active.")
 
     # Check override Exception overrides
     override_active = False
     try:
         import uawos_governance
+
         exc = uawos_governance.load_state()
         if exc is not None:
             override_active = True
@@ -686,6 +648,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     has_dynamic_autonomy = False
     try:
         import uawos_governance
+
         if hasattr(uawos_governance, "get_dynamic_agent_autonomy_level"):
             level = uawos_governance.get_dynamic_agent_autonomy_level("Governor Agent")
             if level is not None:
@@ -701,14 +664,10 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
         aut_score = 5.0
     elif aut_score >= 4.0:
         aut_gaps.append("Autonomy levels are statically mapped per agent class.")
-        aut_recs.append(
-            "Implement dynamic trust-based autonomy scoring to elevate trusted agents to Level 5."
-        )
+        aut_recs.append("Implement dynamic trust-based autonomy scoring to elevate trusted agents to Level 5.")
     else:
         aut_gaps.append("Governance or OPA policy controllers are not active.")
-        aut_recs.append(
-            "Configure uawos_governance.py and check OPA server on port 8181."
-        )
+        aut_recs.append("Configure uawos_governance.py and check OPA server on port 8181.")
 
     dimensions["Autonomy"] = {
         "score": round(aut_score, 2),
@@ -742,9 +701,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 
     # Log to history
     state = load_state()
-    state["assessment_history"].append(
-        {"timestamp": int(time.time()), "score": overall_index, "level": maturity_stage}
-    )
+    state["assessment_history"].append({"timestamp": int(time.time()), "score": overall_index, "level": maturity_stage})
     save_state(state)
 
     return assessment
@@ -756,22 +713,14 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
 def verify_pmcms_logic():
     assessment = get_maturity_assessment()
     assert "overall_score" in assessment, "Maturity assessment missing overall score."
-    assert (
-        "maturity_level" in assessment
-    ), "Maturity assessment missing maturity level descriptor."
-    assert (
-        len(assessment["dimensions"]) == 9
-    ), "Assessment must cover exactly 9 PMCMS dimensions."
+    assert "maturity_level" in assessment, "Maturity assessment missing maturity level descriptor."
+    assert len(assessment["dimensions"]) == 9, "Assessment must cover exactly 9 PMCMS dimensions."
     for name, d in assessment["dimensions"].items():
         assert "score" in d, f"Dimension {name} missing score."
         assert "level" in d, f"Dimension {name} missing level."
-        assert isinstance(
-            d["evidence"], list
-        ), f"Dimension {name} evidence must be a list."
+        assert isinstance(d["evidence"], list), f"Dimension {name} evidence must be a list."
         assert isinstance(d["gaps"], list), f"Dimension {name} gaps must be a list."
-        assert isinstance(
-            d["recommendations"], list
-        ), f"Dimension {name} recommendations must be a list."
+        assert isinstance(d["recommendations"], list), f"Dimension {name} recommendations must be a list."
     return True
 
 

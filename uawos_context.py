@@ -4,7 +4,6 @@ Exposes context variables for tenant_id, actor role, and actor owner.
 """
 
 from contextvars import ContextVar
-from typing import Optional
 
 # Define thread-safe ContextVar primitives
 _tenant_id = ContextVar("tenant_id", default="default_tenant")

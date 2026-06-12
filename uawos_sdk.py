@@ -1,10 +1,12 @@
 # uawos_sdk.py
 import json
 import urllib.request
-import uawos_db
-import uawos_objective
-import uawos_memory
+
 import uawos_context
+import uawos_db
+import uawos_memory
+import uawos_objective
+
 
 class UAWOSClientSDK:
     def __init__(self, base_url: str = "http://127.0.0.1:8099", tenant_id: str = "default_tenant"):
@@ -15,12 +17,7 @@ class UAWOSClientSDK:
         """Programmatically create a new strategic objective."""
         tokens = uawos_context.set_context(self.tenant_id, "Developer", "system")
         try:
-            obj = uawos_objective.create_objective(
-                title=title,
-                description=description,
-                priority=priority,
-                owner=owner
-            )
+            obj = uawos_objective.create_objective(title=title, description=description, priority=priority, owner=owner)
             # Sync to the relational database to ensure consistency with DB-backed APIs
             uawos_db.db_save_objective(obj)
             return obj

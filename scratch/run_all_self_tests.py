@@ -1,7 +1,7 @@
 import importlib
+import os
 import sys
 import traceback
-import os
 
 
 def run_module_tests(module_name):

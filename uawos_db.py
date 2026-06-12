@@ -148,8 +148,12 @@ def init_db():
         """)
         # Dynamic schema updates to guarantee tenant_id column existence in pre-existing DBs
         for table in ["uawos_objectives", "uawos_outcomes", "uawos_plans", "uawos_workflows", "uawos_actions"]:
-            cursor.execute(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS tenant_id VARCHAR(50) DEFAULT 'default_tenant';")
-        cursor.execute("ALTER TABLE uawos_state ADD COLUMN IF NOT EXISTS tenant_id VARCHAR(50) DEFAULT 'default_tenant';")
+            cursor.execute(
+                f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS tenant_id VARCHAR(50) DEFAULT 'default_tenant';"
+            )
+        cursor.execute(
+            "ALTER TABLE uawos_state ADD COLUMN IF NOT EXISTS tenant_id VARCHAR(50) DEFAULT 'default_tenant';"
+        )
         try:
             cursor.execute("ALTER TABLE uawos_state DROP CONSTRAINT IF EXISTS uawos_state_pkey;")
         except Exception:
@@ -237,7 +241,9 @@ def init_db():
             );
         """)
         try:
-            cursor.execute("ALTER TABLE uawos_semantic_knowledge DROP CONSTRAINT IF EXISTS uawos_semantic_knowledge_content_hash_key;")
+            cursor.execute(
+                "ALTER TABLE uawos_semantic_knowledge DROP CONSTRAINT IF EXISTS uawos_semantic_knowledge_content_hash_key;"
+            )
         except Exception:
             pass
         cursor.execute("""
@@ -369,6 +375,7 @@ def db_get_state(key: str, default_fn, tenant_id: str = "default_tenant") -> dic
     try:
         if tenant_id == "default_tenant":
             from uawos_context import get_tenant_id
+
             tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -393,6 +400,7 @@ def db_save_state(key: str, state: dict, tenant_id: str = "default_tenant"):
     try:
         if tenant_id == "default_tenant":
             from uawos_context import get_tenant_id
+
             tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -419,6 +427,7 @@ def index_memory(memory_id: int, content: str, scope: str, owner: str):
         return
     try:
         from uawos_context import get_tenant_id
+
         tenant_id = get_tenant_id()
         client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         embedding = get_embedding(content)
@@ -442,11 +451,20 @@ def index_memory(memory_id: int, content: str, scope: str, owner: str):
         print(f"Error indexing memory in Qdrant: {e}")
 
 
-def db_save_semantic_knowledge(asset_id: str, tenant_id: str, title: str, content: str, source_type: str, provenance: str, confidence_score: float = 100.0):
+def db_save_semantic_knowledge(
+    asset_id: str,
+    tenant_id: str,
+    title: str,
+    content: str,
+    source_type: str,
+    provenance: str,
+    confidence_score: float = 100.0,
+):
     if not DB_AVAILABLE:
         return
     try:
         import hashlib
+
         content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -458,7 +476,7 @@ def db_save_semantic_knowledge(asset_id: str, tenant_id: str, title: str, conten
             SET tenant_id = EXCLUDED.tenant_id, title = EXCLUDED.title, content_hash = EXCLUDED.content_hash, content = EXCLUDED.content,
                 source_type = EXCLUDED.source_type, provenance = EXCLUDED.provenance, confidence_score = EXCLUDED.confidence_score, updated_at = CURRENT_TIMESTAMP;
             """,
-            (asset_id, tenant_id, title, content_hash, content, source_type, provenance, confidence_score)
+            (asset_id, tenant_id, title, content_hash, content, source_type, provenance, confidence_score),
         )
         conn.commit()
         cursor.close()
@@ -481,7 +499,7 @@ def db_save_semantic_chunk(asset_id: str, chunk_index: int, content: str, vector
             ON CONFLICT (chunk_id) DO UPDATE
             SET content = EXCLUDED.content, chunk_index = EXCLUDED.chunk_index, vector_id = EXCLUDED.vector_id;
             """,
-            (chunk_id, asset_id, chunk_index, content, vector_id)
+            (chunk_id, asset_id, chunk_index, content, vector_id),
         )
         conn.commit()
         cursor.close()
@@ -490,12 +508,11 @@ def db_save_semantic_chunk(asset_id: str, chunk_index: int, content: str, vector
         print(f"db_save_semantic_chunk error: {e}")
 
 
-def index_knowledge(
-    asset_id: str, title: str, content: str, source_type: str, provenance: str
-):
+def index_knowledge(asset_id: str, title: str, content: str, source_type: str, provenance: str):
     from uawos_context import get_tenant_id
+
     tenant_id = get_tenant_id()
-    
+
     # Save to SQL database
     db_save_semantic_knowledge(
         asset_id=asset_id,
@@ -503,17 +520,13 @@ def index_knowledge(
         title=title,
         content=content,
         source_type=source_type,
-        provenance=provenance
+        provenance=provenance,
     )
-    
+
     import uuid
+
     point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, asset_id))
-    db_save_semantic_chunk(
-        asset_id=asset_id,
-        chunk_index=0,
-        content=content,
-        vector_id=point_id
-    )
+    db_save_semantic_chunk(asset_id=asset_id, chunk_index=0, content=content, vector_id=point_id)
 
     if not QDRANT_AVAILABLE:
         return
@@ -547,21 +560,16 @@ def search_memory(query: str, limit: int = 5) -> list:
         return []
     try:
         from uawos_context import get_tenant_id
+
         tenant_id = get_tenant_id()
-        from qdrant_client.models import Filter, FieldCondition, MatchValue
+        from qdrant_client.models import FieldCondition, Filter, MatchValue
+
         client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         embedding = get_embedding(query)
         results = client.query_points(
             collection_name="uawos_memory",
             query=embedding,
-            query_filter=Filter(
-                must=[
-                    FieldCondition(
-                        key="tenant_id",
-                        match=MatchValue(value=tenant_id)
-                    )
-                ]
-            ),
+            query_filter=Filter(must=[FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))]),
             limit=limit,
         )
         return [r.payload for r in results.points]
@@ -575,21 +583,16 @@ def search_knowledge(query: str, limit: int = 5) -> list:
         return []
     try:
         from uawos_context import get_tenant_id
+
         tenant_id = get_tenant_id()
-        from qdrant_client.models import Filter, FieldCondition, MatchValue
+        from qdrant_client.models import FieldCondition, Filter, MatchValue
+
         client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         embedding = get_embedding(query)
         results = client.query_points(
             collection_name="uawos_knowledge",
             query=embedding,
-            query_filter=Filter(
-                must=[
-                    FieldCondition(
-                        key="tenant_id",
-                        match=MatchValue(value=tenant_id)
-                    )
-                ]
-            ),
+            query_filter=Filter(must=[FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))]),
             limit=limit,
         )
         return [r.payload for r in results.points]
@@ -603,6 +606,7 @@ def hybrid_search_knowledge(query: str, tenant_id: str = "default_tenant", limit
     if tenant_id == "default_tenant":
         try:
             from uawos_context import get_tenant_id
+
             tenant_id = get_tenant_id()
         except ImportError:
             pass
@@ -615,7 +619,7 @@ def hybrid_search_knowledge(query: str, tenant_id: str = "default_tenant", limit
             words = [f"%{w}%" for w in query.split() if len(w) > 2]
             if not words:
                 words = [f"%{query}%"]
-            
+
             like_clauses = " OR ".join(["sc.content ILIKE %s" for _ in words])
             sql = f"""
                 SELECT sc.asset_id, sc.content, sk.title, sk.source_type, sk.provenance, sk.confidence_score
@@ -629,35 +633,31 @@ def hybrid_search_knowledge(query: str, tenant_id: str = "default_tenant", limit
             cursor.close()
             conn.close()
             for r in rows:
-                lexical_results.append({
-                    "id": r[0],
-                    "content": r[1],
-                    "title": r[2],
-                    "source_type": r[3],
-                    "provenance": r[4],
-                    "confidence_score": float(r[5]),
-                    "tenant_id": tenant_id
-                })
+                lexical_results.append(
+                    {
+                        "id": r[0],
+                        "content": r[1],
+                        "title": r[2],
+                        "source_type": r[3],
+                        "provenance": r[4],
+                        "confidence_score": float(r[5]),
+                        "tenant_id": tenant_id,
+                    }
+                )
         except Exception as e:
             print(f"Lexical search failed: {e}")
 
     vector_results = []
     if QDRANT_AVAILABLE:
         try:
-            from qdrant_client.models import Filter, FieldCondition, MatchValue
+            from qdrant_client.models import FieldCondition, Filter, MatchValue
+
             client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
             embedding = get_embedding(query)
             results = client.query_points(
                 collection_name="uawos_knowledge",
                 query=embedding,
-                query_filter=Filter(
-                    must=[
-                        FieldCondition(
-                            key="tenant_id",
-                            match=MatchValue(value=tenant_id)
-                        )
-                    ]
-                ),
+                query_filter=Filter(must=[FieldCondition(key="tenant_id", match=MatchValue(value=tenant_id))]),
                 limit=20,
             )
             for r in results.points:
@@ -667,7 +667,7 @@ def hybrid_search_knowledge(query: str, tenant_id: str = "default_tenant", limit
 
     # RRF merging
     rrf_scores = {}
-    
+
     def add_to_rrf(results_list):
         seen_in_list = set()
         for rank, item in enumerate(results_list):
@@ -700,6 +700,7 @@ def db_save_objective(obj: dict):
         tenant_id = obj.get("tenant_id")
         if not tenant_id or tenant_id == "default_tenant":
             from uawos_context import get_tenant_id
+
             tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -750,12 +751,13 @@ def db_load_objectives() -> dict:
         return {"objectives": {}}
     try:
         from uawos_context import get_tenant_id
+
         tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             "SELECT id, title, description, source_type, source_uri, owner, sponsor, priority, status, version, health_score, confidence_score, dependencies, history, tenant_id FROM uawos_objectives WHERE tenant_id = %s;",
-            (tenant_id,)
+            (tenant_id,),
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -777,14 +779,10 @@ def db_load_objectives() -> dict:
                 "health_score": float(r[10]),
                 "confidence_score": float(r[11]),
                 "dependencies": (
-                    r[12]
-                    if isinstance(r[12], list)
-                    else json.loads(r[12] if isinstance(r[12], str) else "[]")
+                    r[12] if isinstance(r[12], list) else json.loads(r[12] if isinstance(r[12], str) else "[]")
                 ),
                 "history": (
-                    r[13]
-                    if isinstance(r[13], list)
-                    else json.loads(r[13] if isinstance(r[13], str) else "[]")
+                    r[13] if isinstance(r[13], list) else json.loads(r[13] if isinstance(r[13], str) else "[]")
                 ),
                 "tenant_id": r[14],
             }
@@ -802,6 +800,7 @@ def db_save_outcome(out: dict):
         tenant_id = out.get("tenant_id")
         if not tenant_id or tenant_id == "default_tenant":
             from uawos_context import get_tenant_id
+
             tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -850,12 +849,13 @@ def db_load_outcomes() -> dict:
         return {"outcomes": {}}
     try:
         from uawos_context import get_tenant_id
+
         tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             "SELECT id, objective_id, title, metric, unit, weight, dependencies, confidence_score, owner, baseline_state, target_state, current_state, forecasted_state, tenant_id FROM uawos_outcomes WHERE tenant_id = %s;",
-            (tenant_id,)
+            (tenant_id,),
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -871,9 +871,7 @@ def db_load_outcomes() -> dict:
                 "unit": r[4],
                 "weight": float(r[5]),
                 "dependencies": (
-                    r[6]
-                    if isinstance(r[6], list)
-                    else json.loads(r[6] if isinstance(r[6], str) else "[]")
+                    r[6] if isinstance(r[6], list) else json.loads(r[6] if isinstance(r[6], str) else "[]")
                 ),
                 "confidence_score": float(r[7]),
                 "owner": r[8],
@@ -897,6 +895,7 @@ def db_save_plan(plan: dict):
         tenant_id = plan.get("tenant_id")
         if not tenant_id or tenant_id == "default_tenant":
             from uawos_context import get_tenant_id
+
             tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -947,12 +946,13 @@ def db_load_plans() -> dict:
         return {"plans": {}}
     try:
         from uawos_context import get_tenant_id
+
         tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             "SELECT id, objective_id, title, steps, cost_estimate, duration_estimate, resource_requirements, success_probability, status, version, risks, assumptions, is_alternative, history, tenant_id FROM uawos_plans WHERE tenant_id = %s;",
-            (tenant_id,)
+            (tenant_id,),
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -964,36 +964,22 @@ def db_load_plans() -> dict:
                 "id": r[0],
                 "objective_id": r[1],
                 "title": r[2],
-                "steps": (
-                    r[3]
-                    if isinstance(r[3], list)
-                    else json.loads(r[3] if isinstance(r[3], str) else "[]")
-                ),
+                "steps": (r[3] if isinstance(r[3], list) else json.loads(r[3] if isinstance(r[3], str) else "[]")),
                 "cost_estimate": float(r[4]),
                 "duration_estimate": int(r[5]),
                 "resource_requirements": (
-                    r[6]
-                    if isinstance(r[6], list)
-                    else json.loads(r[6] if isinstance(r[6], str) else "[]")
+                    r[6] if isinstance(r[6], list) else json.loads(r[6] if isinstance(r[6], str) else "[]")
                 ),
                 "success_probability": float(r[7]),
                 "status": r[8],
                 "version": int(r[9]),
-                "risks": (
-                    r[10]
-                    if isinstance(r[10], list)
-                    else json.loads(r[10] if isinstance(r[10], str) else "[]")
-                ),
+                "risks": (r[10] if isinstance(r[10], list) else json.loads(r[10] if isinstance(r[10], str) else "[]")),
                 "assumptions": (
-                    r[11]
-                    if isinstance(r[11], list)
-                    else json.loads(r[11] if isinstance(r[11], str) else "[]")
+                    r[11] if isinstance(r[11], list) else json.loads(r[11] if isinstance(r[11], str) else "[]")
                 ),
                 "is_alternative": bool(r[12]),
                 "history": (
-                    r[13]
-                    if isinstance(r[13], list)
-                    else json.loads(r[13] if isinstance(r[13], str) else "[]")
+                    r[13] if isinstance(r[13], list) else json.loads(r[13] if isinstance(r[13], str) else "[]")
                 ),
                 "tenant_id": r[14],
             }
@@ -1011,6 +997,7 @@ def db_save_workflow(wf: dict):
         tenant_id = wf.get("tenant_id")
         if not tenant_id or tenant_id == "default_tenant":
             from uawos_context import get_tenant_id
+
             tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -1054,12 +1041,13 @@ def db_load_workflows() -> dict:
         return {"workflows": {}}
     try:
         from uawos_context import get_tenant_id
+
         tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             "SELECT id, plan_id, title, tasks, dependencies, state, version, governed, history, tenant_id FROM uawos_workflows WHERE tenant_id = %s;",
-            (tenant_id,)
+            (tenant_id,),
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -1071,24 +1059,14 @@ def db_load_workflows() -> dict:
                 "id": r[0],
                 "plan_id": r[1],
                 "title": r[2],
-                "tasks": (
-                    r[3]
-                    if isinstance(r[3], list)
-                    else json.loads(r[3] if isinstance(r[3], str) else "[]")
-                ),
+                "tasks": (r[3] if isinstance(r[3], list) else json.loads(r[3] if isinstance(r[3], str) else "[]")),
                 "dependencies": (
-                    r[4]
-                    if isinstance(r[4], list)
-                    else json.loads(r[4] if isinstance(r[4], str) else "[]")
+                    r[4] if isinstance(r[4], list) else json.loads(r[4] if isinstance(r[4], str) else "[]")
                 ),
                 "state": r[5],
                 "version": int(r[6]),
                 "governed": bool(r[7]),
-                "history": (
-                    r[8]
-                    if isinstance(r[8], list)
-                    else json.loads(r[8] if isinstance(r[8], str) else "[]")
-                ),
+                "history": (r[8] if isinstance(r[8], list) else json.loads(r[8] if isinstance(r[8], str) else "[]")),
                 "tenant_id": r[9],
             }
         return {"workflows": wfs}
@@ -1105,6 +1083,7 @@ def db_save_action(act: dict):
         tenant_id = act.get("tenant_id")
         if not tenant_id or tenant_id == "default_tenant":
             from uawos_context import get_tenant_id
+
             tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -1150,12 +1129,13 @@ def db_load_actions() -> dict:
         return {"actions": {}}
     try:
         from uawos_context import get_tenant_id
+
         tenant_id = get_tenant_id()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             "SELECT id, workflow_id, name, owner, dependencies, priority, budget, deadline, status, approval_required, tenant_id FROM uawos_actions WHERE tenant_id = %s;",
-            (tenant_id,)
+            (tenant_id,),
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -1169,9 +1149,7 @@ def db_load_actions() -> dict:
                 "name": r[2],
                 "owner": r[3],
                 "dependencies": (
-                    r[4]
-                    if isinstance(r[4], list)
-                    else json.loads(r[4] if isinstance(r[4], str) else "[]")
+                    r[4] if isinstance(r[4], list) else json.loads(r[4] if isinstance(r[4], str) else "[]")
                 ),
                 "priority": r[5],
                 "budget": float(r[6]),
@@ -1184,6 +1162,8 @@ def db_load_actions() -> dict:
     except Exception as e:
         print(f"Database error loading actions: {e}")
         return {"actions": {}}
+
+
 # Channels
 def db_create_channel(channel_id: str, name: str, tenant_id: str = "default_tenant") -> dict:
     if not DB_AVAILABLE:
@@ -1198,7 +1178,7 @@ def db_create_channel(channel_id: str, name: str, tenant_id: str = "default_tena
             ON CONFLICT (channel_id) DO UPDATE
             SET name = EXCLUDED.name, tenant_id = EXCLUDED.tenant_id;
             """,
-            (channel_id, name, tenant_id)
+            (channel_id, name, tenant_id),
         )
         conn.commit()
         cursor.close()
@@ -1207,6 +1187,7 @@ def db_create_channel(channel_id: str, name: str, tenant_id: str = "default_tena
     except Exception as e:
         print(f"db_create_channel error: {e}")
         return {}
+
 
 def db_add_channel_member(channel_id: str, user_id: str, tenant_id: str = "default_tenant") -> bool:
     if not DB_AVAILABLE:
@@ -1220,7 +1201,7 @@ def db_add_channel_member(channel_id: str, user_id: str, tenant_id: str = "defau
             VALUES (%s, %s, %s)
             ON CONFLICT (channel_id, user_id) DO NOTHING;
             """,
-            (channel_id, user_id, tenant_id)
+            (channel_id, user_id, tenant_id),
         )
         conn.commit()
         cursor.close()
@@ -1230,16 +1211,14 @@ def db_add_channel_member(channel_id: str, user_id: str, tenant_id: str = "defau
         print(f"db_add_channel_member error: {e}")
         return False
 
+
 def db_get_channel_members(channel_id: str) -> list:
     if not DB_AVAILABLE:
         return []
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT user_id FROM uawos_channel_members WHERE channel_id = %s;",
-            (channel_id,)
-        )
+        cursor.execute("SELECT user_id FROM uawos_channel_members WHERE channel_id = %s;", (channel_id,))
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -1248,16 +1227,14 @@ def db_get_channel_members(channel_id: str) -> list:
         print(f"db_get_channel_members error: {e}")
         return []
 
+
 def db_get_channels(tenant_id: str = "default_tenant") -> list:
     if not DB_AVAILABLE:
         return []
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT channel_id, name FROM uawos_channels WHERE tenant_id = %s;",
-            (tenant_id,)
-        )
+        cursor.execute("SELECT channel_id, name FROM uawos_channels WHERE tenant_id = %s;", (tenant_id,))
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -1266,8 +1243,17 @@ def db_get_channels(tenant_id: str = "default_tenant") -> list:
         print(f"db_get_channels error: {e}")
         return []
 
+
 # Artifacts
-def db_save_artifact(artifact_id: str, name: str, file_path: str, file_hash: str, objective_id: str = None, action_id: str = None, tenant_id: str = "default_tenant") -> dict:
+def db_save_artifact(
+    artifact_id: str,
+    name: str,
+    file_path: str,
+    file_hash: str,
+    objective_id: str = None,
+    action_id: str = None,
+    tenant_id: str = "default_tenant",
+) -> dict:
     if not DB_AVAILABLE:
         return {}
     try:
@@ -1281,7 +1267,7 @@ def db_save_artifact(artifact_id: str, name: str, file_path: str, file_hash: str
             SET name = EXCLUDED.name, file_path = EXCLUDED.file_path, file_hash = EXCLUDED.file_hash,
                 objective_id = EXCLUDED.objective_id, action_id = EXCLUDED.action_id, tenant_id = EXCLUDED.tenant_id;
             """,
-            (artifact_id, name, file_path, file_hash, objective_id, action_id, tenant_id)
+            (artifact_id, name, file_path, file_hash, objective_id, action_id, tenant_id),
         )
         conn.commit()
         cursor.close()
@@ -1293,11 +1279,12 @@ def db_save_artifact(artifact_id: str, name: str, file_path: str, file_hash: str
             "file_hash": file_hash,
             "objective_id": objective_id,
             "action_id": action_id,
-            "tenant_id": tenant_id
+            "tenant_id": tenant_id,
         }
     except Exception as e:
         print(f"db_save_artifact error: {e}")
         return {}
+
 
 def db_get_action_artifacts(action_id: str) -> list:
     if not DB_AVAILABLE:
@@ -1307,7 +1294,7 @@ def db_get_action_artifacts(action_id: str) -> list:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT artifact_id, name, file_path, file_hash, objective_id, action_id, tenant_id FROM uawos_artifacts WHERE action_id = %s;",
-            (action_id,)
+            (action_id,),
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -1320,7 +1307,7 @@ def db_get_action_artifacts(action_id: str) -> list:
                 "file_hash": r[3],
                 "objective_id": r[4],
                 "action_id": r[5],
-                "tenant_id": r[6]
+                "tenant_id": r[6],
             }
             for r in rows
         ]
@@ -1328,12 +1315,14 @@ def db_get_action_artifacts(action_id: str) -> list:
         print(f"db_get_action_artifacts error: {e}")
         return []
 
+
 # Subscriptions
 def db_save_subscription(tenant_id: str, plan_type: str, status: str, expires_at_timestamp: float = None) -> dict:
     if not DB_AVAILABLE:
         return {}
     try:
         import datetime
+
         expires_at = datetime.datetime.fromtimestamp(expires_at_timestamp) if expires_at_timestamp else None
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -1344,15 +1333,21 @@ def db_save_subscription(tenant_id: str, plan_type: str, status: str, expires_at
             ON CONFLICT (tenant_id) DO UPDATE
             SET plan_type = EXCLUDED.plan_type, status = EXCLUDED.status, expires_at = EXCLUDED.expires_at;
             """,
-            (tenant_id, plan_type, status, expires_at)
+            (tenant_id, plan_type, status, expires_at),
         )
         conn.commit()
         cursor.close()
         conn.close()
-        return {"tenant_id": tenant_id, "plan_type": plan_type, "status": status, "expires_at": str(expires_at) if expires_at else None}
+        return {
+            "tenant_id": tenant_id,
+            "plan_type": plan_type,
+            "status": status,
+            "expires_at": str(expires_at) if expires_at else None,
+        }
     except Exception as e:
         print(f"db_save_subscription error: {e}")
         return {}
+
 
 def db_get_subscription(tenant_id: str) -> dict:
     if not DB_AVAILABLE:
@@ -1362,7 +1357,7 @@ def db_get_subscription(tenant_id: str) -> dict:
         cursor = conn.cursor()
         cursor.execute(
             "SELECT tenant_id, plan_type, status, expires_at FROM uawos_subscriptions WHERE tenant_id = %s;",
-            (tenant_id,)
+            (tenant_id,),
         )
         row = cursor.fetchone()
         cursor.close()
@@ -1372,7 +1367,7 @@ def db_get_subscription(tenant_id: str) -> dict:
                 "tenant_id": row[0],
                 "plan_type": row[1],
                 "status": row[2],
-                "expires_at": str(row[3]) if row[3] else None
+                "expires_at": str(row[3]) if row[3] else None,
             }
         return {}
     except Exception as e:

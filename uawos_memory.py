@@ -2,16 +2,13 @@
 import json
 import os
 import time
-import uuid
 import urllib.request
-
-from uawos_state_utils import load_state, save_state
+import uuid
 
 import uawos_db
+from uawos_state_utils import load_state, save_state
 
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_memory_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_memory_state.json")
 
 
 def get_default_state() -> dict:
@@ -34,6 +31,7 @@ def get_default_state() -> dict:
         },
     }
 
+
 # FR-121 to FR-130: Append Memory
 def append_memory(
     content: str,
@@ -46,9 +44,7 @@ def append_memory(
 
     # Enforce Governance (FR-126)
     if governance_check and "secret" in content.lower():
-        raise ValueError(
-            "Governance rule violation: Memory cannot store plain secret/credential data."
-        )
+        raise ValueError("Governance rule violation: Memory cannot store plain secret/credential data.")
 
     index = len(state["memory_logs"])
     entry = {
@@ -108,13 +104,12 @@ def apply_retention_policy(retention_seconds: int):
     cutoff = int(time.time()) - retention_seconds
     for entry in state["memory_logs"]:
         if entry["timestamp"] < cutoff and entry["status"] == "active":
-            entry["status"] = (
-                "archived"  # Historical preservation (no physical deletion)
-            )
+            entry["status"] = "archived"  # Historical preservation (no physical deletion)
     save_state(state)
 
 
 # ----------------- STM & Episodic Memory Upgrade (Level 5.0) -----------------
+
 
 def create_stm_session(tenant_id: str, actor_owner: str) -> str:
     """Create a new short-term memory session in the database."""
@@ -129,7 +124,7 @@ def create_stm_session(tenant_id: str, actor_owner: str) -> str:
             INSERT INTO uawos_stm_sessions (session_id, tenant_id, actor_owner, status)
             VALUES (%s, %s, %s, 'active');
             """,
-            (session_id, tenant_id, actor_owner)
+            (session_id, tenant_id, actor_owner),
         )
         conn.commit()
         cursor.close()
@@ -154,7 +149,7 @@ def add_stm_message(session_id: str, sender: str, content: str, parent_message_i
             VALUES (%s, %s, %s, %s, %s)
             RETURNING id;
             """,
-            (session_id, sender, content, token_count, parent_message_id)
+            (session_id, sender, content, token_count, parent_message_id),
         )
         row = cursor.fetchone()
         inserted_id = row[0] if row else None
@@ -181,7 +176,7 @@ def get_stm_sliding_context(session_id: str, max_tokens: int = 1500) -> list:
             WHERE session_id = %s
             ORDER BY created_at ASC;
             """,
-            (session_id,)
+            (session_id,),
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -195,14 +190,16 @@ def get_stm_sliding_context(session_id: str, max_tokens: int = 1500) -> list:
             if accumulated_tokens + t_count > max_tokens:
                 break
             accumulated_tokens += t_count
-            messages.append({
-                "sender": r[0],
-                "content": r[1],
-                "token_count": t_count,
-                "created_at": str(r[3]),
-                "id": r[4],
-                "parent_message_id": r[5]
-            })
+            messages.append(
+                {
+                    "sender": r[0],
+                    "content": r[1],
+                    "token_count": t_count,
+                    "created_at": str(r[3]),
+                    "id": r[4],
+                    "parent_message_id": r[5],
+                }
+            )
         return list(reversed(messages))
     except Exception as e:
         print(f"get_stm_sliding_context error: {e}")
@@ -226,7 +223,7 @@ def update_agent_scratchpad(agent_id: str, session_id: str, thought_process: str
                 active_plan_step = EXCLUDED.active_plan_step,
                 updated_at = CURRENT_TIMESTAMP;
             """,
-            (agent_id, session_id, thought_process, active_plan_step)
+            (agent_id, session_id, thought_process, active_plan_step),
         )
         conn.commit()
         cursor.close()
@@ -248,7 +245,7 @@ def get_agent_scratchpad(agent_id: str) -> dict:
             FROM uawos_stm_agent_scratchpad
             WHERE agent_id = %s;
             """,
-            (agent_id,)
+            (agent_id,),
         )
         row = cursor.fetchone()
         cursor.close()
@@ -259,7 +256,7 @@ def get_agent_scratchpad(agent_id: str) -> dict:
                 "session_id": row[0],
                 "thought_process": row[1],
                 "active_plan_step": row[2],
-                "updated_at": str(row[3])
+                "updated_at": str(row[3]),
             }
         return {}
     except Exception as e:
@@ -280,7 +277,7 @@ def create_episode(session_id: str, objective_id: str, summary: str) -> str:
             INSERT INTO uawos_episodic_episodes (episode_id, session_id, objective_id, summary, status)
             VALUES (%s, %s, %s, %s, 'in_progress');
             """,
-            (episode_id, session_id, objective_id, summary)
+            (episode_id, session_id, objective_id, summary),
         )
         conn.commit()
         cursor.close()
@@ -303,7 +300,7 @@ def add_episode_event(episode_id: str, actor_id: str, event_type: str, content: 
             INSERT INTO uawos_episodic_events (episode_id, actor_id, event_type, content, telemetry)
             VALUES (%s, %s, %s, %s, %s);
             """,
-            (episode_id, actor_id, event_type, content, json.dumps(telemetry or {}))
+            (episode_id, actor_id, event_type, content, json.dumps(telemetry or {})),
         )
         conn.commit()
         cursor.close()
@@ -312,7 +309,9 @@ def add_episode_event(episode_id: str, actor_id: str, event_type: str, content: 
         print(f"add_episode_event error: {e}")
 
 
-def add_episode_decision(episode_id: str, recommendation_id: str, chosen_alternative: str, justification: str, causal_impact: dict = None):
+def add_episode_decision(
+    episode_id: str, recommendation_id: str, chosen_alternative: str, justification: str, causal_impact: dict = None
+):
     """Log a decision linked to the current execution episode."""
     if not uawos_db.DB_AVAILABLE:
         return
@@ -325,7 +324,14 @@ def add_episode_decision(episode_id: str, recommendation_id: str, chosen_alterna
             INSERT INTO uawos_episodic_decisions (decision_id, episode_id, recommendation_id, chosen_alternative, justification, causal_impact)
             VALUES (%s, %s, %s, %s, %s, %s);
             """,
-            (decision_id, episode_id, recommendation_id, chosen_alternative, justification, json.dumps(causal_impact or {}))
+            (
+                decision_id,
+                episode_id,
+                recommendation_id,
+                chosen_alternative,
+                justification,
+                json.dumps(causal_impact or {}),
+            ),
         )
         conn.commit()
         cursor.close()
@@ -348,7 +354,7 @@ def get_episode_timeline(episode_id: str) -> list:
             WHERE episode_id = %s
             ORDER BY created_at ASC;
             """,
-            (episode_id,)
+            (episode_id,),
         )
         rows = cursor.fetchall()
         cursor.close()
@@ -360,7 +366,7 @@ def get_episode_timeline(episode_id: str) -> list:
                 "event_type": r[2],
                 "content": r[3],
                 "telemetry": r[4],
-                "created_at": str(r[5])
+                "created_at": str(r[5]),
             }
             for r in rows
         ]
@@ -407,7 +413,7 @@ def reflect_on_episode(episode_id: str) -> dict:
     timeline = get_episode_timeline(episode_id)
     if not timeline:
         return {}
-    
+
     events_summary = " ".join([f"{e['actor_id']} - {e['content']}" for e in timeline])
     reflection_text = f"Continuous learning summary of events: {events_summary[:200]}"
     try:
@@ -425,12 +431,13 @@ def reflect_on_episode(episode_id: str) -> dict:
         pass
 
     import uawos_knowledge
+
     asset = uawos_knowledge.create_knowledge_asset(
         title=f"Reflected Best Practice - Episode {episode_id[:8]}",
         content=reflection_text,
         source_type="best_practice",
         source_uri=f"internal://reflection/{episode_id}",
-        provenance="Autonomous Reflection Service"
+        provenance="Autonomous Reflection Service",
     )
 
     if uawos_db.DB_AVAILABLE:
@@ -439,14 +446,14 @@ def reflect_on_episode(episode_id: str) -> dict:
             cursor = conn.cursor()
             cursor.execute(
                 "UPDATE uawos_episodic_episodes SET status = 'completed', end_time = CURRENT_TIMESTAMP WHERE episode_id = %s;",
-                (episode_id,)
+                (episode_id,),
             )
             conn.commit()
             cursor.close()
             conn.close()
         except Exception as e:
             print(f"Failed to update episode status: {e}")
-            
+
     return asset
 
 
@@ -458,7 +465,9 @@ def auto_consolidate_memories(similarity_threshold: float = 0.92) -> list:
     try:
         conn = uawos_db.get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT asset_id, content, title FROM uawos_semantic_knowledge WHERE source_type != 'reconciled';")
+        cursor.execute(
+            "SELECT asset_id, content, title FROM uawos_semantic_knowledge WHERE source_type != 'reconciled';"
+        )
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -472,6 +481,7 @@ def auto_consolidate_memories(similarity_threshold: float = 0.92) -> list:
 
         visited = set()
         import uawos_knowledge
+
         for i in range(len(rows)):
             id_i, content_i, title_i = rows[i]
             if id_i in visited:
@@ -484,10 +494,7 @@ def auto_consolidate_memories(similarity_threshold: float = 0.92) -> list:
                 if score >= similarity_threshold:
                     visited.add(id_j)
                     reconciled = uawos_knowledge.reconcile_contradictions(id_i, id_j, "latest_timestamp")
-                    consolidated.append({
-                        "merged_from": [id_i, id_j],
-                        "reconciled_asset_id": reconciled["id"]
-                    })
+                    consolidated.append({"merged_from": [id_i, id_j], "reconciled_asset_id": reconciled["id"]})
         return consolidated
     except Exception as e:
         print(f"auto_consolidate_memories error: {e}")
@@ -540,9 +547,7 @@ def verify_fr_126():
 def verify_fr_127():
     state = load_state()
     # verify entry 0 has original_content preserved
-    assert (
-        "original_content" in state["memory_logs"][0]
-    ), "Historical preservation failed."
+    assert "original_content" in state["memory_logs"][0], "Historical preservation failed."
     return True
 
 

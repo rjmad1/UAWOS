@@ -1,15 +1,9 @@
 # uawos_resource.py
-import json
 import os
-import time
 
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_resource_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_resource_state.json")
 
 
 def get_default_state() -> dict:
@@ -46,9 +40,7 @@ def get_default_state() -> dict:
 
 
 # Core API
-def create_resource(
-    name: str, category: str, capacity: int, constraints: list = None
-) -> dict:
+def create_resource(name: str, category: str, capacity: int, constraints: list = None) -> dict:
     """Manage platform resources (FR-141, FR-142, FR-149)."""
     state = load_state()
     rid = f"RES-{len(state['resources']) + 1:02d}"
@@ -82,9 +74,7 @@ def allocate_resource(
 
     # Governance validation
     if governance_check and amount > res["capacity"]:
-        raise ValueError(
-            "Governance violation: Allocation request exceeds maximum resource capacity."
-        )
+        raise ValueError("Governance violation: Allocation request exceeds maximum resource capacity.")
 
     aid = f"ALL-{len(state['allocations']) + 1:02d}"
     allocation = {
@@ -117,10 +107,7 @@ def detect_resource_conflicts() -> list:
                 if a1["id"] == a2["id"]:
                     continue
                 # Overlap logic
-                if not (
-                    a1["end_time"] <= a2["start_time"]
-                    or a1["start_time"] >= a2["end_time"]
-                ):
+                if not (a1["end_time"] <= a2["start_time"] or a1["start_time"] >= a2["end_time"]):
                     total_allocated += a2["allocated_amount"]
                     overlaps.append(a2["id"])
             if total_allocated > res["capacity"]:
@@ -150,9 +137,7 @@ def optimize_allocations() -> dict:
             alloc["start_time"] += 86400  # Shift 1 day
             alloc["end_time"] += 86400
             state["allocations"][aid] = alloc
-            optimizations.append(
-                f"Shifted allocation {aid} forward by 24h to optimize resource {conf['resource_id']}."
-            )
+            optimizations.append(f"Shifted allocation {aid} forward by 24h to optimize resource {conf['resource_id']}.")
 
     save_state(state)
     return {"status": "Optimized", "actions": optimizations}
@@ -161,9 +146,7 @@ def optimize_allocations() -> dict:
 # FR-146: Forecasting
 def forecast_resource_demand(resource_id: str) -> dict:
     state = load_state()
-    allocs = [
-        a for a in state["allocations"].values() if a["resource_id"] == resource_id
-    ]
+    allocs = [a for a in state["allocations"].values() if a["resource_id"] == resource_id]
     total_allocated = sum(a["allocated_amount"] for a in allocs)
     # Estimate forecast for next period
     forecast = total_allocated * 1.15
@@ -173,12 +156,14 @@ def forecast_resource_demand(resource_id: str) -> dict:
         "forecasted_demand": round(forecast, 2),
     }
 
+
 def run_predictive_budget_forecasting() -> dict:
     """Project demands dynamically using current active DB allocations (PG budget sums)."""
     total_db_budget = 0.0
     active_actions_count = 0
     try:
         import uawos_db
+
         if uawos_db.DB_AVAILABLE:
             conn = uawos_db.get_db_connection()
             cursor = conn.cursor()
@@ -207,7 +192,7 @@ def run_predictive_budget_forecasting() -> dict:
         "active_actions_evaluated": active_actions_count or 1,
         "current_budget_allocation": round(total_db_budget, 2),
         "projected_demand": round(projected_demand, 2),
-        "status": "Healthy"
+        "status": "Healthy",
     }
 
 
@@ -216,9 +201,7 @@ def simulate_allocations(simulation_details: dict) -> dict:
     # Estimate resource metrics under a simulated scenario
     return {
         "status": "Simulation Completed",
-        "predicted_conflict_probability": (
-            0.05 if simulation_details.get("hours", 0) < 40 else 0.85
-        ),
+        "predicted_conflict_probability": (0.05 if simulation_details.get("hours", 0) < 40 else 0.85),
         "efficiency_score": 94.5,
     }
 
@@ -229,13 +212,9 @@ def get_utilization_analytics(resource_id: str) -> dict:
     res = state["resources"].get(resource_id)
     if not res:
         raise ValueError("Resource not found.")
-    allocs = [
-        a for a in state["allocations"].values() if a["resource_id"] == resource_id
-    ]
+    allocs = [a for a in state["allocations"].values() if a["resource_id"] == resource_id]
     total_allocated = sum(a["allocated_amount"] for a in allocs)
-    util_rate = (
-        (total_allocated / res["capacity"]) * 100.0 if res["capacity"] > 0 else 0.0
-    )
+    util_rate = (total_allocated / res["capacity"]) * 100.0 if res["capacity"] > 0 else 0.0
     return {
         "resource_id": resource_id,
         "utilization_percentage": round(util_rate, 2),

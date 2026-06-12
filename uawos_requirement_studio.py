@@ -1,17 +1,10 @@
 # uawos_requirement_studio.py
-import json
 import os
 import time
-import urllib.error
-import urllib.request
 
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json")
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
 
 # Core Strategic Themes & Vision from PSCB/Adoption Roadmap
@@ -53,6 +46,7 @@ def get_default_state() -> dict:
         "resequenced_portfolio": [],
     }
 
+
 # Phase 2: Ingestion & Analysis
 def ingest_requirement(text: str, llm_enrichment: dict = None) -> dict:
     """Analyze raw requirement text for completeness, readiness, and structure (Phase 2)."""
@@ -60,21 +54,63 @@ def ingest_requirement(text: str, llm_enrichment: dict = None) -> dict:
 
     # Completeness checklist scoring
     checklist = {
-        "has_objective": any(w in text_lower for w in ["objective", "goal", "achieve", "improve", "build", "add", "support", "implement", "enable", "solve"]),
-        "has_user_context": any(w in text_lower for w in ["user", "customer", "stakeholder", "persona", "team", "enterprise", "tenant", "sign-in"]),
-        "has_business_value": any(w in text_lower for w in ["value", "roi", "revenue", "cost", "saving", "efficiency", "budget", "business"]),
-        "has_technical_detail": any(w in text_lower for w in ["api", "database", "service", "system", "integration", "module", "integrate", "protocol", "interface"]),
-        "has_timeline": any(w in text_lower for w in ["sprint", "quarter", "milestone", "date", "deadline", "release", "week", "month", "within"]),
-        "has_acceptance_criteria": any(w in text_lower for w in ["must", "shall", "should", "criteria", "accept", "verify", "success", "metric", "latency"]),
-        "has_dependencies": any(w in text_lower for w in ["depends", "requires", "linked", "after", "prerequisite", "scope", "exclude", "include"]),
-        "has_risk_awareness": any(w in text_lower for w in ["risk", "concern", "issue", "challenge", "compliance", "security", "vulnerability", "constraint"]),
+        "has_objective": any(
+            w in text_lower
+            for w in [
+                "objective",
+                "goal",
+                "achieve",
+                "improve",
+                "build",
+                "add",
+                "support",
+                "implement",
+                "enable",
+                "solve",
+            ]
+        ),
+        "has_user_context": any(
+            w in text_lower
+            for w in ["user", "customer", "stakeholder", "persona", "team", "enterprise", "tenant", "sign-in"]
+        ),
+        "has_business_value": any(
+            w in text_lower for w in ["value", "roi", "revenue", "cost", "saving", "efficiency", "budget", "business"]
+        ),
+        "has_technical_detail": any(
+            w in text_lower
+            for w in [
+                "api",
+                "database",
+                "service",
+                "system",
+                "integration",
+                "module",
+                "integrate",
+                "protocol",
+                "interface",
+            ]
+        ),
+        "has_timeline": any(
+            w in text_lower
+            for w in ["sprint", "quarter", "milestone", "date", "deadline", "release", "week", "month", "within"]
+        ),
+        "has_acceptance_criteria": any(
+            w in text_lower
+            for w in ["must", "shall", "should", "criteria", "accept", "verify", "success", "metric", "latency"]
+        ),
+        "has_dependencies": any(
+            w in text_lower
+            for w in ["depends", "requires", "linked", "after", "prerequisite", "scope", "exclude", "include"]
+        ),
+        "has_risk_awareness": any(
+            w in text_lower
+            for w in ["risk", "concern", "issue", "challenge", "compliance", "security", "vulnerability", "constraint"]
+        ),
     }
     completeness_score = int(sum(checklist.values()) / len(checklist) * 100)
 
     parsed_problem = (
-        llm_enrichment.get("problem", "Extracted from context")
-        if llm_enrichment
-        else "Inferred problem context"
+        llm_enrichment.get("problem", "Extracted from context") if llm_enrichment else "Inferred problem context"
     )
     parsed_scope = (
         llm_enrichment.get("scope", ["Core functionality definition"])
@@ -90,12 +126,7 @@ def ingest_requirement(text: str, llm_enrichment: dict = None) -> dict:
     # Readiness Score logic
     # Base readiness is completeness, scaled down if high technical complexity words exist
     complexity_penalty = (
-        15
-        if any(
-            w in text_lower
-            for w in ["complex", "sast", "compliance", "distribute", "latency"]
-        )
-        else 0
+        15 if any(w in text_lower for w in ["complex", "sast", "compliance", "distribute", "latency"]) else 0
     )
     readiness_score = max(10, min(100, completeness_score - complexity_penalty))
 
@@ -116,10 +147,7 @@ def analyze_strategic_fit(text: str) -> dict:
 
     # Heuristic scoring based on key terms matching Themes
     theme_matches = {
-        "Theme-1": any(
-            w in text_lower
-            for w in ["workspace", "local", "docker", "setup", "dashboard", "engine"]
-        ),
+        "Theme-1": any(w in text_lower for w in ["workspace", "local", "docker", "setup", "dashboard", "engine"]),
         "Theme-2": any(
             w in text_lower
             for w in [
@@ -168,40 +196,18 @@ def analyze_strategic_fit(text: str) -> dict:
     # Scores (0-100)
     alignment_score = min(
         100,
-        40
-        + len(matched_themes) * 15
-        + (
-            15
-            if any(w in text_lower for w in ["vision", "mission", "objective"])
-            else 0
-        ),
+        40 + len(matched_themes) * 15 + (15 if any(w in text_lower for w in ["vision", "mission", "objective"]) else 0),
     )
 
     # Impact calculations
     strategic_impact = min(100, 35 + len(matched_themes) * 20)
     business_value = min(
         100,
-        45
-        + (
-            25
-            if any(
-                w in text_lower
-                for w in ["value", "cost", "revenue", "saving", "efficiency"]
-            )
-            else 10
-        ),
+        45 + (25 if any(w in text_lower for w in ["value", "cost", "revenue", "saving", "efficiency"]) else 10),
     )
     user_value = min(
         100,
-        50
-        + (
-            25
-            if any(
-                w in text_lower
-                for w in ["user", "experience", "persona", "simpl", "interface"]
-            )
-            else 10
-        ),
+        50 + (25 if any(w in text_lower for w in ["user", "experience", "persona", "simpl", "interface"]) else 10),
     )
 
     return {
@@ -220,9 +226,7 @@ def generate_critique(text: str) -> dict:
     """Act as Product Leader, Strategist, Business Analyst, and Domain Expert to perform Gap/Risk/Dependency analysis."""
     text_lower = text.lower()
 
-    strengths = [
-        "Strong alignment with core UAWOS objective-centric execution architecture."
-    ]
+    strengths = ["Strong alignment with core UAWOS objective-centric execution architecture."]
     weaknesses = []
     missing_info = []
     risks = []
@@ -230,57 +234,33 @@ def generate_critique(text: str) -> dict:
 
     # Critique logic based on text content
     if len(text) < 100:
-        weaknesses.append(
-            "Submission is very brief, lacking necessary operational details."
-        )
-        missing_info.append(
-            "Detailed technical integration scopes and user interaction flows."
-        )
-        improvements.append(
-            "Elaborate on specific inputs, triggers, and expected outputs of this capability."
-        )
+        weaknesses.append("Submission is very brief, lacking necessary operational details.")
+        missing_info.append("Detailed technical integration scopes and user interaction flows.")
+        improvements.append("Elaborate on specific inputs, triggers, and expected outputs of this capability.")
 
     if "security" not in text_lower and "governance" not in text_lower:
-        risks.append(
-            "Lacks explicit security governance bounds or rego policy declarations."
-        )
+        risks.append("Lacks explicit security governance bounds or rego policy declarations.")
         missing_info.append("OPA policy controls and verification checks.")
-        improvements.append(
-            "Incorporate explicit security compliance requirements and check rules."
-        )
+        improvements.append("Incorporate explicit security compliance requirements and check rules.")
 
     if "dependency" not in text_lower and "integration" not in text_lower:
         risks.append("Undocumented system and package dependencies.")
-        improvements.append(
-            "Link the requirement with the existing platform capability catalogs."
-        )
+        improvements.append("Link the requirement with the existing platform capability catalogs.")
 
     if "gpl" in text_lower or "copyleft" in text_lower or "marker" in text_lower:
-        risks.append(
-            "Severe GPLv3 copyleft contamination risk: code must remain strictly isolated."
-        )
+        risks.append("Severe GPLv3 copyleft contamination risk: code must remain strictly isolated.")
         strengths.append("Proactively identifies legal and licensing risk elements.")
-        improvements.append(
-            "Use a REST API container boundary to isolate GPLv3 packages."
-        )
+        improvements.append("Use a REST API container boundary to isolate GPLv3 packages.")
 
     # Default fill if empty
     if not weaknesses:
-        weaknesses.append(
-            "Heuristic parsing might overlook hidden technical complexities in high-load scenarios."
-        )
+        weaknesses.append("Heuristic parsing might overlook hidden technical complexities in high-load scenarios.")
     if not missing_info:
-        missing_info.append(
-            "Resource utilization capacity estimates for concurrent agent operations."
-        )
+        missing_info.append("Resource utilization capacity estimates for concurrent agent operations.")
     if not risks:
-        risks.append(
-            "Infrastructure capacity drift if active agent instances scale up rapidly."
-        )
+        risks.append("Infrastructure capacity drift if active agent instances scale up rapidly.")
     if not improvements:
-        improvements.append(
-            "Provide detailed user story acceptance criteria matching the 17-section layout."
-        )
+        improvements.append("Provide detailed user story acceptance criteria matching the 17-section layout.")
 
     return {
         "strengths": strengths,
@@ -371,35 +351,27 @@ def generate_clarification_questions(text: str) -> list:
 
     # Tailor based on key terms
     if "sso" in text_lower or "auth" in text_lower:
-        base_questions[1][
-            "question"
-        ] = "Which identity federation protocols (SAML, OIDC) should be enabled for auth?"
-        base_questions[1][
-            "rationale"
-        ] = "Ensures integration with Okta or Azure AD schemas."
+        base_questions[1]["question"] = "Which identity federation protocols (SAML, OIDC) should be enabled for auth?"
+        base_questions[1]["rationale"] = "Ensures integration with Okta or Azure AD schemas."
 
     if "sast" in text_lower or "code" in text_lower:
-        base_questions[6][
-            "question"
-        ] = "Which static scanning rulesets (Semgrep, Gitleaks) are mandatory for verification?"
-        base_questions[6][
-            "rationale"
-        ] = "Ensures integration with existing git hook configurations."
+        base_questions[6]["question"] = (
+            "Which static scanning rulesets (Semgrep, Gitleaks) are mandatory for verification?"
+        )
+        base_questions[6]["rationale"] = "Ensures integration with existing git hook configurations."
 
     return base_questions
 
 
 # Phase 6: Requirement Authoring Workspace
-def generate_strategic_product_proposition(
-    req_id: str, title: str, text: str, answers: dict
-) -> dict:
+def generate_strategic_product_proposition(req_id: str, title: str, text: str, answers: dict) -> dict:
     """Generate the 17-section Strategic Product Proposition (Sections A to Q)."""
 
     prop = {
         "A_Executive_Summary": f"This proposition outlines the strategic implementation of '{title}' inside the UAWOS ecosystem. It establishes a governance-native, objective-centric framework to support this feature.",
         "B_Problem_Statement": f"Currently, the platform lacks dedicated support for '{title}', leading to manual overhead, isolated capabilities, and gaps in strategic product management governance.",
         "C_Opportunity_Statement": f"By integrating '{title}', UAWOS can automate execution, capture structured metadata, and increase value-to-cost efficiency by 25% across corresponding workspaces.",
-        "D_Strategic_Alignment": f"Directly aligns with UAWOS Strategic Themes, supporting enterprise scaling, governed AI workflows, and single-source-of-truth roadmap alignment.",
+        "D_Strategic_Alignment": "Directly aligns with UAWOS Strategic Themes, supporting enterprise scaling, governed AI workflows, and single-source-of-truth roadmap alignment.",
         "E_Business_Value": "Reduces operational friction, minimizes tech debt growth, and increases ROI by enabling automated priority audit logs.",
         "F_User_Value": "Empowers product managers, CPOs, and enterprise architects with live visual feedback, detailed critique logs, and real-time portfolio sequencing.",
         "G_Personas": "Chief Product Officer (CPO), Portfolio Management Lead, Enterprise Business Analyst, Principal Software Architect.",
@@ -411,8 +383,8 @@ def generate_strategic_product_proposition(
         ],
         "I_Non_Functional_Requirements": "Latency < 200ms for analysis API endpoints; compatibility with docker sandboxed execution; zero-trust access control policy compliance.",
         "J_User_Stories": [
-            f"As a CPO, I want to submit raw requirement documents so that I can automatically evaluate their strategic impact.",
-            f"As a Product Strategist, I want to answer clarification questions to increase the requirement readiness score.",
+            "As a CPO, I want to submit raw requirement documents so that I can automatically evaluate their strategic impact.",
+            "As a Product Strategist, I want to answer clarification questions to increase the requirement readiness score.",
         ],
         "K_Acceptance_Criteria": "Completeness score must exceed 80% to publish; all clarification questions must be answered or waived; candidate must receive portfolio rank placement.",
         "L_Dependencies": "Requires Qdrant vector index for RAG queries; requires SQLite/Postgres for state persistence; requires uawos_traceability integration.",
@@ -435,11 +407,7 @@ def generate_strategic_product_proposition(
 def create_roadmap_candidate(req_id: str, state: dict) -> dict:
     """Create a new roadmap candidate (CreateRoadmapCandidate API)."""
     # Auto-calculate next RD number
-    existing_rds = [
-        int(k[3:])
-        for k in state["roadmap_candidates"].keys()
-        if k.startswith("RD-") and k[3:].isdigit()
-    ]
+    existing_rds = [int(k[3:]) for k in state["roadmap_candidates"].keys() if k.startswith("RD-") and k[3:].isdigit()]
     # Also check existing hardcoded roadmap items (RD-01 to RD-04)
     all_rd_numbers = existing_rds + [1, 2, 3, 4]
     next_rd_num = max(all_rd_numbers) + 1
@@ -534,9 +502,7 @@ def re_sequence_roadmap(state: dict, active_candidate_id: str) -> list:
             candidates_list.append(
                 {
                     "id": cand["roadmap_id"],
-                    "name": state["requirements"][cand["origin_requirement_id"]][
-                        "title"
-                    ],
+                    "name": state["requirements"][cand["origin_requirement_id"]]["title"],
                     "priority_score": cand["priority_score"],
                     "effort": 15,  # Assumed effort
                 }
@@ -557,9 +523,7 @@ def re_sequence_roadmap(state: dict, active_candidate_id: str) -> list:
 
         # Calculate old rank (baselines are 1 to 4 in order: RD-01, RD-03, RD-02, RD-04 based on priority scores 90, 82, 75, 60)
         # Sort baselines alone to find old ranks
-        baseline_order = sorted(
-            baselines, key=lambda x: x["priority_score"], reverse=True
-        )
+        baseline_order = sorted(baselines, key=lambda x: x["priority_score"], reverse=True)
         old_rank = None
         if item["id"] in [b["id"] for b in baselines]:
             old_rank = [b["id"] for b in baseline_order].index(item["id"]) + 1
@@ -688,9 +652,7 @@ def author_proposition(req_id: str) -> dict:
     if not req:
         return {"error": f"Requirement {req_id} not found"}
 
-    prop = generate_strategic_product_proposition(
-        req_id, req["title"], req["raw_text"], req["clarification_answers"]
-    )
+    prop = generate_strategic_product_proposition(req_id, req["title"], req["raw_text"], req["clarification_answers"])
     req["product_proposition"] = prop
     req["status"] = "AUTHORED"
 
@@ -709,9 +671,7 @@ def absorb_requirement(req_id: str) -> dict:
     candidate = create_roadmap_candidate(req_id, state)
 
     # Phase 8: Prioritize
-    candidate = evaluate_priority(
-        candidate, req["ingestion_analysis"], req["strategic_analysis"]
-    )
+    candidate = evaluate_priority(candidate, req["ingestion_analysis"], req["strategic_analysis"])
 
     state["roadmap_candidates"][candidate["roadmap_id"]] = candidate
 
@@ -730,14 +690,7 @@ def absorb_requirement(req_id: str) -> dict:
 
     # Build complete Output Contract
     compared = [s["id"] for s in sequencing if s["id"] != candidate["roadmap_id"]]
-    new_rank = (
-        next(
-            idx
-            for idx, s in enumerate(sequencing)
-            if s["id"] == candidate["roadmap_id"]
-        )
-        + 1
-    )
+    new_rank = next(idx for idx, s in enumerate(sequencing) if s["id"] == candidate["roadmap_id"]) + 1
 
     output_contract = {
         "requirement_analysis": req["ingestion_analysis"],
@@ -798,9 +751,7 @@ def publish_roadmap_item(candidate_id: str) -> dict:
     return {"status": "PUBLISHED", "roadmap_id": candidate_id}
 
 
-def direct_ingest_to_backlog(
-    req_id: str, answers: dict = None, waive: bool = False
-) -> dict:
+def direct_ingest_to_backlog(req_id: str, answers: dict = None, waive: bool = False) -> dict:
     """Directly ingest, clarify, author, absorb, and publish a requirement in one step."""
     # 1. Update clarifications
     clarify_res = update_clarifications(req_id, answers or {}, waive=waive)
@@ -849,9 +800,7 @@ def run_self_tests():
     req_id = res["requirement_id"]
     print(f"  [PASS] submit_new_requirement created {req_id}")
     assert res["completeness_score"] > 60, "Ingest completeness score failed."
-    assert (
-        len(res["clarification_questions"]) == 10
-    ), "Clarification questions count should be exactly 10."
+    assert len(res["clarification_questions"]) == 10, "Clarification questions count should be exactly 10."
 
     # Test clarification
     clarify_res = update_clarifications(
@@ -859,29 +808,19 @@ def run_self_tests():
         {"Q1": "Latency must be < 50ms", "Q2": "Supports Okta OIDC"},
         waive=False,
     )
-    print(
-        f"  [PASS] update_clarifications completed: {clarify_res['clarification_status']}"
-    )
+    print(f"  [PASS] update_clarifications completed: {clarify_res['clarification_status']}")
 
     # Test authoring
     prop = author_proposition(req_id)
-    print(f"  [PASS] author_proposition completed sections A-Q")
-    assert (
-        "REQ-REQ-001-01" in prop["H_Functional_Requirements"][0]
-    ), "Functional requirements parsing failed."
+    print("  [PASS] author_proposition completed sections A-Q")
+    assert "REQ-REQ-001-01" in prop["H_Functional_Requirements"][0], "Functional requirements parsing failed."
 
     # Test absorption
     contract = absorb_requirement(req_id)
-    print(f"  [PASS] absorb_requirement completed")
-    assert (
-        contract["roadmap_candidate"]["roadmap_id"] == "RD-05"
-    ), "Candidate ID generation failed."
-    assert (
-        contract["roadmap_candidate"]["priority_score"] > 0
-    ), "Priority score calculation failed."
-    assert (
-        len(contract["sequencing_changes"]) == 5
-    ), "Re-sequencing count should be 5 (4 baselines + 1 candidate)."
+    print("  [PASS] absorb_requirement completed")
+    assert contract["roadmap_candidate"]["roadmap_id"] == "RD-05", "Candidate ID generation failed."
+    assert contract["roadmap_candidate"]["priority_score"] > 0, "Priority score calculation failed."
+    assert len(contract["sequencing_changes"]) == 5, "Re-sequencing count should be 5 (4 baselines + 1 candidate)."
 
     # Test publishing
     pub_res = publish_roadmap_item("RD-05")

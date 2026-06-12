@@ -4,8 +4,8 @@ Verifies thread-safe context propagation, database tenant filters,
 Qdrant vector filtering, and the removal of plaintext file fallbacks.
 """
 
-import sys
 import os
+import sys
 
 # Ensure project root is in path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,7 +15,7 @@ if project_root not in sys.path:
 import uawos_context
 import uawos_db
 import uawos_state_utils
-import uawos_objective
+
 
 def verify_relational_tenant_isolation():
     print("\n1. Verifying PostgreSQL Tenant Isolation...")
@@ -32,12 +32,12 @@ def verify_relational_tenant_isolation():
         cursor.close()
         conn.close()
     except Exception as e:
-         print(f"   [WARN] Database cleanup failed: {e}")
+        print(f"   [WARN] Database cleanup failed: {e}")
 
     # Set Context for Tenant A
     uawos_context.set_context("tenant_a", "Developer", "alice")
     print(f"   Active Tenant: {uawos_context.get_tenant_id()} | Actor: {uawos_context.get_actor_owner()}")
-    
+
     # Save Objective A
     obj_a = {
         "id": "TEST-OBJ-A",
@@ -54,7 +54,7 @@ def verify_relational_tenant_isolation():
         "confidence_score": 100.0,
         "dependencies": [],
         "history": [],
-        "tenant_id": "default_tenant" # should be overridden by context
+        "tenant_id": "default_tenant",  # should be overridden by context
     }
     uawos_db.db_save_objective(obj_a)
     print("   Saved Objective TEST-OBJ-A under Tenant A context.")
@@ -79,7 +79,7 @@ def verify_relational_tenant_isolation():
         "confidence_score": 95.0,
         "dependencies": [],
         "history": [],
-        "tenant_id": "default_tenant" # should be overridden by context
+        "tenant_id": "default_tenant",  # should be overridden by context
     }
     uawos_db.db_save_objective(obj_b)
     print("   Saved Objective TEST-OBJ-B under Tenant B context.")
@@ -158,7 +158,9 @@ def verify_no_file_fallbacks():
     # Modify and save state
     state["new_key"] = "new_val"
     uawos_state_utils.save_state(test_state_file, state)
-    assert not os.path.exists(test_state_file), "State utility should NOT write a plaintext state JSON file to disk during save."
+    assert not os.path.exists(test_state_file), (
+        "State utility should NOT write a plaintext state JSON file to disk during save."
+    )
     print("   Verified that no local JSON file was created during save.")
 
     # Re-load to verify database lookup returned the correct modified state
@@ -175,7 +177,7 @@ def verify_no_file_fallbacks():
         cursor.close()
         conn.close()
     except Exception as e:
-         print(f"   [WARN] Database cleanup of test state failed: {e}")
+        print(f"   [WARN] Database cleanup of test state failed: {e}")
 
     print("   [PASS] Plaintext File Fallback Decommissioning Verified Successfully.")
 
@@ -198,5 +200,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n[ERROR] Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

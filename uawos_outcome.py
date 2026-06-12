@@ -1,15 +1,10 @@
 # uawos_outcome.py
-import json
 import os
-import time
-
-from uawos_state_utils import load_state, save_state
 
 import uawos_db
+from uawos_state_utils import load_state, save_state
 
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_outcome_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_outcome_state.json")
 
 
 def get_default_state() -> dict:
@@ -47,6 +42,7 @@ def get_default_state() -> dict:
             },
         }
     }
+
 
 # FR-031 to FR-040: Create an Outcome
 def create_outcome(
@@ -93,9 +89,7 @@ def create_outcome(
 def get_objective_outcomes(objective_id: str) -> list:
     """Get all outcomes associated with a specific objective (FR-032)."""
     state = load_state()
-    return [
-        out for out in state["outcomes"].values() if out["objective_id"] == objective_id
-    ]
+    return [out for out in state["outcomes"].values() if out["objective_id"] == objective_id]
 
 
 def update_outcome(outcome_id: str, updates: dict) -> dict:
@@ -174,9 +168,7 @@ def verify_fr_032():
 
 def verify_fr_033():
     """Verify system supports outcome weighting."""
-    out = create_outcome(
-        "OBJ-101", "Weighted Outcome", "Conversion Rate", "percent", weight=0.75
-    )
+    out = create_outcome("OBJ-101", "Weighted Outcome", "Conversion Rate", "percent", weight=0.75)
     assert out["weight"] == 0.75, "Outcome weight not preserved."
     return True
 
@@ -224,27 +216,21 @@ def verify_fr_036():
 
 def verify_fr_037():
     """Verify system supports outcome ownership."""
-    out = create_outcome(
-        "OBJ-101", "Owned Outcome", "Conversion Rate", "percent", owner="Design Lead"
-    )
+    out = create_outcome("OBJ-101", "Owned Outcome", "Conversion Rate", "percent", owner="Design Lead")
     assert out["owner"] == "Design Lead", "Outcome owner not preserved."
     return True
 
 
 def verify_fr_038():
     """Verify system supports outcome baselines."""
-    out = create_outcome(
-        "OBJ-101", "Baseline Outcome", "Conversion Rate", "percent", baseline_state=12.5
-    )
+    out = create_outcome("OBJ-101", "Baseline Outcome", "Conversion Rate", "percent", baseline_state=12.5)
     assert out["baseline_state"] == 12.5, "Outcome baseline not preserved."
     return True
 
 
 def verify_fr_039():
     """Verify system supports outcome target states."""
-    out = create_outcome(
-        "OBJ-101", "Target Outcome", "Conversion Rate", "percent", target_state=95.0
-    )
+    out = create_outcome("OBJ-101", "Target Outcome", "Conversion Rate", "percent", target_state=95.0)
     assert out["target_state"] == 95.0, "Outcome target state not preserved."
     return True
 

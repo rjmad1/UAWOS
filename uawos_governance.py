@@ -2,16 +2,12 @@
 import json
 import os
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_governance_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_governance_state.json")
 
 OPA_HOST = os.environ.get("OPA_HOST", "127.0.0.1")
 OPA_PORT = int(os.environ.get("OPA_PORT", 8181))
@@ -185,7 +181,7 @@ def bootstrap_openfga() -> bool:
         url = f"{OPENFGA_URL}/stores"
         req = urllib.request.Request(url, method="GET")
         with urllib.request.urlopen(req, timeout=1.0) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
+            data = json.loads(resp.read().decode("utf-8"))
             stores = data.get("stores", [])
 
         for s in stores:
@@ -196,19 +192,19 @@ def bootstrap_openfga() -> bool:
         if not _fga_store_id:
             req = urllib.request.Request(
                 url,
-                data=json.dumps({"name": "uawos"}).encode('utf-8'),
+                data=json.dumps({"name": "uawos"}).encode("utf-8"),
                 headers={"Content-Type": "application/json"},
-                method="POST"
+                method="POST",
             )
             with urllib.request.urlopen(req, timeout=1.0) as resp:
-                res = json.loads(resp.read().decode('utf-8'))
+                res = json.loads(resp.read().decode("utf-8"))
                 _fga_store_id = res.get("id")
 
         # 2. Get or create authorization model
         model_url = f"{OPENFGA_URL}/stores/{_fga_store_id}/authorization-models"
         req = urllib.request.Request(model_url, method="GET")
         with urllib.request.urlopen(req, timeout=1.0) as resp:
-            data = json.loads(resp.read().decode('utf-8'))
+            data = json.loads(resp.read().decode("utf-8"))
             models = data.get("authorization_models", [])
 
         if models:
@@ -217,54 +213,36 @@ def bootstrap_openfga() -> bool:
             auth_model = {
                 "schema_version": "1.1",
                 "type_definitions": [
-                    {
-                        "type": "user"
-                    },
+                    {"type": "user"},
                     {
                         "type": "role",
-                        "relations": {
-                            "member": {
-                                "this": {}
-                            }
-                        },
-                        "metadata": {
-                            "relations": {
-                                "member": {
-                                    "directly_related_user_types": [
-                                        {"type": "user"}
-                                    ]
-                                }
-                            }
-                        }
+                        "relations": {"member": {"this": {}}},
+                        "metadata": {"relations": {"member": {"directly_related_user_types": [{"type": "user"}]}}},
                     },
                     {
                         "type": "action_category",
-                        "relations": {
-                            "permitted": {
-                                "this": {}
-                            }
-                        },
+                        "relations": {"permitted": {"this": {}}},
                         "metadata": {
                             "relations": {
                                 "permitted": {
                                     "directly_related_user_types": [
                                         {"type": "user"},
-                                        {"type": "role", "relation": "member"}
+                                        {"type": "role", "relation": "member"},
                                     ]
                                 }
                             }
-                        }
-                    }
-                ]
+                        },
+                    },
+                ],
             }
             req_model = urllib.request.Request(
                 model_url,
-                data=json.dumps(auth_model).encode('utf-8'),
+                data=json.dumps(auth_model).encode("utf-8"),
                 headers={"Content-Type": "application/json"},
-                method="POST"
+                method="POST",
             )
             with urllib.request.urlopen(req_model, timeout=1.0) as resp:
-                res_model = json.loads(resp.read().decode('utf-8'))
+                res_model = json.loads(resp.read().decode("utf-8"))
                 _fga_model_id = res_model.get("authorization_model_id")
 
         # 3. Seed static permission tuples individually
@@ -273,38 +251,29 @@ def bootstrap_openfga() -> bool:
         static_tuples = []
         # Budget roles
         for r in ["CEO", "Lead Engineer", "Database Expert", "Admin"]:
-            static_tuples.append({
-                "user": f"role:{sanitize_id(r)}#member",
-                "relation": "permitted",
-                "object": "action_category:budget"
-            })
+            static_tuples.append(
+                {"user": f"role:{sanitize_id(r)}#member", "relation": "permitted", "object": "action_category:budget"}
+            )
         # General roles (all valid roles)
         for r in ["CEO", "Lead Engineer", "Database Expert", "Developer", "Executor Agent", "Senior Engineer", "Admin"]:
-            static_tuples.append({
-                "user": f"role:{sanitize_id(r)}#member",
-                "relation": "permitted",
-                "object": "action_category:general"
-            })
+            static_tuples.append(
+                {"user": f"role:{sanitize_id(r)}#member", "relation": "permitted", "object": "action_category:general"}
+            )
 
         for t in static_tuples:
-            payload = {
-                "writes": {
-                    "tuple_keys": [t]
-                },
-                "authorization_model_id": _fga_model_id
-            }
+            payload = {"writes": {"tuple_keys": [t]}, "authorization_model_id": _fga_model_id}
             try:
                 req_write = urllib.request.Request(
                     write_url,
-                    data=json.dumps(payload).encode('utf-8'),
+                    data=json.dumps(payload).encode("utf-8"),
                     headers={"Content-Type": "application/json"},
-                    method="POST"
+                    method="POST",
                 )
                 with urllib.request.urlopen(req_write, timeout=1.0) as resp:
                     pass
             except urllib.error.HTTPError as he:
                 # Ignore duplicate writes
-                err_data = he.read().decode('utf-8')
+                err_data = he.read().decode("utf-8")
                 if "already exists" not in err_data:
                     pass
             except Exception:
@@ -328,26 +297,21 @@ def check_fga_authorization(actor: str, actor_role: str, category: str) -> bool:
     user_tuple = {
         "user": f"user:{sanitize_id(actor)}",
         "relation": "member",
-        "object": f"role:{sanitize_id(actor_role)}"
+        "object": f"role:{sanitize_id(actor_role)}",
     }
-    payload = {
-        "writes": {
-            "tuple_keys": [user_tuple]
-        },
-        "authorization_model_id": _fga_model_id
-    }
+    payload = {"writes": {"tuple_keys": [user_tuple]}, "authorization_model_id": _fga_model_id}
 
     try:
         req_write = urllib.request.Request(
             write_url,
-            data=json.dumps(payload).encode('utf-8'),
+            data=json.dumps(payload).encode("utf-8"),
             headers={"Content-Type": "application/json"},
-            method="POST"
+            method="POST",
         )
         with urllib.request.urlopen(req_write, timeout=1.0) as resp:
             pass
     except urllib.error.HTTPError as he:
-        err_data = he.read().decode('utf-8')
+        err_data = he.read().decode("utf-8")
         if "already exists" not in err_data:
             return None
     except Exception:
@@ -359,19 +323,19 @@ def check_fga_authorization(actor: str, actor_role: str, category: str) -> bool:
         "tuple_key": {
             "user": f"user:{sanitize_id(actor)}",
             "relation": "permitted",
-            "object": f"action_category:{mapped_cat}"
+            "object": f"action_category:{mapped_cat}",
         },
-        "authorization_model_id": _fga_model_id
+        "authorization_model_id": _fga_model_id,
     }
     try:
         req_check = urllib.request.Request(
             check_url,
-            data=json.dumps(check_payload).encode('utf-8'),
+            data=json.dumps(check_payload).encode("utf-8"),
             headers={"Content-Type": "application/json"},
-            method="POST"
+            method="POST",
         )
         with urllib.request.urlopen(req_check, timeout=1.0) as resp:
-            check_res = json.loads(resp.read().decode('utf-8'))
+            check_res = json.loads(resp.read().decode("utf-8"))
             return check_res.get("allowed", False)
     except Exception:
         return None
@@ -424,12 +388,12 @@ def evaluate_action_governance(action_id: str, action_details: dict) -> dict:
                 if category == "budget":
                     return {
                         "verdict": "REJECTED",
-                        "reason": f"Role Governance violation: Role '{actor_role}' is not authorized for budget actions."
+                        "reason": f"Role Governance violation: Role '{actor_role}' is not authorized for budget actions.",
                     }
                 else:
                     return {
                         "verdict": "REJECTED",
-                        "reason": f"Role Governance violation: Unrecognized or unauthorized role '{actor_role}'."
+                        "reason": f"Role Governance violation: Unrecognized or unauthorized role '{actor_role}'.",
                     }
 
     # 3. Try OPA engine REST verification
@@ -458,9 +422,7 @@ def evaluate_action_governance(action_id: str, action_details: dict) -> dict:
     approver = action_details.get("approver")
     if owner and approver and owner == approver:
         verdict = "REJECTED"
-        reason = (
-            "Separation of Duties violation: Action owner/actor cannot be the approver."
-        )
+        reason = "Separation of Duties violation: Action owner/actor cannot be the approver."
 
     # Check Actor Role Governance
     actor_role = action_details.get("actor_role") or action_details.get("role")
@@ -509,9 +471,7 @@ def detect_policy_conflicts() -> list:
         for j in range(i + 1, len(policies)):
             p1 = policies[i]
             p2 = policies[j]
-            if p1["category"] == p2["category"] and (
-                "==" in p1["rule"] and "==" in p2["rule"]
-            ):
+            if p1["category"] == p2["category"] and ("==" in p1["rule"] and "==" in p2["rule"]):
                 # check if they contradict
                 pass
     return conflicts
@@ -581,10 +541,12 @@ def log_audit(event_type: str, details: dict):
     state["audit_logs"].append(entry)
     save_state(state)
 
+
 def get_dynamic_agent_autonomy_level(agent_name: str) -> int:
     """Resolve dynamic agent autonomy level (3, 4, or 5) based on trust score."""
     try:
         import uawos_agent_workforce
+
         trust = uawos_agent_workforce.calculate_agent_trust(agent_name)
     except Exception:
         trust = 95.0
@@ -595,6 +557,7 @@ def get_dynamic_agent_autonomy_level(agent_name: str) -> int:
         return 4
     else:
         return 3
+
 
 def run_governor_audit_analysis() -> list:
     """Analyze audit logs dynamically to propose policy adjustments."""
@@ -614,30 +577,37 @@ def run_governor_audit_analysis() -> list:
             gpl_violations += 1
 
     if token_violations > 0:
-        proposals.append({
-            "type": "policy_modification",
-            "policy_id": "POL-01",
-            "suggestion": "Adjust token consumption limits or trigger throttling.",
-            "reason": f"Detected {token_violations} token limit violations in audit logs."
-        })
+        proposals.append(
+            {
+                "type": "policy_modification",
+                "policy_id": "POL-01",
+                "suggestion": "Adjust token consumption limits or trigger throttling.",
+                "reason": f"Detected {token_violations} token limit violations in audit logs.",
+            }
+        )
     if gpl_violations > 0:
-        proposals.append({
-            "type": "policy_modification",
-            "policy_id": "POL-02",
-            "suggestion": "Restrict marker library imports to isolated sandboxes.",
-            "reason": f"Detected {gpl_violations} GPL license compliance violations in audit logs."
-        })
+        proposals.append(
+            {
+                "type": "policy_modification",
+                "policy_id": "POL-02",
+                "suggestion": "Restrict marker library imports to isolated sandboxes.",
+                "reason": f"Detected {gpl_violations} GPL license compliance violations in audit logs.",
+            }
+        )
 
     # Default fallback proposal to ensure audit runs even with empty logs
     if not proposals:
-        proposals.append({
-            "type": "policy_modification",
-            "policy_id": "POL-01",
-            "suggestion": "Review default token limit based on scaling metrics.",
-            "reason": "System audit analysis found stable performance logs."
-        })
+        proposals.append(
+            {
+                "type": "policy_modification",
+                "policy_id": "POL-01",
+                "suggestion": "Review default token limit based on scaling metrics.",
+                "reason": "System audit analysis found stable performance logs.",
+            }
+        )
 
     return proposals
+
 
 # ----------------- VERIFICATION TESTS (FR-101 to FR-110) -----------------
 
@@ -704,51 +674,31 @@ def verify_fr_109():
 def verify_fr_110():
     log_audit("AUDIT_TEST", {"msg": "Self test active"})
     state = load_state()
-    assert any(
-        log["event_type"] == "AUDIT_TEST" for log in state["audit_logs"]
-    ), "Auditing failed."
+    assert any(log["event_type"] == "AUDIT_TEST" for log in state["audit_logs"]), "Auditing failed."
     return True
 
 
 def verify_fr_111():
     # Test separation of duties violation
-    res_sod = evaluate_action_governance(
-        "ACT-SOD", {"owner": "Alice", "approver": "Alice"}
-    )
-    assert (
-        res_sod["verdict"] == "REJECTED"
-    ), "Separation of duties violation not blocked."
-    assert (
-        "Separation of Duties" in res_sod["reason"]
-    ), "Incorrect rejection reason for Separation of Duties."
+    res_sod = evaluate_action_governance("ACT-SOD", {"owner": "Alice", "approver": "Alice"})
+    assert res_sod["verdict"] == "REJECTED", "Separation of duties violation not blocked."
+    assert "Separation of Duties" in res_sod["reason"], "Incorrect rejection reason for Separation of Duties."
 
     # Test valid separation of duties
-    res_valid_sod = evaluate_action_governance(
-        "ACT-SOD-OK", {"owner": "Alice", "approver": "Bob"}
-    )
-    assert (
-        res_valid_sod["verdict"] == "APPROVED"
-    ), "Valid separation of duties rejected."
+    res_valid_sod = evaluate_action_governance("ACT-SOD-OK", {"owner": "Alice", "approver": "Bob"})
+    assert res_valid_sod["verdict"] == "APPROVED", "Valid separation of duties rejected."
 
     # Test unrecognized role
     res_bad_role = evaluate_action_governance("ACT-ROLE-BAD", {"actor_role": "Hacker"})
     assert res_bad_role["verdict"] == "REJECTED", "Unrecognized role not blocked."
 
     # Test unauthorized role for budget action
-    res_unauth_role = evaluate_action_governance(
-        "ACT-BUDGET-UNAUTH", {"actor_role": "Developer", "category": "budget"}
-    )
-    assert (
-        res_unauth_role["verdict"] == "REJECTED"
-    ), "Unauthorized role for budget was not blocked."
+    res_unauth_role = evaluate_action_governance("ACT-BUDGET-UNAUTH", {"actor_role": "Developer", "category": "budget"})
+    assert res_unauth_role["verdict"] == "REJECTED", "Unauthorized role for budget was not blocked."
 
     # Test authorized role for budget action
-    res_auth_role = evaluate_action_governance(
-        "ACT-BUDGET-AUTH", {"actor_role": "CEO", "category": "budget"}
-    )
-    assert (
-        res_auth_role["verdict"] == "APPROVED"
-    ), "Authorized role for budget was rejected."
+    res_auth_role = evaluate_action_governance("ACT-BUDGET-AUTH", {"actor_role": "CEO", "category": "budget"})
+    assert res_auth_role["verdict"] == "APPROVED", "Authorized role for budget was rejected."
 
     return True
 

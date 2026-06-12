@@ -5,16 +5,11 @@ import time
 import urllib.parse
 import urllib.request
 
+import uawos_db
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_action_state.json"
-)
-MOCK_SERVICES_BASE_URL = os.environ.get(
-    "MOCK_SERVICES_BASE_URL", "http://127.0.0.1:5001"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_action_state.json")
+MOCK_SERVICES_BASE_URL = os.environ.get("MOCK_SERVICES_BASE_URL", "http://127.0.0.1:5001")
 
 
 def get_default_state() -> dict:
@@ -35,6 +30,7 @@ def get_default_state() -> dict:
         }
     }
 
+
 # FR-070 to FR-080: Create an Action
 def create_action(
     workflow_id: str,
@@ -50,9 +46,7 @@ def create_action(
     """Create and persist a new Action within a workflow."""
     state = load_state()
     existing_ids = [
-        int(k.split("-")[1])
-        for k in state["actions"]
-        if k.startswith("ACT-") and k.split("-")[1].isdigit()
+        int(k.split("-")[1]) for k in state["actions"] if k.startswith("ACT-") and k.split("-")[1].isdigit()
     ]
     next_id_num = max(existing_ids) + 1 if existing_ids else 201
     action_id = f"ACT-{next_id_num}"
@@ -295,15 +289,9 @@ def verify_fr_081():
 
     # Test dangerous command
     res_unsafe = execute_agent_action_secure("ACT-101", "rm -rf /")
-    assert (
-        res_unsafe["status"] == "blocked"
-    ), "Dangerous command execution was not blocked."
-    assert (
-        "Security Sandbox Block" in res_unsafe["reason"]
-    ), "Blocked reason not captured."
-    assert (
-        res_unsafe["action"]["status"] == "failed"
-    ), "Action status not updated to failed on block."
+    assert res_unsafe["status"] == "blocked", "Dangerous command execution was not blocked."
+    assert "Security Sandbox Block" in res_unsafe["reason"], "Blocked reason not captured."
+    assert res_unsafe["action"]["status"] == "failed", "Action status not updated to failed on block."
     return True
 
 

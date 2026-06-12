@@ -494,14 +494,10 @@ to
 That transition is where the defensible IP of UAWOS actually resides. The dashboard screenshot suggests the foundation exists, but the intelligence, trust, optimization, and autonomous control layers remain the largest backend gaps."""
 
 # Submit the requirements
-res1 = uawos_requirement_studio.submit_new_requirement(
-    "High Value Backend Gaps", req_text
-)
+res1 = uawos_requirement_studio.submit_new_requirement("High Value Backend Gaps", req_text)
 print("Submitted 1:", res1["requirement_id"])
 
-res2 = uawos_requirement_studio.submit_new_requirement(
-    "High Value Backend Gaps", req_text
-)
+res2 = uawos_requirement_studio.submit_new_requirement("High Value Backend Gaps", req_text)
 print("Submitted 2:", res2["requirement_id"])
 
 # Ingest them directly to backlog

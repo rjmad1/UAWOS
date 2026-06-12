@@ -35,9 +35,7 @@ def run_tests():
         print("\n1. Domain Identification (FR-252):")
         domains = uawos_dtase.identify_domains(text)
         for d in domains:
-            print(
-                f"   - Domain: {d['domain']:<20} | Confidence: {d['confidence']:.2f} | Evidence: {d['evidence']}"
-            )
+            print(f"   - Domain: {d['domain']:<20} | Confidence: {d['confidence']:.2f} | Evidence: {d['evidence']}")
 
         primary_domains = [d["domain"] for d in domains if d["confidence"] >= 0.4]
         if not primary_domains:
@@ -51,39 +49,29 @@ def run_tests():
             print(f"     Framework: {trans.get('framework')}")
             for key, val in trans.items():
                 if key != "framework":
-                    print(
-                        f"     {key.replace('_', ' ').capitalize()}: {str(val)[:150]}..."
-                    )
+                    print(f"     {key.replace('_', ' ').capitalize()}: {str(val)[:150]}...")
 
         # Test 3: Discover Opportunities, Risks, Anomalies (FR-255)
         print("\n3. Opportunities, Risks & Anomalies Discovery (FR-255):")
         insights = uawos_dtase.discover_opportunities_risks_anomalies(text)
         print("   * Discovered Opportunities:")
         for opp in insights["opportunities"]:
-            print(
-                f"     - [{opp['type']}] {opp['description']} (Conf: {opp['confidence']:.2f})"
-            )
-            print(f"       Quote: \"{opp['evidence']}\"")
+            print(f"     - [{opp['type']}] {opp['description']} (Conf: {opp['confidence']:.2f})")
+            print(f'       Quote: "{opp["evidence"]}"')
 
         print("   * Discovered Risks:")
         for risk in insights["risks"]:
-            print(
-                f"     - [{risk['type']}] {risk['description']} (Conf: {risk['confidence']:.2f})"
-            )
-            print(f"       Quote: \"{risk['evidence']}\"")
+            print(f"     - [{risk['type']}] {risk['description']} (Conf: {risk['confidence']:.2f})")
+            print(f'       Quote: "{risk["evidence"]}"')
 
         print("   * Discovered Anomalies:")
         for anom in insights["anomalies"]:
-            print(
-                f"     - [{anom['type']}] {anom['description']} (Conf: {anom['confidence']:.2f})"
-            )
-            print(f"       Quote: \"{anom['evidence']}\"")
+            print(f"     - [{anom['type']}] {anom['description']} (Conf: {anom['confidence']:.2f})")
+            print(f'       Quote: "{anom["evidence"]}"')
 
         # Test 4: Multi-Persona Output Generation (FR-257)
         print("\n4. Multi-Persona Output Synthesis (FR-257):")
-        personas = uawos_dtase.generate_multi_persona_outputs(
-            text, [d["domain"] for d in domains]
-        )
+        personas = uawos_dtase.generate_multi_persona_outputs(text, [d["domain"] for d in domains])
         for persona, output in personas.items():
             print(f"   * Persona: {persona}")
             first_lines = "\n".join(output.strip().split("\n")[:3])

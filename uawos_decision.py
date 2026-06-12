@@ -1,15 +1,10 @@
 # uawos_decision.py
-import json
 import os
 import time
 
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_decision_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_decision_state.json")
 
 
 def get_default_state() -> dict:
@@ -76,9 +71,7 @@ def register_evidence(claim_id: str, source: str, text: str) -> dict:
     return ev
 
 
-def generate_recommendation(
-    title: str, description: str, alternatives: list, assumptions: list
-) -> dict:
+def generate_recommendation(title: str, description: str, alternatives: list, assumptions: list) -> dict:
     """Generate recommendations incorporating alternatives and assumptions (FR-161, FR-165, FR-169)."""
     state = load_state()
     rid = f"REC-{len(state['recommendations']) + 1:02d}"
@@ -96,9 +89,7 @@ def generate_recommendation(
     return rec
 
 
-def record_decision(
-    recommendation_id: str, chosen_alternative: str, justification: str
-) -> dict:
+def record_decision(recommendation_id: str, chosen_alternative: str, justification: str) -> dict:
     """Record a governed decision (FR-162, FR-170)."""
     state = load_state()
     did = f"DEC-{len(state['decisions']) + 1:02d}"

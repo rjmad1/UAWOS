@@ -32,9 +32,7 @@ Length of processed binary: {len(pdf_content)} bytes.
 - Status: Success
 """
     return (
-        jsonify(
-            {"success": True, "filename": file.filename, "markdown": mock_markdown}
-        ),
+        jsonify({"success": True, "filename": file.filename, "markdown": mock_markdown}),
         200,
     )
 

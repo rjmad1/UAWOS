@@ -8,9 +8,9 @@ import threading
 import time
 
 import uvicorn
-from fastapi import FastAPI, Header, HTTPException, Query, Request
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 
 import uawos_traceability
 
@@ -121,9 +121,7 @@ except ImportError:
     uawos_pmcms = None
 
 PORT = 8099
-STATUS_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_status.json"
-)
+STATUS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_status.json")
 
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "127.0.0.1")
 POSTGRES_PORT = int(os.environ.get("POSTGRES_PORT", 5435))
@@ -159,21 +157,11 @@ OLLAMA_PORT = int(os.environ.get("OLLAMA_PORT", 11434))
 NEO4J_HOST = os.environ.get("NEO4J_HOST", "127.0.0.1")
 NEO4J_PORT_1 = int(os.environ.get("NEO4J_PORT_1", 7687))
 NEO4J_PORT_2 = int(os.environ.get("NEO4J_PORT_2", 7474))
-HTML_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_dashboard.html"
-)
-DELIVERY_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_delivery.html"
-)
-ROADMAP_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_roadmap.html"
-)
-REQUIREMENT_STUDIO_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_studio.html"
-)
-ARCHITECTURE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_architecture.html"
-)
+HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_dashboard.html")
+DELIVERY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_delivery.html")
+ROADMAP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_roadmap.html")
+REQUIREMENT_STUDIO_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_studio.html")
+ARCHITECTURE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_architecture.html")
 
 # Global status cache
 status_cache = {}
@@ -192,6 +180,7 @@ def decode_token_payload(token: str) -> dict:
     """Safely decode JWT claims without verifying signature for development context."""
     import base64
     import json
+
     try:
         parts = token.split(".")
         if len(parts) == 3:
@@ -210,16 +199,12 @@ def verify_secure_token(x_uawos_token: str = None, authorization: str = None):
         token = authorization[7:]
 
     if not token:
-        raise HTTPException(
-            status_code=401, detail="Unauthorized: Invalid or missing authentication credentials."
-        )
+        raise HTTPException(status_code=401, detail="Unauthorized: Invalid or missing authentication credentials.")
 
     if token != SECURE_TOKEN:
         claims = decode_token_payload(token)
         if not claims:
-            raise HTTPException(
-                status_code=401, detail="Unauthorized: Invalid security token."
-            )
+            raise HTTPException(status_code=401, detail="Unauthorized: Invalid security token.")
 
 
 # Constants for duplicate literals
@@ -248,9 +233,7 @@ def get_docker_status():
     containers = {}
     try:
         # Check if Docker is running
-        res = subprocess.run(
-            ["docker", "info"], capture_output=True, text=True, timeout=2.0
-        )
+        res = subprocess.run(["docker", "info"], capture_output=True, text=True, timeout=2.0)
         if res.returncode == 0:
             is_docker_running = True
             # Get running containers and their status
@@ -284,17 +267,13 @@ def check_semgrep_availability():
                 timeout=10.0,
             )
         else:
-            res = subprocess.run(
-                ["semgrep", "--version"], capture_output=True, text=True, timeout=10.0
-            )
+            res = subprocess.run(["semgrep", "--version"], capture_output=True, text=True, timeout=10.0)
         return res.returncode == 0
     except (subprocess.SubprocessError, FileNotFoundError):
         return False
 
 
-def evaluate_infra(
-    is_docker_running, running_containers, local_dev_healthy, ollama_running
-):
+def evaluate_infra(is_docker_running, running_containers, local_dev_healthy, ollama_running):
     infra_components = {
         "Postgres DB": {
             "container": "uawos-postgres",
@@ -330,9 +309,7 @@ def evaluate_infra(
 
     infra_status = {}
     infra_status["Local Dev Environment"] = "GREEN" if local_dev_healthy else "YELLOW"
-    infra_status["Outbound Model Gateway"] = (
-        "GREEN" if (is_docker_running and ollama_running) else "YELLOW"
-    )
+    infra_status["Outbound Model Gateway"] = "GREEN" if (is_docker_running and ollama_running) else "YELLOW"
 
     for name, cfg in infra_components.items():
         c_name = cfg["container"]
@@ -352,13 +329,8 @@ def evaluate_infra(
     return infra_status
 
 
-def evaluate_integrations(
-    infra_status, venv_ok, is_semgrep_available, running_containers
-):
-    marker_running = (
-        "uawos-marker-service" in running_containers
-        or "marker-service" in running_containers
-    )
+def evaluate_integrations(infra_status, venv_ok, is_semgrep_available, running_containers):
+    marker_running = "uawos-marker-service" in running_containers or "marker-service" in running_containers
 
     mesa_ok = False
     try:
@@ -375,13 +347,9 @@ def evaluate_integrations(
         "INT-A-02: Pydantic AI Core Integration": "GREEN" if venv_ok else "GRAY",
         "INT-A-03: Graphiti Temporal Memory": "GREEN" if venv_ok else "GRAY",
         "INT-A-04: LlamaIndex & Haystack Pipeline": "GREEN" if venv_ok else "GRAY",
-        "INT-A-05: Apache Superset BI": (
-            "GREEN" if (infra_status.get(APACHE_SUPERSET) == "GREEN") else "YELLOW"
-        ),
+        "INT-A-05: Apache Superset BI": ("GREEN" if (infra_status.get(APACHE_SUPERSET) == "GREEN") else "YELLOW"),
         "INT-A-06: Security Scanning Suite": (
-            "GREEN"
-            if (infra_status.get(DEP_TRACK_API) == "GREEN" and is_semgrep_available)
-            else "YELLOW"
+            "GREEN" if (infra_status.get(DEP_TRACK_API) == "GREEN" and is_semgrep_available) else "YELLOW"
         ),
         "INT-B-01: GitLab/Bitbucket MCP": "GRAY",
         "INT-B-02: Figma & Style Dictionary Sync": "GRAY",
@@ -400,15 +368,9 @@ def evaluate_security(is_semgrep_available, is_docker_running, infra_status):
         "Semgrep SAST": "YELLOW" if not is_semgrep_available else "GREEN",
         "Trivy Container Scanner": "GREEN" if is_docker_running else "YELLOW",
         "Gitleaks Secret Detection": (
-            "GREEN"
-            if os.path.exists(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), ".git")
-            )
-            else "YELLOW"
+            "GREEN" if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".git")) else "YELLOW"
         ),
-        "Dependency-Track SBOM Auditor": (
-            "GREEN" if (infra_status.get(DEP_TRACK_API) == "GREEN") else "RED"
-        ),
+        "Dependency-Track SBOM Auditor": ("GREEN" if (infra_status.get(DEP_TRACK_API) == "GREEN") else "RED"),
         "Falco Sandbox / OpenHands Sandboxing": sandboxing_healthy,
     }
 
@@ -417,17 +379,11 @@ def evaluate_governance(infra_status):
     sbom_auditor_green = infra_status.get(DEP_TRACK_API) == "GREEN"
     opa_healthy = "GREEN" if check_port(OPA_HOST, OPA_PORT) else "YELLOW"
     openfga_healthy = "GREEN" if check_port(OPENFGA_HOST, OPENFGA_PORT) else "YELLOW"
-    openmetadata_healthy = (
-        "GREEN" if check_port(OPENMETADATA_HOST, OPENMETADATA_PORT) else "GRAY"
-    )
+    openmetadata_healthy = "GREEN" if check_port(OPENMETADATA_HOST, OPENMETADATA_PORT) else "GRAY"
     return {
         "License Governance Filters": "GREEN" if sbom_auditor_green else "YELLOW",
-        "OpenLineage Execution Ingestion": (
-            "GREEN" if (infra_status.get(MARQUEZ_LINEAGE) == "GREEN") else "YELLOW"
-        ),
-        "Marquez Metadata & Lineage": (
-            "GREEN" if (infra_status.get(MARQUEZ_LINEAGE) == "GREEN") else "RED"
-        ),
+        "OpenLineage Execution Ingestion": ("GREEN" if (infra_status.get(MARQUEZ_LINEAGE) == "GREEN") else "YELLOW"),
+        "Marquez Metadata & Lineage": ("GREEN" if (infra_status.get(MARQUEZ_LINEAGE) == "GREEN") else "RED"),
         "OpenMetadata Catalog": openmetadata_healthy,
         "OPA/Rego Policy Engine": opa_healthy,
         "OpenFGA Authorization": openfga_healthy,
@@ -436,28 +392,18 @@ def evaluate_governance(infra_status):
 
 def evaluate_data(infra_status):
     return {
-        "Vector Storage (Qdrant)": (
-            "GREEN" if (infra_status.get(QDRANT_VECTOR_DB) == "GREEN") else "RED"
-        ),
-        "Relational Databases (Postgres)": (
-            "GREEN" if (infra_status.get("Postgres DB") == "GREEN") else "RED"
-        ),
-        "Long-term Log Storage (ClickHouse)": (
-            "GREEN" if check_port(CLICKHOUSE_HOST, CLICKHOUSE_PORT) else "YELLOW"
-        ),
+        "Vector Storage (Qdrant)": ("GREEN" if (infra_status.get(QDRANT_VECTOR_DB) == "GREEN") else "RED"),
+        "Relational Databases (Postgres)": ("GREEN" if (infra_status.get("Postgres DB") == "GREEN") else "RED"),
+        "Long-term Log Storage (ClickHouse)": ("GREEN" if check_port(CLICKHOUSE_HOST, CLICKHOUSE_PORT) else "YELLOW"),
     }
 
 
 def evaluate_operations(infra_status):
-    telemetry_healthy = (
-        "GREEN" if check_port(TELEMETRY_HOST, TELEMETRY_PORT) else "YELLOW"
-    )
+    telemetry_healthy = "GREEN" if check_port(TELEMETRY_HOST, TELEMETRY_PORT) else "YELLOW"
     alarm_healthy = "GREEN" if check_port(ALARM_HOST, ALARM_PORT) else "GRAY"
     return {
         "Telemetry Collection": telemetry_healthy,
-        "BI Reporting (Apache Superset)": (
-            "GREEN" if (infra_status.get(APACHE_SUPERSET) == "GREEN") else "RED"
-        ),
+        "BI Reporting (Apache Superset)": ("GREEN" if (infra_status.get(APACHE_SUPERSET) == "GREEN") else "RED"),
         "Operational Alarm Framework": alarm_healthy,
     }
 
@@ -470,9 +416,7 @@ def _evaluate_dynamic_services(dtase_healthy, budget_healthy, objective_healthy)
         "Planning Engine": "GREEN" if uawos_planning is not None else "GRAY",
         "Governance Engine": "GREEN" if uawos_governance is not None else "GRAY",
         "Knowledge Engine": "GREEN" if uawos_knowledge is not None else "GRAY",
-        "Value Engine": (
-            "GREEN" if (uawos_value is not None or uawos_budget is not None) else "GRAY"
-        ),
+        "Value Engine": ("GREEN" if (uawos_value is not None or uawos_budget is not None) else "GRAY"),
         "Simulation Engine": "GREEN" if uawos_simulation is not None else "GRAY",
         "DTASE": "GREEN" if uawos_dtase is not None else "GRAY",
         "Maturity Engine": "GREEN" if uawos_pmcms is not None else "GRAY",
@@ -482,66 +426,28 @@ def _evaluate_dynamic_services(dtase_healthy, budget_healthy, objective_healthy)
 def _evaluate_dynamic_agents(budget_healthy, objective_healthy):
     """Evaluate current agent statuses dynamically."""
     return {
-        "Planner Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_planning is not None)
-            else "GRAY"
-        ),
+        "Planner Agent": ("GREEN" if (uawos_agent_workforce is not None and uawos_planning is not None) else "GRAY"),
         "Orchestrator Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_workflow is not None)
-            else "GRAY"
+            "GREEN" if (uawos_agent_workforce is not None and uawos_workflow is not None) else "GRAY"
         ),
-        "Executor Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_action is not None)
-            else "GRAY"
-        ),
-        "Reviewer Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_outcome is not None)
-            else "GRAY"
-        ),
-        "Governor Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_governance is not None)
-            else "GRAY"
-        ),
-        "Learner Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_learning is not None)
-            else "GRAY"
-        ),
+        "Executor Agent": ("GREEN" if (uawos_agent_workforce is not None and uawos_action is not None) else "GRAY"),
+        "Reviewer Agent": ("GREEN" if (uawos_agent_workforce is not None and uawos_outcome is not None) else "GRAY"),
+        "Governor Agent": ("GREEN" if (uawos_agent_workforce is not None and uawos_governance is not None) else "GRAY"),
+        "Learner Agent": ("GREEN" if (uawos_agent_workforce is not None and uawos_learning is not None) else "GRAY"),
         "Knowledge Manager Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_knowledge is not None)
-            else "GRAY"
+            "GREEN" if (uawos_agent_workforce is not None and uawos_knowledge is not None) else "GRAY"
         ),
         "Portfolio Governor Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_budget is not None)
-            else "GRAY"
+            "GREEN" if (uawos_agent_workforce is not None and uawos_budget is not None) else "GRAY"
         ),
-        "Value Analyst Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_value is not None)
-            else "GRAY"
-        ),
+        "Value Analyst Agent": ("GREEN" if (uawos_agent_workforce is not None and uawos_value is not None) else "GRAY"),
         "Resource Manager Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_resource is not None)
-            else "GRAY"
+            "GREEN" if (uawos_agent_workforce is not None and uawos_resource is not None) else "GRAY"
         ),
         "Simulation Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_simulation is not None)
-            else "GRAY"
+            "GREEN" if (uawos_agent_workforce is not None and uawos_simulation is not None) else "GRAY"
         ),
-        "Challenger Agent": (
-            "GREEN"
-            if (uawos_agent_workforce is not None and uawos_decision is not None)
-            else "GRAY"
-        ),
+        "Challenger Agent": ("GREEN" if (uawos_agent_workforce is not None and uawos_decision is not None) else "GRAY"),
     }
 
 
@@ -570,20 +476,12 @@ def run_health_checks():
     is_docker_running, running_containers = get_docker_status()
     is_semgrep_available = check_semgrep_availability()
 
-    local_dev_healthy = os.path.exists(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), ".venv")
-    )
+    local_dev_healthy = os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".venv"))
     ollama_running = check_port(OLLAMA_HOST, OLLAMA_PORT)
 
-    infra_status = evaluate_infra(
-        is_docker_running, running_containers, local_dev_healthy, ollama_running
-    )
-    integrations = evaluate_integrations(
-        infra_status, local_dev_healthy, is_semgrep_available, running_containers
-    )
-    security_status = evaluate_security(
-        is_semgrep_available, is_docker_running, infra_status
-    )
+    infra_status = evaluate_infra(is_docker_running, running_containers, local_dev_healthy, ollama_running)
+    integrations = evaluate_integrations(infra_status, local_dev_healthy, is_semgrep_available, running_containers)
+    security_status = evaluate_security(is_semgrep_available, is_docker_running, infra_status)
     governance_status = evaluate_governance(infra_status)
     data_status = evaluate_data(infra_status)
     operations_status = evaluate_operations(infra_status)
@@ -591,9 +489,7 @@ def run_health_checks():
     services_status = _evaluate_dynamic_services(
         uawos_dtase is not None, uawos_budget is not None, uawos_objective is not None
     )
-    agents_status = _evaluate_dynamic_agents(
-        uawos_budget is not None, uawos_objective is not None
-    )
+    agents_status = _evaluate_dynamic_agents(uawos_budget is not None, uawos_objective is not None)
 
     # Dynamic skill health checks
     dspy_ok = False
@@ -665,9 +561,7 @@ def run_health_checks():
     java_ok = shutil.which("java") is not None
     npm_ok = shutil.which("npm") is not None
 
-    neo4j_running = check_port(NEO4J_HOST, NEO4J_PORT_1) or check_port(
-        NEO4J_HOST, NEO4J_PORT_2
-    )
+    neo4j_running = check_port(NEO4J_HOST, NEO4J_PORT_1) or check_port(NEO4J_HOST, NEO4J_PORT_2)
     clickhouse_running = check_port(CLICKHOUSE_HOST, CLICKHOUSE_PORT)
 
     # SKL-AI-01: Prompt Tuning
@@ -810,15 +704,9 @@ def run_health_checks():
     green_count, yellow_count, red_count, gray_count = _count_statuses(dicts_to_count)
 
     total_components = green_count + yellow_count + red_count + gray_count
-    strict_health = (
-        round((green_count / total_components) * 100, 1)
-        if total_components > 0
-        else 0.0
-    )
+    strict_health = round((green_count / total_components) * 100, 1) if total_components > 0 else 0.0
     weighted_health = (
-        round(((green_count + 0.5 * yellow_count) / total_components) * 100, 1)
-        if total_components > 0
-        else 0.0
+        round(((green_count + 0.5 * yellow_count) / total_components) * 100, 1) if total_components > 0 else 0.0
     )
 
     alt_components = {
@@ -858,8 +746,7 @@ def run_health_checks():
         "alternate_daemons": {
             name: (
                 "GREEN"
-                if (name == "Ollama Local LLM" and ollama_running)
-                or (cfg["container"] in running_containers)
+                if (name == "Ollama Local LLM" and ollama_running) or (cfg["container"] in running_containers)
                 else "GRAY"
             )
             for name, cfg in alt_components.items()
@@ -885,9 +772,7 @@ def daemon_loop():
 
 def get_documents():
     """Scan and categorize all markdown files in the Requirements Master directory."""
-    docs_dir = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "Requirements Master"
-    )
+    docs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Requirements Master")
     categories = {
         "Architectural Standards": [],
         "Ecosystem Catalogs": [],
@@ -905,11 +790,7 @@ def get_documents():
                 name_lower = f_name.lower()
                 if "catalog" in name_lower:
                     categories["Ecosystem Catalogs"].append(f_name)
-                elif (
-                    "prd" in name_lower
-                    or "blueprint" in name_lower
-                    or "solutiondesign" in name_lower
-                ):
+                elif "prd" in name_lower or "blueprint" in name_lower or "solutiondesign" in name_lower:
                     categories["Product & Requirements (PRD)"].append(f_name)
                 elif "roadmap" in name_lower or "backlog" in name_lower:
                     categories["Delivery & Roadmaps"].append(f_name)
@@ -985,7 +866,7 @@ async def tenant_context_middleware(request: Request, call_next):
 @app.get("/index.html", response_class=HTMLResponse)
 def serve_dashboard():
     try:
-        with open(HTML_FILE, "r", encoding="utf-8") as f:
+        with open(HTML_FILE, encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Dashboard UI file not found.")
@@ -995,7 +876,7 @@ def serve_dashboard():
 @app.get("/delivery.html", response_class=HTMLResponse)
 def serve_delivery():
     try:
-        with open(DELIVERY_FILE, "r", encoding="utf-8") as f:
+        with open(DELIVERY_FILE, encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Delivery UI file not found.")
@@ -1005,7 +886,7 @@ def serve_delivery():
 @app.get("/roadmap.html", response_class=HTMLResponse)
 def serve_roadmap():
     try:
-        with open(ROADMAP_FILE, "r", encoding="utf-8") as f:
+        with open(ROADMAP_FILE, encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Roadmap UI file not found.")
@@ -1015,19 +896,17 @@ def serve_roadmap():
 @app.get("/requirement_studio.html", response_class=HTMLResponse)
 def serve_requirement_studio():
     try:
-        with open(REQUIREMENT_STUDIO_FILE, "r", encoding="utf-8") as f:
+        with open(REQUIREMENT_STUDIO_FILE, encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
-        raise HTTPException(
-            status_code=404, detail="Requirement Studio UI file not found."
-        )
+        raise HTTPException(status_code=404, detail="Requirement Studio UI file not found.")
 
 
 @app.get("/architecture", response_class=HTMLResponse)
 @app.get("/architecture.html", response_class=HTMLResponse)
 def serve_architecture():
     try:
-        with open(ARCHITECTURE_FILE, "r", encoding="utf-8") as f:
+        with open(ARCHITECTURE_FILE, encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Architecture UI file not found.")
@@ -1037,9 +916,7 @@ def serve_architecture():
 @app.get("/api/requirement/list")
 def get_requirement_list():
     if uawos_requirement_studio is None:
-        raise HTTPException(
-            status_code=500, detail="Requirement Studio module unavailable."
-        )
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
         return uawos_requirement_studio.load_state()
     except Exception as e:
@@ -1075,9 +952,7 @@ def get_status():
 @app.get("/api/pmcms")
 def get_pmcms():
     if uawos_pmcms is None:
-        raise HTTPException(
-            status_code=500, detail="PMCMS Maturity module unavailable."
-        )
+        raise HTTPException(status_code=500, detail="PMCMS Maturity module unavailable.")
     global status_cache
     try:
         return uawos_pmcms.get_maturity_assessment(status_cache)
@@ -1133,13 +1008,11 @@ def get_docs():
 @app.get("/api/docs/content", response_class=PlainTextResponse)
 def get_docs_content(file: str = ""):
     file_name = os.path.basename(file)
-    docs_dir = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "Requirements Master"
-    )
+    docs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Requirements Master")
     file_path = os.path.join(docs_dir, file_name)
     if file_name and os.path.exists(file_path) and file_name.endswith(".md"):
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 return f.read()
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error reading file: {e}")
@@ -1185,9 +1058,7 @@ async def budget_action(request: Request, x_uawos_token: str = Header(None), aut
             tokens_in = int(payload.get("tokens_in", 10000))
             tokens_out = int(payload.get("tokens_out", 5000))
             tokens_reasoning = int(payload.get("tokens_reasoning", 0))
-            uawos_budget.record_agent_cost(
-                agent, model, tokens_in, tokens_out, tokens_reasoning
-            )
+            uawos_budget.record_agent_cost(agent, model, tokens_in, tokens_out, tokens_reasoning)
             result["message"] = f"Recorded token usage for {agent}."
         elif action == "adjust_budget":
             obj_id = payload.get("objective_id", "")
@@ -1216,9 +1087,7 @@ async def budget_action(request: Request, x_uawos_token: str = Header(None), aut
 async def requirement_submit(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
     verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
-        raise HTTPException(
-            status_code=500, detail="Requirement Studio module unavailable."
-        )
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
         payload = await request.json()
         title = payload.get("title", "New Requirement")
@@ -1232,9 +1101,7 @@ async def requirement_submit(request: Request, x_uawos_token: str = Header(None)
 async def requirement_clarify(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
     verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
-        raise HTTPException(
-            status_code=500, detail="Requirement Studio module unavailable."
-        )
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
         payload = await request.json()
         req_id = payload.get("requirement_id", "")
@@ -1249,9 +1116,7 @@ async def requirement_clarify(request: Request, x_uawos_token: str = Header(None
 async def requirement_author(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
     verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
-        raise HTTPException(
-            status_code=500, detail="Requirement Studio module unavailable."
-        )
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
         payload = await request.json()
         req_id = payload.get("requirement_id", "")
@@ -1264,9 +1129,7 @@ async def requirement_author(request: Request, x_uawos_token: str = Header(None)
 async def requirement_absorb(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
     verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
-        raise HTTPException(
-            status_code=500, detail="Requirement Studio module unavailable."
-        )
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
         payload = await request.json()
         req_id = payload.get("requirement_id", "")
@@ -1279,9 +1142,7 @@ async def requirement_absorb(request: Request, x_uawos_token: str = Header(None)
 async def requirement_publish(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
     verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
-        raise HTTPException(
-            status_code=500, detail="Requirement Studio module unavailable."
-        )
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
         payload = await request.json()
         cand_id = payload.get("roadmap_id", "")
@@ -1296,9 +1157,7 @@ async def requirement_direct_ingest(
 ):
     verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
-        raise HTTPException(
-            status_code=500, detail="Requirement Studio module unavailable."
-        )
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
         payload = await request.json()
         req_id = payload.get("requirement_id", "")
@@ -1313,9 +1172,7 @@ async def requirement_direct_ingest(
 def requirement_reset(x_uawos_token: str = Header(None), authorization: str = Header(None)):
     verify_secure_token(x_uawos_token, authorization)
     if uawos_requirement_studio is None:
-        raise HTTPException(
-            status_code=500, detail="Requirement Studio module unavailable."
-        )
+        raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
         state = uawos_requirement_studio.get_default_state()
         uawos_requirement_studio.save_state(state)
@@ -1338,9 +1195,7 @@ async def objective_submit(request: Request, x_uawos_token: str = Header(None), 
         owner = payload.get("owner", "")
         sponsor = payload.get("sponsor", "")
         source_uri = payload.get("source_uri", "")
-        return uawos_objective.create_objective_from_input(
-            text, input_type, owner, sponsor, source_uri
-        )
+        return uawos_objective.create_objective_from_input(text, input_type, owner, sponsor, source_uri)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

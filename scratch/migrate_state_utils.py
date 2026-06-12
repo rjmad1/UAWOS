@@ -1,13 +1,12 @@
 # migrate_state_utils.py
 import os
-import re
 import sys
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
 def process_file(filepath):
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         lines = f.readlines()
     # Find load_state and save_state definitions
     load_start = None

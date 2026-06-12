@@ -1,8 +1,10 @@
 # uawos_cli.py
-import sys
 import argparse
+import sys
+
 import uawos_agent_workforce
 import uawos_integrations
+
 
 def main():
     parser = argparse.ArgumentParser(description="UAWOS Command Line Interface")
@@ -11,7 +13,9 @@ def main():
     # register-agent
     reg_parser = subparsers.add_parser("register-agent", help="Onboard a new agent dynamically")
     reg_parser.add_argument("--name", required=True, help="Agent name")
-    reg_parser.add_argument("--class", dest="agent_class", required=True, help="Agent class (Orchestrator, Executor, etc.)")
+    reg_parser.add_argument(
+        "--class", dest="agent_class", required=True, help="Agent class (Orchestrator, Executor, etc.)"
+    )
     reg_parser.add_argument("--capabilities", default="", help="Comma-separated capabilities list")
 
     # mcp-connect
@@ -25,9 +29,7 @@ def main():
         caps = [c.strip() for c in args.capabilities.split(",") if c.strip()]
         try:
             agent = uawos_agent_workforce.register_agent(
-                name=args.name,
-                agent_class=args.agent_class,
-                capabilities=caps
+                name=args.name, agent_class=args.agent_class, capabilities=caps
             )
             print(f"SUCCESS: Agent '{args.name}' registered with ID {agent['id']}.")
         except Exception as e:
@@ -36,17 +38,15 @@ def main():
 
     elif args.command == "mcp-connect":
         try:
-            conn = uawos_integrations.setup_mcp_agent_server(
-                agent_id=args.agent,
-                mcp_url=args.mcp_url
-            )
+            conn = uawos_integrations.setup_mcp_agent_server(agent_id=args.agent, mcp_url=args.mcp_url)
             print(f"SUCCESS: MCP server connection established for '{args.agent}' to {args.mcp_url}.")
         except Exception as e:
             print(f"ERROR: Failed to connect MCP: {e}")
             sys.exit(1)
-            
+
     else:
         parser.print_help()
+
 
 if __name__ == "__main__":
     main()

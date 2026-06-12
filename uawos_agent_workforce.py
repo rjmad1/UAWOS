@@ -1,14 +1,9 @@
 # uawos_agent_workforce.py
-import json
 import os
 
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_agent_workforce_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_agent_workforce_state.json")
 
 
 def get_default_state() -> dict:
@@ -73,6 +68,7 @@ def get_default_state() -> dict:
         }
     }
 
+
 # FR-091 to FR-100: Register Agent
 def register_agent(
     name: str,
@@ -92,9 +88,7 @@ def register_agent(
         "Knowledge Manager",
     ]
     if agent_class not in valid_classes:
-        raise ValueError(
-            f"Invalid Agent Class: {agent_class}. Must be one of {valid_classes}"
-        )
+        raise ValueError(f"Invalid Agent Class: {agent_class}. Must be one of {valid_classes}")
 
     aid = f"AGT-{len(state['agents']) + 1:02d}"
     agent = {
@@ -137,6 +131,7 @@ def calculate_agent_trust(name: str) -> float:
     # Try dynamic calculation via Postgres uawos_actions
     try:
         import uawos_db
+
         if uawos_db.DB_AVAILABLE:
             conn = uawos_db.get_db_connection()
             cursor = conn.cursor()
@@ -223,9 +218,7 @@ def verify_fr_096():
 
 def verify_fr_097():
     agent = register_agent("Custom KM", "Knowledge Manager", ["indexing"])
-    assert (
-        agent["class"] == "Knowledge Manager"
-    ), "Knowledge Manager Agent type unsupported."
+    assert agent["class"] == "Knowledge Manager", "Knowledge Manager Agent type unsupported."
     return True
 
 

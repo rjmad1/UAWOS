@@ -1,15 +1,10 @@
 # uawos_learning.py
-import json
 import os
 import time
 
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_learning_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_learning_state.json")
 
 
 def get_default_state() -> dict:
@@ -60,9 +55,7 @@ def detect_opportunities(action_logs: list) -> list:
     return opportunities
 
 
-def generate_learning(
-    opportunity: str, proposal: str, source_action_id: str, confidence: float = 90.0
-) -> dict:
+def generate_learning(opportunity: str, proposal: str, source_action_id: str, confidence: float = 90.0) -> dict:
     """Generate a learning recommendation (FR-132, FR-137, FR-139)."""
     state = load_state()
     lid = f"LRN-{len(state['learnings']) + 101:03d}"
@@ -134,9 +127,7 @@ def create_learning_pack(name: str, learning_ids: list) -> dict:
 
 
 def verify_fr_131():
-    opps = detect_opportunities(
-        [{"action_name": "API call", "latency_ms": 4500, "action_id": "ACT-101"}]
-    )
+    opps = detect_opportunities([{"action_name": "API call", "latency_ms": 4500, "action_id": "ACT-101"}])
     assert len(opps) > 0, "Opportunity detection failed."
     return True
 

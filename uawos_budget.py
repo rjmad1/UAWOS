@@ -1,15 +1,10 @@
 # uawos_budget.py
-import json
 import os
 import time
 
 from uawos_state_utils import load_state, save_state
 
-import uawos_db
-
-STATE_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "uawos_budget_state.json"
-)
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_budget_state.json")
 
 # Model pricing structures per 1M tokens
 MODEL_PRICING = {
@@ -211,9 +206,7 @@ def allocate_objective_budget(objective_id: str, name: str, budget: float) -> di
 
 
 # FR-152: Action budgets
-def allocate_action_budget(
-    action_id: str, objective_id: str, name: str, budget: float
-) -> dict:
+def allocate_action_budget(action_id: str, objective_id: str, name: str, budget: float) -> dict:
     state = load_state()
     state["action_budgets"][action_id] = {
         "name": name,
@@ -288,15 +281,11 @@ def calculate_forecasts_and_variance(state: dict) -> dict:
     # Assume 10 days of run elapsed, total 30 planned
     elapsed_days = 10
     total_days = 30
-    run_rate_per_day = (
-        round(total_actual / elapsed_days, 2) if elapsed_days > 0 else 0.0
-    )
+    run_rate_per_day = round(total_actual / elapsed_days, 2) if elapsed_days > 0 else 0.0
     forecast_spend = round(run_rate_per_day * total_days, 2)
 
     variance = round(total_actual - total_budget, 2)
-    variance_pct = (
-        round((variance / total_budget) * 100, 1) if total_budget > 0 else 0.0
-    )
+    variance_pct = round((variance / total_budget) * 100, 1) if total_budget > 0 else 0.0
 
     # Exceed governance risk check
     is_over_budget_risk = forecast_spend > total_budget
@@ -331,7 +320,7 @@ def evaluate_cost_governance(objective_id: str, threshold_ratio: float = 0.9) ->
         message = f"Budget limit of ${budget:.2f} exceeded! Active execution blocked by Governor."
     elif ratio >= threshold_ratio:
         verdict = "WARNING"
-        message = f"Objective has consumed {ratio*100:.1f}% of allocated budget. Optimization recommended."
+        message = f"Objective has consumed {ratio * 100:.1f}% of allocated budget. Optimization recommended."
 
     return {
         "objective_id": objective_id,
@@ -344,9 +333,7 @@ def evaluate_cost_governance(objective_id: str, threshold_ratio: float = 0.9) ->
 
 
 # FR-157: Budget approvals
-def submit_approval_request(
-    objective_id: str, amount: float, requested_by: str
-) -> dict:
+def submit_approval_request(objective_id: str, amount: float, requested_by: str) -> dict:
     state = load_state()
     req_id = f"APP-{len(state['budget_approvals']) + 1:03d}"
     req = {
@@ -392,13 +379,10 @@ def get_summary() -> dict:
             p_val["cost"] = state["objective_budgets"]["OBJ-102"]["actual"]
         elif p_id == "PORT-C":
             p_val["cost"] = (
-                state["objective_budgets"]["OBJ-103"]["actual"]
-                + state["objective_budgets"]["OBJ-104"]["actual"]
+                state["objective_budgets"]["OBJ-103"]["actual"] + state["objective_budgets"]["OBJ-104"]["actual"]
             )
 
-        p_val["percentage"] = (
-            round((p_val["cost"] / total_cost) * 100, 1) if total_cost > 0 else 0.0
-        )
+        p_val["percentage"] = round((p_val["cost"] / total_cost) * 100, 1) if total_cost > 0 else 0.0
 
     # Calculate value-to-cost ratios
     v_to_c = state["value_to_cost"]
@@ -407,9 +391,7 @@ def get_summary() -> dict:
         if obj:
             val_dict["cost"] = obj["actual"]
             val_dict["roi_ratio"] = (
-                round(val_dict["value_score"] / (obj["actual"] / 100.0), 2)
-                if obj["actual"] > 0
-                else 0.0
+                round(val_dict["value_score"] / (obj["actual"] / 100.0), 2) if obj["actual"] > 0 else 0.0
             )
 
     return {
