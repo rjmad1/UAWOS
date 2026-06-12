@@ -538,7 +538,7 @@ def verify_fr_125():
 def verify_fr_126():
     try:
         append_memory("secret password", governance_check=True)
-        assert False, "Should have blocked secret memory."
+        raise AssertionError("Should have blocked secret memory.")
     except ValueError:
         pass
     return True

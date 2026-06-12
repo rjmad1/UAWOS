@@ -46,16 +46,28 @@ def get_default_state() -> dict:
 
 def execute_cypher(statement: str, parameters: dict = None) -> dict:
     """Execute Cypher query on Neo4j HTTP API. Returns None if Neo4j is offline."""
+    import base64
+
     url = f"{NEO4J_URL}/db/neo4j/tx/commit"
     payload = {"statements": [{"statement": statement, "parameters": parameters or {}}]}
+
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    auth_str = os.environ.get("NEO4J_AUTH", "neo4j/uawos-change-me")
+    if auth_str and auth_str.lower() != "none" and "/" in auth_str:
+        user, pw = auth_str.split("/", 1)
+        base64string = base64.b64encode(f"{user}:{pw}".encode()).decode("utf-8")
+        headers["Authorization"] = f"Basic {base64string}"
+
     try:
         req_data = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            url, data=req_data, headers={"Content-Type": "application/json", "Accept": "application/json"}
-        )
+        req = urllib.request.Request(url, data=req_data, headers=headers)
         with urllib.request.urlopen(req, timeout=1.0) as resp:
             return json.loads(resp.read().decode("utf-8"))
-    except Exception:
+    except Exception as e:
+        print(f"[DEBUG] execute_cypher failed: {e}")
         return None
 
 

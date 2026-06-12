@@ -29,10 +29,12 @@ _fga_bootstrapped = False
 
 REGO_POLICY = """package uawos.governance
 
-default allow = false
-default reason = "No policy matched or check failed."
+import rego.v1
 
-allow {
+default allow := false
+default reason := "No policy matched or check failed."
+
+allow if {
     not uses_marker_library_violation
     not token_limit_violation
     not separation_of_duties_violation
@@ -40,54 +42,54 @@ allow {
     not unauthorized_budget_role_violation
 }
 
-reason = "All active policy checks passed." {
+reason := "All active policy checks passed." if {
     allow
 }
 
-uses_marker_library_violation {
+uses_marker_library_violation if {
     input.uses_marker_library == true
 }
 
-reason = "GPLv3 License compliance policy violation: marker library cannot be imported directly." {
+reason := "GPLv3 License compliance policy violation: marker library cannot be imported directly." if {
     uses_marker_library_violation
 }
 
-token_limit_violation {
+token_limit_violation if {
     input.estimated_tokens > 5000000
 }
 
-reason = "Token consumption policy exceeded: request exceeds 5M tokens limit." {
+reason := "Token consumption policy exceeded: request exceeds 5M tokens limit." if {
     token_limit_violation
 }
 
-separation_of_duties_violation {
+separation_of_duties_violation if {
     input.owner == input.approver
     input.owner != null
     input.approver != null
 }
 
-reason = "Separation of Duties violation: Action owner/actor cannot be the approver." {
+reason := "Separation of Duties violation: Action owner/actor cannot be the approver." if {
     separation_of_duties_violation
 }
 
-unauthorized_role_violation {
+unauthorized_role_violation if {
     input.actor_role
     valid_roles := ["CEO", "Lead Engineer", "Database Expert", "Developer", "Executor Agent", "Senior Engineer", "Admin"]
     count({role | role := valid_roles[_]; role == input.actor_role}) == 0
 }
 
-reason = "Role Governance violation: Unrecognized or unauthorized role." {
+reason := "Role Governance violation: Unrecognized or unauthorized role." if {
     unauthorized_role_violation
 }
 
-unauthorized_budget_role_violation {
+unauthorized_budget_role_violation if {
     input.category == "budget"
     input.actor_role
     budget_roles := ["CEO", "Lead Engineer", "Database Expert", "Admin"]
     count({role | role := budget_roles[_]; role == input.actor_role}) == 0
 }
 
-reason = "Role Governance violation: Role is not authorized for budget actions." {
+reason := "Role Governance violation: Role is not authorized for budget actions." if {
     unauthorized_budget_role_violation
 }
 """
@@ -383,81 +385,31 @@ def evaluate_action_governance(action_id: str, action_details: dict) -> dict:
     category = action_details.get("category")
     if actor and actor_role:
         fga_allowed = check_fga_authorization(actor, actor_role, category)
-        if fga_allowed is not None:
-            if not fga_allowed:
-                if category == "budget":
-                    return {
-                        "verdict": "REJECTED",
-                        "reason": f"Role Governance violation: Role '{actor_role}' is not authorized for budget actions.",
-                    }
-                else:
-                    return {
-                        "verdict": "REJECTED",
-                        "reason": f"Role Governance violation: Unrecognized or unauthorized role '{actor_role}'.",
-                    }
+        if fga_allowed is None:
+            return {
+                "verdict": "REJECTED",
+                "reason": "Security Infrastructure Offline: OpenFGA connection failed (Fail-Secure Enforcement).",
+            }
+        if not fga_allowed:
+            if category == "budget":
+                return {
+                    "verdict": "REJECTED",
+                    "reason": f"Role Governance violation: Role '{actor_role}' is not authorized for budget actions.",
+                }
+            else:
+                return {
+                    "verdict": "REJECTED",
+                    "reason": f"Role Governance violation: Unrecognized or unauthorized role '{actor_role}'.",
+                }
 
     # 3. Try OPA engine REST verification
     opa_result = evaluate_via_opa(action_details)
-    if opa_result is not None:
-        return opa_result
-
-    # 3. Fallback local Python-native checks if OPA container is offline
-    verdict = "APPROVED"
-    reason = "All active policy checks passed."
-
-    # Check for direct marker imports
-    if action_details.get("uses_marker_library", False):
-        # Law 11 / Policy violation
-        verdict = "REJECTED"
-        reason = "GPLv3 License compliance policy violation: marker library cannot be imported directly."
-
-    # Check token budget limit
-    tokens = action_details.get("estimated_tokens", 0)
-    if tokens > 5000000:
-        verdict = "REJECTED"
-        reason = "Token consumption policy exceeded: request exceeds 5M tokens limit."
-
-    # Check Separation of Duties (Separation of duties)
-    owner = action_details.get("owner") or action_details.get("actor")
-    approver = action_details.get("approver")
-    if owner and approver and owner == approver:
-        verdict = "REJECTED"
-        reason = "Separation of Duties violation: Action owner/actor cannot be the approver."
-
-    # Check Actor Role Governance
-    actor_role = action_details.get("actor_role") or action_details.get("role")
-    if actor_role:
-        valid_roles = [
-            "CEO",
-            "Lead Engineer",
-            "Database Expert",
-            "Developer",
-            "Executor Agent",
-            "Senior Engineer",
-            "Admin",
-        ]
-        if actor_role not in valid_roles:
-            verdict = "REJECTED"
-            reason = f"Role Governance violation: Unrecognized or unauthorized role '{actor_role}'."
-        else:
-            category = action_details.get("category")
-            if category == "budget" and actor_role not in [
-                "CEO",
-                "Lead Engineer",
-                "Database Expert",
-                "Admin",
-            ]:
-                verdict = "REJECTED"
-                reason = f"Role Governance violation: Role '{actor_role}' is not authorized for budget actions."
-
-    # Check if there is an active exception override (FR-108)
-    if action_id in state["exceptions"]:
-        exc = state["exceptions"][action_id]
-        if exc["status"] == "Approved":
-            verdict = "APPROVED"
-            reason = f"Governance Policy Exception approved: {exc['reason']}"
-
-    return {"verdict": verdict, "reason": reason}
+    if opa_result is None:
+        return {
+            "verdict": "REJECTED",
+            "reason": "Security Infrastructure Offline: OPA connection failed (Fail-Secure Enforcement).",
+        }
+    return opa_result
 
 
 # FR-103: Conflict detection
@@ -653,7 +605,7 @@ def verify_fr_106():
 
 
 def verify_fr_107():
-    exc = request_exception("ACT-SSO", "Testing SSO exception")
+    request_exception("ACT-SSO", "Testing SSO exception")
     proc = process_exception("ACT-SSO", "Approved")
     assert proc["status"] == "Approved", "Approval workflow failed."
     return True

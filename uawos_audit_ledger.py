@@ -581,14 +581,23 @@ class UAWOSLineageEmitter:
     def _emit_openlineage(cls, run: LineageRun, event_type: str) -> None:
         """
         Emit OpenLineage event.
-        Wave 2: Local storage only.
-        Production: POST to Marquez REST API.
+        POST to Marquez REST API with timeout protection.
         """
+        import json
+        import urllib.request
+
         event = run.to_openlineage_event(event_type)
-        # Production:
-        # import httpx
-        # httpx.post(cls.MARQUEZ_URL, json=event, timeout=5)
-        _ = event  # Stub
+        try:
+            req_data = json.dumps(event).encode("utf-8")
+            req = urllib.request.Request(
+                cls.MARQUEZ_URL,
+                data=req_data,
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=2.0) as response:
+                response.read()
+        except Exception:
+            pass
 
     @classmethod
     def get_runs(cls, correlation_id: str) -> list[LineageRun]:

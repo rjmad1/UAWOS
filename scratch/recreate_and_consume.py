@@ -4,7 +4,7 @@ req_text = """The backend is strong in foundational engines, governance, memory,
 
 The bigger risk is that UAWOS is currently building a collection of engines rather than a self-operating enterprise execution system.
 
-The missing capabilities are primarily orchestration intelligence, operational automation, and autonomous platform management. These are backend concerns, not UX concerns.  
+The missing capabilities are primarily orchestration intelligence, operational automation, and autonomous platform management. These are backend concerns, not UX concerns.
 
 # What Appears Implemented
 
@@ -27,7 +27,7 @@ These align well with:
 * Identity Platform
 * Value Platform
 
-defined in the PRDs.  
+defined in the PRDs.
 
 ---
 
@@ -289,7 +289,7 @@ Relevant:
 * FR-120
 * NFR-135
 
- 
+
 
 Priority: P1
 
@@ -297,7 +297,7 @@ Priority: P1
 
 # Missing Agent Experience (AX) Layer
 
-The AX document exposes a gap. UAWOS is currently optimized for human operators but not yet for AI operators. 
+The AX document exposes a gap. UAWOS is currently optimized for human operators but not yet for AI operators.
 
 Need:
 
@@ -408,7 +408,7 @@ Priority: P0
 
 # Missing Observability Capabilities
 
-Your NFRs are heavily observability-driven but the roadmap screenshot only surfaces implementation status. 
+Your NFRs are heavily observability-driven but the roadmap screenshot only surfaces implementation status.
 
 Need:
 

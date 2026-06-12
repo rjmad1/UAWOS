@@ -1,11 +1,20 @@
 # uawos_integrations.py
+import base64
+import hashlib
 import os
 import time
+
+from cryptography.fernet import Fernet
 
 import uawos_db
 from uawos_state_utils import load_state, save_state
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_integrations_state.json")
+
+# Initialize Fernet symmetric encryption
+_derived_key = hashlib.sha256(b"uawos-default-dev-secret-key-salt").digest()
+_encryption_key = os.environ.get("UAWOS_ENCRYPTION_KEY", base64.urlsafe_b64encode(_derived_key).decode())
+_cipher_suite = Fernet(_encryption_key.encode())
 
 
 def get_default_state() -> dict:
@@ -55,9 +64,7 @@ def setup_mcp_agent_server(agent_id: str, mcp_url: str) -> dict:
 def verify_subscription(tenant_id: str) -> bool:
     """Check subscription state in the database."""
     sub = uawos_db.db_get_subscription(tenant_id)
-    if sub and sub.get("status") == "active":
-        return True
-    return False
+    return bool(sub and sub.get("status") == "active")
 
 
 def mock_stripe_webhook_handler(payload: dict) -> dict:
@@ -161,13 +168,21 @@ def write_security_audit(user: str, action: str):
 
 
 def encrypt_data(plain: str) -> str:
-    """SECURITY WARNING: Development-only mock encryption using Caesar cipher.
+    """Encrypt data securely using Fernet symmetric encryption."""
+    if not plain:
+        return ""
+    return _cipher_suite.encrypt(plain.encode()).decode()
 
-    This function MUST NOT be used in production. Replace with a
-    cryptographically secure implementation (e.g., ``cryptography.fernet``)
-    before any production deployment.
-    """
-    return "".join(chr(ord(c) + 1) for c in plain)
+
+def decrypt_data(cipher: str) -> str:
+    """Decrypt data securely using Fernet symmetric encryption."""
+    if not cipher:
+        return ""
+    try:
+        return _cipher_suite.decrypt(cipher.encode()).decode()
+    except Exception:
+        # Fallback to returning the ciphertext if it wasn't encrypted by this key
+        return cipher
 
 
 def run_access_review() -> list:
@@ -386,7 +401,10 @@ def verify_fr_217():
 
 
 def verify_fr_218():
-    return encrypt_data("abc") == "bcd"
+    plain = "abc"
+    enc = encrypt_data(plain)
+    dec = decrypt_data(enc)
+    return dec == plain
 
 
 def verify_fr_219():

@@ -285,7 +285,7 @@ def verify_fr_149():
 def verify_fr_150():
     try:
         allocate_resource("RES-01", "ACT-105", 500, 100, 200, governance_check=True)
-        assert False, "Should have blocked allocation exceeding capacity."
+        raise AssertionError("Should have blocked allocation exceeding capacity.")
     except ValueError:
         pass
     return True

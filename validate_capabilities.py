@@ -102,7 +102,7 @@ def run_validation():
             # Run functional check for nested message threading
             session_id = uawos_memory.create_stm_session("tenant-hybrid-test", "Verification Agent")
             m1_id = uawos_memory.add_stm_message(session_id, "user", "How can I refactor checkouts?")
-            m2_id = uawos_memory.add_stm_message(session_id, "agent", "We can apply caching.", parent_message_id=m1_id)
+            uawos_memory.add_stm_message(session_id, "agent", "We can apply caching.", parent_message_id=m1_id)
             context = uawos_memory.get_stm_sliding_context(session_id)
 
             has_parent = False

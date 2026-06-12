@@ -196,7 +196,7 @@ def detect_conflicts() -> list:
         path.pop()
         return False
 
-    for obj_id in objectives.keys():
+    for obj_id in objectives:
         visited = set()
         stack = set()
         path = []

@@ -1,4 +1,5 @@
 # uawos_db.py
+import contextlib
 import hashlib
 import json
 import os
@@ -19,6 +20,21 @@ try:
     QDRANT_AVAILABLE = True
 except ImportError:
     QDRANT_AVAILABLE = False
+
+# Load local .env file variables if present
+_env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+if os.path.exists(_env_path):
+    with open(_env_path, encoding="utf-8") as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _v = _line.split("=", 1)
+                _k = _k.strip()
+                _v = _v.strip()
+                if _v.startswith(('"', "'")) and _v.endswith(('"', "'")):
+                    _v = _v[1:-1]
+                if _k not in os.environ:
+                    os.environ[_k] = _v
 
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "127.0.0.1")
 POSTGRES_PORT = int(os.environ.get("POSTGRES_PORT", 5435))
@@ -154,14 +170,10 @@ def init_db():
         cursor.execute(
             "ALTER TABLE uawos_state ADD COLUMN IF NOT EXISTS tenant_id VARCHAR(50) DEFAULT 'default_tenant';"
         )
-        try:
+        with contextlib.suppress(Exception):
             cursor.execute("ALTER TABLE uawos_state DROP CONSTRAINT IF EXISTS uawos_state_pkey;")
-        except Exception:
-            pass
-        try:
+        with contextlib.suppress(Exception):
             cursor.execute("ALTER TABLE uawos_state ADD CONSTRAINT uawos_state_pkey PRIMARY KEY (key, tenant_id);")
-        except Exception:
-            pass
 
         # STM, Episodic, Semantic tables for Level 5.0 Memory Upgrade
         cursor.execute("""
@@ -240,12 +252,10 @@ def init_db():
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
-        try:
+        with contextlib.suppress(Exception):
             cursor.execute(
                 "ALTER TABLE uawos_semantic_knowledge DROP CONSTRAINT IF EXISTS uawos_semantic_knowledge_content_hash_key;"
             )
-        except Exception:
-            pass
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS uawos_semantic_chunks (
                 chunk_id VARCHAR(255) PRIMARY KEY,
@@ -258,7 +268,7 @@ def init_db():
 
         # Add parent_message_id to STM sliding context
         cursor.execute("""
-            ALTER TABLE uawos_stm_sliding_context 
+            ALTER TABLE uawos_stm_sliding_context
             ADD COLUMN IF NOT EXISTS parent_message_id INTEGER REFERENCES uawos_stm_sliding_context(id) ON DELETE SET NULL;
         """)
 
@@ -302,6 +312,22 @@ def init_db():
                 plan_type VARCHAR(50) NOT NULL,
                 status VARCHAR(50) NOT NULL,
                 expires_at TIMESTAMP
+            );
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS uawos_events (
+                event_id VARCHAR(255) PRIMARY KEY,
+                event_type VARCHAR(255) NOT NULL,
+                event_version VARCHAR(50) NOT NULL,
+                timestamp DOUBLE PRECISION NOT NULL,
+                actor VARCHAR(255) NOT NULL,
+                source VARCHAR(255) NOT NULL,
+                correlation_id VARCHAR(255) NOT NULL,
+                causation_id VARCHAR(255) NOT NULL,
+                entity_ref VARCHAR(255) NOT NULL,
+                payload JSONB DEFAULT '{}',
+                tenant_id VARCHAR(50) DEFAULT 'default_tenant',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
 
@@ -419,6 +445,88 @@ def db_save_state(key: str, state: dict, tenant_id: str = "default_tenant"):
     except Exception as e:
         print(f"Database error saving state for {key} under tenant {tenant_id}: {e}")
         raise e
+
+
+def db_save_event(event: dict) -> None:
+    if not DB_AVAILABLE:
+        return
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO uawos_events (
+                event_id, event_type, event_version, timestamp, actor, source,
+                correlation_id, causation_id, entity_ref, payload, tenant_id
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (event_id) DO NOTHING;
+        """,
+            (
+                event.get("event_id"),
+                event.get("event_type"),
+                event.get("event_version"),
+                event.get("timestamp"),
+                event.get("actor"),
+                event.get("source"),
+                event.get("correlation_id"),
+                event.get("causation_id"),
+                event.get("entity_ref"),
+                json.dumps(event.get("payload", {})),
+                event.get("tenant_id", "default_tenant"),
+            ),
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"db_save_event failed: {e}")
+
+
+def db_get_events(correlation_id: str | None = None, event_type: str | None = None, limit: int = 100) -> list[dict]:
+    if not DB_AVAILABLE:
+        return []
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = "SELECT event_id, event_type, event_version, timestamp, actor, source, correlation_id, causation_id, entity_ref, payload, tenant_id FROM uawos_events"
+        conditions = []
+        params = []
+        if correlation_id:
+            conditions.append("correlation_id = %s")
+            params.append(correlation_id)
+        if event_type:
+            conditions.append("event_type = %s")
+            params.append(event_type)
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        query += " ORDER BY timestamp ASC LIMIT %s"
+        params.append(limit)
+        cursor.execute(query, tuple(params))
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        events = []
+        for r in rows:
+            events.append(
+                {
+                    "event_id": r[0],
+                    "event_type": r[1],
+                    "event_version": r[2],
+                    "timestamp": r[3],
+                    "actor": r[4],
+                    "source": r[5],
+                    "correlation_id": r[6],
+                    "causation_id": r[7],
+                    "entity_ref": r[8],
+                    "payload": r[9] if isinstance(r[9], dict) else json.loads(r[9] or "{}"),
+                    "tenant_id": r[10],
+                }
+            )
+        return events
+    except Exception as e:
+        print(f"db_get_events failed: {e}")
+        return []
 
 
 # Qdrant Indexing Helpers

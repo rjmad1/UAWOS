@@ -38,7 +38,7 @@ def main():
 
     elif args.command == "mcp-connect":
         try:
-            conn = uawos_integrations.setup_mcp_agent_server(agent_id=args.agent, mcp_url=args.mcp_url)
+            uawos_integrations.setup_mcp_agent_server(agent_id=args.agent, mcp_url=args.mcp_url)
             print(f"SUCCESS: MCP server connection established for '{args.agent}' to {args.mcp_url}.")
         except Exception as e:
             print(f"ERROR: Failed to connect MCP: {e}")

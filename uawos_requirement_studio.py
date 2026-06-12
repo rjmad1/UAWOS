@@ -407,7 +407,7 @@ def generate_strategic_product_proposition(req_id: str, title: str, text: str, a
 def create_roadmap_candidate(req_id: str, state: dict) -> dict:
     """Create a new roadmap candidate (CreateRoadmapCandidate API)."""
     # Auto-calculate next RD number
-    existing_rds = [int(k[3:]) for k in state["roadmap_candidates"].keys() if k.startswith("RD-") and k[3:].isdigit()]
+    existing_rds = [int(k[3:]) for k in state["roadmap_candidates"] if k.startswith("RD-") and k[3:].isdigit()]
     # Also check existing hardcoded roadmap items (RD-01 to RD-04)
     all_rd_numbers = existing_rds + [1, 2, 3, 4]
     next_rd_num = max(all_rd_numbers) + 1
@@ -497,7 +497,7 @@ def re_sequence_roadmap(state: dict, active_candidate_id: str) -> list:
 
     # Add candidates
     candidates_list = []
-    for cid, cand in state["roadmap_candidates"].items():
+    for _cid, cand in state["roadmap_candidates"].items():
         if cand["status"] in ["APPROVED", "PUBLISHED", "DRAFT"]:
             candidates_list.append(
                 {

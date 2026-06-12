@@ -21,8 +21,10 @@ Standards: GCF v1.0 (Law 11), ESLS, Security Policy, WAAS Section 25
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import time
+import urllib.request
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
@@ -324,14 +326,39 @@ class AutoGenCodeSandbox:
                 "sandbox": True,
             }
 
-        # Production: HTTP POST to sandbox
-        # import httpx
-        # response = httpx.post(cls.SANDBOX_ENDPOINT, json={
-        #     "code": code, "language": language, "timeout": timeout,
-        # }, headers={...}, timeout=timeout)
-        # return response.json()
+        # Try Live HTTP POST to Sandbox
+        try:
+            req_payload = json.dumps(
+                {
+                    "code": code,
+                    "language": language,
+                    "timeout": timeout,
+                }
+            ).encode("utf-8")
+            req = urllib.request.Request(
+                cls.SANDBOX_ENDPOINT, data=req_payload, headers={"Content-Type": "application/json"}, method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                if resp.status == 200:
+                    res_data = json.loads(resp.read().decode("utf-8"))
+                    UAWOSAuditLedger.write(
+                        LedgerEntry.from_context(
+                            "CODE_EXECUTION_SANDBOXED",
+                            ctx,
+                            "APPROVED",
+                            reason="Code executed in live Docker sandbox",
+                            payload={
+                                "code_hash": code_hash,
+                                "language": language,
+                                "exit_code": res_data.get("exit_code"),
+                            },
+                        )
+                    )
+                    return res_data
+        except Exception:
+            pass
 
-        # Wave 6 simulation
+        # Wave 6 simulation fallback
         UAWOSAuditLedger.write(
             LedgerEntry.from_context(
                 "CODE_EXECUTION_SANDBOXED",
@@ -504,18 +531,32 @@ class AutoGenConversableAdapter(UAWOSBaseAgentRuntime):
 
         if _AUTOGEN_AVAILABLE:
             # Production: create AutoGen agents with sandbox code execution
-            # assistant = autogen.ConversableAgent(
-            #     "assistant", system_message=system_message,
-            #     llm_config={...},
-            #     code_execution_config=False,  # DISABLE local code exec
-            # )
-            # user_proxy = autogen.ConversableAgent(
-            #     "user_proxy",
-            #     code_execution_config={"executor": AutoGenCodeSandbox},
-            #     human_input_mode="NEVER",
-            # )
-            # result = user_proxy.initiate_chat(assistant, message=prompt, max_turns=3)
-            messages = self._simulate_conversation(prompt, system_message, context)
+            llm_config = {
+                "config_list": [
+                    {
+                        "model": "tinyllama",
+                        "base_url": os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434") + "/v1",
+                        "api_key": "ollama",
+                    }
+                ],
+                "cache_seed": None,
+            }
+            assistant = autogen.ConversableAgent(
+                "assistant",
+                system_message=system_message,
+                llm_config=llm_config,
+                code_execution_config=False,  # DISABLE local code exec
+            )
+            # Create a sandbox executor
+            sandbox_executor = AutoGenCodeSandbox()
+            user_proxy = autogen.ConversableAgent(
+                "user_proxy",
+                code_execution_config={"executor": sandbox_executor},
+                human_input_mode="NEVER",
+                llm_config=False,
+            )
+            result = user_proxy.initiate_chat(assistant, message=prompt, max_turns=3)
+            messages = result.chat_history
         else:
             messages = self._simulate_conversation(prompt, system_message, context)
 

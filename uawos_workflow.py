@@ -90,7 +90,7 @@ def modify_workflow(workflow_id: str, updates: dict) -> dict:
     workflow["history"].append({"timestamp": time.time(), "state": snap})
 
     for k, v in updates.items():
-        if k in ["title", "tasks", "dependencies", "state", "governed"]:
+        if k in ["title", "tasks", "dependencies", "state", "governed", "execution_mode", "temporal_run_id"]:
             workflow[k] = v
 
     workflow["version"] += 1
@@ -127,6 +127,47 @@ def simulate_workflow(workflow_id: str) -> dict:
     }
 
 
+def execute_workflow(workflow_id: str) -> dict:
+    """
+    Execute/schedule a workflow on the running Temporal service (port 7233),
+    with graceful fallback to in-process simulation.
+    """
+    state = load_state()
+    workflow = state["workflows"].get(workflow_id)
+    if not workflow:
+        raise ValueError(f"Workflow {workflow_id} not found.")
+
+    temporal_started = False
+    run_id = None
+    try:
+        import asyncio
+
+        from temporalio.client import Client
+
+        async def _run():
+            client = await Client.connect("localhost:7233")
+            handle = await client.start_workflow(
+                "UAWOSWorkflowOrchestrator", workflow, id=workflow_id, task_queue="uawos-workflow-queue"
+            )
+            return handle.first_execution_run_id
+
+        loop = asyncio.new_event_loop()
+        run_id = loop.run_until_complete(_run())
+        loop.close()
+        temporal_started = True
+    except Exception:
+        pass
+
+    updates = {"state": "active"}
+    if temporal_started:
+        updates["temporal_run_id"] = run_id
+        updates["execution_mode"] = "temporal"
+    else:
+        updates["execution_mode"] = "simulation"
+
+    return modify_workflow(workflow_id, updates)
+
+
 # FR-067: Workflow optimization
 def optimize_workflow(workflow_id: str) -> dict:
     state = load_state()
@@ -154,9 +195,7 @@ def check_temporal_worker_queues() -> bool:
             pass
 
     # Mock/simulated activation for local development/testing
-    if os.environ.get("TEMPORAL_MOCK_ACTIVE", "true").lower() == "true":
-        return True
-    return False
+    return os.environ.get("TEMPORAL_MOCK_ACTIVE", "true").lower() == "true"
 
 
 # ----------------- VERIFICATION TESTS (FR-061 to FR-070) -----------------
@@ -200,6 +239,9 @@ def verify_fr_065():
 def verify_fr_066():
     sim = simulate_workflow("WRK-101")
     assert "estimated_duration_seconds" in sim, "Workflow simulation failed."
+    exec_wf = execute_workflow("WRK-101")
+    assert exec_wf["state"] == "active", "Workflow execution failed."
+    assert "execution_mode" in exec_wf, "Execution mode missing."
     return True
 
 

@@ -104,6 +104,34 @@ try {
     Write-Host "     Start manually later: docker compose --profile core up -d" -ForegroundColor Gray
 }
 
+# --- Pull tinyllama model for Ollama ---
+Write-Host ""
+Write-Host "► Checking Ollama local model..." -ForegroundColor Yellow
+$ollamaUrl = "http://127.0.0.1:11434"
+try {
+    $tags = Invoke-RestMethod -Uri "$ollamaUrl/api/tags" -Method Get -TimeoutSec 5
+    $hasModel = $false
+    if ($tags -and $tags.models) {
+        foreach ($m in $tags.models) {
+            if ($m.name -like "*tinyllama*") {
+                $hasModel = $true
+                break
+            }
+        }
+    }
+    if (-not $hasModel) {
+        Write-Host "  ... Pulling tinyllama model (this may take a minute)..." -ForegroundColor Yellow
+        $body = @{ name = "tinyllama" } | ConvertTo-Json
+        $null = Invoke-RestMethod -Uri "$ollamaUrl/api/pull" -Method Post -Body $body -ContentType "application/json" -TimeoutSec 300
+        Write-Host "  ✓ tinyllama model pulled successfully" -ForegroundColor Green
+    } else {
+        Write-Host "  ✓ tinyllama model already present" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "  ⚠  Ollama is not running on $ollamaUrl or failed to pull model." -ForegroundColor Yellow
+    Write-Host "     Please start Ollama and run: ollama pull tinyllama" -ForegroundColor Gray
+}
+
 # --- Wait for PostgreSQL ---
 Write-Host ""
 Write-Host "► Waiting for PostgreSQL to be ready..." -ForegroundColor Yellow

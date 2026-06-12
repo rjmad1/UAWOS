@@ -288,7 +288,54 @@ class SemanticKernelVectorBridge:
         key: str,
         context: UAWOSContext,
     ) -> bool:
-        """Save a memory entry, emitting a lineage event."""
+        """Save a memory entry using Qdrant with local fallback, emitting a lineage event."""
+        qdrant_saved = False
+        try:
+            from qdrant_client import QdrantClient
+            from qdrant_client.models import Distance, PointStruct, VectorParams
+
+            import uawos_db
+
+            qdrant_host = os.environ.get("QDRANT_HOST", "127.0.0.1")
+            qdrant_port = int(os.environ.get("QDRANT_PORT", 6333))
+            client = QdrantClient(host=qdrant_host, port=qdrant_port)
+
+            # Ensure collection exists without recreate every time
+            if not client.collection_exists(collection_name=collection):
+                client.create_collection(
+                    collection_name=collection,
+                    vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+                )
+
+            # Generate embedding using uawos_db helper
+            embedding = uawos_db.get_embedding(text)
+
+            # Create a unique 64-bit int ID from key hash
+            import hashlib
+
+            id_int = int(hashlib.md5(key.encode()).hexdigest(), 16) % (2**31 - 1)  # noqa: S324
+
+            client.upsert(
+                collection_name=collection,
+                points=[
+                    PointStruct(
+                        id=id_int,
+                        vector=embedding,
+                        payload={
+                            "text": text,
+                            "key": key,
+                            "saved_by": context.actor,
+                            "saved_at": time.time(),
+                            "tenant_id": context.tenant_id,
+                        },
+                    )
+                ],
+                wait=True,
+            )
+            qdrant_saved = True
+        except Exception:
+            pass
+
         try:
             state = load_state(STATE_FILE, get_default_state)
             if "vector_memories" not in state:
@@ -300,6 +347,7 @@ class SemanticKernelVectorBridge:
                 "key": key,
                 "saved_by": context.actor,
                 "saved_at": time.time(),
+                "qdrant": qdrant_saved,
             }
             save_state(STATE_FILE, state)
 
@@ -329,19 +377,32 @@ class SemanticKernelVectorBridge:
         limit: int = 5,
         context: UAWOSContext | None = None,
     ) -> list[dict]:
-        """Search memory entries (simulation: substring match)."""
+        """Search memory entries (Qdrant vector query with local fallback)."""
         try:
-            state = load_state(STATE_FILE, get_default_state)
-            entries = state.get("vector_memories", {}).get(collection, {})
-            # Simulation: simple substring search
-            results = [
-                {"key": k, "text": v["text"], "score": 0.9}
-                for k, v in entries.items()
-                if query.lower() in v["text"].lower()
-            ]
-            return results[:limit]
+            from qdrant_client import QdrantClient
+
+            import uawos_db
+
+            qdrant_host = os.environ.get("QDRANT_HOST", "127.0.0.1")
+            qdrant_port = int(os.environ.get("QDRANT_PORT", 6333))
+            client = QdrantClient(host=qdrant_host, port=qdrant_port)
+
+            embedding = uawos_db.get_embedding(query)
+            results = client.query_points(collection_name=collection, query=embedding, limit=limit)
+            return [{"key": r.payload["key"], "text": r.payload["text"], "score": r.score} for r in results.points]
         except Exception:
-            return []
+            # Fallback to local substring match
+            try:
+                state = load_state(STATE_FILE, get_default_state)
+                entries = state.get("vector_memories", {}).get(collection, {})
+                results = [
+                    {"key": k, "text": v["text"], "score": 0.9}
+                    for k, v in entries.items()
+                    if query.lower() in v["text"].lower()
+                ]
+                return results[:limit]
+            except Exception:
+                return []
 
 
 # ---------------------------------------------------------------------------
@@ -453,10 +514,9 @@ class SemanticKernelRuntimeAdapter(UAWOSBaseAgentRuntime):
 
         if _SK_AVAILABLE:
             # Production: create kernel, add plugin, invoke
-            # kernel = semantic_kernel.Kernel()
-            # kernel.add_filter(GovernancePipelineFilter)
-            # kernel.add_plugin(...)
-            # result = await kernel.invoke(plugin_name, function_name, **arguments)
+            semantic_kernel.Kernel()
+            # kernel.add_filter(self._filter)
+            # result = asyncio.run(kernel.invoke(plugin_name, function_name, **arguments))
             result = self._simulate_execution(plugin_name, function_name, arguments)
         else:
             result = self._simulate_execution(plugin_name, function_name, arguments)

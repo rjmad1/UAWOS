@@ -13,7 +13,7 @@ def listen_on_port(port, name):
         while True:
             client, addr = server.accept()
             try:
-                request = client.recv(1024)
+                client.recv(1024)
                 response = f'HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\n\r\n{{"status":"healthy","mock":"{name}"}}\n'
                 client.sendall(response.encode("utf-8"))
             except Exception as client_err:

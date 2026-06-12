@@ -3,6 +3,7 @@ import json
 import os
 import socket
 import time
+import urllib.request
 
 from uawos_state_utils import load_state, save_state
 
@@ -60,30 +61,24 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     dtrack_host = os.environ.get("DTRACK_HOST", "127.0.0.1")
     dtrack_port = int(os.environ.get("DTRACK_PORT", 8081))
 
-    opa_online = check_port(opa_host, opa_port) or os.environ.get("OPA_MOCK_ACTIVE", "true").lower() == "true"
+    opa_online = check_port(opa_host, opa_port) or os.environ.get("OPA_MOCK_ACTIVE", "false").lower() == "true"
     openfga_online = (
-        check_port(openfga_host, openfga_port) or os.environ.get("OPENFGA_MOCK_ACTIVE", "true").lower() == "true"
+        check_port(openfga_host, openfga_port) or os.environ.get("OPENFGA_MOCK_ACTIVE", "false").lower() == "true"
     )
     qdrant_online = (
-        check_port(qdrant_host, qdrant_port) or os.environ.get("QDRANT_MOCK_ACTIVE", "true").lower() == "true"
+        check_port(qdrant_host, qdrant_port) or os.environ.get("QDRANT_MOCK_ACTIVE", "false").lower() == "true"
     )
     postgres_online = (
-        check_port(postgres_host, postgres_port) or os.environ.get("POSTGRES_MOCK_ACTIVE", "true").lower() == "true"
+        check_port(postgres_host, postgres_port) or os.environ.get("POSTGRES_MOCK_ACTIVE", "false").lower() == "true"
     )
-    clickhouse_online = (
+    (
         check_port(clickhouse_host, 8124)
         or check_port(clickhouse_host, clickhouse_port)
-        or os.environ.get("CLICKHOUSE_MOCK_ACTIVE", "true").lower() == "true"
+        or os.environ.get("CLICKHOUSE_MOCK_ACTIVE", "false").lower() == "true"
     )
-    marquez_online = (
-        check_port(marquez_host, marquez_port) or os.environ.get("MARQUEZ_MOCK_ACTIVE", "true").lower() == "true"
-    )
-    superset_online = (
-        check_port(superset_host, superset_port) or os.environ.get("SUPERSET_MOCK_ACTIVE", "true").lower() == "true"
-    )
-    dtrack_online = (
-        check_port(dtrack_host, dtrack_port) or os.environ.get("DTRACK_MOCK_ACTIVE", "true").lower() == "true"
-    )
+    (check_port(marquez_host, marquez_port) or os.environ.get("MARQUEZ_MOCK_ACTIVE", "false").lower() == "true")
+    (check_port(superset_host, superset_port) or os.environ.get("SUPERSET_MOCK_ACTIVE", "false").lower() == "true")
+    (check_port(dtrack_host, dtrack_port) or os.environ.get("DTRACK_MOCK_ACTIVE", "false").lower() == "true")
 
     # Engine import checks
     has_obj = check_module("uawos_objective")
@@ -96,7 +91,7 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     has_governance = check_module("uawos_governance")
     has_knowledge = check_module("uawos_knowledge")
     has_memory = check_module("uawos_memory")
-    has_learning = check_module("uawos_learning")
+    check_module("uawos_learning")
     has_resource = check_module("uawos_resource")
     has_budget = check_module("uawos_budget")
     has_decision = check_module("uawos_decision")
@@ -268,9 +263,8 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     try:
         import uawos_workflow
 
-        if hasattr(uawos_workflow, "check_temporal_worker_queues"):
-            if uawos_workflow.check_temporal_worker_queues():
-                has_temporal_worker = True
+        if hasattr(uawos_workflow, "check_temporal_worker_queues") and uawos_workflow.check_temporal_worker_queues():
+            has_temporal_worker = True
     except Exception:
         pass
 

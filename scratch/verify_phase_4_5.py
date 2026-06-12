@@ -8,6 +8,8 @@ project_root = r"C:/Users/rajaj/Projects/UAWOS"
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
+import contextlib
+
 import uawos_db
 import uawos_knowledge
 import uawos_state_utils
@@ -40,10 +42,20 @@ def verify_neo4j_sync():
     payload = {"statements": [{"statement": query, "parameters": {"id": asset_id}}]}
 
     try:
+        import base64
+
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+        auth_str = os.environ.get("NEO4J_AUTH", "neo4j/uawos-change-me")
+        if auth_str and auth_str.lower() != "none" and "/" in auth_str:
+            user, pw = auth_str.split("/", 1)
+            base64string = base64.b64encode(f"{user}:{pw}".encode()).decode("utf-8")
+            headers["Authorization"] = f"Basic {base64string}"
+
         req_data = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            url, data=req_data, headers={"Content-Type": "application/json", "Accept": "application/json"}
-        )
+        req = urllib.request.Request(url, data=req_data, headers=headers)
         with urllib.request.urlopen(req, timeout=1.0) as resp:
             res = json.loads(resp.read().decode("utf-8"))
             results = res.get("results", [])
@@ -62,7 +74,6 @@ def verify_neo4j_sync():
 def verify_tenant_isolation():
     print("--- Verifying Multi-Tenant State Isolation ---")
 
-    test_key = "uawos_test_tenant_state"
     state_file = os.path.join(project_root, "uawos_test_tenant_state.json")
 
     # Define caller STATE_FILE and get_default_state
@@ -101,10 +112,8 @@ def verify_tenant_isolation():
     finally:
         # Cleanup file if exists
         if os.path.exists(state_file):
-            try:
+            with contextlib.suppress(Exception):
                 os.remove(state_file)
-            except Exception:
-                pass
     return False
 
 

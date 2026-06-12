@@ -19,6 +19,7 @@ FR Range:  FR-091 to FR-100 (Agent Workforce), FR-061 to FR-070 (Workflow)
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import os
 import time
 import uuid
@@ -496,10 +497,8 @@ class UAWOSTraceProvider(ITraceProvider):
                 for k, v in e.items():
                     if hasattr(evt, k):
                         if k == "event_type":
-                            try:
+                            with contextlib.suppress(ValueError):
                                 setattr(evt, k, EventCategory(v))
-                            except ValueError:
-                                pass
                         else:
                             setattr(evt, k, v)
                 result.append(evt)

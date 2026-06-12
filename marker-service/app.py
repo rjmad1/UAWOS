@@ -23,7 +23,7 @@ def convert():
     # Mock PDF to Markdown conversion
     pdf_content = file.read()
     mock_markdown = f"""# Converted Document: {file.filename}
-    
+
 This is a mock markdown representation of the uploaded PDF file.
 Length of processed binary: {len(pdf_content)} bytes.
 

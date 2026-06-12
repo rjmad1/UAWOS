@@ -134,7 +134,7 @@ def _resolve_roadmap_mapping(section):
     ]:
         roadmap_item = "RD-02"
         design_doc = "COS, FGKAS & SDD"
-        if section == KNOWLEDGE_MGMT or section == MEMORY_MGMT:
+        if section in (KNOWLEDGE_MGMT, MEMORY_MGMT):
             epic = "EP-07: Semantic Memory & Knowledge"
         elif section == DECISION_INT:
             epic = "EP-10: Recommendation & Reasoning"
@@ -322,7 +322,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
         elif req_id in ["FR-252", "FR-253", "FR-255", "FR-257"]:
             dtase_ok = False
             try:
-                import uawos_dtase
+                import uawos_dtase  # noqa: F401
 
                 dtase_ok = True
             except ImportError:
@@ -389,7 +389,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
     elif roadmap_item == "RD-03" and section == BUDGET_COST_MGMT:
         budget_ok = False
         try:
-            import uawos_budget
+            import uawos_budget  # noqa: F401
 
             budget_ok = True
         except ImportError:
@@ -566,7 +566,7 @@ def _resolve_requirement_status(req_id, section, roadmap_item, health):
     # Integration requirements
     if section == "Integrations":
         try:
-            import uawos_integrations
+            import uawos_integrations  # noqa: F401
 
             integrations_ok = True
         except ImportError:

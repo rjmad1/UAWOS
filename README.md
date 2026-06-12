@@ -362,4 +362,20 @@ Verify system engines and platform capabilities:
 .venv\Scripts\python.exe validate_capabilities.py
 ```
 
+---
+
+## 🛡️ License, Attribution, and Governance
+
+This repository contains the core software for the **Universal AI Workforce Operating System (UAWOS)**.
+
+### Original Authorship
+The system architecture, control plane engines, verification tools, UI dashboards, and deployment automation scripts are original works authored and engineered by **Raja Jeevan Kumar Maduri** ([LinkedIn Profile](https://www.linkedin.com/in/rajajeevankumar/)).
+
+### Open-Source Technologies
+We gratefully build on top of key open-source technologies, including FastAPI, Qdrant, OpenFGA, Open Policy Agent, Marquez, Neo4j, and Mesa. We strictly respect the licenses of all upstream libraries. Factual attribution details, license splits, and component isolation strategies are documented in [PROJECT_ATTRIBUTION_PROVENANCE.md](./PROJECT_ATTRIBUTION_PROVENANCE.md).
+
+### Contact & Contributions
+For inquiries regarding system architecture, product deployment, or professional collaboration, please connect via [LinkedIn](https://www.linkedin.com/in/rajajeevankumar/). Contributions must adhere to our [CONTRIBUTING.md](./CONTRIBUTING.md) guidelines and respect our dependency sandboxing architecture.
+
+
 

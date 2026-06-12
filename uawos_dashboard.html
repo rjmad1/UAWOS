@@ -687,6 +687,7 @@
                     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-dtase" id="btn-tab-dtase" onclick="switchTab(event, 'tab-dtase')">DTASE Engine</button>
                     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-budget" id="btn-tab-budget" onclick="switchTab(event, 'tab-budget')">Budget & Cost</button>
                     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-pmcms" id="btn-tab-pmcms" onclick="switchTab(event, 'tab-pmcms')">Platform Maturity (PMCMS)</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-governance" id="btn-tab-governance" onclick="switchTab(event, 'tab-governance')">Proactive Governance</button>
                     <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-docs" id="btn-tab-docs" onclick="switchTab(event, 'tab-docs')">Documentation</button>
                     <a href="/roadmap.html" class="tab-btn" role="link" aria-label="Roadmap Intelligence (opens in new page)" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Roadmap Intelligence ↗</a>
                     <a href="/architecture.html" class="tab-btn" role="link" aria-label="Architecture Diagrams (opens in new page)" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Architecture Diagrams ↗</a>
@@ -870,6 +871,270 @@
                             </div>
                         </div>
 
+                    </div>
+                </div>
+
+                <!-- Proactive Governance Tab -->
+                <div id="tab-governance" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-governance">
+                    <!-- Top control row -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700; color: white; margin: 0 0 4px 0;">Proactive Platform Governance System (PPGS)</h2>
+                            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0;">
+                                Continuous software risk analysis, architectural boundaries validation, and reliability forecasting.
+                            </p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span id="gov-last-updated" style="font-size: 0.76rem; color: var(--text-secondary); font-family: monospace;">Last scanned: Never</span>
+                            <button id="btn-run-governance" onclick="runGovernanceAudit()" class="action-btn" style="background: var(--primary); border-color: var(--primary); font-size: 0.85rem; padding: 6px 16px;">Trigger Live Governance Scan</button>
+                        </div>
+                    </div>
+
+                    <!-- Scores & Trend Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Score 1: Platform Confidence -->
+                        <div class="glass" style="padding: 1.25rem; display: flex; align-items: center; justify-content: space-around; background: rgba(16, 185, 129, 0.02); border: 1px solid rgba(16, 185, 129, 0.12);">
+                            <div class="health-ring-container" style="width: 100px; height: 100px;">
+                                <svg class="health-svg" width="100" height="100" viewBox="0 0 160 160">
+                                    <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                                    <circle class="health-ring-fill" id="gov-confidence-ring" cx="80" cy="80" r="70" style="stroke: var(--green); filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.3));" />
+                                </svg>
+                                <div class="health-percentage-text">
+                                    <span class="health-pct" id="gov-confidence-score" style="font-size: 1.6rem; color: var(--green);">0</span>
+                                    <span class="health-label" style="font-size: 0.55rem; letter-spacing: 0.5px;">CONFIDENCE</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 4px; max-width: 50%;">
+                                <span style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Confidence Score</span>
+                                <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.3; margin: 0;">Code quality and test coverage confidence.</p>
+                            </div>
+                        </div>
+
+                        <!-- Score 2: Future Risk -->
+                        <div class="glass" style="padding: 1.25rem; display: flex; align-items: center; justify-content: space-around; background: rgba(239, 68, 68, 0.02); border: 1px solid rgba(239, 68, 68, 0.12);">
+                            <div class="health-ring-container" style="width: 100px; height: 100px;">
+                                <svg class="health-svg" width="100" height="100" viewBox="0 0 160 160">
+                                    <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                                    <circle class="health-ring-fill" id="gov-risk-ring" cx="80" cy="80" r="70" style="stroke: var(--red); filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.3));" />
+                                </svg>
+                                <div class="health-percentage-text">
+                                    <span class="health-pct" id="gov-risk-score" style="font-size: 1.6rem; color: var(--red);">0</span>
+                                    <span class="health-label" style="font-size: 0.55rem; letter-spacing: 0.5px;">FUTURE RISK</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 4px; max-width: 50%;">
+                                <span style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Future Risk Index</span>
+                                <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.3; margin: 0;">Debt, circularity, and risk warnings.</p>
+                            </div>
+                        </div>
+
+                        <!-- Score 3: Operational Readiness -->
+                        <div class="glass" style="padding: 1.25rem; display: flex; align-items: center; justify-content: space-around; background: rgba(99, 102, 241, 0.02); border: 1px solid rgba(99, 102, 241, 0.12);">
+                            <div class="health-ring-container" style="width: 100px; height: 100px;">
+                                <svg class="health-svg" width="100" height="100" viewBox="0 0 160 160">
+                                    <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                                    <circle class="health-ring-fill" id="gov-readiness-ring" cx="80" cy="80" r="70" style="stroke: #818cf8; filter: drop-shadow(0 0 6px rgba(129, 140, 248, 0.3));" />
+                                </svg>
+                                <div class="health-percentage-text">
+                                    <span class="health-pct" id="gov-readiness-score" style="font-size: 1.6rem; color: #a5b4fc;">0</span>
+                                    <span class="health-label" style="font-size: 0.55rem; letter-spacing: 0.5px;">READINESS</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 4px; max-width: 50%;">
+                                <span style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Readiness Index</span>
+                                <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.3; margin: 0;">Platform compliance and production readiness.</p>
+                            </div>
+                        </div>
+
+                        <!-- Stats Card -->
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Stability Trend</span>
+                                <span id="gov-stability-trend" class="status-pill green" style="font-size: 0.72rem; padding: 2px 8px;">Stable</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem;">
+                                <div style="color: var(--text-secondary);">Python Files: <strong id="gov-stat-files" style="color: white; float: right;">0</strong></div>
+                                <div style="color: var(--text-secondary);">LOC Checked: <strong id="gov-stat-loc" style="color: white; float: right;">0</strong></div>
+                                <div style="color: var(--text-secondary);">Active TODOs: <strong id="gov-stat-todos" style="color: white; float: right;">0</strong></div>
+                                <div style="color: var(--text-secondary);">Suppressions: <strong id="gov-stat-suppressions" style="color: white; float: right;">0</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning Register & Decision Matrix Grid -->
+                    <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 2rem; align-items: start;">
+                        <!-- Early Warning Register -->
+                        <div class="glass" style="padding: 1.5rem;">
+                            <h3 class="section-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                                <span>Platform Early Warning Register</span>
+                            </h3>
+                            <div class="table-container" style="max-height: 320px;">
+                                <table aria-label="Early Warning Register">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Title / Evidence</th>
+                                            <th>Predicted Outcome</th>
+                                            <th>Horizon</th>
+                                            <th>Severity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-warnings-tbody">
+                                        <!-- Dynamic warnings -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Decision Support Matrix -->
+                        <div class="glass" style="padding: 1.5rem;">
+                            <h3 class="section-title" style="color: #60a5fa;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="9" y1="3" x2="9" y2="21"/>
+                                    <line x1="15" y1="3" x2="15" y2="21"/>
+                                    <line x1="3" y1="9" x2="21" y2="9"/>
+                                    <line x1="3" y1="15" x2="21" y2="15"/>
+                                </svg>
+                                <span>Proactive Decision Matrix</span>
+                            </h3>
+                            <div class="table-container" style="max-height: 320px;">
+                                <table aria-label="Decision Support Matrix">
+                                    <thead>
+                                        <tr>
+                                            <th>Option</th>
+                                            <th>Cost</th>
+                                            <th>Risk Reduction</th>
+                                            <th>Projected ROI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-decisions-tbody">
+                                        <!-- Dynamic decision matrix options -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Governance Registries Panel -->
+                    <div class="glass" style="padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 1.25rem;">
+                            <h3 class="section-title" style="margin: 0; color: #a78bfa;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10 9 9 9 8 9"/>
+                                </svg>
+                                <span>Technical Registries & Audits</span>
+                            </h3>
+                            <div style="display: flex; gap: 8px;" id="gov-subtabs">
+                                <button class="action-btn action-btn-primary active" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-test')">Test Gaps</button>
+                                <button class="action-btn action-btn-primary" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-blast')">Blast Radius</button>
+                                <button class="action-btn action-btn-primary" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-arch')">Arch & Coupling</button>
+                                <button class="action-btn action-btn-primary" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-forecast')">Health Forecasts</button>
+                                <button class="action-btn action-btn-primary" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-dependencies')">Dependencies</button>
+                            </div>
+                        </div>
+
+                        <!-- Registry Sub-tab contents -->
+                        <div id="gov-subtab-test" class="gov-subtab-content" style="display: block;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Test Confidence Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Component</th>
+                                            <th>Confidence Score</th>
+                                            <th>Tests Linked</th>
+                                            <th>Coverage Gap Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-test-tbody">
+                                        <!-- Test intelligence table -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="gov-subtab-blast" class="gov-subtab-content" style="display: none;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Blast Radius Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Module Name</th>
+                                            <th>Blast Radius Score</th>
+                                            <th>Criticality</th>
+                                            <th>Downstream Dependents</th>
+                                            <th>Upstream Dependents</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-blast-tbody">
+                                        <!-- Blast radius table -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="gov-subtab-arch" class="gov-subtab-content" style="display: none;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Architecture Violations Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Component</th>
+                                            <th>Violations / Risk</th>
+                                            <th>Remediation Recommendation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-arch-tbody">
+                                        <!-- Architectural risks table -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="gov-subtab-forecast" class="gov-subtab-content" style="display: none;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Reliability Forecasting Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Horizon</th>
+                                            <th>Predicted Risk Description</th>
+                                            <th>Probability</th>
+                                            <th>Impact Score</th>
+                                            <th>System Blast Radius</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-forecast-tbody">
+                                        <!-- Reliability forecasts table -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="gov-subtab-dependencies" class="gov-subtab-content" style="display: none;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Package Compliance Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Package Name</th>
+                                            <th>License Type</th>
+                                            <th>Verdict</th>
+                                            <th>Security Vulnerability Status</th>
+                                            <th>Operational Concerns</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-dep-tbody">
+                                        <!-- Dependency Risk Registry -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1609,6 +1874,313 @@
             evt.currentTarget.classList.add("active");
             if (evt.currentTarget.hasAttribute("aria-selected")) {
                 evt.currentTarget.setAttribute("aria-selected", "true");
+            }
+        }
+
+        function switchGovSubTab(evt, subTabId) {
+            const contents = document.getElementsByClassName("gov-subtab-content");
+            for (const content of contents) {
+                content.style.display = "none";
+            }
+            const buttons = document.getElementById("gov-subtabs").getElementsByTagName("button");
+            for (const btn of buttons) {
+                btn.classList.remove("active");
+            }
+            document.getElementById(subTabId).style.display = "block";
+            evt.currentTarget.classList.add("active");
+        }
+
+        async function fetchGovernanceStatus() {
+            try {
+                const res = await fetch("/api/governance/status");
+                if (!res.ok) throw new Error("Failed to fetch governance status");
+                const data = await res.json();
+                updateGovernanceUI(data);
+            } catch (err) {
+                console.error("Governance fetch error:", err);
+            }
+        }
+
+        async function runGovernanceAudit() {
+            const btn = document.getElementById("btn-run-governance");
+            const originalText = btn.textContent;
+            btn.textContent = "Auditing Codebase...";
+            btn.disabled = true;
+            try {
+                const res = await fetch("/api/governance/run", { method: "POST" });
+                if (!res.ok) throw new Error("Failed to execute governance run");
+                const data = await res.json();
+                updateGovernanceUI(data);
+                showCustomToast("Governance audit completed successfully.");
+            } catch (err) {
+                console.error("Governance run error:", err);
+                alert("Error triggering audit: " + err.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function updateGovernanceUI(data) {
+            if (!data || !data.metrics) return;
+
+            // Update timestamp
+            document.getElementById("gov-last-updated").textContent = "Last scanned: " + (data.timestamp || new Date().toLocaleString());
+
+            // Update scores
+            const conf = data.metrics.platform_confidence_score || 0;
+            const risk = data.metrics.future_risk_score || 0;
+            const read = data.metrics.operational_readiness_score || 0;
+
+            document.getElementById("gov-confidence-score").textContent = conf;
+            document.getElementById("gov-risk-score").textContent = risk;
+            document.getElementById("gov-readiness-score").textContent = read;
+
+            const fillRing = (ringId, score, maxVal = 100) => {
+                const ring = document.getElementById(ringId);
+                if (ring) {
+                    const r = ring.r.baseVal.value || 70;
+                    const circumference = r * 2 * Math.PI;
+                    ring.style.strokeDasharray = `${circumference} ${circumference}`;
+                    ring.style.strokeDashoffset = circumference - (Math.min(maxVal, Math.max(0, score)) / maxVal) * circumference;
+                }
+            };
+
+            fillRing("gov-confidence-ring", conf);
+            fillRing("gov-risk-ring", risk);
+            fillRing("gov-readiness-ring", read);
+
+            // Set ring colors & glows dynamically
+            const confRing = document.getElementById("gov-confidence-ring");
+            if (confRing) {
+                if (conf >= 70) {
+                    confRing.style.stroke = "var(--green)";
+                    confRing.style.filter = "drop-shadow(0 0 6px rgba(16, 185, 129, 0.4))";
+                    document.getElementById("gov-confidence-score").style.color = "var(--green)";
+                } else if (conf >= 40) {
+                    confRing.style.stroke = "var(--yellow)";
+                    confRing.style.filter = "drop-shadow(0 0 6px rgba(245, 158, 11, 0.4))";
+                    document.getElementById("gov-confidence-score").style.color = "var(--yellow)";
+                } else {
+                    confRing.style.stroke = "var(--red)";
+                    confRing.style.filter = "drop-shadow(0 0 6px rgba(239, 68, 68, 0.4))";
+                    document.getElementById("gov-confidence-score").style.color = "var(--red)";
+                }
+            }
+
+            const riskRing = document.getElementById("gov-risk-ring");
+            if (riskRing) {
+                // For risk, lower is better
+                if (risk < 35) {
+                    riskRing.style.stroke = "var(--green)";
+                    riskRing.style.filter = "drop-shadow(0 0 6px rgba(16, 185, 129, 0.4))";
+                    document.getElementById("gov-risk-score").style.color = "var(--green)";
+                } else if (risk < 65) {
+                    riskRing.style.stroke = "var(--yellow)";
+                    riskRing.style.filter = "drop-shadow(0 0 6px rgba(245, 158, 11, 0.4))";
+                    document.getElementById("gov-risk-score").style.color = "var(--yellow)";
+                } else {
+                    riskRing.style.stroke = "var(--red)";
+                    riskRing.style.filter = "drop-shadow(0 0 6px rgba(239, 68, 68, 0.4))";
+                    document.getElementById("gov-risk-score").style.color = "var(--red)";
+                }
+            }
+
+            const readRing = document.getElementById("gov-readiness-ring");
+            if (readRing) {
+                if (read >= 75) {
+                    readRing.style.stroke = "#818cf8";
+                    readRing.style.filter = "drop-shadow(0 0 6px rgba(129, 140, 248, 0.4))";
+                    document.getElementById("gov-readiness-score").style.color = "#a5b4fc";
+                } else if (read >= 50) {
+                    readRing.style.stroke = "var(--yellow)";
+                    readRing.style.filter = "drop-shadow(0 0 6px rgba(245, 158, 11, 0.4))";
+                    document.getElementById("gov-readiness-score").style.color = "var(--yellow)";
+                } else {
+                    readRing.style.stroke = "var(--red)";
+                    readRing.style.filter = "drop-shadow(0 0 6px rgba(239, 68, 68, 0.4))";
+                    document.getElementById("gov-readiness-score").style.color = "var(--red)";
+                }
+            }
+
+            // Update stability trend badge
+            const trend = data.metrics.predicted_stability_trend || "Stable";
+            const trendEl = document.getElementById("gov-stability-trend");
+            if (trendEl) {
+                trendEl.textContent = trend;
+                if (trend === "Stable") {
+                    trendEl.className = "status-pill green";
+                } else if (trend === "Improving") {
+                    trendEl.className = "status-pill blue";
+                } else {
+                    trendEl.className = "status-pill red";
+                }
+            }
+
+            // Stats
+            document.getElementById("gov-stat-files").textContent = data.metrics.total_python_files || 0;
+            document.getElementById("gov-stat-loc").textContent = (data.metrics.total_lines_of_code || 0).toLocaleString();
+            document.getElementById("gov-stat-todos").textContent = data.metrics.total_todos || 0;
+            document.getElementById("gov-stat-suppressions").textContent = data.metrics.total_suppressions || 0;
+
+            // Early warnings
+            const warnBody = document.getElementById("gov-warnings-tbody");
+            if (warnBody) {
+                warnBody.innerHTML = "";
+                const warnings = data.warnings || [];
+                if (warnings.length === 0) {
+                    warnBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary); font-style:italic;">No early warning risk flags active.</td></tr>`;
+                } else {
+                    warnings.forEach(w => {
+                        const row = document.createElement("tr");
+                        row.setAttribute("tabindex", "0");
+                        const sevClass = w.severity.toLowerCase().includes("risk") || w.severity.toLowerCase().includes("high") ? "red" : (w.severity.toLowerCase().includes("warning") ? "yellow" : "blue");
+                        row.innerHTML = `
+                            <td><strong style="color:#f472b6;">${w.code}</strong></td>
+                            <td>
+                                <strong>${w.title}</strong><br/>
+                                <span style="font-size:0.75rem; color:var(--text-secondary);">${w.evidence}</span>
+                            </td>
+                            <td style="color:#d1d5db;">${w.predicted_outcome}</td>
+                            <td style="white-space:nowrap;">${w.time_horizon}</td>
+                            <td><span class="status-pill ${sevClass}">${w.severity}</span></td>
+                        `;
+                        warnBody.appendChild(row);
+                    });
+                }
+            }
+
+            // Proactive Decisions matrix
+            const decBody = document.getElementById("gov-decisions-tbody");
+            if (decBody) {
+                decBody.innerHTML = "";
+                const decisions = data.decisions || [];
+                decisions.forEach(d => {
+                    const row = document.createElement("tr");
+                    row.setAttribute("tabindex", "0");
+                    row.innerHTML = `
+                        <td><strong>${d.option}</strong><br/><span style="font-size:0.72rem; color:var(--text-secondary);">${d.complexity}</span></td>
+                        <td>${d.cost}</td>
+                        <td style="color:var(--green); font-weight:600;">${d.risk_reduction}</td>
+                        <td><span class="status-pill blue" style="font-size:0.72rem; padding:2px 6px;">${d.roi}</span></td>
+                    `;
+                    decBody.appendChild(row);
+                });
+            }
+
+            // Sub-tab 1: Test Gaps
+            const testBody = document.getElementById("gov-reg-test-tbody");
+            if (testBody) {
+                testBody.innerHTML = "";
+                const tc = data.test_confidence || {};
+                if (Object.keys(tc).length === 0) {
+                    testBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-secondary); font-style:italic;">No test confidence data.</td></tr>`;
+                } else {
+                    for (const [comp, item] of Object.entries(tc)) {
+                        const score = item.confidence_score;
+                        const scoreColor = score >= 70 ? "var(--green)" : score >= 40 ? "var(--yellow)" : "var(--red)";
+                        const testsStr = item.tests && item.tests.length > 0 ? item.tests.join(", ") : "*None*";
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><strong>${comp}</strong></td>
+                            <td style="color:${scoreColor}; font-weight:600;">${score}%</td>
+                            <td style="font-size:0.75rem;">${testsStr}</td>
+                            <td style="font-size:0.78rem; color:var(--text-secondary);">${item.coverage_gap}</td>
+                        `;
+                        testBody.appendChild(row);
+                    }
+                }
+            }
+
+            // Sub-tab 2: Blast Radius
+            const blastBody = document.getElementById("gov-reg-blast-tbody");
+            if (blastBody) {
+                blastBody.innerHTML = "";
+                const br = data.blast_radius || {};
+                if (Object.keys(br).length === 0) {
+                    blastBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary); font-style:italic;">No blast radius data.</td></tr>`;
+                } else {
+                    for (const [comp, item] of Object.entries(br)) {
+                        const score = item.score;
+                        const critClass = item.criticality.toLowerCase() === "critical" ? "red" : (item.criticality.toLowerCase() === "high" ? "yellow" : "blue");
+                        const dependentsStr = item.dependents && item.dependents.length > 0 ? item.dependents.join(", ") : "*None*";
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><strong>${comp}</strong></td>
+                            <td style="font-weight:600;">${score} / 100</td>
+                            <td><span class="status-pill ${critClass}">${item.criticality}</span></td>
+                            <td style="font-size:0.75rem; color:var(--text-secondary); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${dependentsStr}">${dependentsStr}</td>
+                            <td>${item.upstream_count}</td>
+                        `;
+                        blastBody.appendChild(row);
+                    }
+                }
+            }
+
+            // Sub-tab 3: Arch Risks & Coupling
+            const archBody = document.getElementById("gov-reg-arch-tbody");
+            if (archBody) {
+                archBody.innerHTML = "";
+                const arch = data.architecture_risks || [];
+                if (arch.length === 0) {
+                    archBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-secondary); font-style:italic;">No architectural risks detected.</td></tr>`;
+                } else {
+                    arch.forEach(a => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><strong>${a.component}</strong></td>
+                            <td style="color:#fca5a5;">${a.risk}</td>
+                            <td style="font-size:0.78rem; color:var(--text-secondary);">${a.recommendation}</td>
+                        `;
+                        archBody.appendChild(row);
+                    });
+                }
+            }
+
+            // Sub-tab 4: Reliability Forecast
+            const foreBody = document.getElementById("gov-reg-forecast-tbody");
+            if (foreBody) {
+                foreBody.innerHTML = "";
+                const forecasts = data.reliability_forecast || [];
+                if (forecasts.length === 0) {
+                    foreBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary); font-style:italic;">No reliability forecasts.</td></tr>`;
+                } else {
+                    forecasts.forEach(f => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><strong>${f.time_horizon}</strong></td>
+                            <td>${f.risk_description}</td>
+                            <td>${f.probability}</td>
+                            <td style="color:#a5b4fc; font-weight:600;">${f.blast_radius}</td>
+                            <td style="font-size:0.78rem; color:var(--text-secondary);">${f.expected_impact}</td>
+                        `;
+                        foreBody.appendChild(row);
+                    });
+                }
+            }
+
+            // Sub-tab 5: Dependency risk register (mock licenses parsed)
+            const depBody = document.getElementById("gov-reg-dep-tbody");
+            if (depBody) {
+                depBody.innerHTML = "";
+                const deps = [
+                    { name: "pydantic-ai", license: "Apache-2.0", compliance: "Approved", security: "None", risk: "Beta library API change risk" },
+                    { name: "dspy-ai", license: "MIT", compliance: "Approved", security: "IndentationError resolved", risk: "Syntax break risk on PEP-649" },
+                    { name: "psycopg2-binary", license: "BSD", compliance: "Approved", security: "None", risk: "Uses port 5435 instead of default" },
+                    { name: "marker-wrapper", license: "GPLv3", compliance: "Isolated", security: "None", risk: "Isolated to port 8000 REST service" }
+                ];
+                deps.forEach(d => {
+                    const row = document.createElement("tr");
+                    const compClass = d.compliance === "Approved" ? "green" : "yellow";
+                    row.innerHTML = `
+                        <td><strong>${d.name}</strong></td>
+                        <td>${d.license}</td>
+                        <td><span class="status-pill ${compClass}">${d.compliance}</span></td>
+                        <td style="color:#d1d5db;">${d.security}</td>
+                        <td style="font-size:0.78rem; color:var(--text-secondary);">${d.risk}</td>
+                    `;
+                    depBody.appendChild(row);
+                });
             }
         }
 
@@ -2659,6 +3231,7 @@
 
         await fetchStatus();
         await loadDocs();
+        await fetchGovernanceStatus();
         setInterval(fetchStatus, 5000);
     </script>
     

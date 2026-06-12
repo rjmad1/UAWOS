@@ -473,13 +473,15 @@ class UAWOSSandboxToolExecutor(IToolExecutor):
             }
 
         # Step 2 — Enforce license isolation
-        if tool.license_class in (LicenseClass.COPYLEFT, LicenseClass.PROPRIETARY):
-            if tool.sandbox_mode == SandboxMode.IN_PROCESS:
-                return {
-                    "error": f"Tool '{tool_name}' has {tool.license_class.value} license but is configured for InProcess mode. "
-                    f"Copyleft/Proprietary tools MUST run in Container or RemoteAPI mode.",
-                    "verdict": ExecutionVerdict.REJECTED.value,
-                }
+        if (
+            tool.license_class in (LicenseClass.COPYLEFT, LicenseClass.PROPRIETARY)
+            and tool.sandbox_mode == SandboxMode.IN_PROCESS
+        ):
+            return {
+                "error": f"Tool '{tool_name}' has {tool.license_class.value} license but is configured for InProcess mode. "
+                f"Copyleft/Proprietary tools MUST run in Container or RemoteAPI mode.",
+                "verdict": ExecutionVerdict.REJECTED.value,
+            }
 
         # Step 3 — Validate required secrets
         secrets_ok, missing = UAWOSSecretsManager.validate_requirements(tool.required_secrets)
@@ -636,7 +638,7 @@ class UAWOSSandboxToolExecutor(IToolExecutor):
         Wave 3: Simulation mode — returns a structured sandbox response.
         """
         # Inject secrets into the request payload (secrets go ONLY to container, not audit)
-        injected_payload = UAWOSSecretsManager.inject_into_request(tool, arguments)
+        UAWOSSecretsManager.inject_into_request(tool, arguments)
 
         # Production implementation:
         # import httpx

@@ -256,10 +256,7 @@ class LangGraphWorkflowAdapter(UAWOSBaseWorkflowRuntime):
 
             # Execute the registered node function
             user_fn = self._node_registry.get(runtime_id, {}).get(node_name)
-            if user_fn:
-                output = user_fn(state)
-            else:
-                output = state
+            output = user_fn(state) if user_fn else state
 
             # Checkpoint after node execution
             child_ctx = ctx.child(f"{node_name}-{uuid.uuid4().hex[:4]}")
@@ -301,10 +298,7 @@ class LangGraphWorkflowAdapter(UAWOSBaseWorkflowRuntime):
         else:
             # Simulation mode
             user_fn = self._node_registry.get(runtime_id, {}).get(step_id)
-            if user_fn:
-                result = user_fn(state_with_ctx)
-            else:
-                result = {**state_with_ctx, f"_{step_id}_output": "simulated"}
+            result = user_fn(state_with_ctx) if user_fn else {**state_with_ctx, f"_{step_id}_output": "simulated"}
 
         # Always checkpoint the result
         checkpoint_id = self._checkpointer.save(runtime_id, result, context)

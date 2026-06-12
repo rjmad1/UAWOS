@@ -120,6 +120,11 @@ try:
 except ImportError:
     uawos_pmcms = None
 
+try:
+    import uawos_proactive_governance
+except ImportError:
+    uawos_proactive_governance = None
+
 PORT = 8099
 STATUS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_status.json")
 
@@ -332,13 +337,9 @@ def evaluate_infra(is_docker_running, running_containers, local_dev_healthy, oll
 def evaluate_integrations(infra_status, venv_ok, is_semgrep_available, running_containers):
     marker_running = "uawos-marker-service" in running_containers or "marker-service" in running_containers
 
-    mesa_ok = False
-    try:
-        import mesa
+    import importlib.util
 
-        mesa_ok = True
-    except ImportError:
-        pass
+    mesa_ok = importlib.util.find_spec("mesa") is not None
 
     return {
         "INT-A-01: Qdrant Vector Integration": (
@@ -492,69 +493,16 @@ def run_health_checks():
     agents_status = _evaluate_dynamic_agents(uawos_budget is not None, uawos_objective is not None)
 
     # Dynamic skill health checks
-    dspy_ok = False
-    try:
-        import dspy
+    import importlib.util
 
-        dspy_ok = True
-    except ImportError:
-        pass
-
-    instructor_ok = False
-    try:
-        import instructor
-
-        instructor_ok = True
-    except ImportError:
-        pass
-
-    fastembed_ok = False
-    try:
-        import fastembed
-
-        fastembed_ok = True
-    except ImportError:
-        pass
-
-    dbt_ok = False
-    try:
-        import dbt
-
-        dbt_ok = True
-    except ImportError:
-        pass
-
-    mesa_ok = False
-    try:
-        import mesa
-
-        mesa_ok = True
-    except ImportError:
-        pass
-
-    networkx_ok = False
-    try:
-        import networkx
-
-        networkx_ok = True
-    except ImportError:
-        pass
-
-    openlineage_ok = False
-    try:
-        import openlineage
-
-        openlineage_ok = True
-    except ImportError:
-        pass
-
-    marquez_ok = False
-    try:
-        import marquez_client
-
-        marquez_ok = True
-    except ImportError:
-        pass
+    dspy_ok = importlib.util.find_spec("dspy") is not None
+    instructor_ok = importlib.util.find_spec("instructor") is not None
+    fastembed_ok = importlib.util.find_spec("fastembed") is not None
+    dbt_ok = importlib.util.find_spec("dbt") is not None
+    mesa_ok = importlib.util.find_spec("mesa") is not None
+    networkx_ok = importlib.util.find_spec("networkx") is not None
+    openlineage_ok = importlib.util.find_spec("openlineage") is not None
+    marquez_ok = importlib.util.find_spec("marquez_client") is not None
 
     import shutil
 
@@ -1227,6 +1175,27 @@ async def objective_action(request: Request, x_uawos_token: str = Header(None), 
         else:
             raise HTTPException(status_code=400, detail=f"Unknown action: {action}")
         return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/governance/status")
+def get_governance_status():
+    if uawos_proactive_governance is None:
+        raise HTTPException(status_code=500, detail="Proactive governance module unavailable.")
+    try:
+        return uawos_proactive_governance.run_full_governance_audit()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/governance/run")
+def run_governance_audit(x_uawos_token: str = Header(None), authorization: str = Header(None)):
+    verify_secure_token(x_uawos_token, authorization)
+    if uawos_proactive_governance is None:
+        raise HTTPException(status_code=500, detail="Proactive governance module unavailable.")
+    try:
+        return uawos_proactive_governance.run_full_governance_audit()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

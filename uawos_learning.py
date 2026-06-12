@@ -133,26 +133,26 @@ def verify_fr_131():
 
 
 def verify_fr_132():
-    l = generate_learning("Query timeouts", "Add indexes", "ACT-101")
-    assert l["id"].startswith("LRN-"), "Learning generation failed."
+    lrn = generate_learning("Query timeouts", "Add indexes", "ACT-101")
+    assert lrn["id"].startswith("LRN-"), "Learning generation failed."
     return True
 
 
 def verify_fr_133():
-    l = approve_learning("LRN-101")
-    assert l["status"] == "approved", "Learning approval failed."
+    lrn = approve_learning("LRN-101")
+    assert lrn["status"] == "approved", "Learning approval failed."
     return True
 
 
 def verify_fr_134():
-    l = publish_learning("LRN-101")
-    assert l["status"] == "published", "Learning publication failed."
+    lrn = publish_learning("LRN-101")
+    assert lrn["status"] == "published", "Learning publication failed."
     return True
 
 
 def verify_fr_135():
-    l = publish_learning("LRN-101")
-    assert l["published_as_best_practice"] is True, "Best practice generation failed."
+    lrn = publish_learning("LRN-101")
+    assert lrn["published_as_best_practice"] is True, "Best practice generation failed."
     return True
 
 
@@ -172,8 +172,8 @@ def verify_fr_136():
 
 
 def verify_fr_137():
-    l = generate_learning("Continuous feedback", "Refactor routing", "ACT-102")
-    assert l["confidence_score"] == 90.0, "Continuous learning failed."
+    lrn = generate_learning("Continuous feedback", "Refactor routing", "ACT-102")
+    assert lrn["confidence_score"] == 90.0, "Continuous learning failed."
     return True
 
 
@@ -184,8 +184,8 @@ def verify_fr_138():
 
 
 def verify_fr_139():
-    l = generate_learning("Timeout", "Fix", "ACT-101", confidence=95.0)
-    assert l["confidence_score"] == 95.0, "Confidence setting failed."
+    lrn = generate_learning("Timeout", "Fix", "ACT-101", confidence=95.0)
+    assert lrn["confidence_score"] == 95.0, "Confidence setting failed."
     return True
 
 

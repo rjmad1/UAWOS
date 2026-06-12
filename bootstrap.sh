@@ -93,6 +93,26 @@ else
     echo "     You can start it manually later: docker compose --profile core up -d"
 fi
 
+# --- Pull tinyllama model for Ollama ---
+echo ""
+echo "► Checking Ollama local model..."
+OLLAMA_URL="http://127.0.0.1:11434"
+if curl -s --connect-timeout 3 "$OLLAMA_URL/api/tags" > /dev/null; then
+    if curl -s "$OLLAMA_URL/api/tags" | grep -q "tinyllama"; then
+        echo "  ✓ tinyllama model already present"
+    else
+        echo "  ... Pulling tinyllama model (this may take a minute)..."
+        if curl -s -X POST "$OLLAMA_URL/api/pull" -d '{"name": "tinyllama"}' > /dev/null; then
+            echo "  ✓ tinyllama model pulled successfully"
+        else
+            echo "  ⚠  Failed to pull tinyllama model"
+        fi
+    fi
+else
+    echo "  ⚠  Ollama is not running on $OLLAMA_URL."
+    echo "     Please start Ollama and run: ollama pull tinyllama"
+fi
+
 # --- Wait for PostgreSQL ---
 echo ""
 echo "► Waiting for PostgreSQL to be ready..."

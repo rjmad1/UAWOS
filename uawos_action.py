@@ -72,7 +72,7 @@ def create_action(
 # FR-071: Decompose Workflow into Actions
 def decompose_workflow(workflow_id: str) -> list:
     """Decompose a Workflow's tasks into granular executable Actions."""
-    state = load_state()
+    load_state()
     actions_created = []
 
     # Check workflow if uawos_workflow is available
@@ -87,7 +87,7 @@ def decompose_workflow(workflow_id: str) -> list:
     except Exception:
         pass
 
-    for idx, task in enumerate(tasks):
+    for _idx, task in enumerate(tasks):
         act = create_action(
             workflow_id=workflow_id,
             name=f"Execute: {task}",

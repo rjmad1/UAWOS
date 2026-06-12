@@ -153,7 +153,7 @@ def verify_fr_031():
     """Verify system requires measurable outcomes."""
     try:
         create_outcome("OBJ-101", "Invalid Outcome", "", "")  # Missing metric/unit
-        assert False, "Should have raised ValueError for missing metric/unit."
+        raise AssertionError("Should have raised ValueError for missing metric/unit.")
     except ValueError:
         pass
     return True

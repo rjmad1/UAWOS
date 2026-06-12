@@ -1,5 +1,8 @@
 # uawos_workforce.py
 import os
+import time
+
+from uawos_state_utils import load_state, save_state
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_workforce_state.json")
 
@@ -33,7 +36,6 @@ def get_default_state() -> dict:
 
 
 # State handling via shared utilities
-from uawos_state_utils import load_state, save_state
 
 
 # Core API
