@@ -1,0 +1,4977 @@
+{
+  "uawos_action.py": {
+    "file": "uawos_action.py",
+    "imports": [
+      "json",
+      "os",
+      "time",
+      "uawos_db",
+      "uawos_state_utils",
+      "uawos_workflow",
+      "urllib.parse",
+      "urllib.request"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 15
+      },
+      {
+        "name": "create_action",
+        "lineno": 35
+      },
+      {
+        "name": "decompose_workflow",
+        "lineno": 73
+      },
+      {
+        "name": "reassign_action",
+        "lineno": 104
+      },
+      {
+        "name": "get_action_traceability",
+        "lineno": 120
+      },
+      {
+        "name": "execute_agent_action_secure",
+        "lineno": 133
+      },
+      {
+        "name": "verify_fr_071",
+        "lineno": 218
+      },
+      {
+        "name": "verify_fr_072",
+        "lineno": 224
+      },
+      {
+        "name": "verify_fr_073",
+        "lineno": 230
+      },
+      {
+        "name": "verify_fr_074",
+        "lineno": 236
+      },
+      {
+        "name": "verify_fr_075",
+        "lineno": 242
+      },
+      {
+        "name": "verify_fr_076",
+        "lineno": 248
+      },
+      {
+        "name": "verify_fr_077",
+        "lineno": 254
+      },
+      {
+        "name": "verify_fr_078",
+        "lineno": 260
+      },
+      {
+        "name": "verify_fr_079",
+        "lineno": 266
+      },
+      {
+        "name": "verify_fr_080",
+        "lineno": 272
+      },
+      {
+        "name": "verify_fr_081",
+        "lineno": 278
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 298
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [
+      179
+    ],
+    "ai_terms": [
+      [
+        "agent",
+        2
+      ]
+    ]
+  },
+  "uawos_agent_runtime.py": {
+    "file": "uawos_agent_runtime.py",
+    "imports": [
+      "__future__",
+      "abc",
+      "asyncio",
+      "contextlib",
+      "dataclasses",
+      "enum",
+      "os",
+      "time",
+      "typing",
+      "uawos_db",
+      "uawos_governance",
+      "uawos_state_utils",
+      "uuid"
+    ],
+    "classes": [
+      {
+        "name": "AgentStatus",
+        "lineno": 61,
+        "methods": []
+      },
+      {
+        "name": "WorkflowStatus",
+        "lineno": 72,
+        "methods": []
+      },
+      {
+        "name": "PolicyVerdict",
+        "lineno": 84,
+        "methods": []
+      },
+      {
+        "name": "EventCategory",
+        "lineno": 92,
+        "methods": []
+      },
+      {
+        "name": "UAWOSContext",
+        "lineno": 114,
+        "methods": [
+          "to_dict",
+          "from_dict",
+          "child"
+        ]
+      },
+      {
+        "name": "PolicyResult",
+        "lineno": 172,
+        "methods": []
+      },
+      {
+        "name": "AuditEntry",
+        "lineno": 183,
+        "methods": [
+          "to_dict"
+        ]
+      },
+      {
+        "name": "LifecycleEvent",
+        "lineno": 207,
+        "methods": [
+          "to_dict"
+        ]
+      },
+      {
+        "name": "IPolicyEvaluator",
+        "lineno": 243,
+        "methods": [
+          "evaluate_policy"
+        ]
+      },
+      {
+        "name": "IAuditProvider",
+        "lineno": 260,
+        "methods": [
+          "write_audit",
+          "read_audit"
+        ]
+      },
+      {
+        "name": "ITraceProvider",
+        "lineno": 277,
+        "methods": [
+          "emit_event",
+          "get_lineage"
+        ]
+      },
+      {
+        "name": "IToolExecutor",
+        "lineno": 294,
+        "methods": [
+          "execute_tool",
+          "list_available_tools"
+        ]
+      },
+      {
+        "name": "IAgentRuntime",
+        "lineno": 317,
+        "methods": [
+          "register_agent",
+          "execute_task",
+          "get_agent_status",
+          "suspend_agent"
+        ]
+      },
+      {
+        "name": "IWorkflowRuntime",
+        "lineno": 359,
+        "methods": [
+          "compile_workflow",
+          "run_step",
+          "get_workflow_state",
+          "checkpoint_state"
+        ]
+      },
+      {
+        "name": "UAWOSPolicyEvaluator",
+        "lineno": 405,
+        "methods": [
+          "evaluate_policy"
+        ]
+      },
+      {
+        "name": "UAWOSAuditProvider",
+        "lineno": 428,
+        "methods": [
+          "write_audit",
+          "read_audit"
+        ]
+      },
+      {
+        "name": "UAWOSTraceProvider",
+        "lineno": 470,
+        "methods": [
+          "emit_event",
+          "get_lineage"
+        ]
+      },
+      {
+        "name": "UAWOSLocalToolExecutor",
+        "lineno": 510,
+        "methods": [
+          "register_tool",
+          "execute_tool",
+          "list_available_tools"
+        ]
+      },
+      {
+        "name": "UAWOSBaseAgentRuntime",
+        "lineno": 610,
+        "methods": [
+          "__init__",
+          "register_agent",
+          "execute_task",
+          "_do_execute",
+          "get_agent_status",
+          "suspend_agent"
+        ]
+      },
+      {
+        "name": "UAWOSBaseWorkflowRuntime",
+        "lineno": 812,
+        "methods": [
+          "__init__",
+          "compile_workflow",
+          "run_step",
+          "_do_run_step",
+          "get_workflow_state",
+          "checkpoint_state"
+        ]
+      },
+      {
+        "name": "UAWOSAgentRegistry",
+        "lineno": 957,
+        "methods": [
+          "register",
+          "get_status",
+          "list_agents"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 40
+      },
+      {
+        "name": "to_dict",
+        "lineno": 130
+      },
+      {
+        "name": "from_dict",
+        "lineno": 144
+      },
+      {
+        "name": "child",
+        "lineno": 151
+      },
+      {
+        "name": "to_dict",
+        "lineno": 194
+      },
+      {
+        "name": "to_dict",
+        "lineno": 222
+      },
+      {
+        "name": "evaluate_policy",
+        "lineno": 250
+      },
+      {
+        "name": "write_audit",
+        "lineno": 267
+      },
+      {
+        "name": "read_audit",
+        "lineno": 272
+      },
+      {
+        "name": "emit_event",
+        "lineno": 284
+      },
+      {
+        "name": "get_lineage",
+        "lineno": 289
+      },
+      {
+        "name": "execute_tool",
+        "lineno": 302
+      },
+      {
+        "name": "list_available_tools",
+        "lineno": 312
+      },
+      {
+        "name": "register_agent",
+        "lineno": 324
+      },
+      {
+        "name": "execute_task",
+        "lineno": 335
+      },
+      {
+        "name": "get_agent_status",
+        "lineno": 349
+      },
+      {
+        "name": "suspend_agent",
+        "lineno": 354
+      },
+      {
+        "name": "compile_workflow",
+        "lineno": 366
+      },
+      {
+        "name": "run_step",
+        "lineno": 374
+      },
+      {
+        "name": "get_workflow_state",
+        "lineno": 390
+      },
+      {
+        "name": "checkpoint_state",
+        "lineno": 395
+      },
+      {
+        "name": "evaluate_policy",
+        "lineno": 411
+      },
+      {
+        "name": "write_audit",
+        "lineno": 434
+      },
+      {
+        "name": "read_audit",
+        "lineno": 449
+      },
+      {
+        "name": "emit_event",
+        "lineno": 476
+      },
+      {
+        "name": "get_lineage",
+        "lineno": 485
+      },
+      {
+        "name": "register_tool",
+        "lineno": 519
+      },
+      {
+        "name": "execute_tool",
+        "lineno": 522
+      },
+      {
+        "name": "list_available_tools",
+        "lineno": 606
+      },
+      {
+        "name": "__init__",
+        "lineno": 616
+      },
+      {
+        "name": "register_agent",
+        "lineno": 630
+      },
+      {
+        "name": "execute_task",
+        "lineno": 669
+      },
+      {
+        "name": "_do_execute",
+        "lineno": 765
+      },
+      {
+        "name": "get_agent_status",
+        "lineno": 769
+      },
+      {
+        "name": "suspend_agent",
+        "lineno": 779
+      },
+      {
+        "name": "__init__",
+        "lineno": 821
+      },
+      {
+        "name": "compile_workflow",
+        "lineno": 832
+      },
+      {
+        "name": "run_step",
+        "lineno": 844
+      },
+      {
+        "name": "_do_run_step",
+        "lineno": 926
+      },
+      {
+        "name": "get_workflow_state",
+        "lineno": 936
+      },
+      {
+        "name": "checkpoint_state",
+        "lineno": 939
+      },
+      {
+        "name": "register",
+        "lineno": 961
+      },
+      {
+        "name": "get_status",
+        "lineno": 971
+      },
+      {
+        "name": "list_agents",
+        "lineno": 982
+      },
+      {
+        "name": "create_agent_runtime",
+        "lineno": 995
+      },
+      {
+        "name": "create_workflow_runtime",
+        "lineno": 1010
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 1028
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        31
+      ],
+      [
+        "llm",
+        2
+      ]
+    ]
+  },
+  "uawos_agent_workforce.py": {
+    "file": "uawos_agent_workforce.py",
+    "imports": [
+      "os",
+      "uawos_db",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 9
+      },
+      {
+        "name": "register_agent",
+        "lineno": 73
+      },
+      {
+        "name": "update_agent_lifecycle",
+        "lineno": 107
+      },
+      {
+        "name": "calculate_agent_trust",
+        "lineno": 122
+      },
+      {
+        "name": "get_agent_skills",
+        "lineno": 163
+      },
+      {
+        "name": "get_agents_by_skill",
+        "lineno": 170
+      },
+      {
+        "name": "verify_fr_091",
+        "lineno": 183
+      },
+      {
+        "name": "verify_fr_092",
+        "lineno": 189
+      },
+      {
+        "name": "verify_fr_093",
+        "lineno": 195
+      },
+      {
+        "name": "verify_fr_094",
+        "lineno": 201
+      },
+      {
+        "name": "verify_fr_095",
+        "lineno": 207
+      },
+      {
+        "name": "verify_fr_096",
+        "lineno": 213
+      },
+      {
+        "name": "verify_fr_097",
+        "lineno": 219
+      },
+      {
+        "name": "verify_fr_098",
+        "lineno": 225
+      },
+      {
+        "name": "verify_fr_099",
+        "lineno": 231
+      },
+      {
+        "name": "verify_fr_100",
+        "lineno": 237
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 243
+      }
+    ],
+    "todos": [],
+    "sql_lines": [
+      138
+    ],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        71
+      ]
+    ]
+  },
+  "uawos_audit_ledger.py": {
+    "file": "uawos_audit_ledger.py",
+    "imports": [
+      "__future__",
+      "dataclasses",
+      "hashlib",
+      "json",
+      "os",
+      "time",
+      "uawos_agent_runtime",
+      "uawos_db",
+      "uawos_state_utils",
+      "urllib.request",
+      "uuid"
+    ],
+    "classes": [
+      {
+        "name": "LedgerEntry",
+        "lineno": 62,
+        "methods": [
+          "__post_init__",
+          "_compute_hash",
+          "verify_integrity",
+          "to_dict",
+          "from_dict",
+          "from_context"
+        ]
+      },
+      {
+        "name": "UAWOSAuditLedger",
+        "lineno": 176,
+        "methods": [
+          "write",
+          "query",
+          "verify_integrity",
+          "get_decision_trail"
+        ]
+      },
+      {
+        "name": "StateSnapshot",
+        "lineno": 271,
+        "methods": [
+          "to_dict",
+          "from_dict"
+        ]
+      },
+      {
+        "name": "UAWOSCheckpointer",
+        "lineno": 304,
+        "methods": [
+          "save",
+          "load_latest",
+          "load_at",
+          "load_at_index",
+          "list_snapshots",
+          "reconstruct_timeline",
+          "purge"
+        ]
+      },
+      {
+        "name": "LineageRun",
+        "lineno": 434,
+        "methods": [
+          "to_openlineage_event",
+          "to_dict"
+        ]
+      },
+      {
+        "name": "UAWOSLineageEmitter",
+        "lineno": 502,
+        "methods": [
+          "start_run",
+          "complete_run",
+          "fail_run",
+          "_persist_run",
+          "_emit_openlineage",
+          "get_runs"
+        ]
+      },
+      {
+        "name": "ExplainabilityReport",
+        "lineno": 623,
+        "methods": [
+          "to_dict",
+          "to_json"
+        ]
+      },
+      {
+        "name": "ExplainabilityEngine",
+        "lineno": 660,
+        "methods": [
+          "generate_report",
+          "verify_audit_integrity"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 39
+      },
+      {
+        "name": "__post_init__",
+        "lineno": 84
+      },
+      {
+        "name": "_compute_hash",
+        "lineno": 89
+      },
+      {
+        "name": "verify_integrity",
+        "lineno": 105
+      },
+      {
+        "name": "to_dict",
+        "lineno": 109
+      },
+      {
+        "name": "from_dict",
+        "lineno": 129
+      },
+      {
+        "name": "from_context",
+        "lineno": 150
+      },
+      {
+        "name": "write",
+        "lineno": 186
+      },
+      {
+        "name": "query",
+        "lineno": 202
+      },
+      {
+        "name": "verify_integrity",
+        "lineno": 235
+      },
+      {
+        "name": "get_decision_trail",
+        "lineno": 245
+      },
+      {
+        "name": "to_dict",
+        "lineno": 285
+      },
+      {
+        "name": "from_dict",
+        "lineno": 300
+      },
+      {
+        "name": "save",
+        "lineno": 317
+      },
+      {
+        "name": "load_latest",
+        "lineno": 347
+      },
+      {
+        "name": "load_at",
+        "lineno": 355
+      },
+      {
+        "name": "load_at_index",
+        "lineno": 364
+      },
+      {
+        "name": "list_snapshots",
+        "lineno": 372
+      },
+      {
+        "name": "reconstruct_timeline",
+        "lineno": 383
+      },
+      {
+        "name": "purge",
+        "lineno": 412
+      },
+      {
+        "name": "to_openlineage_event",
+        "lineno": 454
+      },
+      {
+        "name": "to_dict",
+        "lineno": 484
+      },
+      {
+        "name": "start_run",
+        "lineno": 514
+      },
+      {
+        "name": "complete_run",
+        "lineno": 536
+      },
+      {
+        "name": "fail_run",
+        "lineno": 549
+      },
+      {
+        "name": "_persist_run",
+        "lineno": 559
+      },
+      {
+        "name": "_emit_openlineage",
+        "lineno": 581
+      },
+      {
+        "name": "get_runs",
+        "lineno": 603
+      },
+      {
+        "name": "to_dict",
+        "lineno": 641
+      },
+      {
+        "name": "to_json",
+        "lineno": 656
+      },
+      {
+        "name": "generate_report",
+        "lineno": 669
+      },
+      {
+        "name": "verify_audit_integrity",
+        "lineno": 716
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 735
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [
+      597
+    ],
+    "ai_terms": [
+      [
+        "agent",
+        2
+      ]
+    ]
+  },
+  "uawos_autogen_adapter.py": {
+    "file": "uawos_autogen_adapter.py",
+    "imports": [
+      "__future__",
+      "autogen",
+      "dataclasses",
+      "enum",
+      "hashlib",
+      "json",
+      "os",
+      "time",
+      "typing",
+      "uawos_agent_runtime",
+      "uawos_audit_ledger",
+      "uawos_db",
+      "uawos_sandbox_runtime",
+      "uawos_state_utils",
+      "urllib.request",
+      "uuid"
+    ],
+    "classes": [
+      {
+        "name": "SpeakerPolicy",
+        "lineno": 99,
+        "methods": []
+      },
+      {
+        "name": "MessageRole",
+        "lineno": 108,
+        "methods": []
+      },
+      {
+        "name": "AuditedMessage",
+        "lineno": 124,
+        "methods": [
+          "__post_init__",
+          "to_dict"
+        ]
+      },
+      {
+        "name": "AutoGenMessageAuditor",
+        "lineno": 170,
+        "methods": [
+          "audit_message",
+          "parse_autogen_messages",
+          "audit_conversation"
+        ]
+      },
+      {
+        "name": "AutoGenCodeSandbox",
+        "lineno": 268,
+        "methods": [
+          "execute_code"
+        ]
+      },
+      {
+        "name": "GoverningGroupSpeakerSelector",
+        "lineno": 386,
+        "methods": [
+          "__init__",
+          "select_speaker",
+          "_select_round_robin",
+          "_select_role_based",
+          "_select_capability",
+          "_select_governed"
+        ]
+      },
+      {
+        "name": "AutoGenConversableAdapter",
+        "lineno": 487,
+        "methods": [
+          "__init__",
+          "_do_execute",
+          "_simulate_conversation",
+          "execute_code"
+        ]
+      },
+      {
+        "name": "AutoGenGroupChatAdapter",
+        "lineno": 644,
+        "methods": [
+          "__init__",
+          "_do_execute"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 63
+      },
+      {
+        "name": "__post_init__",
+        "lineno": 143
+      },
+      {
+        "name": "to_dict",
+        "lineno": 149
+      },
+      {
+        "name": "audit_message",
+        "lineno": 182
+      },
+      {
+        "name": "parse_autogen_messages",
+        "lineno": 220
+      },
+      {
+        "name": "audit_conversation",
+        "lineno": 246
+      },
+      {
+        "name": "execute_code",
+        "lineno": 282
+      },
+      {
+        "name": "__init__",
+        "lineno": 398
+      },
+      {
+        "name": "select_speaker",
+        "lineno": 407
+      },
+      {
+        "name": "_select_round_robin",
+        "lineno": 438
+      },
+      {
+        "name": "_select_role_based",
+        "lineno": 444
+      },
+      {
+        "name": "_select_capability",
+        "lineno": 452
+      },
+      {
+        "name": "_select_governed",
+        "lineno": 461
+      },
+      {
+        "name": "__init__",
+        "lineno": 504
+      },
+      {
+        "name": "_do_execute",
+        "lineno": 516
+      },
+      {
+        "name": "_simulate_conversation",
+        "lineno": 617
+      },
+      {
+        "name": "execute_code",
+        "lineno": 634
+      },
+      {
+        "name": "__init__",
+        "lineno": 655
+      },
+      {
+        "name": "_do_execute",
+        "lineno": 667
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 752
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [
+      341
+    ],
+    "ai_terms": [
+      [
+        "agent",
+        29
+      ],
+      [
+        "prompt",
+        15
+      ]
+    ]
+  },
+  "uawos_budget.py": {
+    "file": "uawos_budget.py",
+    "imports": [
+      "os",
+      "time",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 19
+      },
+      {
+        "name": "allocate_objective_budget",
+        "lineno": 185
+      },
+      {
+        "name": "allocate_action_budget",
+        "lineno": 209
+      },
+      {
+        "name": "record_agent_cost",
+        "lineno": 222
+      },
+      {
+        "name": "calculate_forecasts_and_variance",
+        "lineno": 276
+      },
+      {
+        "name": "evaluate_cost_governance",
+        "lineno": 305
+      },
+      {
+        "name": "submit_approval_request",
+        "lineno": 336
+      },
+      {
+        "name": "process_approval_request",
+        "lineno": 352
+      },
+      {
+        "name": "get_summary",
+        "lineno": 368
+      },
+      {
+        "name": "verify_fr_151",
+        "lineno": 410
+      },
+      {
+        "name": "verify_fr_152",
+        "lineno": 417
+      },
+      {
+        "name": "verify_fr_153",
+        "lineno": 424
+      },
+      {
+        "name": "verify_fr_154",
+        "lineno": 431
+      },
+      {
+        "name": "verify_fr_155",
+        "lineno": 438
+      },
+      {
+        "name": "verify_fr_156",
+        "lineno": 445
+      },
+      {
+        "name": "verify_fr_157",
+        "lineno": 456
+      },
+      {
+        "name": "verify_fr_158",
+        "lineno": 463
+      },
+      {
+        "name": "verify_fr_159",
+        "lineno": 470
+      },
+      {
+        "name": "verify_fr_160",
+        "lineno": 477
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 484
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        14
+      ],
+      [
+        "gemini",
+        2
+      ]
+    ]
+  },
+  "uawos_cli.py": {
+    "file": "uawos_cli.py",
+    "imports": [
+      "argparse",
+      "sys",
+      "uawos_agent_workforce",
+      "uawos_integrations"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "main",
+        "lineno": 9
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        15
+      ]
+    ]
+  },
+  "uawos_context.py": {
+    "file": "uawos_context.py",
+    "imports": [
+      "contextvars"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_tenant_id",
+        "lineno": 14
+      },
+      {
+        "name": "get_actor_role",
+        "lineno": 19
+      },
+      {
+        "name": "get_actor_owner",
+        "lineno": 24
+      },
+      {
+        "name": "set_context",
+        "lineno": 29
+      },
+      {
+        "name": "reset_context",
+        "lineno": 39
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        2
+      ]
+    ]
+  },
+  "uawos_dashboard_daemon.py": {
+    "file": "uawos_dashboard_daemon.py",
+    "imports": [
+      "base64",
+      "fastapi",
+      "fastapi.middleware.cors",
+      "fastapi.responses",
+      "hashlib",
+      "hmac",
+      "importlib.util",
+      "json",
+      "os",
+      "shutil",
+      "socket",
+      "subprocess",
+      "sys",
+      "threading",
+      "time",
+      "uawos_action",
+      "uawos_agent_workforce",
+      "uawos_budget",
+      "uawos_context",
+      "uawos_decision",
+      "uawos_dtase",
+      "uawos_governance",
+      "uawos_integrations",
+      "uawos_knowledge",
+      "uawos_learning",
+      "uawos_memory",
+      "uawos_objective",
+      "uawos_observability",
+      "uawos_outcome",
+      "uawos_planning",
+      "uawos_pmcms",
+      "uawos_proactive_governance",
+      "uawos_requirement_studio",
+      "uawos_resource",
+      "uawos_simulation",
+      "uawos_traceability",
+      "uawos_value",
+      "uawos_workflow",
+      "uawos_workforce",
+      "uvicorn"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "decode_token_payload",
+        "lineno": 184
+      },
+      {
+        "name": "verify_secure_token",
+        "lineno": 215
+      },
+      {
+        "name": "check_port",
+        "lineno": 240
+      },
+      {
+        "name": "get_docker_status",
+        "lineno": 251
+      },
+      {
+        "name": "check_semgrep_availability",
+        "lineno": 278
+      },
+      {
+        "name": "evaluate_infra",
+        "lineno": 297
+      },
+      {
+        "name": "evaluate_integrations",
+        "lineno": 353
+      },
+      {
+        "name": "evaluate_security",
+        "lineno": 382
+      },
+      {
+        "name": "evaluate_governance",
+        "lineno": 395
+      },
+      {
+        "name": "evaluate_data",
+        "lineno": 410
+      },
+      {
+        "name": "evaluate_operations",
+        "lineno": 418
+      },
+      {
+        "name": "_evaluate_dynamic_services",
+        "lineno": 428
+      },
+      {
+        "name": "_evaluate_dynamic_agents",
+        "lineno": 443
+      },
+      {
+        "name": "_count_statuses",
+        "lineno": 471
+      },
+      {
+        "name": "run_health_checks",
+        "lineno": 491
+      },
+      {
+        "name": "daemon_loop",
+        "lineno": 723
+      },
+      {
+        "name": "get_documents",
+        "lineno": 737
+      },
+      {
+        "name": "serve_dashboard",
+        "lineno": 831
+      },
+      {
+        "name": "serve_delivery",
+        "lineno": 841
+      },
+      {
+        "name": "serve_roadmap",
+        "lineno": 851
+      },
+      {
+        "name": "serve_requirement_studio",
+        "lineno": 861
+      },
+      {
+        "name": "serve_architecture",
+        "lineno": 871
+      },
+      {
+        "name": "get_requirement_list",
+        "lineno": 881
+      },
+      {
+        "name": "get_objective_list",
+        "lineno": 891
+      },
+      {
+        "name": "get_objective_conflicts",
+        "lineno": 901
+      },
+      {
+        "name": "get_status",
+        "lineno": 911
+      },
+      {
+        "name": "get_pmcms",
+        "lineno": 917
+      },
+      {
+        "name": "get_traceability",
+        "lineno": 928
+      },
+      {
+        "name": "get_roadmap",
+        "lineno": 939
+      },
+      {
+        "name": "get_changes",
+        "lineno": 949
+      },
+      {
+        "name": "get_generate_prompt",
+        "lineno": 957
+      },
+      {
+        "name": "get_docs",
+        "lineno": 968
+      },
+      {
+        "name": "get_docs_content",
+        "lineno": 973
+      },
+      {
+        "name": "get_budget_status",
+        "lineno": 987
+      },
+      {
+        "name": "requirement_reset",
+        "lineno": 1136
+      },
+      {
+        "name": "get_governance_status",
+        "lineno": 1199
+      },
+      {
+        "name": "run_governance_audit",
+        "lineno": 1209
+      },
+      {
+        "name": "start_server",
+        "lineno": 1219
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        18
+      ],
+      [
+        "prompt",
+        5
+      ],
+      [
+        "rag",
+        4
+      ],
+      [
+        "llm",
+        2
+      ],
+      [
+        "litellm",
+        1
+      ],
+      [
+        "telemetry",
+        1
+      ]
+    ]
+  },
+  "uawos_db.py": {
+    "file": "uawos_db.py",
+    "imports": [
+      "contextlib",
+      "datetime",
+      "hashlib",
+      "json",
+      "os",
+      "psycopg2",
+      "qdrant_client",
+      "qdrant_client.models",
+      "time",
+      "uawos_context",
+      "urllib.request",
+      "uuid"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_db_connection",
+        "lineno": 53
+      },
+      {
+        "name": "init_db",
+        "lineno": 59
+      },
+      {
+        "name": "init_qdrant",
+        "lineno": 342
+      },
+      {
+        "name": "get_embedding",
+        "lineno": 365
+      },
+      {
+        "name": "db_get_state",
+        "lineno": 398
+      },
+      {
+        "name": "db_save_state",
+        "lineno": 423
+      },
+      {
+        "name": "db_save_event",
+        "lineno": 450
+      },
+      {
+        "name": "db_get_events",
+        "lineno": 485
+      },
+      {
+        "name": "index_memory",
+        "lineno": 533
+      },
+      {
+        "name": "db_save_semantic_knowledge",
+        "lineno": 562
+      },
+      {
+        "name": "db_save_semantic_chunk",
+        "lineno": 596
+      },
+      {
+        "name": "index_knowledge",
+        "lineno": 619
+      },
+      {
+        "name": "search_memory",
+        "lineno": 666
+      },
+      {
+        "name": "search_knowledge",
+        "lineno": 689
+      },
+      {
+        "name": "hybrid_search_knowledge",
+        "lineno": 712
+      },
+      {
+        "name": "add_to_rrf",
+        "lineno": 779
+      },
+      {
+        "name": "db_save_objective",
+        "lineno": 804
+      },
+      {
+        "name": "db_save_all_objectives",
+        "lineno": 852
+      },
+      {
+        "name": "db_load_objectives",
+        "lineno": 857
+      },
+      {
+        "name": "db_save_outcome",
+        "lineno": 904
+      },
+      {
+        "name": "db_save_all_outcomes",
+        "lineno": 950
+      },
+      {
+        "name": "db_load_outcomes",
+        "lineno": 955
+      },
+      {
+        "name": "db_save_plan",
+        "lineno": 999
+      },
+      {
+        "name": "db_save_all_plans",
+        "lineno": 1047
+      },
+      {
+        "name": "db_load_plans",
+        "lineno": 1052
+      },
+      {
+        "name": "db_save_workflow",
+        "lineno": 1101
+      },
+      {
+        "name": "db_save_all_workflows",
+        "lineno": 1142
+      },
+      {
+        "name": "db_load_workflows",
+        "lineno": 1147
+      },
+      {
+        "name": "db_save_action",
+        "lineno": 1187
+      },
+      {
+        "name": "db_save_all_actions",
+        "lineno": 1230
+      },
+      {
+        "name": "db_load_actions",
+        "lineno": 1235
+      },
+      {
+        "name": "db_create_channel",
+        "lineno": 1276
+      },
+      {
+        "name": "db_add_channel_member",
+        "lineno": 1300
+      },
+      {
+        "name": "db_get_channel_members",
+        "lineno": 1323
+      },
+      {
+        "name": "db_get_channels",
+        "lineno": 1339
+      },
+      {
+        "name": "db_save_artifact",
+        "lineno": 1356
+      },
+      {
+        "name": "db_get_action_artifacts",
+        "lineno": 1397
+      },
+      {
+        "name": "db_save_subscription",
+        "lineno": 1428
+      },
+      {
+        "name": "db_get_subscription",
+        "lineno": 1460
+      }
+    ],
+    "todos": [],
+    "sql_lines": [
+      66,
+      75,
+      95,
+      114,
+      134,
+      149,
+      167,
+      170,
+      174,
+      176,
+      179,
+      189,
+      199,
+      208,
+      219,
+      230,
+      241,
+      256,
+      259,
+      270,
+      276,
+      284,
+      295,
+      309,
+      317,
+      408,
+      433,
+      456,
+      504,
+      579,
+      603,
+      739,
+      815,
+      866,
+      915,
+      964,
+      1010,
+      1061,
+      1112,
+      1156,
+      1198,
+      1244,
+      1282,
+      1306,
+      1329,
+      1345,
+      1370,
+      1403,
+      1437,
+      1466
+    ],
+    "urllib_lines": [
+      374
+    ],
+    "ai_terms": [
+      [
+        "prompt",
+        1
+      ],
+      [
+        "telemetry",
+        1
+      ]
+    ]
+  },
+  "uawos_decision.py": {
+    "file": "uawos_decision.py",
+    "imports": [
+      "os",
+      "time",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 10
+      },
+      {
+        "name": "register_claim",
+        "lineno": 54
+      },
+      {
+        "name": "register_evidence",
+        "lineno": 64
+      },
+      {
+        "name": "generate_recommendation",
+        "lineno": 74
+      },
+      {
+        "name": "record_decision",
+        "lineno": 92
+      },
+      {
+        "name": "evaluate_confidence",
+        "lineno": 110
+      },
+      {
+        "name": "explain_decision",
+        "lineno": 120
+      },
+      {
+        "name": "run_causal_analysis",
+        "lineno": 129
+      },
+      {
+        "name": "verify_fr_161",
+        "lineno": 146
+      },
+      {
+        "name": "verify_fr_162",
+        "lineno": 152
+      },
+      {
+        "name": "verify_fr_163",
+        "lineno": 158
+      },
+      {
+        "name": "verify_fr_164",
+        "lineno": 164
+      },
+      {
+        "name": "verify_fr_165",
+        "lineno": 170
+      },
+      {
+        "name": "verify_fr_166",
+        "lineno": 176
+      },
+      {
+        "name": "verify_fr_167",
+        "lineno": 182
+      },
+      {
+        "name": "verify_fr_168",
+        "lineno": 188
+      },
+      {
+        "name": "verify_fr_169",
+        "lineno": 194
+      },
+      {
+        "name": "verify_fr_170",
+        "lineno": 200
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 206
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": []
+  },
+  "uawos_dtase.py": {
+    "file": "uawos_dtase.py",
+    "imports": [
+      "json",
+      "os",
+      "re",
+      "uawos_weaverouter",
+      "urllib.error",
+      "urllib.request"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "analyze_unstructured_input",
+        "lineno": 12
+      },
+      {
+        "name": "identify_domains",
+        "lineno": 262
+      },
+      {
+        "name": "apply_domain_frameworks",
+        "lineno": 382
+      },
+      {
+        "name": "discover_opportunities_risks_anomalies",
+        "lineno": 421
+      },
+      {
+        "name": "generate_multi_persona_outputs",
+        "lineno": 474
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        2
+      ],
+      [
+        "prompt",
+        3
+      ],
+      [
+        "llm",
+        6
+      ]
+    ]
+  },
+  "uawos_event_bus.py": {
+    "file": "uawos_event_bus.py",
+    "imports": [
+      "__future__",
+      "collections",
+      "collections.abc",
+      "confluent_kafka",
+      "contextlib",
+      "dataclasses",
+      "json",
+      "kafka",
+      "os",
+      "time",
+      "uawos_agent_runtime",
+      "uawos_db",
+      "uawos_state_utils",
+      "uuid"
+    ],
+    "classes": [
+      {
+        "name": "EventSchemaRegistry",
+        "lineno": 85,
+        "methods": [
+          "validate",
+          "get_schema",
+          "list_schemas"
+        ]
+      },
+      {
+        "name": "Subscription",
+        "lineno": 148,
+        "methods": []
+      },
+      {
+        "name": "UAWOSEventBus",
+        "lineno": 156,
+        "methods": [
+          "subscribe",
+          "unsubscribe",
+          "publish",
+          "_publish_to_broker",
+          "get_history",
+          "replay",
+          "clear_subscriptions"
+        ]
+      },
+      {
+        "name": "CorrelationManager",
+        "lineno": 347,
+        "methods": [
+          "new_root",
+          "derive_child",
+          "inject_into_headers",
+          "extract_from_headers",
+          "validate"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 34
+      },
+      {
+        "name": "validate",
+        "lineno": 92
+      },
+      {
+        "name": "get_schema",
+        "lineno": 128
+      },
+      {
+        "name": "list_schemas",
+        "lineno": 137
+      },
+      {
+        "name": "subscribe",
+        "lineno": 174
+      },
+      {
+        "name": "unsubscribe",
+        "lineno": 190
+      },
+      {
+        "name": "publish",
+        "lineno": 198
+      },
+      {
+        "name": "_publish_to_broker",
+        "lineno": 239
+      },
+      {
+        "name": "get_history",
+        "lineno": 272
+      },
+      {
+        "name": "replay",
+        "lineno": 297
+      },
+      {
+        "name": "clear_subscriptions",
+        "lineno": 336
+      },
+      {
+        "name": "new_root",
+        "lineno": 358
+      },
+      {
+        "name": "derive_child",
+        "lineno": 376
+      },
+      {
+        "name": "inject_into_headers",
+        "lineno": 384
+      },
+      {
+        "name": "extract_from_headers",
+        "lineno": 401
+      },
+      {
+        "name": "validate",
+        "lineno": 417
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 434
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        2
+      ]
+    ]
+  },
+  "uawos_governance.py": {
+    "file": "uawos_governance.py",
+    "imports": [
+      "json",
+      "os",
+      "time",
+      "uawos_agent_workforce",
+      "uawos_state_utils",
+      "urllib.error",
+      "urllib.request"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 98
+      },
+      {
+        "name": "upload_opa_policy",
+        "lineno": 124
+      },
+      {
+        "name": "evaluate_via_opa",
+        "lineno": 146
+      },
+      {
+        "name": "sanitize_id",
+        "lineno": 175
+      },
+      {
+        "name": "bootstrap_openfga",
+        "lineno": 180
+      },
+      {
+        "name": "check_fga_authorization",
+        "lineno": 295
+      },
+      {
+        "name": "create_policy",
+        "lineno": 352
+      },
+      {
+        "name": "evaluate_action_governance",
+        "lineno": 371
+      },
+      {
+        "name": "detect_policy_conflicts",
+        "lineno": 421
+      },
+      {
+        "name": "approve_policy",
+        "lineno": 438
+      },
+      {
+        "name": "request_exception",
+        "lineno": 450
+      },
+      {
+        "name": "process_exception",
+        "lineno": 465
+      },
+      {
+        "name": "accept_risk",
+        "lineno": 477
+      },
+      {
+        "name": "log_audit",
+        "lineno": 491
+      },
+      {
+        "name": "get_dynamic_agent_autonomy_level",
+        "lineno": 502
+      },
+      {
+        "name": "run_governor_audit_analysis",
+        "lineno": 519
+      },
+      {
+        "name": "verify_fr_101",
+        "lineno": 572
+      },
+      {
+        "name": "verify_fr_102",
+        "lineno": 578
+      },
+      {
+        "name": "verify_fr_103",
+        "lineno": 584
+      },
+      {
+        "name": "verify_fr_104",
+        "lineno": 590
+      },
+      {
+        "name": "verify_fr_105",
+        "lineno": 597
+      },
+      {
+        "name": "verify_fr_106",
+        "lineno": 605
+      },
+      {
+        "name": "verify_fr_107",
+        "lineno": 612
+      },
+      {
+        "name": "verify_fr_108",
+        "lineno": 619
+      },
+      {
+        "name": "verify_fr_109",
+        "lineno": 625
+      },
+      {
+        "name": "verify_fr_110",
+        "lineno": 631
+      },
+      {
+        "name": "verify_fr_111",
+        "lineno": 638
+      },
+      {
+        "name": "verify_fr_112",
+        "lineno": 663
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 683
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [
+      137,
+      159,
+      190,
+      206,
+      213,
+      251,
+      279,
+      318,
+      344
+    ],
+    "ai_terms": [
+      [
+        "agent",
+        3
+      ]
+    ]
+  },
+  "uawos_integrations.py": {
+    "file": "uawos_integrations.py",
+    "imports": [
+      "base64",
+      "cryptography.fernet",
+      "hashlib",
+      "os",
+      "sys",
+      "time",
+      "uawos_db",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 29
+      },
+      {
+        "name": "setup_api_integration",
+        "lineno": 48
+      },
+      {
+        "name": "setup_mcp_integration",
+        "lineno": 59
+      },
+      {
+        "name": "setup_mcp_agent_server",
+        "lineno": 63
+      },
+      {
+        "name": "verify_subscription",
+        "lineno": 73
+      },
+      {
+        "name": "mock_stripe_webhook_handler",
+        "lineno": 79
+      },
+      {
+        "name": "setup_database_integration",
+        "lineno": 100
+      },
+      {
+        "name": "setup_saas_integration",
+        "lineno": 104
+      },
+      {
+        "name": "setup_doc_repo_integration",
+        "lineno": 108
+      },
+      {
+        "name": "setup_comm_platform_integration",
+        "lineno": 112
+      },
+      {
+        "name": "setup_event_integration",
+        "lineno": 116
+      },
+      {
+        "name": "evaluate_integration_governance",
+        "lineno": 120
+      },
+      {
+        "name": "calculate_integration_trust",
+        "lineno": 126
+      },
+      {
+        "name": "emit_integration_telemetry",
+        "lineno": 132
+      },
+      {
+        "name": "manage_identity",
+        "lineno": 137
+      },
+      {
+        "name": "authenticate",
+        "lineno": 144
+      },
+      {
+        "name": "authorize",
+        "lineno": 149
+      },
+      {
+        "name": "rbac_check",
+        "lineno": 160
+      },
+      {
+        "name": "pbac_check",
+        "lineno": 164
+      },
+      {
+        "name": "delegated_access_check",
+        "lineno": 168
+      },
+      {
+        "name": "write_security_audit",
+        "lineno": 172
+      },
+      {
+        "name": "encrypt_data",
+        "lineno": 179
+      },
+      {
+        "name": "decrypt_data",
+        "lineno": 186
+      },
+      {
+        "name": "run_access_review",
+        "lineno": 197
+      },
+      {
+        "name": "trust_aware_permission_check",
+        "lineno": 201
+      },
+      {
+        "name": "install_pack",
+        "lineno": 208
+      },
+      {
+        "name": "remove_pack",
+        "lineno": 215
+      },
+      {
+        "name": "get_pack_version",
+        "lineno": 224
+      },
+      {
+        "name": "inherit_pack",
+        "lineno": 230
+      },
+      {
+        "name": "compose_packs",
+        "lineno": 240
+      },
+      {
+        "name": "govern_pack",
+        "lineno": 244
+      },
+      {
+        "name": "manage_organization",
+        "lineno": 249
+      },
+      {
+        "name": "manage_workspace",
+        "lineno": 256
+      },
+      {
+        "name": "manage_registry",
+        "lineno": 263
+      },
+      {
+        "name": "administer_policy",
+        "lineno": 267
+      },
+      {
+        "name": "administer_workforce",
+        "lineno": 271
+      },
+      {
+        "name": "administer_capability",
+        "lineno": 275
+      },
+      {
+        "name": "configure_platform",
+        "lineno": 279
+      },
+      {
+        "name": "manage_retention",
+        "lineno": 286
+      },
+      {
+        "name": "manage_backup",
+        "lineno": 293
+      },
+      {
+        "name": "manage_recovery",
+        "lineno": 297
+      },
+      {
+        "name": "optimize_plan_continuous",
+        "lineno": 302
+      },
+      {
+        "name": "optimize_resources_continuous",
+        "lineno": 306
+      },
+      {
+        "name": "optimize_value_continuous",
+        "lineno": 310
+      },
+      {
+        "name": "optimize_utilization_continuous",
+        "lineno": 314
+      },
+      {
+        "name": "proactive_recommendation",
+        "lineno": 318
+      },
+      {
+        "name": "detect_emerging_risks",
+        "lineno": 322
+      },
+      {
+        "name": "detect_execution_bottlenecks",
+        "lineno": 326
+      },
+      {
+        "name": "recommend_corrective_actions",
+        "lineno": 330
+      },
+      {
+        "name": "recommend_strategic_opportunities",
+        "lineno": 334
+      },
+      {
+        "name": "improve_effectiveness",
+        "lineno": 338
+      },
+      {
+        "name": "setup_weaverouter_integration",
+        "lineno": 342
+      },
+      {
+        "name": "verify_fr_weaverouter",
+        "lineno": 355
+      },
+      {
+        "name": "verify_fr_201",
+        "lineno": 360
+      },
+      {
+        "name": "verify_fr_202",
+        "lineno": 364
+      },
+      {
+        "name": "verify_fr_203",
+        "lineno": 368
+      },
+      {
+        "name": "verify_fr_204",
+        "lineno": 372
+      },
+      {
+        "name": "verify_fr_205",
+        "lineno": 376
+      },
+      {
+        "name": "verify_fr_206",
+        "lineno": 380
+      },
+      {
+        "name": "verify_fr_207",
+        "lineno": 384
+      },
+      {
+        "name": "verify_fr_208",
+        "lineno": 388
+      },
+      {
+        "name": "verify_fr_209",
+        "lineno": 392
+      },
+      {
+        "name": "verify_fr_210",
+        "lineno": 396
+      },
+      {
+        "name": "verify_fr_211",
+        "lineno": 400
+      },
+      {
+        "name": "verify_fr_212",
+        "lineno": 404
+      },
+      {
+        "name": "verify_fr_213",
+        "lineno": 408
+      },
+      {
+        "name": "verify_fr_214",
+        "lineno": 412
+      },
+      {
+        "name": "verify_fr_215",
+        "lineno": 416
+      },
+      {
+        "name": "verify_fr_216",
+        "lineno": 420
+      },
+      {
+        "name": "verify_fr_217",
+        "lineno": 424
+      },
+      {
+        "name": "verify_fr_218",
+        "lineno": 429
+      },
+      {
+        "name": "verify_fr_219",
+        "lineno": 436
+      },
+      {
+        "name": "verify_fr_220",
+        "lineno": 440
+      },
+      {
+        "name": "verify_fr_221",
+        "lineno": 444
+      },
+      {
+        "name": "verify_fr_222",
+        "lineno": 448
+      },
+      {
+        "name": "verify_fr_223",
+        "lineno": 452
+      },
+      {
+        "name": "verify_fr_224",
+        "lineno": 456
+      },
+      {
+        "name": "verify_fr_225",
+        "lineno": 460
+      },
+      {
+        "name": "verify_fr_226",
+        "lineno": 464
+      },
+      {
+        "name": "verify_fr_227",
+        "lineno": 468
+      },
+      {
+        "name": "verify_fr_228",
+        "lineno": 472
+      },
+      {
+        "name": "verify_fr_229",
+        "lineno": 476
+      },
+      {
+        "name": "verify_fr_230",
+        "lineno": 480
+      },
+      {
+        "name": "verify_fr_231",
+        "lineno": 484
+      },
+      {
+        "name": "verify_fr_232",
+        "lineno": 488
+      },
+      {
+        "name": "verify_fr_233",
+        "lineno": 492
+      },
+      {
+        "name": "verify_fr_234",
+        "lineno": 496
+      },
+      {
+        "name": "verify_fr_235",
+        "lineno": 500
+      },
+      {
+        "name": "verify_fr_236",
+        "lineno": 504
+      },
+      {
+        "name": "verify_fr_237",
+        "lineno": 508
+      },
+      {
+        "name": "verify_fr_238",
+        "lineno": 512
+      },
+      {
+        "name": "verify_fr_239",
+        "lineno": 516
+      },
+      {
+        "name": "verify_fr_240",
+        "lineno": 520
+      },
+      {
+        "name": "verify_fr_241",
+        "lineno": 524
+      },
+      {
+        "name": "verify_fr_242",
+        "lineno": 528
+      },
+      {
+        "name": "verify_fr_243",
+        "lineno": 532
+      },
+      {
+        "name": "verify_fr_244",
+        "lineno": 536
+      },
+      {
+        "name": "verify_fr_245",
+        "lineno": 540
+      },
+      {
+        "name": "verify_fr_246",
+        "lineno": 544
+      },
+      {
+        "name": "verify_fr_247",
+        "lineno": 548
+      },
+      {
+        "name": "verify_fr_248",
+        "lineno": 552
+      },
+      {
+        "name": "verify_fr_249",
+        "lineno": 556
+      },
+      {
+        "name": "verify_fr_250",
+        "lineno": 560
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 564
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        3
+      ]
+    ]
+  },
+  "uawos_knowledge.py": {
+    "file": "uawos_knowledge.py",
+    "imports": [
+      "base64",
+      "json",
+      "os",
+      "time",
+      "uawos_db",
+      "uawos_state_utils",
+      "urllib.error",
+      "urllib.request"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 20
+      },
+      {
+        "name": "execute_cypher",
+        "lineno": 47
+      },
+      {
+        "name": "_get_neo4j_label",
+        "lineno": 74
+      },
+      {
+        "name": "sync_asset_to_neo4j",
+        "lineno": 108
+      },
+      {
+        "name": "sync_relationship_to_neo4j",
+        "lineno": 125
+      },
+      {
+        "name": "sync_all_state_to_neo4j",
+        "lineno": 153
+      },
+      {
+        "name": "create_knowledge_asset",
+        "lineno": 168
+      },
+      {
+        "name": "ingest_document",
+        "lineno": 198
+      },
+      {
+        "name": "ingest_conversation",
+        "lineno": 230
+      },
+      {
+        "name": "ingest_meeting",
+        "lineno": 243
+      },
+      {
+        "name": "ingest_email",
+        "lineno": 254
+      },
+      {
+        "name": "ingest_image",
+        "lineno": 265
+      },
+      {
+        "name": "create_graph_relationship",
+        "lineno": 276
+      },
+      {
+        "name": "reconcile_contradictions",
+        "lineno": 294
+      },
+      {
+        "name": "verify_fr_111",
+        "lineno": 370
+      },
+      {
+        "name": "verify_fr_112",
+        "lineno": 376
+      },
+      {
+        "name": "verify_fr_113",
+        "lineno": 382
+      },
+      {
+        "name": "verify_fr_114",
+        "lineno": 388
+      },
+      {
+        "name": "verify_fr_115",
+        "lineno": 394
+      },
+      {
+        "name": "verify_fr_116",
+        "lineno": 400
+      },
+      {
+        "name": "verify_fr_117",
+        "lineno": 406
+      },
+      {
+        "name": "verify_fr_118",
+        "lineno": 412
+      },
+      {
+        "name": "verify_fr_119",
+        "lineno": 418
+      },
+      {
+        "name": "verify_fr_120",
+        "lineno": 424
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 430
+      }
+    ],
+    "todos": [],
+    "sql_lines": [
+      302,
+      327
+    ],
+    "urllib_lines": [
+      67,
+      213
+    ],
+    "ai_terms": [
+      [
+        "agent",
+        1
+      ]
+    ]
+  },
+  "uawos_langgraph_adapter.py": {
+    "file": "uawos_langgraph_adapter.py",
+    "imports": [
+      "__future__",
+      "collections.abc",
+      "langgraph",
+      "langgraph.graph",
+      "os",
+      "time",
+      "typing",
+      "uawos_agent_runtime",
+      "uawos_db",
+      "uawos_state_utils",
+      "uuid"
+    ],
+    "classes": [
+      {
+        "name": "UAWOSSqlCheckpointer",
+        "lineno": 112,
+        "methods": [
+          "save",
+          "load",
+          "list_checkpoints"
+        ]
+      },
+      {
+        "name": "LangGraphWorkflowAdapter",
+        "lineno": 157,
+        "methods": [
+          "__init__",
+          "register_node",
+          "compile_workflow",
+          "_make_governed_node",
+          "_do_run_step",
+          "replay_from_checkpoint"
+        ]
+      },
+      {
+        "name": "LangGraphAgentAdapter",
+        "lineno": 344,
+        "methods": [
+          "__init__",
+          "provision_agent_graph",
+          "_do_execute"
+        ]
+      },
+      {
+        "name": "SemanticKernelAgentAdapter",
+        "lineno": 414,
+        "methods": [
+          "_do_execute"
+        ]
+      },
+      {
+        "name": "AutoGenSandboxAdapter",
+        "lineno": 442,
+        "methods": [
+          "_do_execute"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 49
+      },
+      {
+        "name": "_normalize_state",
+        "lineno": 85
+      },
+      {
+        "name": "save",
+        "lineno": 119
+      },
+      {
+        "name": "load",
+        "lineno": 140
+      },
+      {
+        "name": "list_checkpoints",
+        "lineno": 147
+      },
+      {
+        "name": "__init__",
+        "lineno": 171
+      },
+      {
+        "name": "register_node",
+        "lineno": 182
+      },
+      {
+        "name": "compile_workflow",
+        "lineno": 193
+      },
+      {
+        "name": "_make_governed_node",
+        "lineno": 230
+      },
+      {
+        "name": "governed_node",
+        "lineno": 236
+      },
+      {
+        "name": "_do_run_step",
+        "lineno": 281
+      },
+      {
+        "name": "replay_from_checkpoint",
+        "lineno": 308
+      },
+      {
+        "name": "__init__",
+        "lineno": 352
+      },
+      {
+        "name": "provision_agent_graph",
+        "lineno": 363
+      },
+      {
+        "name": "_do_execute",
+        "lineno": 388
+      },
+      {
+        "name": "_do_execute",
+        "lineno": 421
+      },
+      {
+        "name": "_do_execute",
+        "lineno": 454
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 472
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        15
+      ]
+    ]
+  },
+  "uawos_learning.py": {
+    "file": "uawos_learning.py",
+    "imports": [
+      "os",
+      "time",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 10
+      },
+      {
+        "name": "detect_opportunities",
+        "lineno": 34
+      },
+      {
+        "name": "generate_learning",
+        "lineno": 58
+      },
+      {
+        "name": "approve_learning",
+        "lineno": 79
+      },
+      {
+        "name": "publish_learning",
+        "lineno": 91
+      },
+      {
+        "name": "get_learning_traceability",
+        "lineno": 104
+      },
+      {
+        "name": "create_learning_pack",
+        "lineno": 117
+      },
+      {
+        "name": "verify_fr_131",
+        "lineno": 129
+      },
+      {
+        "name": "verify_fr_132",
+        "lineno": 135
+      },
+      {
+        "name": "verify_fr_133",
+        "lineno": 141
+      },
+      {
+        "name": "verify_fr_134",
+        "lineno": 147
+      },
+      {
+        "name": "verify_fr_135",
+        "lineno": 153
+      },
+      {
+        "name": "verify_fr_136",
+        "lineno": 159
+      },
+      {
+        "name": "verify_fr_137",
+        "lineno": 174
+      },
+      {
+        "name": "verify_fr_138",
+        "lineno": 180
+      },
+      {
+        "name": "verify_fr_139",
+        "lineno": 186
+      },
+      {
+        "name": "verify_fr_140",
+        "lineno": 192
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 198
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": []
+  },
+  "uawos_memory.py": {
+    "file": "uawos_memory.py",
+    "imports": [
+      "json",
+      "os",
+      "time",
+      "uawos_db",
+      "uawos_knowledge",
+      "uawos_state_utils",
+      "uawos_weaverouter",
+      "urllib.request",
+      "uuid"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 14
+      },
+      {
+        "name": "append_memory",
+        "lineno": 36
+      },
+      {
+        "name": "apply_overlay",
+        "lineno": 65
+      },
+      {
+        "name": "curate_memory",
+        "lineno": 76
+      },
+      {
+        "name": "export_memory",
+        "lineno": 95
+      },
+      {
+        "name": "apply_retention_policy",
+        "lineno": 101
+      },
+      {
+        "name": "create_stm_session",
+        "lineno": 114
+      },
+      {
+        "name": "add_stm_message",
+        "lineno": 138
+      },
+      {
+        "name": "get_stm_sliding_context",
+        "lineno": 165
+      },
+      {
+        "name": "update_agent_scratchpad",
+        "lineno": 209
+      },
+      {
+        "name": "get_agent_scratchpad",
+        "lineno": 235
+      },
+      {
+        "name": "create_episode",
+        "lineno": 267
+      },
+      {
+        "name": "add_episode_event",
+        "lineno": 291
+      },
+      {
+        "name": "add_episode_decision",
+        "lineno": 312
+      },
+      {
+        "name": "get_episode_timeline",
+        "lineno": 343
+      },
+      {
+        "name": "acquire_advisory_lock",
+        "lineno": 381
+      },
+      {
+        "name": "release_advisory_lock",
+        "lineno": 401
+      },
+      {
+        "name": "reflect_on_episode",
+        "lineno": 416
+      },
+      {
+        "name": "auto_consolidate_memories",
+        "lineno": 462
+      },
+      {
+        "name": "jaccard",
+        "lineno": 477
+      },
+      {
+        "name": "verify_fr_121",
+        "lineno": 509
+      },
+      {
+        "name": "verify_fr_122",
+        "lineno": 515
+      },
+      {
+        "name": "verify_fr_123",
+        "lineno": 521
+      },
+      {
+        "name": "verify_fr_124",
+        "lineno": 528
+      },
+      {
+        "name": "verify_fr_125",
+        "lineno": 534
+      },
+      {
+        "name": "verify_fr_126",
+        "lineno": 540
+      },
+      {
+        "name": "verify_fr_127",
+        "lineno": 549
+      },
+      {
+        "name": "verify_fr_128",
+        "lineno": 556
+      },
+      {
+        "name": "verify_fr_129",
+        "lineno": 562
+      },
+      {
+        "name": "verify_fr_130",
+        "lineno": 568
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 574
+      }
+    ],
+    "todos": [],
+    "sql_lines": [
+      122,
+      146,
+      172,
+      216,
+      242,
+      275,
+      298,
+      322,
+      350,
+      393,
+      409,
+      449,
+      470
+    ],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        3
+      ],
+      [
+        "prompt",
+        3
+      ],
+      [
+        "telemetry",
+        5
+      ]
+    ]
+  },
+  "uawos_objective.py": {
+    "file": "uawos_objective.py",
+    "imports": [
+      "os",
+      "re",
+      "time",
+      "uawos_budget",
+      "uawos_db",
+      "uawos_dtase",
+      "uawos_outcome",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 11
+      },
+      {
+        "name": "create_objective",
+        "lineno": 16
+      },
+      {
+        "name": "update_objective",
+        "lineno": 56
+      },
+      {
+        "name": "archive_objective",
+        "lineno": 83
+      },
+      {
+        "name": "restore_objective",
+        "lineno": 87
+      },
+      {
+        "name": "cancel_objective",
+        "lineno": 91
+      },
+      {
+        "name": "pause_objective",
+        "lineno": 95
+      },
+      {
+        "name": "resume_objective",
+        "lineno": 99
+      },
+      {
+        "name": "create_objective_from_input",
+        "lineno": 104
+      },
+      {
+        "name": "detect_conflicts",
+        "lineno": 174
+      },
+      {
+        "name": "has_cycle",
+        "lineno": 181
+      },
+      {
+        "name": "recalculate_scores",
+        "lineno": 247
+      },
+      {
+        "name": "verify_fr_011",
+        "lineno": 327
+      },
+      {
+        "name": "verify_fr_012",
+        "lineno": 336
+      },
+      {
+        "name": "verify_fr_013",
+        "lineno": 343
+      },
+      {
+        "name": "verify_fr_014",
+        "lineno": 350
+      },
+      {
+        "name": "verify_fr_015",
+        "lineno": 359
+      },
+      {
+        "name": "verify_fr_016",
+        "lineno": 366
+      },
+      {
+        "name": "verify_fr_017",
+        "lineno": 373
+      },
+      {
+        "name": "verify_fr_018",
+        "lineno": 380
+      },
+      {
+        "name": "verify_fr_019",
+        "lineno": 387
+      },
+      {
+        "name": "verify_fr_020",
+        "lineno": 394
+      },
+      {
+        "name": "verify_fr_021",
+        "lineno": 401
+      },
+      {
+        "name": "verify_fr_022",
+        "lineno": 408
+      },
+      {
+        "name": "verify_fr_023",
+        "lineno": 458
+      },
+      {
+        "name": "verify_fr_024",
+        "lineno": 467
+      },
+      {
+        "name": "verify_fr_025",
+        "lineno": 484
+      },
+      {
+        "name": "verify_fr_026",
+        "lineno": 492
+      },
+      {
+        "name": "verify_fr_027",
+        "lineno": 506
+      },
+      {
+        "name": "verify_fr_028",
+        "lineno": 514
+      },
+      {
+        "name": "verify_fr_029",
+        "lineno": 522
+      },
+      {
+        "name": "verify_fr_030",
+        "lineno": 538
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 545
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        2
+      ],
+      [
+        "rag",
+        1
+      ],
+      [
+        "llm",
+        1
+      ]
+    ]
+  },
+  "uawos_observability.py": {
+    "file": "uawos_observability.py",
+    "imports": [
+      "os",
+      "time",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 10
+      },
+      {
+        "name": "emit_telemetry",
+        "lineno": 32
+      },
+      {
+        "name": "get_metrics",
+        "lineno": 42
+      },
+      {
+        "name": "update_metrics",
+        "lineno": 48
+      },
+      {
+        "name": "run_drift_detection",
+        "lineno": 56
+      },
+      {
+        "name": "run_anomaly_detection",
+        "lineno": 61
+      },
+      {
+        "name": "check_system_health",
+        "lineno": 69
+      },
+      {
+        "name": "get_dashboard_summary",
+        "lineno": 79
+      },
+      {
+        "name": "update_digital_twin_state",
+        "lineno": 85
+      },
+      {
+        "name": "verify_fr_191",
+        "lineno": 97
+      },
+      {
+        "name": "verify_fr_192",
+        "lineno": 103
+      },
+      {
+        "name": "verify_fr_193",
+        "lineno": 109
+      },
+      {
+        "name": "verify_fr_194",
+        "lineno": 115
+      },
+      {
+        "name": "verify_fr_195",
+        "lineno": 121
+      },
+      {
+        "name": "verify_fr_196",
+        "lineno": 127
+      },
+      {
+        "name": "verify_fr_197",
+        "lineno": 133
+      },
+      {
+        "name": "verify_fr_198",
+        "lineno": 139
+      },
+      {
+        "name": "verify_fr_199",
+        "lineno": 145
+      },
+      {
+        "name": "verify_fr_200",
+        "lineno": 151
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 157
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "telemetry",
+        2
+      ]
+    ]
+  },
+  "uawos_outcome.py": {
+    "file": "uawos_outcome.py",
+    "imports": [
+      "os",
+      "uawos_db",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 10
+      },
+      {
+        "name": "create_outcome",
+        "lineno": 48
+      },
+      {
+        "name": "get_objective_outcomes",
+        "lineno": 89
+      },
+      {
+        "name": "update_outcome",
+        "lineno": 95
+      },
+      {
+        "name": "recalculate_forecasts",
+        "lineno": 122
+      },
+      {
+        "name": "verify_fr_031",
+        "lineno": 152
+      },
+      {
+        "name": "verify_fr_032",
+        "lineno": 162
+      },
+      {
+        "name": "verify_fr_033",
+        "lineno": 169
+      },
+      {
+        "name": "verify_fr_034",
+        "lineno": 176
+      },
+      {
+        "name": "verify_fr_035",
+        "lineno": 189
+      },
+      {
+        "name": "verify_fr_036",
+        "lineno": 202
+      },
+      {
+        "name": "verify_fr_037",
+        "lineno": 217
+      },
+      {
+        "name": "verify_fr_038",
+        "lineno": 224
+      },
+      {
+        "name": "verify_fr_039",
+        "lineno": 231
+      },
+      {
+        "name": "verify_fr_040",
+        "lineno": 238
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 253
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": []
+  },
+  "uawos_planning.py": {
+    "file": "uawos_planning.py",
+    "imports": [
+      "os",
+      "time",
+      "uawos_agent_workforce",
+      "uawos_db",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 11
+      },
+      {
+        "name": "create_plan",
+        "lineno": 55
+      },
+      {
+        "name": "generate_plans",
+        "lineno": 93
+      },
+      {
+        "name": "rank_plans",
+        "lineno": 119
+      },
+      {
+        "name": "score_plan",
+        "lineno": 124
+      },
+      {
+        "name": "simulate_plan",
+        "lineno": 136
+      },
+      {
+        "name": "compare_plans",
+        "lineno": 158
+      },
+      {
+        "name": "approve_plan",
+        "lineno": 174
+      },
+      {
+        "name": "reject_plan",
+        "lineno": 178
+      },
+      {
+        "name": "archive_plan",
+        "lineno": 182
+      },
+      {
+        "name": "modify_plan",
+        "lineno": 186
+      },
+      {
+        "name": "trigger_replanning",
+        "lineno": 218
+      },
+      {
+        "name": "get_planning_traceability",
+        "lineno": 242
+      },
+      {
+        "name": "route_action_to_agent",
+        "lineno": 254
+      },
+      {
+        "name": "verify_fr_041",
+        "lineno": 298
+      },
+      {
+        "name": "verify_fr_042",
+        "lineno": 304
+      },
+      {
+        "name": "verify_fr_043",
+        "lineno": 310
+      },
+      {
+        "name": "verify_fr_044",
+        "lineno": 316
+      },
+      {
+        "name": "verify_fr_045",
+        "lineno": 322
+      },
+      {
+        "name": "verify_fr_046",
+        "lineno": 328
+      },
+      {
+        "name": "verify_fr_047",
+        "lineno": 334
+      },
+      {
+        "name": "verify_fr_048",
+        "lineno": 340
+      },
+      {
+        "name": "verify_fr_049",
+        "lineno": 346
+      },
+      {
+        "name": "verify_fr_050",
+        "lineno": 352
+      },
+      {
+        "name": "verify_fr_051",
+        "lineno": 358
+      },
+      {
+        "name": "verify_fr_052",
+        "lineno": 364
+      },
+      {
+        "name": "verify_fr_053",
+        "lineno": 370
+      },
+      {
+        "name": "verify_fr_054",
+        "lineno": 376
+      },
+      {
+        "name": "verify_fr_055",
+        "lineno": 382
+      },
+      {
+        "name": "verify_fr_056",
+        "lineno": 388
+      },
+      {
+        "name": "verify_fr_057",
+        "lineno": 394
+      },
+      {
+        "name": "verify_fr_058",
+        "lineno": 400
+      },
+      {
+        "name": "verify_fr_059",
+        "lineno": 406
+      },
+      {
+        "name": "verify_fr_060",
+        "lineno": 412
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 418
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        7
+      ]
+    ]
+  },
+  "uawos_pmcms.py": {
+    "file": "uawos_pmcms.py",
+    "imports": [
+      "json",
+      "os",
+      "socket",
+      "time",
+      "uawos_agent_workforce",
+      "uawos_db",
+      "uawos_decision",
+      "uawos_governance",
+      "uawos_objective",
+      "uawos_planning",
+      "uawos_resource",
+      "uawos_simulation",
+      "uawos_state_utils",
+      "uawos_value",
+      "uawos_workflow",
+      "urllib.request"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 13
+      },
+      {
+        "name": "check_port",
+        "lineno": 17
+      },
+      {
+        "name": "check_module",
+        "lineno": 28
+      },
+      {
+        "name": "get_maturity_assessment",
+        "lineno": 37
+      },
+      {
+        "name": "verify_pmcms_logic",
+        "lineno": 707
+      },
+      {
+        "name": "verify_fr_236",
+        "lineno": 721
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 726
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [
+      336
+    ],
+    "ai_terms": [
+      [
+        "agent",
+        19
+      ],
+      [
+        "rag",
+        2
+      ],
+      [
+        "telemetry",
+        4
+      ]
+    ]
+  },
+  "uawos_proactive_governance.py": {
+    "file": "uawos_proactive_governance.py",
+    "imports": [
+      "ast",
+      "contextlib",
+      "networkx",
+      "os",
+      "re",
+      "time",
+      "uawos_db"
+    ],
+    "classes": [
+      {
+        "name": "CodeRiskScanner",
+        "lineno": 36,
+        "methods": [
+          "__init__",
+          "scan",
+          "_scan_file",
+          "_build_dependency_graph"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "init_governance_dir",
+        "lineno": 31
+      },
+      {
+        "name": "__init__",
+        "lineno": 37
+      },
+      {
+        "name": "scan",
+        "lineno": 46
+      },
+      {
+        "name": "_scan_file",
+        "lineno": 67
+      },
+      {
+        "name": "_build_dependency_graph",
+        "lineno": 106
+      },
+      {
+        "name": "calculate_blast_radius",
+        "lineno": 123
+      },
+      {
+        "name": "calculate_test_confidence",
+        "lineno": 158
+      },
+      {
+        "name": "generate_reliability_forecasting",
+        "lineno": 202
+      },
+      {
+        "name": "generate_architecture_risks",
+        "lineno": 256
+      },
+      {
+        "name": "generate_incident_learning",
+        "lineno": 295
+      },
+      {
+        "name": "build_early_warnings",
+        "lineno": 308
+      },
+      {
+        "name": "build_decision_matrix",
+        "lineno": 371
+      },
+      {
+        "name": "run_full_governance_audit",
+        "lineno": 397
+      },
+      {
+        "name": "write_registries",
+        "lineno": 464
+      }
+    ],
+    "todos": [
+      [
+        81,
+        "# Scan for TODOs and suppressions"
+      ],
+      [
+        84,
+        "# TODO"
+      ],
+      [
+        85,
+        "if \"TODO\" in line_strip or \"FIXME\" in line_strip:"
+      ],
+      [
+        89,
+        "\"Scan for TODOs\","
+      ],
+      [
+        90,
+        "\"if \\\"TODO\\\" in\","
+      ],
+      [
+        91,
+        "\"re.search(r\\\"(?:TODO|FIXME)\","
+      ],
+      [
+        92,
+        "\"Warning 2: TODO Accumulation\","
+      ],
+      [
+        93,
+        "\"active TODO/FIXME lines in source files\","
+      ],
+      [
+        94,
+        "\"block merging critical TODO comments\","
+      ],
+      [
+        95,
+        "\"derived from TODOs\","
+      ],
+      [
+        96,
+        "\"Active TODOs and FIXMEs\""
+      ],
+      [
+        97,
+        "]) or line_strip == \"# TODO\":"
+      ],
+      [
+        99,
+        "match = re.search(r\"(?:TODO|FIXME)[:\\s]+(.*)\", line_strip, re.IGNORECASE)"
+      ],
+      [
+        328,
+        "# Warning 2: TODO Accumulation"
+      ],
+      [
+        335,
+        "\"evidence\": f\"Detected {todo_count} active TODO/FIXME lines in source files.\","
+      ],
+      [
+        342,
+        "\"Enforce pre-commit hook to block merging critical TODO comments.\","
+      ],
+      [
+        423,
+        "# Future Risk Score: derived from TODOs, circular paths, and unmitigated warnings"
+      ],
+      [
+        1007,
+        "f.write(\"### Active TODOs and FIXMEs\\n\\n\")"
+      ]
+    ],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        7
+      ],
+      [
+        "llm",
+        3
+      ],
+      [
+        "litellm",
+        1
+      ]
+    ]
+  },
+  "uawos_requirement_studio.py": {
+    "file": "uawos_requirement_studio.py",
+    "imports": [
+      "os",
+      "time",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 41
+      },
+      {
+        "name": "ingest_requirement",
+        "lineno": 51
+      },
+      {
+        "name": "analyze_strategic_fit",
+        "lineno": 144
+      },
+      {
+        "name": "generate_critique",
+        "lineno": 225
+      },
+      {
+        "name": "generate_clarification_questions",
+        "lineno": 275
+      },
+      {
+        "name": "generate_strategic_product_proposition",
+        "lineno": 367
+      },
+      {
+        "name": "create_roadmap_candidate",
+        "lineno": 407
+      },
+      {
+        "name": "evaluate_priority",
+        "lineno": 426
+      },
+      {
+        "name": "re_sequence_roadmap",
+        "lineno": 467
+      },
+      {
+        "name": "generate_executive_recommendation",
+        "lineno": 559
+      },
+      {
+        "name": "submit_new_requirement",
+        "lineno": 575
+      },
+      {
+        "name": "update_clarifications",
+        "lineno": 615
+      },
+      {
+        "name": "author_proposition",
+        "lineno": 648
+      },
+      {
+        "name": "absorb_requirement",
+        "lineno": 663
+      },
+      {
+        "name": "publish_roadmap_item",
+        "lineno": 739
+      },
+      {
+        "name": "direct_ingest_to_backlog",
+        "lineno": 754
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 788
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        5
+      ],
+      [
+        "rag",
+        5
+      ],
+      [
+        "llm",
+        1
+      ],
+      [
+        "openai",
+        1
+      ],
+      [
+        "gemini",
+        1
+      ]
+    ]
+  },
+  "uawos_resource.py": {
+    "file": "uawos_resource.py",
+    "imports": [
+      "os",
+      "uawos_db",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 9
+      },
+      {
+        "name": "create_resource",
+        "lineno": 43
+      },
+      {
+        "name": "allocate_resource",
+        "lineno": 62
+      },
+      {
+        "name": "detect_resource_conflicts",
+        "lineno": 94
+      },
+      {
+        "name": "optimize_allocations",
+        "lineno": 127
+      },
+      {
+        "name": "forecast_resource_demand",
+        "lineno": 147
+      },
+      {
+        "name": "run_predictive_budget_forecasting",
+        "lineno": 160
+      },
+      {
+        "name": "simulate_allocations",
+        "lineno": 200
+      },
+      {
+        "name": "get_utilization_analytics",
+        "lineno": 210
+      },
+      {
+        "name": "verify_fr_141",
+        "lineno": 228
+      },
+      {
+        "name": "verify_fr_142",
+        "lineno": 234
+      },
+      {
+        "name": "verify_fr_143",
+        "lineno": 240
+      },
+      {
+        "name": "verify_fr_144",
+        "lineno": 246
+      },
+      {
+        "name": "verify_fr_145",
+        "lineno": 255
+      },
+      {
+        "name": "verify_fr_146",
+        "lineno": 261
+      },
+      {
+        "name": "verify_fr_147",
+        "lineno": 267
+      },
+      {
+        "name": "verify_fr_148",
+        "lineno": 273
+      },
+      {
+        "name": "verify_fr_149",
+        "lineno": 279
+      },
+      {
+        "name": "verify_fr_150",
+        "lineno": 285
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 294
+      }
+    ],
+    "todos": [],
+    "sql_lines": [
+      170
+    ],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        1
+      ]
+    ]
+  },
+  "uawos_sandbox_runtime.py": {
+    "file": "uawos_sandbox_runtime.py",
+    "imports": [
+      "__future__",
+      "collections.abc",
+      "dataclasses",
+      "enum",
+      "hashlib",
+      "json",
+      "os",
+      "re",
+      "time",
+      "uawos_agent_runtime",
+      "uawos_db",
+      "uawos_state_utils",
+      "uuid"
+    ],
+    "classes": [
+      {
+        "name": "LicenseClass",
+        "lineno": 84,
+        "methods": []
+      },
+      {
+        "name": "SandboxMode",
+        "lineno": 93,
+        "methods": []
+      },
+      {
+        "name": "ExecutionVerdict",
+        "lineno": 101,
+        "methods": []
+      },
+      {
+        "name": "ToolDescriptor",
+        "lineno": 114,
+        "methods": [
+          "to_dict",
+          "from_dict"
+        ]
+      },
+      {
+        "name": "UAWOSSecretsManager",
+        "lineno": 186,
+        "methods": [
+          "store_secret",
+          "get_secret",
+          "has_secret",
+          "validate_requirements",
+          "redact",
+          "redact_dict",
+          "inject_into_request"
+        ]
+      },
+      {
+        "name": "ToolRegistry",
+        "lineno": 300,
+        "methods": [
+          "register",
+          "get",
+          "find_by_name",
+          "list_tools",
+          "deactivate"
+        ]
+      },
+      {
+        "name": "SandboxExecution",
+        "lineno": 372,
+        "methods": [
+          "to_dict"
+        ]
+      },
+      {
+        "name": "UAWOSSandboxToolExecutor",
+        "lineno": 414,
+        "methods": [
+          "__init__",
+          "register_callable",
+          "execute_tool",
+          "list_available_tools",
+          "_execute_in_process",
+          "_execute_container",
+          "_execute_remote",
+          "_record_execution"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 60
+      },
+      {
+        "name": "to_dict",
+        "lineno": 134
+      },
+      {
+        "name": "from_dict",
+        "lineno": 152
+      },
+      {
+        "name": "store_secret",
+        "lineno": 204
+      },
+      {
+        "name": "get_secret",
+        "lineno": 226
+      },
+      {
+        "name": "has_secret",
+        "lineno": 231
+      },
+      {
+        "name": "validate_requirements",
+        "lineno": 236
+      },
+      {
+        "name": "redact",
+        "lineno": 242
+      },
+      {
+        "name": "redact_dict",
+        "lineno": 257
+      },
+      {
+        "name": "inject_into_request",
+        "lineno": 279
+      },
+      {
+        "name": "register",
+        "lineno": 308
+      },
+      {
+        "name": "get",
+        "lineno": 319
+      },
+      {
+        "name": "find_by_name",
+        "lineno": 329
+      },
+      {
+        "name": "list_tools",
+        "lineno": 341
+      },
+      {
+        "name": "deactivate",
+        "lineno": 353
+      },
+      {
+        "name": "to_dict",
+        "lineno": 390
+      },
+      {
+        "name": "__init__",
+        "lineno": 438
+      },
+      {
+        "name": "register_callable",
+        "lineno": 449
+      },
+      {
+        "name": "execute_tool",
+        "lineno": 453
+      },
+      {
+        "name": "list_available_tools",
+        "lineno": 621
+      },
+      {
+        "name": "_execute_in_process",
+        "lineno": 627
+      },
+      {
+        "name": "_execute_container",
+        "lineno": 634
+      },
+      {
+        "name": "_execute_remote",
+        "lineno": 667
+      },
+      {
+        "name": "_record_execution",
+        "lineno": 681
+      },
+      {
+        "name": "create_sandbox_service_template",
+        "lineno": 698
+      },
+      {
+        "name": "generate_dockerfile_template",
+        "lineno": 744
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 766
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "prompt",
+        2
+      ],
+      [
+        "llm",
+        3
+      ],
+      [
+        "openai",
+        1
+      ]
+    ]
+  },
+  "uawos_sdk.py": {
+    "file": "uawos_sdk.py",
+    "imports": [
+      "json",
+      "uawos_context",
+      "uawos_db",
+      "uawos_memory",
+      "uawos_objective",
+      "urllib.request"
+    ],
+    "classes": [
+      {
+        "name": "UAWOSClientSDK",
+        "lineno": 11,
+        "methods": [
+          "__init__",
+          "create_objective",
+          "get_objective_status",
+          "add_memory",
+          "search_knowledge",
+          "get_status"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "__init__",
+        "lineno": 12
+      },
+      {
+        "name": "create_objective",
+        "lineno": 16
+      },
+      {
+        "name": "get_objective_status",
+        "lineno": 27
+      },
+      {
+        "name": "add_memory",
+        "lineno": 38
+      },
+      {
+        "name": "search_knowledge",
+        "lineno": 46
+      },
+      {
+        "name": "get_status",
+        "lineno": 50
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [
+      53
+    ],
+    "ai_terms": []
+  },
+  "uawos_semantic_kernel_adapter.py": {
+    "file": "uawos_semantic_kernel_adapter.py",
+    "imports": [
+      "__future__",
+      "collections.abc",
+      "dataclasses",
+      "hashlib",
+      "os",
+      "qdrant_client",
+      "qdrant_client.models",
+      "semantic_kernel",
+      "time",
+      "typing",
+      "uawos_agent_runtime",
+      "uawos_audit_ledger",
+      "uawos_db",
+      "uawos_sandbox_runtime",
+      "uawos_state_utils",
+      "uuid"
+    ],
+    "classes": [
+      {
+        "name": "SKPluginDescriptor",
+        "lineno": 99,
+        "methods": [
+          "to_dict",
+          "from_dict"
+        ]
+      },
+      {
+        "name": "GovernancePipelineFilter",
+        "lineno": 138,
+        "methods": [
+          "__init__",
+          "pre_invocation",
+          "post_invocation"
+        ]
+      },
+      {
+        "name": "SemanticKernelVectorBridge",
+        "lineno": 273,
+        "methods": [
+          "save_memory",
+          "search_memory"
+        ]
+      },
+      {
+        "name": "SemanticKernelRuntimeAdapter",
+        "lineno": 413,
+        "methods": [
+          "__init__",
+          "register_plugin",
+          "_do_execute",
+          "_simulate_execution"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 63
+      },
+      {
+        "name": "to_dict",
+        "lineno": 115
+      },
+      {
+        "name": "from_dict",
+        "lineno": 129
+      },
+      {
+        "name": "__init__",
+        "lineno": 150
+      },
+      {
+        "name": "pre_invocation",
+        "lineno": 160
+      },
+      {
+        "name": "post_invocation",
+        "lineno": 216
+      },
+      {
+        "name": "save_memory",
+        "lineno": 285
+      },
+      {
+        "name": "search_memory",
+        "lineno": 374
+      },
+      {
+        "name": "__init__",
+        "lineno": 427
+      },
+      {
+        "name": "register_plugin",
+        "lineno": 444
+      },
+      {
+        "name": "_do_execute",
+        "lineno": 490
+      },
+      {
+        "name": "_simulate_execution",
+        "lineno": 554
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 578
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        6
+      ],
+      [
+        "openai",
+        2
+      ]
+    ]
+  },
+  "uawos_simulation.py": {
+    "file": "uawos_simulation.py",
+    "imports": [
+      "os",
+      "random",
+      "time",
+      "uawos_db",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 11
+      },
+      {
+        "name": "run_scenario_model",
+        "lineno": 28
+      },
+      {
+        "name": "run_what_if_analysis",
+        "lineno": 50
+      },
+      {
+        "name": "run_monte_carlo",
+        "lineno": 65
+      },
+      {
+        "name": "forecast_risks",
+        "lineno": 108
+      },
+      {
+        "name": "forecast_value",
+        "lineno": 116
+      },
+      {
+        "name": "forecast_capacity",
+        "lineno": 121
+      },
+      {
+        "name": "forecast_success",
+        "lineno": 126
+      },
+      {
+        "name": "run_digital_twin_sync",
+        "lineno": 131
+      },
+      {
+        "name": "validate_forecasts",
+        "lineno": 140
+      },
+      {
+        "name": "learn_from_forecast_errors",
+        "lineno": 153
+      },
+      {
+        "name": "verify_fr_171",
+        "lineno": 161
+      },
+      {
+        "name": "verify_fr_172",
+        "lineno": 167
+      },
+      {
+        "name": "verify_fr_173",
+        "lineno": 173
+      },
+      {
+        "name": "verify_fr_174",
+        "lineno": 179
+      },
+      {
+        "name": "verify_fr_175",
+        "lineno": 185
+      },
+      {
+        "name": "verify_fr_176",
+        "lineno": 191
+      },
+      {
+        "name": "verify_fr_177",
+        "lineno": 197
+      },
+      {
+        "name": "verify_fr_178",
+        "lineno": 203
+      },
+      {
+        "name": "verify_fr_179",
+        "lineno": 209
+      },
+      {
+        "name": "verify_fr_180",
+        "lineno": 215
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 221
+      }
+    ],
+    "todos": [],
+    "sql_lines": [
+      79
+    ],
+    "urllib_lines": [],
+    "ai_terms": []
+  },
+  "uawos_state_utils.py": {
+    "file": "uawos_state_utils.py",
+    "imports": [
+      "collections.abc",
+      "inspect",
+      "json",
+      "os",
+      "sys",
+      "typing",
+      "uawos_context",
+      "uawos_db"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "_get_db_key",
+        "lineno": 11
+      },
+      {
+        "name": "load_state",
+        "lineno": 15
+      },
+      {
+        "name": "save_state",
+        "lineno": 74
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": []
+  },
+  "uawos_traceability.py": {
+    "file": "uawos_traceability.py",
+    "imports": [
+      "json",
+      "os",
+      "sys",
+      "time",
+      "uawos_budget",
+      "uawos_dtase",
+      "uawos_integrations",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "_parse_requirement_description",
+        "lineno": 33
+      },
+      {
+        "name": "parse_prd_requirements",
+        "lineno": 48
+      },
+      {
+        "name": "_resolve_roadmap_mapping",
+        "lineno": 103
+      },
+      {
+        "name": "_resolve_requirement_status",
+        "lineno": 180
+      },
+      {
+        "name": "get_traceability_matrix",
+        "lineno": 604
+      },
+      {
+        "name": "_get_default_roadmap",
+        "lineno": 712
+      },
+      {
+        "name": "_load_roadmap_candidates",
+        "lineno": 806
+      },
+      {
+        "name": "_calculate_item_metrics",
+        "lineno": 850
+      },
+      {
+        "name": "get_roadmap_data",
+        "lineno": 927
+      },
+      {
+        "name": "_classify_health_score",
+        "lineno": 956
+      },
+      {
+        "name": "get_delivery_health",
+        "lineno": 969
+      },
+      {
+        "name": "get_change_detection",
+        "lineno": 1026
+      },
+      {
+        "name": "generate_antigravity_prompt",
+        "lineno": 1057
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        4
+      ],
+      [
+        "prompt",
+        4
+      ],
+      [
+        "rag",
+        3
+      ],
+      [
+        "llm",
+        2
+      ],
+      [
+        "litellm",
+        5
+      ]
+    ]
+  },
+  "uawos_value.py": {
+    "file": "uawos_value.py",
+    "imports": [
+      "os",
+      "time",
+      "uawos_state_utils",
+      "urllib.error",
+      "urllib.request"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 10
+      },
+      {
+        "name": "create_value_hypothesis",
+        "lineno": 36
+      },
+      {
+        "name": "record_value_measurement",
+        "lineno": 56
+      },
+      {
+        "name": "forecast_value_realization",
+        "lineno": 81
+      },
+      {
+        "name": "get_portfolio_value_rollup",
+        "lineno": 95
+      },
+      {
+        "name": "track_strategic_value",
+        "lineno": 102
+      },
+      {
+        "name": "wire_clickhouse_telemetry",
+        "lineno": 110
+      },
+      {
+        "name": "run_continuous_measurement",
+        "lineno": 133
+      },
+      {
+        "name": "verify_fr_181",
+        "lineno": 155
+      },
+      {
+        "name": "verify_fr_182",
+        "lineno": 161
+      },
+      {
+        "name": "verify_fr_183",
+        "lineno": 167
+      },
+      {
+        "name": "verify_fr_184",
+        "lineno": 173
+      },
+      {
+        "name": "verify_fr_185",
+        "lineno": 179
+      },
+      {
+        "name": "verify_fr_186",
+        "lineno": 186
+      },
+      {
+        "name": "verify_fr_187",
+        "lineno": 192
+      },
+      {
+        "name": "verify_fr_188",
+        "lineno": 198
+      },
+      {
+        "name": "verify_fr_189",
+        "lineno": 204
+      },
+      {
+        "name": "verify_fr_190",
+        "lineno": 210
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 216
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [
+      119
+    ],
+    "ai_terms": [
+      [
+        "telemetry",
+        1
+      ]
+    ]
+  },
+  "uawos_weaverouter.py": {
+    "file": "uawos_weaverouter.py",
+    "imports": [
+      "json",
+      "os",
+      "uawos_budget",
+      "urllib.error",
+      "urllib.request"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "uawos_generate_response",
+        "lineno": 13
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [
+      46,
+      91
+    ],
+    "ai_terms": [
+      [
+        "prompt",
+        4
+      ],
+      [
+        "llm",
+        1
+      ]
+    ]
+  },
+  "uawos_workflow.py": {
+    "file": "uawos_workflow.py",
+    "imports": [
+      "asyncio",
+      "os",
+      "socket",
+      "temporalio.client",
+      "time",
+      "uawos_db",
+      "uawos_planning",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 11
+      },
+      {
+        "name": "create_workflow",
+        "lineno": 34
+      },
+      {
+        "name": "generate_workflow",
+        "lineno": 61
+      },
+      {
+        "name": "modify_workflow",
+        "lineno": 82
+      },
+      {
+        "name": "pause_workflow",
+        "lineno": 103
+      },
+      {
+        "name": "resume_workflow",
+        "lineno": 107
+      },
+      {
+        "name": "terminate_workflow",
+        "lineno": 111
+      },
+      {
+        "name": "simulate_workflow",
+        "lineno": 116
+      },
+      {
+        "name": "execute_workflow",
+        "lineno": 130
+      },
+      {
+        "name": "optimize_workflow",
+        "lineno": 172
+      },
+      {
+        "name": "check_temporal_worker_queues",
+        "lineno": 183
+      },
+      {
+        "name": "verify_fr_061",
+        "lineno": 204
+      },
+      {
+        "name": "verify_fr_062",
+        "lineno": 210
+      },
+      {
+        "name": "verify_fr_063",
+        "lineno": 216
+      },
+      {
+        "name": "verify_fr_064",
+        "lineno": 227
+      },
+      {
+        "name": "verify_fr_065",
+        "lineno": 233
+      },
+      {
+        "name": "verify_fr_066",
+        "lineno": 239
+      },
+      {
+        "name": "verify_fr_067",
+        "lineno": 248
+      },
+      {
+        "name": "verify_fr_068",
+        "lineno": 254
+      },
+      {
+        "name": "verify_fr_069",
+        "lineno": 260
+      },
+      {
+        "name": "verify_fr_070",
+        "lineno": 266
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 272
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": []
+  },
+  "uawos_workforce.py": {
+    "file": "uawos_workforce.py",
+    "imports": [
+      "os",
+      "time",
+      "uawos_state_utils"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "get_default_state",
+        "lineno": 10
+      },
+      {
+        "name": "add_workforce_entity",
+        "lineno": 42
+      },
+      {
+        "name": "create_team",
+        "lineno": 63
+      },
+      {
+        "name": "assign_agent",
+        "lineno": 71
+      },
+      {
+        "name": "assign_human",
+        "lineno": 82
+      },
+      {
+        "name": "delegate_task",
+        "lineno": 93
+      },
+      {
+        "name": "track_utilization",
+        "lineno": 109
+      },
+      {
+        "name": "manage_capacity",
+        "lineno": 121
+      },
+      {
+        "name": "calculate_trust_score",
+        "lineno": 133
+      },
+      {
+        "name": "track_performance",
+        "lineno": 151
+      },
+      {
+        "name": "verify_fr_081",
+        "lineno": 165
+      },
+      {
+        "name": "verify_fr_082",
+        "lineno": 171
+      },
+      {
+        "name": "verify_fr_083",
+        "lineno": 177
+      },
+      {
+        "name": "verify_fr_084",
+        "lineno": 183
+      },
+      {
+        "name": "verify_fr_085",
+        "lineno": 189
+      },
+      {
+        "name": "verify_fr_086",
+        "lineno": 195
+      },
+      {
+        "name": "verify_fr_087",
+        "lineno": 201
+      },
+      {
+        "name": "verify_fr_088",
+        "lineno": 207
+      },
+      {
+        "name": "verify_fr_089",
+        "lineno": 213
+      },
+      {
+        "name": "verify_fr_090",
+        "lineno": 219
+      },
+      {
+        "name": "run_self_tests",
+        "lineno": 225
+      }
+    ],
+    "todos": [],
+    "sql_lines": [],
+    "urllib_lines": [],
+    "ai_terms": [
+      [
+        "agent",
+        21
+      ]
+    ]
+  }
+}

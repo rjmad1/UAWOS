@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+prompts:
+  - id: "file://../prompts/coder.md"
+    label: "coder_prompt"
+  - id: "file://../prompts/planner.md"
+    label: "planner_prompt"
+  - id: "file://../prompts/researcher.md"
+    label: "researcher_prompt"
+  - id: "file://../prompts/reviewer.md"
+    label: "reviewer_prompt"
+  - id: "file://../prompts/system.md"
+    label: "system_prompt"
+
+providers:
+  - "file://../../scripts/ai/eval_provider.py"
+
+tests:
+  - description: "Test Coder Agent"
+    prompts:
+      - coder_prompt
+    vars:
+      task: "Implement a rate limiter in Python"
+    assert:
+      - type: contains
+        value: "Python"
+  - description: "Test Planner Agent"
+    prompts:
+      - planner_prompt
+    vars:
+      objective: "Deploy a secure containerized database cluster"
+    assert:
+      - type: contains
+        value: "plan"
+  - description: "Test Researcher Agent"
+    prompts:
+      - researcher_prompt
+    vars:
+      topic: "Zero Trust Architecture"
+    assert:
+      - type: contains
+        value: "Zero Trust"
+  - description: "Test Reviewer Agent"
+    prompts:
+      - reviewer_prompt
+    vars:
+      code: "def run(cmd):\n  import os\n  os.system(cmd)"
+    assert:
+      - type: contains
+        value: "Warning"
+  - description: "Test System Coordinator"
+    prompts:
+      - system_prompt
+    vars: {}
+    assert:
+      - type: contains
+        value: "UAWOS"

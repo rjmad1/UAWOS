@@ -1,0 +1,20 @@
+{
+  "agents":[
+    {
+      "name":"planner",
+      "enabled":true
+    },
+    {
+      "name":"researcher",
+      "enabled":true
+    },
+    {
+      "name":"coder",
+      "enabled":true
+    },
+    {
+      "name":"reviewer",
+      "enabled":true
+    }
+  ]
+}

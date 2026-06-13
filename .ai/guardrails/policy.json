@@ -1,0 +1,7 @@
+{
+  "hallucination_detection":true,
+  "citation_required":true,
+  "tool_validation":true,
+  "security_review":true,
+  "cost_tracking":true
+}
