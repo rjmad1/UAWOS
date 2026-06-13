@@ -14,7 +14,7 @@
 - Security: 4
 
 ### Coverage Health Score
-40
+46
 
 ### Redundant Tests Identified
 2

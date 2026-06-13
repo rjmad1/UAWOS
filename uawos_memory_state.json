@@ -1,47 +1,47 @@
 {
-  "overlays": {
-    "user-01": {
-      "workspace_focus": "sso_testing",
-      "theme_preference": "dark_mode"
-    },
-    "theme_overlay": {
-      "font": "Outfit"
+    "memory_logs": [
+        {
+            "index": 0,
+            "timestamp": 1780963292,
+            "content": "Curated Content",
+            "scope": "workspace",
+            "owner": "system",
+            "status": "archived",
+            "original_content": "Initial workspace memory initialized.",
+            "curated_timestamp": 1781311536
+        },
+        {
+            "index": 1,
+            "timestamp": 1781311517,
+            "content": "Append test entry",
+            "scope": "workspace",
+            "owner": "system",
+            "status": "archived"
+        },
+        {
+            "index": 2,
+            "timestamp": 1781311550,
+            "content": "Global Org Standard",
+            "scope": "organizational",
+            "owner": "system",
+            "status": "active"
+        },
+        {
+            "index": 3,
+            "timestamp": 1781311559,
+            "content": "Project A Standard",
+            "scope": "workspace",
+            "owner": "system",
+            "status": "active"
+        }
+    ],
+    "overlays": {
+        "user-01": {
+            "theme_preference": "dark_mode",
+            "workspace_focus": "sso_testing"
+        },
+        "theme_overlay": {
+            "font": "Outfit"
+        }
     }
-  },
-  "memory_logs": [
-    {
-      "index": 0,
-      "owner": "system",
-      "scope": "workspace",
-      "status": "archived",
-      "content": "Curated Content",
-      "timestamp": 1780963292,
-      "original_content": "Initial workspace memory initialized.",
-      "curated_timestamp": 1781193499
-    },
-    {
-      "index": 1,
-      "owner": "system",
-      "scope": "workspace",
-      "status": "archived",
-      "content": "Append test entry",
-      "timestamp": 1781193498
-    },
-    {
-      "index": 2,
-      "owner": "system",
-      "scope": "organizational",
-      "status": "active",
-      "content": "Global Org Standard",
-      "timestamp": 1781193500
-    },
-    {
-      "index": 3,
-      "owner": "system",
-      "scope": "workspace",
-      "status": "active",
-      "content": "Project A Standard",
-      "timestamp": 1781193500
-    }
-  ]
 }

@@ -1,173 +1,199 @@
 {
-  "plans": {
-    "PLN-101": {
-      "id": "PLN-101",
-      "risks": [
-        "Database downtime during index build"
-      ],
-      "steps": [
-        "Step 1: DB Query refactoring",
-        "Step 2: Add cache headers",
-        "Step 3: Setup conversion metrics"
-      ],
-      "title": "New Mod Title",
-      "status": "archived",
-      "history": [
-        {
-          "state": {
+    "plans": {
+        "PLN-101": {
             "id": "PLN-101",
-            "risks": [
-              "Database downtime during index build"
-            ],
-            "steps": [
-              "Step 1: DB Query refactoring",
-              "Step 2: Add cache headers",
-              "Step 3: Setup conversion metrics"
-            ],
-            "title": "Optimized Cache and Funnel Refactor Plan",
-            "status": "approved",
-            "version": 1,
-            "assumptions": [
-              "Redis cache is available and running"
-            ],
             "objective_id": "OBJ-101",
-            "cost_estimate": 345.5,
-            "is_alternative": false,
-            "duration_estimate": 7,
-            "success_probability": 0.95,
-            "resource_requirements": [
-              "Database Expert",
-              "Frontend Dev"
-            ]
-          },
-          "timestamp": 1781193469.003918
-        },
-        {
-          "state": {
-            "id": "PLN-101",
-            "risks": [
-              "Database downtime during index build"
-            ],
+            "title": "New Mod Title",
             "steps": [
-              "Step 1: DB Query refactoring",
-              "Step 2: Add cache headers",
-              "Step 3: Setup conversion metrics"
+                "Step 1: DB Query refactoring",
+                "Step 2: Add cache headers",
+                "Step 3: Setup conversion metrics"
             ],
-            "title": "Updated Plan title",
+            "cost_estimate": 345.5,
+            "duration_estimate": 7,
+            "resource_requirements": [
+                "Database Expert",
+                "Frontend Dev"
+            ],
+            "success_probability": 0.95,
+            "status": "archived",
+            "version": 5,
+            "history": [
+                {
+                    "timestamp": 1781311284.3574252,
+                    "state": {
+                        "id": "PLN-101",
+                        "objective_id": "OBJ-101",
+                        "title": "Optimized Cache and Funnel Refactor Plan",
+                        "steps": [
+                            "Step 1: DB Query refactoring",
+                            "Step 2: Add cache headers",
+                            "Step 3: Setup conversion metrics"
+                        ],
+                        "cost_estimate": 345.5,
+                        "duration_estimate": 7,
+                        "resource_requirements": [
+                            "Database Expert",
+                            "Frontend Dev"
+                        ],
+                        "success_probability": 0.95,
+                        "status": "approved",
+                        "version": 1,
+                        "risks": [
+                            "Database downtime during index build"
+                        ],
+                        "assumptions": [
+                            "Redis cache is available and running"
+                        ],
+                        "is_alternative": false
+                    }
+                },
+                {
+                    "timestamp": 1781311288.456692,
+                    "state": {
+                        "id": "PLN-101",
+                        "objective_id": "OBJ-101",
+                        "title": "Updated Plan title",
+                        "steps": [
+                            "Step 1: DB Query refactoring",
+                            "Step 2: Add cache headers",
+                            "Step 3: Setup conversion metrics"
+                        ],
+                        "cost_estimate": 345.5,
+                        "duration_estimate": 7,
+                        "resource_requirements": [
+                            "Database Expert",
+                            "Frontend Dev"
+                        ],
+                        "success_probability": 0.95,
+                        "status": "approved",
+                        "version": 2,
+                        "risks": [
+                            "Database downtime during index build"
+                        ],
+                        "assumptions": [
+                            "Redis cache is available and running"
+                        ],
+                        "is_alternative": false
+                    }
+                },
+                {
+                    "timestamp": 1781311292.5568388,
+                    "state": {
+                        "id": "PLN-101",
+                        "objective_id": "OBJ-101",
+                        "title": "Updated Plan title",
+                        "steps": [
+                            "Step 1: DB Query refactoring",
+                            "Step 2: Add cache headers",
+                            "Step 3: Setup conversion metrics"
+                        ],
+                        "cost_estimate": 345.5,
+                        "duration_estimate": 7,
+                        "resource_requirements": [
+                            "Database Expert",
+                            "Frontend Dev"
+                        ],
+                        "success_probability": 0.95,
+                        "status": "rejected",
+                        "version": 3,
+                        "risks": [
+                            "Database downtime during index build"
+                        ],
+                        "assumptions": [
+                            "Redis cache is available and running"
+                        ],
+                        "is_alternative": false
+                    }
+                },
+                {
+                    "timestamp": 1781311296.6352909,
+                    "state": {
+                        "id": "PLN-101",
+                        "objective_id": "OBJ-101",
+                        "title": "New Mod Title",
+                        "steps": [
+                            "Step 1: DB Query refactoring",
+                            "Step 2: Add cache headers",
+                            "Step 3: Setup conversion metrics"
+                        ],
+                        "cost_estimate": 345.5,
+                        "duration_estimate": 7,
+                        "resource_requirements": [
+                            "Database Expert",
+                            "Frontend Dev"
+                        ],
+                        "success_probability": 0.95,
+                        "status": "rejected",
+                        "version": 4,
+                        "risks": [
+                            "Database downtime during index build"
+                        ],
+                        "assumptions": [
+                            "Redis cache is available and running"
+                        ],
+                        "is_alternative": false
+                    }
+                }
+            ],
+            "risks": [
+                "Database downtime during index build"
+            ],
+            "assumptions": [
+                "Redis cache is available and running"
+            ],
+            "is_alternative": false
+        },
+        "PLN-102": {
+            "id": "PLN-102",
+            "objective_id": "OBJ-101",
+            "title": "T",
+            "steps": [
+                "step"
+            ],
+            "cost_estimate": 150.0,
+            "duration_estimate": 5,
+            "resource_requirements": [
+                "Dev"
+            ],
+            "success_probability": 0.9,
             "status": "approved",
             "version": 2,
-            "assumptions": [
-              "Redis cache is available and running"
+            "history": [
+                {
+                    "timestamp": 1781311280.2760687,
+                    "state": {
+                        "id": "PLN-102",
+                        "objective_id": "OBJ-101",
+                        "title": "T",
+                        "steps": [
+                            "step"
+                        ],
+                        "cost_estimate": 150.0,
+                        "duration_estimate": 5,
+                        "resource_requirements": [
+                            "Dev"
+                        ],
+                        "success_probability": 0.9,
+                        "status": "draft",
+                        "version": 1,
+                        "risks": [
+                            "General delivery risk"
+                        ],
+                        "assumptions": [
+                            "Assump X"
+                        ],
+                        "is_alternative": false
+                    }
+                }
             ],
-            "objective_id": "OBJ-101",
-            "cost_estimate": 345.5,
-            "is_alternative": false,
-            "duration_estimate": 7,
-            "success_probability": 0.95,
-            "resource_requirements": [
-              "Database Expert",
-              "Frontend Dev"
-            ]
-          },
-          "timestamp": 1781193469.1636543
-        },
-        {
-          "state": {
-            "id": "PLN-101",
             "risks": [
-              "Database downtime during index build"
+                "General delivery risk"
             ],
-            "steps": [
-              "Step 1: DB Query refactoring",
-              "Step 2: Add cache headers",
-              "Step 3: Setup conversion metrics"
-            ],
-            "title": "Updated Plan title",
-            "status": "rejected",
-            "version": 3,
             "assumptions": [
-              "Redis cache is available and running"
+                "Assump X"
             ],
-            "objective_id": "OBJ-101",
-            "cost_estimate": 345.5,
-            "is_alternative": false,
-            "duration_estimate": 7,
-            "success_probability": 0.95,
-            "resource_requirements": [
-              "Database Expert",
-              "Frontend Dev"
-            ]
-          },
-          "timestamp": 1781193469.271852
-        },
-        {
-          "state": {
-            "id": "PLN-101",
-            "risks": [
-              "Database downtime during index build"
-            ],
-            "steps": [
-              "Step 1: DB Query refactoring",
-              "Step 2: Add cache headers",
-              "Step 3: Setup conversion metrics"
-            ],
-            "title": "New Mod Title",
-            "status": "rejected",
-            "version": 4,
-            "assumptions": [
-              "Redis cache is available and running"
-            ],
-            "objective_id": "OBJ-101",
-            "cost_estimate": 345.5,
-            "is_alternative": false,
-            "duration_estimate": 7,
-            "success_probability": 0.95,
-            "resource_requirements": [
-              "Database Expert",
-              "Frontend Dev"
-            ]
-          },
-          "timestamp": 1781193469.3674088
+            "is_alternative": false
         }
-      ],
-      "version": 5,
-      "assumptions": [
-        "Redis cache is available and running"
-      ],
-      "objective_id": "OBJ-101",
-      "cost_estimate": 345.5,
-      "is_alternative": false,
-      "duration_estimate": 7,
-      "success_probability": 0.95,
-      "resource_requirements": [
-        "Database Expert",
-        "Frontend Dev"
-      ]
-    },
-    "PLN-102": {
-      "id": "PLN-102",
-      "objective_id": "OBJ-101",
-      "title": "Replanned strategy due to: Governance Cost Warning",
-      "steps": [
-        "Step R1: Address constraints",
-        "Step R2: Resume execution"
-      ],
-      "cost_estimate": 250.0,
-      "duration_estimate": 6,
-      "resource_requirements": [
-        "Replanning Agent"
-      ],
-      "success_probability": 0.92,
-      "status": "draft",
-      "version": 1,
-      "history": [],
-      "risks": [
-        "General delivery risk"
-      ],
-      "assumptions": [
-        "Required resources are available"
-      ],
-      "is_alternative": false
     }
-  }
 }

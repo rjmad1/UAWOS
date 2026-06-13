@@ -379,9 +379,13 @@ _active_locks = {}
 
 
 def acquire_advisory_lock(lock_id: int):
-    """Acquire a session-level PostgreSQL advisory lock (blocking)."""
+    """Acquire a session-level PostgreSQL advisory lock (blocking).
+    
+    Raises:
+        ConnectionError: If the database is offline or lock acquisition fails.
+    """
     if not uawos_db.DB_AVAILABLE:
-        return
+        raise ConnectionError("PostgreSQL database is offline (db driver unavailable).")
     try:
         conn = uawos_db.get_db_connection()
         conn.set_isolation_level(0)  # autocommit mode
@@ -391,6 +395,7 @@ def acquire_advisory_lock(lock_id: int):
         _active_locks[lock_id] = conn
     except Exception as e:
         print(f"acquire_advisory_lock error: {e}")
+        raise ConnectionError(f"Failed to acquire PostgreSQL advisory lock: {e}") from e
 
 
 def release_advisory_lock(lock_id: int):

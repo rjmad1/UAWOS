@@ -664,40 +664,47 @@ def get_traceability_matrix(status_data):
         }
 
     # Load requirement studio candidates dynamically
+    import uawos_state_utils
     state_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json")
-    if os.path.exists(state_file):
-        try:
-            with open(state_file) as f:
-                state = json.load(f)
-            for cid, cand in state.get("roadmap_candidates", {}).items():
-                if cand["status"] in ["APPROVED", "PUBLISHED"]:
-                    req_id = cand["origin_requirement_id"]
-                    req = state["requirements"].get(req_id, {})
-                    prop = req.get("product_proposition", {})
-                    func_reqs = prop.get("H_Functional_Requirements", [])
+    try:
+        state = uawos_state_utils.load_state(
+            state_file,
+            lambda: {
+                "requirements": {},
+                "roadmap_candidates": {},
+                "published_items": [],
+                "resequenced_portfolio": [],
+            }
+        )
+        for cid, cand in state.get("roadmap_candidates", {}).items():
+            if cand["status"] in ["APPROVED", "PUBLISHED"]:
+                req_id = cand["origin_requirement_id"]
+                req = state["requirements"].get(req_id, {})
+                prop = req.get("product_proposition", {})
+                func_reqs = prop.get("H_Functional_Requirements", [])
 
-                    # Add child functional requirements to the traceability matrix
-                    for idx, fr_desc in enumerate(func_reqs):
-                        fr_id = f"FR-{req_id}-{idx + 1:03d}"
-                        matrix[fr_id] = {
-                            "id": fr_id,
-                            "description": fr_desc,
-                            "section": "Requirement Intelligence Studio",
-                            "category": "Business Capability",
-                            "roadmap_item": cid,
-                            "epic": "EP-18: Requirement Ingestion Services",
-                            "technical_design": "Strategic Proposition A-Q",
-                            "status": ("OPERATIONAL" if cand["status"] == "PUBLISHED" else "APPROVED"),
-                            "code_references": ["uawos_requirement_studio.py"],
-                            "deployment_references": ["uawos-requirement-studio-api"],
-                            "infrastructure_references": [],
-                            "test_evidence": "Self-testing suite validated",
-                            "release_evidence": "Adoption Roadmap v1.0",
-                            "environment": ("production" if cand["status"] == "PUBLISHED" else "none"),
-                            "reason_blocked": "",
-                        }
-        except Exception as e:
-            print(f"Error loading candidates in get_traceability_matrix: {e}")
+                # Add child functional requirements to the traceability matrix
+                for idx, fr_desc in enumerate(func_reqs):
+                    fr_id = f"FR-{req_id}-{idx + 1:03d}"
+                    matrix[fr_id] = {
+                        "id": fr_id,
+                        "description": fr_desc,
+                        "section": "Requirement Intelligence Studio",
+                        "category": "Business Capability",
+                        "roadmap_item": cid,
+                        "epic": "EP-18: Requirement Ingestion Services",
+                        "technical_design": "Strategic Proposition A-Q",
+                        "status": ("OPERATIONAL" if cand["status"] == "PUBLISHED" else "APPROVED"),
+                        "code_references": ["uawos_requirement_studio.py"],
+                        "deployment_references": ["uawos-requirement-studio-api"],
+                        "infrastructure_references": [],
+                        "test_evidence": "Self-testing suite validated",
+                        "release_evidence": "Adoption Roadmap v1.0",
+                        "environment": ("production" if cand["status"] == "PUBLISHED" else "none"),
+                        "reason_blocked": "",
+                    }
+    except Exception as e:
+        print(f"Error loading candidates in get_traceability_matrix: {e}")
 
     return matrix
 
@@ -798,39 +805,46 @@ def _get_default_roadmap():
 
 def _load_roadmap_candidates(roadmap):
     """Load and add dynamically published roadmap candidates."""
+    import uawos_state_utils
     state_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json")
-    if os.path.exists(state_file):
-        try:
-            with open(state_file) as f:
-                state = json.load(f)
-            for cid, cand in state.get("roadmap_candidates", {}).items():
-                if cand["status"] in ["APPROVED", "PUBLISHED"]:
-                    req_id = cand["origin_requirement_id"]
-                    req = state["requirements"].get(req_id, {})
-                    roadmap[cid] = {
-                        "id": cid,
-                        "name": req.get("title", "New Candidate"),
-                        "capability": "Strategic Product Proposition",
-                        "priority": f"P1 (Score: {cand['priority_score']})",
-                        "release": "v1.1.0-delta",
-                        "owner": "CPO & Strategist",
-                        "business_value": int(req.get("strategic_analysis", {}).get("business_value_score", 70)),
-                        "technical_value": int(req.get("strategic_analysis", {}).get("strategic_impact_score", 70)),
-                        "infrastructure_value": int(req.get("strategic_analysis", {}).get("alignment_score", 70)),
-                        "req_count": 0,
-                        "impl_count": 0,
-                        "open_count": 0,
-                        "impl_pct": 0,
-                        "test_pct": 0,
-                        "deploy_pct": 0,
-                        "prod_readiness_pct": 0,
-                        "status": (STATUS_FULLY_IMPLEMENTED if cand["status"] == "PUBLISHED" else STATUS_IN_PROGRESS),
-                        "planned_scope": req.get("raw_text", "")[:100] + "...",
-                        "delivered_scope": "",
-                        "remaining_scope": "",
-                    }
-        except Exception as e:
-            print(f"Error loading state in get_roadmap_data: {e}")
+    try:
+        state = uawos_state_utils.load_state(
+            state_file,
+            lambda: {
+                "requirements": {},
+                "roadmap_candidates": {},
+                "published_items": [],
+                "resequenced_portfolio": [],
+            }
+        )
+        for cid, cand in state.get("roadmap_candidates", {}).items():
+            if cand["status"] in ["APPROVED", "PUBLISHED"]:
+                req_id = cand["origin_requirement_id"]
+                req = state["requirements"].get(req_id, {})
+                roadmap[cid] = {
+                    "id": cid,
+                    "name": req.get("title", "New Candidate"),
+                    "capability": "Strategic Product Proposition",
+                    "priority": f"P1 (Score: {cand['priority_score']})",
+                    "release": "v1.1.0-delta",
+                    "owner": "CPO & Strategist",
+                    "business_value": int(req.get("strategic_analysis", {}).get("business_value_score", 70)),
+                    "technical_value": int(req.get("strategic_analysis", {}).get("strategic_impact_score", 70)),
+                    "infrastructure_value": int(req.get("strategic_analysis", {}).get("alignment_score", 70)),
+                    "req_count": 0,
+                    "impl_count": 0,
+                    "open_count": 0,
+                    "impl_pct": 0,
+                    "test_pct": 0,
+                    "deploy_pct": 0,
+                    "prod_readiness_pct": 0,
+                    "status": (STATUS_FULLY_IMPLEMENTED if cand["status"] == "PUBLISHED" else STATUS_IN_PROGRESS),
+                    "planned_scope": req.get("raw_text", "")[:100] + "...",
+                    "delivered_scope": "",
+                    "remaining_scope": "",
+                }
+    except Exception as e:
+        print(f"Error loading state in get_roadmap_data: {e}")
 
 
 def _calculate_item_metrics(r_id, item, traceability_matrix):

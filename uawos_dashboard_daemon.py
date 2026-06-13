@@ -181,18 +181,32 @@ if SECURE_TOKEN in _DEFAULT_TOKENS:
     )
 
 
-def decode_token_payload(token: str) -> dict:
-    """Safely decode JWT claims without verifying signature for development context."""
+def decode_token_payload(token: str, secret_key: str) -> dict:
+    """Decodes JWT claims after cryptographically verifying the HMAC-SHA256 signature."""
     import base64
+    import hmac
+    import hashlib
     import json
 
     try:
         parts = token.split(".")
         if len(parts) == 3:
-            payload_b64 = parts[1]
-            payload_b64 += "=" * ((4 - len(payload_b64) % 4) % 4)
-            payload_json = base64.urlsafe_b64decode(payload_b64.encode("utf-8")).decode("utf-8")
-            return json.loads(payload_json)
+            header, payload_b64, signature = parts
+            
+            # Recreate signature payload
+            signing_input = f"{header}.{payload_b64}".encode("utf-8")
+            
+            # Base64url decode signature
+            sig_bytes = base64.urlsafe_b64decode(signature + "=" * ((4 - len(signature) % 4) % 4))
+            
+            # Compute expected signature
+            expected_sig = hmac.new(secret_key.encode("utf-8"), signing_input, hashlib.sha256).digest()
+            
+            # Cryptographically compare signatures to prevent timing attacks
+            if hmac.compare_digest(sig_bytes, expected_sig):
+                payload_b64 += "=" * ((4 - len(payload_b64) % 4) % 4)
+                payload_json = base64.urlsafe_b64decode(payload_b64.encode("utf-8")).decode("utf-8")
+                return json.loads(payload_json)
     except Exception:
         pass
     return {}
@@ -206,8 +220,10 @@ def verify_secure_token(x_uawos_token: str = None, authorization: str = None):
     if not token:
         raise HTTPException(status_code=401, detail="Unauthorized: Invalid or missing authentication credentials.")
 
-    if token != SECURE_TOKEN:
-        claims = decode_token_payload(token)
+    is_dev_mode = (SECURE_TOKEN in _DEFAULT_TOKENS)
+
+    if token != SECURE_TOKEN and not (is_dev_mode and token in _DEFAULT_TOKENS):
+        claims = decode_token_payload(token, SECURE_TOKEN)
         if not claims:
             raise HTTPException(status_code=401, detail="Unauthorized: Invalid security token.")
 
@@ -795,7 +811,7 @@ async def tenant_context_middleware(request: Request, call_next):
             role = "Admin"
             owner = "admin_user"
         else:
-            claims = decode_token_payload(token)
+            claims = decode_token_payload(token, SECURE_TOKEN)
             if claims:
                 tenant_id = claims.get("tenant_id", "default_tenant")
                 role = claims.get("role", "Developer")
@@ -866,7 +882,7 @@ def get_requirement_list():
     if uawos_requirement_studio is None:
         raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
-        return uawos_requirement_studio.load_state()
+        return uawos_requirement_studio.load_state(uawos_requirement_studio.STATE_FILE, uawos_requirement_studio.get_default_state)
     except Exception as e:
         return {"error": str(e)}
 
@@ -876,7 +892,7 @@ def get_objective_list():
     if uawos_objective is None:
         raise HTTPException(status_code=500, detail="Objective module unavailable.")
     try:
-        return uawos_objective.load_state()
+        return uawos_objective.load_state(uawos_objective.STATE_FILE, uawos_objective.get_default_state)
     except Exception as e:
         return {"error": str(e)}
 
@@ -1123,7 +1139,7 @@ def requirement_reset(x_uawos_token: str = Header(None), authorization: str = He
         raise HTTPException(status_code=500, detail="Requirement Studio module unavailable.")
     try:
         state = uawos_requirement_studio.get_default_state()
-        uawos_requirement_studio.save_state(state)
+        uawos_requirement_studio.save_state(uawos_requirement_studio.STATE_FILE, state)
         if os.path.exists(uawos_requirement_studio.STATE_FILE):
             os.remove(uawos_requirement_studio.STATE_FILE)
         return {"status": "SUCCESS"}

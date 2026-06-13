@@ -7,6 +7,22 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.8.0] — 2026-06-13 — Security Hardening & Concurrency Stabilization (Waves 1-2)
+
+### Added
+- **Security Validation Scripts**: Added automated integration test scripts to verify encryption warning limits, OPA drift recovery, offline fallbacks, and JWT HMAC-SHA256 signature verification in the `scratch/` directory.
+
+### Changed
+- **JWT Cryptographic Verification**: Upgraded the JWT decoder in `uawos_dashboard_daemon.py` to perform cryptographically secure HMAC-SHA256 signature verification using the configured secure token as the secret. Unsigned or fabricated tokens are now rejected with a `401 Unauthorized` HTTP error.
+- **Robust Concurrency Advisory Locks**: Modified `acquire_advisory_lock` in `uawos_memory.py` to raise a `ConnectionError` on PostgreSQL connection or lock failures, preventing silent execution with concurrent race conditions.
+- **OPA Policy Cache Drift Recovery**: Enforced policy cache refresh in `uawos_governance.py` by resetting the internal upload flag on empty REST payloads or connection errors, ensuring automatic recovery on OPA service restarts.
+- **Symmetric Encryption Upgrade**: Upgraded the simple Caesar cipher development fallback to AES-256 GCM authenticated encryption via the `cryptography.fernet` module in `uawos_integrations.py`. Logs a warning on stderr if running with the default development key.
+- **Offline State Fallback**: Enhanced `uawos_state_utils.py` and `uawos_traceability.py` to transparently fall back to local JSON file state operations if PostgreSQL database connectivity is lost, resolving API daemon crashes.
+- **TODO Scanner Self-Match Filter**: Configured `uawos_proactive_governance.py` to exclude its own code terms from matching TODO/FIXME regexes, preventing false positive risk score inflations.
+- **API Daemon Stabilization**: Resolved stack frame trace lookup failures in `uawos_dashboard_daemon.py` by passing database state files explicitly to utility functions.
+
+---
+
 ## [0.7.0] — 2026-06-12 — Agent Framework Integration (Waves 0-6)
 
 ### Added

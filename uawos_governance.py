@@ -145,6 +145,7 @@ def upload_opa_policy() -> bool:
 
 def evaluate_via_opa(action_details: dict) -> dict:
     """Query the OPA REST API endpoint to evaluate Rego rules."""
+    global _policy_uploaded
     if not upload_opa_policy():
         return None
     try:
@@ -162,8 +163,12 @@ def evaluate_via_opa(action_details: dict) -> dict:
                 verdict = "APPROVED" if result.get("allow") else "REJECTED"
                 reason = result.get("reason", "All active policy checks passed.")
                 return {"verdict": verdict, "reason": reason}
+            else:
+                # OPA returned empty result - policy likely lost/not loaded in OPA
+                _policy_uploaded = False
     except Exception:
-        pass
+        # Reset state on connection errors to force re-upload on next retry
+        _policy_uploaded = False
     return None
 
 

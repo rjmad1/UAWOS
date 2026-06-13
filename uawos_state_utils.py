@@ -13,8 +13,10 @@ def _get_db_key(state_file: str) -> str:
 
 
 def load_state(state_file: str = None, default_state_func: Callable[[], Any] = None, tenant_id: str = "default_tenant"):
-    """Load state from PostgreSQL database, throwing error if offline."""
+    """Load state from PostgreSQL database, falling back to local JSON file if offline."""
     import inspect
+    import json
+    import sys
 
     from uawos_context import get_tenant_id
 
@@ -44,9 +46,25 @@ def load_state(state_file: str = None, default_state_func: Callable[[], Any] = N
         else:
             raise RuntimeError("PostgreSQL database is offline.")
     except Exception as e:
-        raise RuntimeError(f"Database error loading state: {e}")
+        # DB is offline or errored - fall back to local JSON file
+        sys.stderr.write(f"WARNING: PostgreSQL database offline ({e}). Falling back to local JSON file state: {state_file}\n")
+        
+        if os.path.exists(state_file):
+            try:
+                with open(state_file, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as file_err:
+                sys.stderr.write(f"ERROR: Failed to read local JSON state file: {file_err}\n")
 
-    # Plaintext file fallbacks are decommissioned in Wave 1.
+        # Seed default state if local JSON doesn't exist
+        state = default_state_func()
+        try:
+            with open(state_file, "w", encoding="utf-8") as f:
+                json.dump(state, f, indent=4)
+        except Exception as file_err:
+            sys.stderr.write(f"ERROR: Failed to write default state to local JSON file: {file_err}\n")
+        return state
+
     # Seed default state if not found in database, then save it to database.
     state = default_state_func()
     save_state(state_file, state, tenant_id)
@@ -54,8 +72,10 @@ def load_state(state_file: str = None, default_state_func: Callable[[], Any] = N
 
 
 def save_state(state_file: str = None, state: Any = None, tenant_id: str = "default_tenant"):
-    """Save state to PostgreSQL database."""
+    """Save state to PostgreSQL database, falling back to local JSON file if offline."""
     import inspect
+    import json
+    import sys
 
     from uawos_context import get_tenant_id
 
@@ -84,4 +104,10 @@ def save_state(state_file: str = None, state: Any = None, tenant_id: str = "defa
         else:
             raise RuntimeError("PostgreSQL database is offline.")
     except Exception as e:
-        raise RuntimeError(f"Database error saving state: {e}")
+        sys.stderr.write(f"WARNING: PostgreSQL database offline ({e}). Falling back to local JSON file save: {state_file}\n")
+        
+        try:
+            with open(state_file, "w", encoding="utf-8") as f:
+                json.dump(state, f, indent=4)
+        except Exception as file_err:
+            raise RuntimeError(f"Failed to write state to local JSON file: {file_err}") from file_err

@@ -11,9 +11,18 @@ from uawos_state_utils import load_state, save_state
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_integrations_state.json")
 
+import sys
+
 # Initialize Fernet symmetric encryption
-_derived_key = hashlib.sha256(b"uawos-default-dev-secret-key-salt").digest()
-_encryption_key = os.environ.get("UAWOS_ENCRYPTION_KEY", base64.urlsafe_b64encode(_derived_key).decode())
+_encryption_key = os.environ.get("UAWOS_ENCRYPTION_KEY")
+if not _encryption_key:
+    sys.stderr.write(
+        "WARNING: UAWOS_ENCRYPTION_KEY environment variable is not set. "
+        "Falling back to insecure development key. THIS IS INSECURE FOR PRODUCTION DEPLOYMENTS!\n"
+    )
+    _derived_key = hashlib.sha256(b"uawos-default-dev-secret-key-salt").digest()
+    _encryption_key = base64.urlsafe_b64encode(_derived_key).decode()
+
 _cipher_suite = Fernet(_encryption_key.encode())
 
 
