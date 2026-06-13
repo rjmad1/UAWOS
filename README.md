@@ -1,4 +1,9 @@
 # Universal AI Workforce Operating System (UAWOS)
+<img width="2752" height="1536" alt="image-1781314175139" src="https://github.com/user-attachments/assets/d165d541-74dd-4802-8690-a081f306336e" />
+<img width="2752" height="1536" alt="image-1781314192064" src="https://github.com/user-attachments/assets/51f888f9-9303-4bac-88a2-10df805b6793" />
+<img width="2752" height="1536" alt="image-1781314183474" src="https://github.com/user-attachments/assets/a0434d36-1c8a-486e-905d-1cc8824a8ecf" />
+
+
 
 [![CI](https://github.com/rjmad1/UAWOS/actions/workflows/ci.yml/badge.svg)](https://github.com/rjmad1/UAWOS/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
