@@ -19,13 +19,13 @@ guidance>=0.1.15
 
 # --- Agent Memory Layer ---
 mem0ai>=0.1.10
-graphiti-core>=0.1.0
+graphiti-core>=0.28.2
 
 # --- RAG & Knowledge Layer ---
 haystack-ai>=2.0.0
 llama-index>=0.10.35
 fastembed>=0.2.7
-unstructured[all-docs]>=0.14.0
+unstructured[all-docs]>=0.18.18
 
 # --- Data & Analytics Engineering ---
 dbt-core>=1.8.0
