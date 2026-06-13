@@ -37,3 +37,9 @@ test_out_utf8.txt
 htmlcov/
 .coverage
 .pytest_cache/
+
+# Agent frameworks and local plans
+.agents/
+plans/
+skills-lock.json
+
