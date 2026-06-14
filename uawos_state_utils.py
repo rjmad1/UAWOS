@@ -111,3 +111,50 @@ def save_state(state_file: str = None, state: Any = None, tenant_id: str = "defa
                 json.dump(state, f, indent=4)
         except Exception as file_err:
             raise RuntimeError(f"Failed to write state to local JSON file: {file_err}") from file_err
+
+
+import contextlib
+import hashlib
+
+@contextlib.contextmanager
+def state_transaction(state_file: str = None, tenant_id: str = "default_tenant"):
+    """Context manager to perform state read-modify-write operations under a PostgreSQL advisory lock."""
+    import inspect
+    from uawos_context import get_tenant_id
+
+    # Resolve state_file if not provided
+    if state_file is None:
+        # Go up 2 stack frames: contextmanager generator block is frame 1, caller is frame 2
+        try:
+            caller_globals = inspect.stack()[2].frame.f_globals
+            state_file = caller_globals.get("STATE_FILE")
+        except Exception:
+            pass
+    if state_file is None:
+        raise ValueError("STATE_FILE must be defined in the caller or passed explicitly.")
+
+    if tenant_id == "default_tenant":
+        tenant_id = get_tenant_id()
+
+    key = _get_db_key(state_file)
+    lock_id = int(hashlib.md5(key.encode()).hexdigest(), 16) % (2**31 - 1)
+
+    acquired = False
+    try:
+        import uawos_memory
+        uawos_memory.acquire_advisory_lock(lock_id)
+        acquired = True
+    except Exception as e:
+        import sys
+        sys.stderr.write(f"WARNING: PostgreSQL offline, executing state transaction without advisory lock ({e})\n")
+
+    try:
+        yield
+    finally:
+        if acquired:
+            try:
+                import uawos_memory
+                uawos_memory.release_advisory_lock(lock_id)
+            except Exception as e:
+                import sys
+                sys.stderr.write(f"ERROR: Failed to release state advisory lock ({e})\n")

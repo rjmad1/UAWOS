@@ -320,7 +320,7 @@ def run_validation():
             if lf_status == "VERIFIED"
             else [
                 "No dedicated uawos_artifacts table or metadata schema mapping files to actions/workflows.",
-                "No file attachment API in the BaseHTTPRequestHandler.",
+                "No file attachment API in the FastAPI BFF server.",
             ],
             "dependencies": ["Task Management System"],
         }
@@ -585,7 +585,7 @@ def run_validation():
     ras_confidence = 95
     if check_file_exists("uawos_dashboard_daemon.py"):
         ras_checks.append("uawos_dashboard_daemon.py exists")
-        ras_evidence.append("uawos_dashboard_daemon.py runs BaseHTTPRequestHandler serving API endpoints on port 8099.")
+        ras_evidence.append("uawos_dashboard_daemon.py runs FastAPI / Uvicorn serving API endpoints on port 8099.")
 
         # Test UAWOS Python Client SDK
         try:
@@ -617,7 +617,7 @@ def run_validation():
             "gaps": []
             if ras_status == "VERIFIED"
             else [
-                "BaseHTTPRequestHandler uses error-prone string routing.",
+                "FastAPI daemon uses standard route decorators.",
                 "No official client SDK library (e.g. Python SDK, JS SDK) is provided.",
             ],
             "dependencies": [],
@@ -737,10 +737,10 @@ def run_validation():
     # Roadmap sequencing (representing current target implementation status)
     roadmap = [
         {
-            "phase": "Phase 1: REST & SDK Stabilization (Immediate)",
+            "phase": "Phase 1: REST & SDK Stabilization (Completed)",
             "features": [
-                "Migrate BaseHTTPRequestHandler daemon to FastAPI",
-                "Generate OpenAPI specs and initial Python/JS client SDKs",
+                "Migrated BFF daemon HTTP server to FastAPI and Uvicorn",
+                "Generated OpenAPI specs and initial Python/JS client SDKs",
             ],
             "rationale": "FastAPI migration provides a robust API gateway needed as a dependency for secure external agent connections (MCP) and dynamic routing.",
             "success_metrics": [

@@ -76,9 +76,10 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install core dependencies
+      - name: Install core and test dependencies
         run: |
           pip install --upgrade pip
+          pip install pytest pytest-cov
           pip install fastapi uvicorn psycopg2-binary qdrant-client networkx
 
       - name: Wait for services
@@ -103,6 +104,21 @@ jobs:
           OPENFGA_HOST: 127.0.0.1
           OPENFGA_PORT: 8083
         run: python scratch/run_all_self_tests.py
+
+      - name: Run pytest test suites
+        env:
+          POSTGRES_HOST: 127.0.0.1
+          POSTGRES_PORT: 5435
+          POSTGRES_DB: marquez
+          POSTGRES_USER: marquez
+          POSTGRES_PASSWORD: marquez
+          QDRANT_HOST: 127.0.0.1
+          QDRANT_PORT: 6333
+          OPA_HOST: 127.0.0.1
+          OPA_PORT: 8181
+          OPENFGA_HOST: 127.0.0.1
+          OPENFGA_PORT: 8083
+        run: python -m pytest scratch/
 
   security:
     name: Security Scan

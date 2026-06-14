@@ -170,6 +170,13 @@ ARCHITECTURE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ua
 
 # Global status cache
 status_cache = {}
+if os.path.exists(STATUS_FILE):
+    try:
+        with open(STATUS_FILE, "r") as f:
+            status_cache = json.load(f)
+    except Exception:
+        pass
+
 
 SECURE_TOKEN = os.environ.get("UAWOS_SECURE_TOKEN", "uawos-secure-token-change-me")
 _DEFAULT_TOKENS = {"uawos-secure-token-2026", "uawos-secure-token-change-me"}

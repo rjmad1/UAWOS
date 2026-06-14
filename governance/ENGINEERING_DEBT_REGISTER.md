@@ -1,6 +1,6 @@
 # Engineering Debt Register
 
-**Debt Summary Score:** 58 / 100
+**Debt Summary Score:** 82 / 100
 
 ### Active TODOs and FIXMEs
 
@@ -26,4 +26,4 @@
 | uawos_traceability.py | 392 | `import uawos_budget  # noqa: F401` |
 | uawos_traceability.py | 569 | `import uawos_integrations  # noqa: F401` |
 
-*Last updated: 2026-06-13T11:42:55+0530*
+*Last updated: 2026-06-14T20:16:15+0530*
