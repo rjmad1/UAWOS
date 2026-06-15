@@ -1,15 +1,20 @@
 # uawos_action.py
-import json
 import os
 import time
-import urllib.parse
-import urllib.request
 
 import uawos_db
 from uawos_state_utils import load_state, save_state
 
+from application.use_cases.action_use_cases import (
+    create_action,
+    decompose_workflow,
+    reassign_action,
+    get_action_traceability,
+    execute_agent_action_secure,
+    MOCK_SERVICES_BASE_URL,
+)
+
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_action_state.json")
-MOCK_SERVICES_BASE_URL = os.environ.get("MOCK_SERVICES_BASE_URL", "http://127.0.0.1:5001")
 
 
 def get_default_state() -> dict:
@@ -29,187 +34,6 @@ def get_default_state() -> dict:
             }
         }
     }
-
-
-# FR-070 to FR-080: Create an Action
-def create_action(
-    workflow_id: str,
-    name: str,
-    owner: str = "Executor Agent",
-    dependencies: list = None,
-    priority: str = "Medium",
-    budget: float = 100.0,
-    deadline: int = None,
-    status: str = "pending",
-    approval_required: bool = False,
-) -> dict:
-    """Create and persist a new Action within a workflow."""
-    state = load_state()
-    existing_ids = [
-        int(k.split("-")[1]) for k in state["actions"] if k.startswith("ACT-") and k.split("-")[1].isdigit()
-    ]
-    next_id_num = max(existing_ids) + 1 if existing_ids else 201
-    action_id = f"ACT-{next_id_num}"
-
-    action = {
-        "id": action_id,
-        "workflow_id": workflow_id,
-        "name": name,
-        "owner": owner,  # FR-072
-        "dependencies": dependencies or [],  # FR-073
-        "priority": priority,  # FR-074
-        "budget": budget,  # FR-075
-        "deadline": deadline or int(time.time() + 86400 * 3),  # FR-076
-        "status": status,  # FR-077
-        "approval_required": approval_required,  # FR-079
-    }
-
-    state["actions"][action_id] = action
-    save_state(state)
-    return state["actions"][action_id]
-
-
-# FR-071: Decompose Workflow into Actions
-def decompose_workflow(workflow_id: str) -> list:
-    """Decompose a Workflow's tasks into granular executable Actions."""
-    load_state()
-    actions_created = []
-
-    # Check workflow if uawos_workflow is available
-    tasks = ["Decomposed Task 1", "Decomposed Task 2"]
-    try:
-        import uawos_workflow
-
-        wfs = uawos_workflow.load_state()
-        wf = wfs["workflows"].get(workflow_id)
-        if wf:
-            tasks = wf["tasks"]
-    except Exception:
-        pass
-
-    for _idx, task in enumerate(tasks):
-        act = create_action(
-            workflow_id=workflow_id,
-            name=f"Execute: {task}",
-            owner="Executor Agent",
-            priority="Medium",
-            budget=50.0,
-        )
-        actions_created.append(act)
-
-    return actions_created
-
-
-# FR-080: Action reassignment
-def reassign_action(action_id: str, new_owner: str) -> dict:
-    state = load_state()
-    action = state["actions"].get(action_id)
-    if not action:
-        raise ValueError(f"Action {action_id} not found.")
-
-    if not new_owner:
-        raise ValueError("Cannot reassign to empty owner.")
-
-    action["owner"] = new_owner
-    state["actions"][action_id] = action
-    save_state(state)
-    return state["actions"][action_id]
-
-
-# FR-078: Traceability
-def get_action_traceability(action_id: str) -> dict:
-    state = load_state()
-    action = state["actions"].get(action_id)
-    if not action:
-        raise ValueError(f"Action {action_id} not found.")
-
-    return {
-        "action_id": action_id,
-        "workflow_id": action["workflow_id"],
-        "traceability_chain": f"WF -> {action['workflow_id']} -> ACTION -> {action_id}",
-    }
-
-
-def execute_agent_action_secure(action_id: str, command: str) -> dict:
-    """Validate command and route external terminal commands through container sandbox."""
-    state = load_state()
-    action = state["actions"].get(action_id)
-    if not action:
-        raise ValueError(f"Action {action_id} not found.")
-
-    # Validate command for security (check dangerous characters or commands)
-    dangerous_keywords = ["rm", "mv", "chmod", "chown", "sudo", "wget", "curl"]
-    dangerous_chars = [";", "&&", "||", "|", "`", "$", ".."]
-
-    is_malicious = False
-    violation_reason = ""
-
-    # Simple check for keywords as full words or substring
-    for kw in dangerous_keywords:
-        if kw in command.split() or command.startswith(kw + " "):
-            is_malicious = True
-            violation_reason = f"Forbidden command/keyword: '{kw}'"
-            break
-
-    for char in dangerous_chars:
-        if char in command:
-            is_malicious = True
-            violation_reason = f"Forbidden shell operator/character: '{char}'"
-            break
-
-    if is_malicious:
-        # Update action status
-        action["status"] = "failed"
-        action["error"] = f"Security Sandbox Block: {violation_reason}"
-        state["actions"][action_id] = action
-        save_state(state)
-        return {
-            "status": "blocked",
-            "reason": f"Security Sandbox Block: {violation_reason}",
-            "action": action,
-        }
-
-    # Route through OpenHands Sandbox Mock API on port 5001
-    url = f"{MOCK_SERVICES_BASE_URL}/execute?cmd={urllib.parse.quote(command)}"
-    sandbox_healthy = False
-    mock_resp = {}
-
-    try:
-        req = urllib.request.Request(url, method="GET")
-        with urllib.request.urlopen(req, timeout=2.0) as response:
-            resp_body = response.read().decode("utf-8")
-            mock_resp = json.loads(resp_body)
-            if mock_resp.get("mock") == "OpenHands Sandbox":
-                sandbox_healthy = True
-    except Exception as e:
-        # Graceful fallback: sandbox is simulated offline
-        mock_resp = {"status": "offline", "error": str(e)}
-
-    if sandbox_healthy:
-        action["status"] = "completed"
-        action["executed_command"] = command
-        action["sandbox_env"] = "OpenHands Sandbox (gVisor)"
-        state["actions"][action_id] = action
-        save_state(state)
-        return {
-            "status": "success",
-            "message": "Command successfully routed and executed within OpenHands Sandbox container.",
-            "sandbox": "OpenHands Sandbox",
-            "action": action,
-        }
-    else:
-        # Fallback simulated sandboxing if the container is offline or returns different
-        action["status"] = "completed"
-        action["executed_command"] = command
-        action["sandbox_env"] = "Simulated Fallback Sandbox"
-        state["actions"][action_id] = action
-        save_state(state)
-        return {
-            "status": "success",
-            "message": "Command executed via simulated sandbox fallback (mock offline).",
-            "sandbox": "Simulated Fallback Sandbox",
-            "action": action,
-        }
 
 
 # ----------------- VERIFICATION TESTS (FR-071 to FR-080) -----------------

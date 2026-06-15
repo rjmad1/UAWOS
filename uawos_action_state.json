@@ -23,9 +23,12 @@
             "dependencies": [],
             "priority": "Medium",
             "budget": 50.0,
-            "deadline": 1781570583,
+            "deadline": 1781793037,
             "status": "pending",
-            "approval_required": false
+            "approval_required": false,
+            "executed_command": null,
+            "sandbox_env": null,
+            "error": null
         },
         "ACT-103": {
             "id": "ACT-103",
@@ -35,9 +38,12 @@
             "dependencies": [],
             "priority": "Medium",
             "budget": 50.0,
-            "deadline": 1781570587,
+            "deadline": 1781793041,
             "status": "pending",
-            "approval_required": false
+            "approval_required": false,
+            "executed_command": null,
+            "sandbox_env": null,
+            "error": null
         },
         "ACT-104": {
             "id": "ACT-104",
@@ -49,9 +55,12 @@
             ],
             "priority": "Medium",
             "budget": 100.0,
-            "deadline": 1781570593,
+            "deadline": 1781793047,
             "status": "pending",
-            "approval_required": false
+            "approval_required": false,
+            "executed_command": null,
+            "sandbox_env": null,
+            "error": null
         },
         "ACT-105": {
             "id": "ACT-105",
@@ -61,9 +70,12 @@
             "dependencies": [],
             "priority": "Critical",
             "budget": 100.0,
-            "deadline": 1781570597,
+            "deadline": 1781793051,
             "status": "pending",
-            "approval_required": false
+            "approval_required": false,
+            "executed_command": null,
+            "sandbox_env": null,
+            "error": null
         },
         "ACT-106": {
             "id": "ACT-106",
@@ -73,9 +85,12 @@
             "dependencies": [],
             "priority": "Medium",
             "budget": 120.0,
-            "deadline": 1781570601,
+            "deadline": 1781793055,
             "status": "pending",
-            "approval_required": false
+            "approval_required": false,
+            "executed_command": null,
+            "sandbox_env": null,
+            "error": null
         },
         "ACT-107": {
             "id": "ACT-107",
@@ -87,7 +102,10 @@
             "budget": 100.0,
             "deadline": 123456,
             "status": "pending",
-            "approval_required": false
+            "approval_required": false,
+            "executed_command": null,
+            "sandbox_env": null,
+            "error": null
         },
         "ACT-108": {
             "id": "ACT-108",
@@ -97,9 +115,12 @@
             "dependencies": [],
             "priority": "Medium",
             "budget": 100.0,
-            "deadline": 1781570609,
+            "deadline": 1781793063,
             "status": "running",
-            "approval_required": false
+            "approval_required": false,
+            "executed_command": null,
+            "sandbox_env": null,
+            "error": null
         },
         "ACT-109": {
             "id": "ACT-109",
@@ -109,9 +130,12 @@
             "dependencies": [],
             "priority": "Medium",
             "budget": 100.0,
-            "deadline": 1781570615,
+            "deadline": 1781793070,
             "status": "pending",
-            "approval_required": true
+            "approval_required": true,
+            "executed_command": null,
+            "sandbox_env": null,
+            "error": null
         }
     }
 }

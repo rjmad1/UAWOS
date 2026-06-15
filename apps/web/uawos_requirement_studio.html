@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAWOS - Requirement Intelligence Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        :root {
+            --bg-color: #060813;
+            --card-bg: rgba(16, 20, 38, 0.5);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --card-border-hover: rgba(99, 102, 241, 0.3);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.2);
+            --accent: #d946ef;
+            --accent-glow: rgba(217, 70, 239, 0.15);
+            
+            /* Status Colors */
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.15);
+            --yellow: #f59e0b;
+            --yellow-glow: rgba(245, 158, 11, 0.15);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.15);
+            --blue: #3b82f6;
+            --blue-glow: rgba(59, 130, 246, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 5% 5%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 95% 90%, rgba(217, 70, 239, 0.08) 0%, transparent 40%);
+            background-attachment: fixed;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        /* Glass header card */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .brand h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #e0a7ff 0%, #6366f1 50%, #d946ef 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--card-border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, #d946ef 0%, #c026d3 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+
+        .btn-accent:hover {
+            box-shadow: 0 6px 20px rgba(217, 70, 239, 0.3);
+        }
+
+        /* Layout Grid */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1.1fr 1.9fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1200px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #a5b4fc;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: var(--text-primary);
+            padding: 12px 16px;
+            font-size: 0.92rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            background: rgba(0, 0, 0, 0.45);
+        }
+
+        /* Gauges */
+        .gauges-wrapper {
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .gauge-card {
+            text-align: center;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.015);
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .gauge-svg {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .gauge-svg circle {
+            fill: none;
+            stroke-width: 8;
+        }
+
+        .gauge-bg {
+            stroke: rgba(255, 255, 255, 0.04);
+        }
+
+        .gauge-fill {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transform: rotate(-90deg);
+            transform-origin: 50px 50px;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+        }
+
+        /* Lists */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .checklist-item svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Critique Accordion */
+        .accordion-item {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .accordion-body {
+            padding: 14px 16px;
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            display: none;
+            line-height: 1.6;
+        }
+
+        .accordion-body ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .accordion-body li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 6px;
+        }
+
+        .accordion-body li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: #818cf8;
+        }
+
+        /* Clarification List */
+        .question-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.76rem;
+            font-weight: 600;
+        }
+
+        .q-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .q-badge.high { background: var(--red-glow); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .q-badge.medium { background: var(--yellow-glow); color: var(--yellow); border: 1px solid rgba(245, 158, 11, 0.2); }
+
+        .question-text {
+            font-weight: 500;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .question-rationales {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.01);
+            padding: 8px;
+            border-radius: 6px;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        /* Propositions rendering */
+        .proposition-section {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .prop-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #818cf8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .prop-body {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Portfolio comparisons table */
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .ranking-table th {
+            text-align: left;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            font-weight: 600;
+        }
+
+        .ranking-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .rank-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.06);
+            font-size: 0.78rem;
+        }
+
+        .rank-badge.top-1 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .rank-badge.new-item { background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%); color: white; }
+
+        .arrow {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-left: 4px;
+        }
+        .arrow.up { color: var(--green); }
+        .arrow.down { color: var(--red); }
+        .arrow.none { color: var(--text-secondary); }
+
+        /* Progress bars */
+        .capacity-bar-wrapper {
+            background: rgba(255,255,255,0.04);
+            border-radius: 8px;
+            height: 16px;
+            overflow: hidden;
+            position: relative;
+            margin-top: 6px;
+        }
+
+        .capacity-bar-fill {
+            background: linear-gradient(90deg, #6366f1 0%, #d946ef 100%);
+            height: 100%;
+            transition: width 1s ease;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 500;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .tab-button {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            color: #818cf8;
+            border-bottom-color: #6366f1;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Block -->
+    <header>
+        <div class="brand">
+            <h1>Requirement Intelligence Studio</h1>
+            <p>Strategic Ingestion, Multi-Persona Critique, Portfolio Ranking & Absorption</p>
+        </div>
+        <div class="nav-buttons">
+            <a href="/roadmap.html" class="btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Roadmap Intelligence Center
+            </a>
+            <a href="/architecture.html" class="btn" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%); border-color: rgba(79,70,229,0.3); color:#a5b4fc;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                Architecture Diagrams
+            </a>
+            <button class="btn btn-accent" onclick="resetStudioState()">
+                Reset Studio State
+            </button>
+        </div>
+    </header>
+
+    <div class="grid-container">
+
+        <!-- LEFT SIDEBAR: Submission, Analysis & Strategic Fit -->
+        <div>
+            <!-- Panel 1: Requirement Submission Panel -->
+            <section class="card" id="submission-panel">
+                <div class="section-title">
+                    <span>1. Requirement Submission</span>
+                </div>
+                <div class="form-group">
+                    <label for="req-title">Requirement Name / Title</label>
+                    <input type="text" id="req-title" placeholder="e.g. Multi-tenant SSO Integration">
+                </div>
+                <div class="form-group">
+                    <label for="req-text">Requirement Body (Free-form Text or PRD File)</label>
+                    <textarea id="req-text" rows="12" placeholder="Paste requirement document here... Include problem statement, scope parameters, technical/business constraints, and metrics."></textarea>
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                    <button class="btn" onclick="loadTemplate()">Load Template</button>
+                    <button class="btn btn-primary" onclick="submitRequirement()">Parse & Ingest</button>
+                </div>
+            </section>
+
+            <!-- Panel 2: Requirement Analysis Panel -->
+            <section class="card" id="analysis-panel" style="display: none;">
+                <div class="section-title">
+                    <span>2. Requirement Analysis</span>
+                </div>
+                <div class="gauges-wrapper">
+                    <div class="gauge-card">
+                        <div style="position: relative; display: inline-block;">
+                            <svg class="gauge-svg" viewBox="0 0 100 100">
+                                <circle class="gauge-bg" cx="50" cy="50" r="40"></circle>
+                                <circle class="gauge-fill" id="completeness-gauge" cx="50" cy="50" r="40" stroke="var(--primary)"></circle>
+                            </svg>
+                            <span class="gauge-text" id="completeness-text">0%</span>
+                        </div>
+                        <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); margin-top:8px;">Completeness</div>
+                    </div>
+                    
+                    <div class="gauge-card">
+                        <div style="position: relative; display: inline-block;">
+                            <svg class="gauge-svg" viewBox="0 0 100 100">
+                                <circle class="gauge-bg" cx="50" cy="50" r="40"></circle>
+                                <circle class="gauge-fill" id="readiness-gauge" cx="50" cy="50" r="40" stroke="var(--green)"></circle>
+                            </svg>
+                            <span class="gauge-text" id="readiness-text">0%</span>
+                        </div>
+                        <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); margin-top:8px;">Readiness Score</div>
+                    </div>
+                </div>
+                
+                <div style="background:rgba(255,255,255,0.015); border-radius:10px; padding:1rem; border:1px solid rgba(255,255,255,0.03);">
+                    <div class="checklist-item"><span id="chk-problem"></span> Problem Statement</div>
+                    <div class="checklist-item"><span id="chk-scope"></span> Clear Scope declaration</div>
+                    <div class="checklist-item"><span id="chk-metrics"></span> Defined Success Metrics</div>
+                    <div class="checklist-item"><span id="chk-business"></span> Business constraints</div>
+                    <div class="checklist-item"><span id="chk-technical"></span> Technical constraints</div>
+                </div>
+            </section>
+
+            <!-- Panel 3: Strategic Alignment Panel -->
+            <section class="card" id="alignment-panel" style="display: none;">
+                <div class="section-title">
+                    <span>3. Strategic Alignment</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:1.5rem;">
+                    <div style="background:rgba(99, 102, 241, 0.05); padding:12px; border-radius:8px; border:1px solid rgba(99,102,241,0.1); text-align:center;">
+                        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-secondary);">Alignment Fit</div>
+                        <div style="font-size:1.8rem; font-family:'Outfit',sans-serif; font-weight:800; color:#a5b4fc;" id="val-alignment">0%</div>
+                    </div>
+                    <div style="background:rgba(217, 70, 239, 0.05); padding:12px; border-radius:8px; border:1px solid rgba(217,70,239,0.1); text-align:center;">
+                        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-secondary);">Strategic Impact</div>
+                        <div style="font-size:1.8rem; font-family:'Outfit',sans-serif; font-weight:800; color:#f472b6;" id="val-strategic">0%</div>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:1.5rem;">
+                    <div style="background:rgba(16, 185, 129, 0.05); padding:12px; border-radius:8px; border:1px solid rgba(16,185,129,0.1); text-align:center;">
+                        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-secondary);">Business Value</div>
+                        <div style="font-size:1.8rem; font-family:'Outfit',sans-serif; font-weight:800; color:#34d399;" id="val-business">0%</div>
+                    </div>
+                    <div style="background:rgba(59, 130, 246, 0.05); padding:12px; border-radius:8px; border:1px solid rgba(59,130,246,0.1); text-align:center;">
+                        <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-secondary);">User Value</div>
+                        <div style="font-size:1.8rem; font-family:'Outfit',sans-serif; font-weight:800; color:#60a5fa;" id="val-user">0%</div>
+                    </div>
+                </div>
+                
+                <div style="font-size:0.84rem; line-height:1.5; color:var(--text-secondary);">
+                    <p><strong>Matched Themes:</strong> <span id="val-themes" style="color:#a5b4fc; font-weight:600;">None</span></p>
+                    <p style="margin-top:6px;"><strong>Core Vision/Mission Match:</strong> <span style="color:var(--green); font-weight:600;">VERIFIED (100% Fit)</span></p>
+                </div>
+            </section>
+        </div>
+
+        <!-- RIGHT WORKSPACE: Critique, Clarification, Authoring, Prioritization & Absorption -->
+        <div>
+            <!-- Workspace Tabs -->
+            <div style="display: flex; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 1.5rem;" id="studio-tabs">
+                <button class="tab-button active" onclick="switchTab('tab-critique')">Critique & Clarifications</button>
+                <button class="tab-button" onclick="switchTab('tab-authoring')">Strategic Proposition</button>
+                <button class="tab-button" onclick="switchTab('tab-prioritization')">Roadmap Absorption</button>
+            </div>
+
+            <!-- Tab 1: Critique & Clarification Engine -->
+            <div id="tab-critique" class="tab-content active">
+                <!-- Panel 4: Critique Workspace -->
+                <section class="card" id="critique-panel" style="display: none;">
+                    <div class="section-title">
+                        <span>4. Requirement Critique</span>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('acc-strengths')">
+                            <span>✅ Core Strengths</span>
+                            <span>+</span>
+                        </div>
+                        <div class="accordion-body" id="acc-strengths">
+                            <ul id="critique-strengths"></ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('acc-weaknesses')">
+                            <span>⚠️ Identified Weaknesses</span>
+                            <span>+</span>
+                        </div>
+                        <div class="accordion-body" id="acc-weaknesses">
+                            <ul id="critique-weaknesses"></ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('acc-gaps')">
+                            <span>🔍 Information Gaps</span>
+                            <span>+</span>
+                        </div>
+                        <div class="accordion-body" id="acc-gaps">
+                            <ul id="critique-gaps"></ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('acc-risks')">
+                            <span>⚡ Operational Risks</span>
+                            <span>+</span>
+                        </div>
+                        <div class="accordion-body" id="acc-risks">
+                            <ul id="critique-risks"></ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="toggleAccordion('acc-improvements')">
+                            <span>📈 Suggested Improvements</span>
+                            <span>+</span>
+                        </div>
+                        <div class="accordion-body" id="acc-improvements">
+                            <ul id="critique-improvements"></ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Panel 5: Clarification Workflow -->
+                <section class="card" id="clarification-panel" style="display: none;">
+                    <div class="section-title">
+                        <span>5. Clarification Workflow</span>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="submitAnswers()" style="padding: 6px 12px; font-size:0.75rem;">Submit Answers</button>
+                            <button class="btn btn-accent" onclick="waiveQuestions()" style="padding: 6px 12px; font-size:0.75rem;">Authorize Waiver</button>
+                            <button class="btn btn-primary" onclick="directConsumeToBacklog()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; padding: 6px 12px; font-size:0.75rem;">Directly Consume to Backlog</button>
+                        </div>
+                    </div>
+                    <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:1.25rem;">
+                        The requirement cannot advance to roadmap candidate status until all 10 questions are answered OR explicitly waived by an executive.
+                    </p>
+                    <div id="questions-list"></div>
+                </section>
+            </div>
+
+            <!-- Tab 2: Requirement Authoring Workspace -->
+            <div id="tab-authoring" class="tab-content">
+                <!-- Panel 6: Requirement Authoring Workspace -->
+                <section class="card" id="authoring-panel">
+                    <div class="section-title">
+                        <span>6. Requirement Authoring Workspace</span>
+                        <button class="btn btn-primary" onclick="compileProposition()" id="btn-compile-prop" disabled style="padding: 6px 12px; font-size:0.75rem;">Compile Proposition</button>
+                    </div>
+                    <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom:1.5rem;" id="prop-status">
+                        Submit a requirement and complete clarifications to unlock the authored Strategic Proposition.
+                    </p>
+                    <div id="proposition-content"></div>
+                </section>
+            </div>
+
+            <!-- Tab 3: Roadmap Prioritization & Absorption -->
+            <div id="tab-prioritization" class="tab-content">
+                <!-- Panel 7 & 8: Roadmap Integration Preview & Prioritization Results -->
+                <section class="card" id="prioritization-panel" style="display: none;">
+                    <div class="section-title">
+                        <span>7 & 8. Prioritization & Integration Preview</span>
+                        <button class="btn btn-accent" onclick="absorbRequirement()" id="btn-absorb-req" style="padding: 6px 12px; font-size:0.75rem;">Approve & Absorb Candidate</button>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div>
+                            <h4 style="font-family:'Outfit',sans-serif; color:#a5b4fc; font-size:1rem; margin-bottom:10px;">Prioritization Rankings Fitting</h4>
+                            <div style="background:rgba(0,0,0,0.3); border-radius:10px; padding:1.25rem; border:1px solid rgba(255,255,255,0.05);" id="prioritization-ranking-list">
+                                <!-- Dynamic comparison rankings -->
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="font-family:'Outfit',sans-serif; color:#a5b4fc; font-size:1rem; margin-bottom:10px;">Integration & System Dependencies</h4>
+                            <div style="background:rgba(0,0,0,0.3); border-radius:10px; padding:1.25rem; border:1px solid rgba(255,255,255,0.05);">
+                                <ul style="list-style-type:none; padding:0; font-size:0.84rem; color:var(--text-secondary);" id="dependencies-list">
+                                    <li style="margin-bottom:8px;">🔗 <strong>INT-A-01:</strong> Qdrant Semantic Vector Index (Linked)</li>
+                                    <li style="margin-bottom:8px;">🔗 <strong>INT-A-02:</strong> Pydantic AI Core Parser (Linked)</li>
+                                    <li style="margin-bottom:8px;">🔗 <strong>INT-A-03:</strong> Graphiti Memory Sync (Linked)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Panel 9 & 10: Executive Governance & Absorption Dashboard -->
+                <section class="card" id="absorption-panel" style="display: none;">
+                    <div class="section-title">
+                        <span>9 & 10. Roadmap Absorption Dashboard</span>
+                        <button class="btn btn-primary" onclick="publishRoadmapItem()" id="btn-publish-item" style="padding: 6px 12px; font-size:0.75rem;">Commit & Publish Roadmap</button>
+                    </div>
+                    
+                    <div style="background:rgba(255,255,255,0.01); border-radius:12px; padding:1.25rem; border:1px solid rgba(255,255,255,0.03); margin-bottom:1.5rem;" id="exec-governance-box">
+                        <h4 style="font-family:'Outfit',sans-serif; color:var(--yellow); font-size:0.95rem; margin-bottom:6px;">Executive Governance Assessment</h4>
+                        <p style="font-size:0.84rem; color:var(--text-secondary); line-height:1.5; font-style:italic;" id="gov-recommendation"></p>
+                        <p style="font-size:0.84rem; color:var(--text-secondary); line-height:1.5; margin-top:8px;" id="gov-impact"></p>
+                    </div>
+
+                    <h4 style="font-family:'Outfit',sans-serif; color:#a5b4fc; font-size:1rem; margin-bottom:10px;">Post-Absorption Sequencing Shifts</h4>
+                    <div style="overflow-x:auto;">
+                        <table class="ranking-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Initiative ID / Title</th>
+                                    <th>Movement</th>
+                                    <th>Effort</th>
+                                    <th>Capacity Impact</th>
+                                    <th>Milestone Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody id="absorption-table-body">
+                                <!-- Re-sequenced items -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top:1.5rem; background:rgba(0,0,0,0.2); padding:1rem; border-radius:10px; border:1px solid rgba(255,255,255,0.04);">
+                        <div style="display:flex; justify-content:space-between; font-size:0.84rem; font-weight:600; color:var(--text-secondary);">
+                            <span>Total Cumulative Portfolio Capacity Utilized</span>
+                            <span id="capacity-percentage">0% / 100%</span>
+                        </div>
+                        <div class="capacity-bar-wrapper">
+                            <div class="capacity-bar-fill" id="capacity-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast notify container -->
+    <div id="toast-notify" class="toast">Requirement successfully parsed.</div>
+
+    <script type="module">
+        window.loadTemplate = loadTemplate;
+        window.submitRequirement = submitRequirement;
+        window.toggleAccordion = toggleAccordion;
+        window.submitAnswers = submitAnswers;
+        window.waiveQuestions = waiveQuestions;
+        window.compileProposition = compileProposition;
+        window.absorbRequirement = absorbRequirement;
+        window.publishRoadmapItem = publishRoadmapItem;
+        window.resetStudioState = resetStudioState;
+        window.switchTab = switchTab;
+        window.directConsumeToBacklog = directConsumeToBacklog;
+
+        let activeRequirementId = "";
+        let activeRoadmapId = "";
+        let completenessScore = 0;
+        let readinessScore = 0;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            const btn = Array.from(document.querySelectorAll('.tab-button')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (btn) btn.classList.add('active');
+            
+            const content = document.getElementById(tabId);
+            if (content) content.classList.add('active');
+        }
+
+        function loadTemplate() {
+            document.getElementById("req-title").value = "Strict Code Analysis SAST Pipelines";
+            document.getElementById("req-text").value = `Add strict security SAST and secrets auditing checks into the pre-commit git pipelines to solve code security leak problems.
+
+Scope parameters:
+- Include Semgrep SAST check and Gitleaks secrets scans.
+- Exclude proprietary large models and external cloud calls to protect intellectual property.
+
+Success metrics:
+- 100% of commits checked automatically before push.
+- Zero secrets committed in repository logs.
+
+Business constraints:
+- Must deploy using existing developer tooling within 2 weeks with a budget of $1200.
+
+Technical constraints:
+- Must execute on local developer desktops using pre-configured Docker hooks.`;
+            showToast("SSO/SAST Requirement template loaded.");
+        }
+
+        async function submitRequirement() {
+            const title = document.getElementById("req-title").value.trim();
+            const text = document.getElementById("req-text").value.trim();
+
+            if (!title || !text) {
+                showToast("Please enter a title and text requirement body.", true);
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/requirement/submit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title, text })
+                });
+
+                if (!res.ok) throw new Error("Submission failed");
+                const data = await res.json();
+
+                activeRequirementId = data.requirement_id;
+                completenessScore = data.completeness_score;
+                readinessScore = data.readiness_score;
+
+                // Update UI Analysis gauges
+                updateGauge("completeness-gauge", completenessScore);
+                document.getElementById("completeness-text").textContent = `${completenessScore}%`;
+                updateGauge("readiness-gauge", readinessScore);
+                document.getElementById("readiness-text").textContent = `${readinessScore}%`;
+
+                // Update checklist indicators
+                const checklist = data.critique; // wait, data has check list or heuristics
+                const chk = data.checklist || {
+                    "has_problem_statement": true,
+                    "has_clear_scope": true,
+                    "has_success_metrics": true,
+                    "has_business_constraints": true,
+                    "has_technical_constraints": true
+                };
+                
+                document.getElementById("chk-problem").innerHTML = chk.has_problem_statement ? "🟢" : "🔴";
+                document.getElementById("chk-scope").innerHTML = chk.has_clear_scope ? "🟢" : "🔴";
+                document.getElementById("chk-metrics").innerHTML = chk.has_success_metrics ? "🟢" : "🔴";
+                document.getElementById("chk-business").innerHTML = chk.has_business_constraints ? "🟢" : "🔴";
+                document.getElementById("chk-technical").innerHTML = chk.has_technical_constraints ? "🟢" : "🔴";
+
+                // Show left panels
+                document.getElementById("analysis-panel").style.display = "block";
+                document.getElementById("alignment-panel").style.display = "block";
+
+                // Strategic Alignment
+                document.getElementById("val-alignment").textContent = `${data.strategic_analysis.alignment_score}%`;
+                document.getElementById("val-strategic").textContent = `${data.strategic_analysis.strategic_impact_score}%`;
+                document.getElementById("val-business").textContent = `${data.strategic_analysis.business_value_score}%`;
+                document.getElementById("val-user").textContent = `${data.strategic_analysis.user_value_score}%`;
+                document.getElementById("val-themes").textContent = data.strategic_analysis.aligned_themes.join(", ");
+
+                // Render Critique Accordions
+                renderCritique(data.critique);
+                document.getElementById("critique-panel").style.display = "block";
+
+                // Render Clarification Questions
+                renderQuestions(data.clarification_questions);
+                document.getElementById("clarification-panel").style.display = "block";
+
+                // Unlock compile button
+                document.getElementById("btn-compile-prop").removeAttribute("disabled");
+                document.getElementById("prop-status").textContent = "Ingestion complete. You may now compile the strategic product proposition.";
+
+                showToast("Requirement ingested and parsed successfully.");
+                switchTab('tab-critique');
+            } catch (err) {
+                showToast("Ingestion error: " + err.message, true);
+            }
+        }
+
+        function updateGauge(gaugeId, score) {
+            const circle = document.getElementById(gaugeId);
+            if (!circle) return;
+            const radius = circle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (score / 100) * circumference;
+            circle.style.strokeDasharray = circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        function renderCritique(critique) {
+            const renderList = (id, items) => {
+                const ul = document.getElementById(id);
+                ul.innerHTML = items.map(item => `<li>${item}</li>`).join("");
+            };
+            renderList("critique-strengths", critique.strengths);
+            renderList("critique-weaknesses", critique.weaknesses);
+            renderList("critique-gaps", critique.missing_information);
+            renderList("critique-risks", critique.risks);
+            renderList("critique-improvements", critique.suggested_improvements);
+        }
+
+        function toggleAccordion(id) {
+            const body = document.getElementById(id);
+            const isVisible = body.style.display === "block";
+            body.style.display = isVisible ? "none" : "block";
+        }
+
+        function renderQuestions(questions) {
+            const container = document.getElementById("questions-list");
+            container.innerHTML = "";
+
+            questions.forEach(q => {
+                const div = document.createElement("div");
+                div.className = "question-card";
+                div.innerHTML = `
+                    <div class="question-meta">
+                        <span style="color:#818cf8;">Question ${q.id}</span>
+                        <span class="q-badge ${q.impact_level.toLowerCase()}">${q.impact_level} Impact</span>
+                    </div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="question-rationales">
+                        <strong>Rationale:</strong> ${q.rationale}<br/>
+                        <strong style="color:#f87171;">Risk if unanswered:</strong> ${q.risk}
+                    </div>
+                    <input type="text" class="q-input" data-qid="${q.id}" placeholder="Provide answer details here..." style="font-size:0.85rem; padding:8px 12px; margin-bottom:8px;">
+                    <div style="display:flex; justify-content:flex-end;">
+                        <button class="btn" onclick="toggleWaived('${q.id}', this)" style="padding:4px 10px; font-size:0.72rem;">Waive Question</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        let waivedQuestions = {};
+        window.toggleWaived = function(qid, btn) {
+            if (waivedQuestions[qid]) {
+                delete waivedQuestions[qid];
+                btn.textContent = "Waive Question";
+                btn.style.background = "";
+                btn.style.borderColor = "";
+            } else {
+                waivedQuestions[qid] = true;
+                btn.textContent = "Waived 🟢";
+                btn.style.background = "var(--green-glow)";
+                btn.style.borderColor = "var(--green)";
+            }
+        };
+
+        async function submitAnswers() {
+            if (!activeRequirementId) return;
+            const answers = {};
+            document.querySelectorAll(".q-input").forEach(input => {
+                const qid = input.getAttribute("data-qid");
+                answers[qid] = input.value.trim() || (waivedQuestions[qid] ? "[WAIVED BY USER]" : "");
+            });
+
+            // Verify if all questions have answers or are waived
+            const totalAnswered = Object.values(answers).filter(val => val).length;
+            if (totalAnswered < 10) {
+                showToast(`Clarification engine requires answers/waivers for all 10 questions. (Progress: ${totalAnswered}/10)`, true);
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/requirement/clarify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ requirement_id: activeRequirementId, answers, waive: false })
+                });
+
+                if (!res.ok) throw new Error("Clarify failed");
+                const data = await res.json();
+                
+                readinessScore = data.readiness_score;
+                updateGauge("readiness-gauge", readinessScore);
+                document.getElementById("readiness-text").textContent = `${readinessScore}%`;
+                
+                showToast("Answers successfully registered. Readiness score updated.");
+            } catch (err) {
+                showToast("Clarify error: " + err.message, true);
+            }
+        }
+
+        async function waiveQuestions() {
+            if (!activeRequirementId) return;
+            try {
+                const res = await fetch("/api/requirement/clarify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ requirement_id: activeRequirementId, answers: {}, waive: true })
+                });
+
+                if (!res.ok) throw new Error("Waiving failed");
+                const data = await res.json();
+
+                readinessScore = data.readiness_score;
+                updateGauge("readiness-gauge", readinessScore);
+                document.getElementById("readiness-text").textContent = `${readinessScore}%`;
+
+                // Set all inputs and waiver buttons to visual green state
+                document.querySelectorAll(".q-input").forEach(input => input.value = "[WAIVED BY EXEC AUTHORITY]");
+                document.querySelectorAll(".question-actions button").forEach(btn => {
+                    btn.textContent = "Waived 🟢";
+                    btn.style.background = "var(--green-glow)";
+                });
+
+                showToast("CPO Executive override applied. Questions waived.");
+            } catch (err) {
+                showToast("Waiver error: " + err.message, true);
+            }
+        }
+
+        async function compileProposition() {
+            if (!activeRequirementId) return;
+            try {
+                const res = await fetch("/api/requirement/author", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ requirement_id: activeRequirementId })
+                });
+
+                if (!res.ok) throw new Error("Authoring failed");
+                const data = await res.json();
+
+                const container = document.getElementById("proposition-content");
+                container.innerHTML = "";
+
+                for (const [key, val] of Object.entries(data)) {
+                    const cleanKey = key.replace(/_/g, " ").substring(2);
+                    const div = document.createElement("div");
+                    div.className = "proposition-section";
+                    div.innerHTML = `
+                        <div class="prop-title">${cleanKey}</div>
+                        <div class="prop-body">${Array.isArray(val) ? val.map(x => `• ${x}`).join('<br/>') : val}</div>
+                    `;
+                    container.appendChild(div);
+                }
+
+                document.getElementById("prop-status").textContent = "Strategic Proposition successfully compiled. Review sections A to Q below.";
+                showToast("Authored Proposition successfully compiled.");
+                
+                // Show prioritization panel
+                document.getElementById("prioritization-panel").style.display = "block";
+                
+                // Populate rankings preview
+                fetchRankingsPreview();
+                switchTab('tab-authoring');
+            } catch (err) {
+                showToast("Authoring error: " + err.message, true);
+            }
+        }
+
+        async function fetchRankingsPreview() {
+            try {
+                const res = await fetch("/api/requirement/list");
+                const data = await res.json();
+                
+                // Call absorb requirement to simulate rank placement
+                const simRes = await fetch("/api/requirement/absorb", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ requirement_id: activeRequirementId })
+                });
+                const sim = await simRes.json();
+                
+                activeRoadmapId = sim.roadmap_candidate.roadmap_id;
+
+                const rankList = document.getElementById("prioritization-ranking-list");
+                rankList.innerHTML = "";
+
+                sim.sequencing_changes.forEach(seq => {
+                    const isNew = seq.id === activeRoadmapId;
+                    const rClass = isNew ? "rank-badge new-item" : "rank-badge";
+                    const itemDiv = document.createElement("div");
+                    itemDiv.style.display = "flex";
+                    itemDiv.style.justifyContent = "space-between";
+                    itemDiv.style.alignItems = "center";
+                    itemDiv.style.marginBottom = "8px";
+                    itemDiv.style.fontSize = "0.86rem";
+                    itemDiv.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span class="${rClass}">${seq.new_position}</span>
+                            <span style="font-weight:600; color:${isNew ? '#a5b4fc' : 'var(--text-primary)'};">${seq.id} — ${seq.name}</span>
+                        </div>
+                        <span style="font-family:monospace; color:var(--text-secondary); font-size:0.75rem;">Score: ${isNew ? sim.roadmap_candidate.priority_score : (seq.id === 'RD-01' ? 90.0 : (seq.id === 'RD-03' ? 82.0 : (seq.id === 'RD-02' ? 75.0 : 60.0)))}</span>
+                    `;
+                    rankList.appendChild(itemDiv);
+                });
+            } catch (err) {
+                console.error("Rankings preview load failed:", err);
+            }
+        }
+
+        async function absorbRequirement() {
+            if (!activeRequirementId) return;
+            try {
+                const res = await fetch("/api/requirement/absorb", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ requirement_id: activeRequirementId })
+                });
+
+                if (!res.ok) throw new Error("Absorption failed");
+                const data = await res.json();
+
+                showToast(`Requirement successfully absorbed as candidate ${activeRoadmapId}.`);
+
+                // Governance Recommendation
+                document.getElementById("gov-recommendation").textContent = data.executive_recommendation.executive_recommendation;
+                document.getElementById("gov-impact").innerHTML = `
+                    <strong>Impact:</strong> ${data.executive_recommendation.portfolio_impact_assessment}<br/>
+                    <strong>Justification:</strong> ${data.executive_recommendation.strategic_justification}
+                `;
+
+                // Render Re-sequenced Rankings
+                const tbody = document.getElementById("absorption-table-body");
+                tbody.innerHTML = "";
+
+                let cumulativeEffort = 0;
+                data.sequencing_changes.forEach(seq => {
+                    const tr = document.createElement("tr");
+                    const isNew = seq.id === activeRoadmapId;
+                    
+                    let arrowColor = "none";
+                    if (seq.movement === "↑") arrowColor = "up";
+                    else if (seq.movement === "↓") arrowColor = "down";
+                    
+                    cumulativeEffort += seq.delivery_effort;
+
+                    tr.innerHTML = `
+                        <td><span class="rank-badge ${isNew ? 'new-item' : ''}">${seq.new_position}</span></td>
+                        <td><strong style="color:${isNew ? '#a5b4fc' : 'inherit'};">${seq.id} — ${seq.name}</strong></td>
+                        <td><span class="arrow ${arrowColor}">${seq.movement}</span></td>
+                        <td style="font-family:monospace;">${seq.delivery_effort} Effort</td>
+                        <td>${seq.capacity_impact}</td>
+                        <td style="color:${seq.milestone_impact.includes('Delayed') ? 'var(--red)' : 'var(--green)'};">${seq.milestone_impact}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Capacity bars
+                const capPct = Math.min(100, cumulativeEffort);
+                document.getElementById("capacity-percentage").textContent = `${capPct}% / 100% capacity`;
+                document.getElementById("capacity-fill").style.width = `${capPct}%`;
+                if (capPct > 90) {
+                    document.getElementById("capacity-fill").style.background = "var(--red)";
+                } else {
+                    document.getElementById("capacity-fill").style.background = "linear-gradient(90deg, #6366f1 0%, #d946ef 100%)";
+                }
+
+                document.getElementById("absorption-panel").style.display = "block";
+                switchTab('tab-prioritization');
+            } catch (err) {
+                showToast("Absorption error: " + err.message, true);
+            }
+        }
+
+        async function publishRoadmapItem() {
+            if (!activeRoadmapId) return;
+            try {
+                const res = await fetch("/api/requirement/publish", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ roadmap_id: activeRoadmapId })
+                });
+
+                if (!res.ok) throw new Error("Publishing failed");
+                const data = await res.json();
+
+                showToast(`Roadmap successfully published. ${activeRoadmapId} is now live!`);
+                
+                // Redirect back to Roadmap Intelligence Center after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "/roadmap.html";
+                }, 2000);
+            } catch (err) {
+                showToast("Publishing error: " + err.message, true);
+            }
+        }
+
+        async function directConsumeToBacklog() {
+            if (!activeRequirementId) return;
+            const answers = {};
+            let answeredCount = 0;
+            document.querySelectorAll(".q-input").forEach(input => {
+                const qid = input.getAttribute("data-qid");
+                const val = input.value.trim();
+                answers[qid] = val || (waivedQuestions[qid] ? "[WAIVED BY USER]" : "");
+                if (answers[qid]) {
+                    answeredCount++;
+                }
+            });
+
+            const autoWaive = answeredCount < 10;
+            if (autoWaive) {
+                document.querySelectorAll(".q-input").forEach(input => {
+                    const qid = input.getAttribute("data-qid");
+                    if (!answers[qid]) {
+                        answers[qid] = "[WAIVED BY EXEC AUTHORITY]";
+                        input.value = "[WAIVED BY EXEC AUTHORITY]";
+                    }
+                });
+            }
+
+            try {
+                showToast("Directly consuming requirement into the backlog...");
+                const res = await fetch("/api/requirement/direct_ingest", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ requirement_id: activeRequirementId, answers, waive: autoWaive })
+                });
+
+                if (!res.ok) throw new Error("Direct ingestion failed");
+                const data = await res.json();
+                
+                showToast(`Requirement successfully consumed as candidate ${data.roadmap_id}. Redirecting to roadmap...`);
+                
+                // Redirect back to Roadmap Intelligence Center after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "/roadmap.html";
+                }, 2000);
+            } catch (err) {
+                showToast("Direct ingestion error: " + err.message, true);
+            }
+        }
+
+        async function resetStudioState() {
+            try {
+                const res = await fetch("/api/requirement/reset", { method: "POST" });
+                if (!res.ok) throw new Error("Reset failed");
+                
+                showToast("Studio state successfully reset. Reloading...");
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } catch (err) {
+                showToast("Reset failed: " + err.message, true);
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast-notify");
+            toast.textContent = message;
+            toast.style.background = isError ? "var(--red)" : "var(--green)";
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

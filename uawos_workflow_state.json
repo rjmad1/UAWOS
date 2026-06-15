@@ -14,7 +14,7 @@
             "version": 7,
             "history": [
                 {
-                    "timestamp": 1781311320.808604,
+                    "timestamp": 1781533774.2657647,
                     "state": {
                         "id": "WRK-101",
                         "plan_id": "PLN-101",
@@ -27,11 +27,13 @@
                         "dependencies": [],
                         "state": "active",
                         "version": 1,
-                        "governed": true
+                        "governed": true,
+                        "execution_mode": null,
+                        "temporal_run_id": null
                     }
                 },
                 {
-                    "timestamp": 1781311341.7930727,
+                    "timestamp": 1781533795.853583,
                     "state": {
                         "id": "WRK-101",
                         "plan_id": "PLN-101",
@@ -44,11 +46,13 @@
                         "dependencies": [],
                         "state": "active",
                         "version": 2,
-                        "governed": true
+                        "governed": true,
+                        "execution_mode": null,
+                        "temporal_run_id": null
                     }
                 },
                 {
-                    "timestamp": 1781311347.9252336,
+                    "timestamp": 1781533802.0047355,
                     "state": {
                         "id": "WRK-101",
                         "plan_id": "PLN-101",
@@ -62,11 +66,12 @@
                         "state": "active",
                         "version": 3,
                         "governed": true,
-                        "execution_mode": "simulation"
+                        "execution_mode": "simulation",
+                        "temporal_run_id": null
                     }
                 },
                 {
-                    "timestamp": 1781311352.0389411,
+                    "timestamp": 1781533806.1126652,
                     "state": {
                         "id": "WRK-101",
                         "plan_id": "PLN-101",
@@ -80,11 +85,12 @@
                         "state": "active",
                         "version": 4,
                         "governed": true,
-                        "execution_mode": "simulation"
+                        "execution_mode": "simulation",
+                        "temporal_run_id": null
                     }
                 },
                 {
-                    "timestamp": 1781311356.1101046,
+                    "timestamp": 1781533810.2204115,
                     "state": {
                         "id": "WRK-101",
                         "plan_id": "PLN-101",
@@ -98,11 +104,12 @@
                         "state": "paused",
                         "version": 5,
                         "governed": true,
-                        "execution_mode": "simulation"
+                        "execution_mode": "simulation",
+                        "temporal_run_id": null
                     }
                 },
                 {
-                    "timestamp": 1781311360.175047,
+                    "timestamp": 1781533814.3095446,
                     "state": {
                         "id": "WRK-101",
                         "plan_id": "PLN-101",
@@ -116,12 +123,14 @@
                         "state": "active",
                         "version": 6,
                         "governed": true,
-                        "execution_mode": "simulation"
+                        "execution_mode": "simulation",
+                        "temporal_run_id": null
                     }
                 }
             ],
             "governed": true,
-            "execution_mode": "simulation"
+            "execution_mode": "simulation",
+            "temporal_run_id": null
         },
         "WRK-102": {
             "id": "WRK-102",
@@ -135,7 +144,9 @@
             "state": "active",
             "version": 1,
             "history": [],
-            "governed": true
+            "governed": true,
+            "execution_mode": null,
+            "temporal_run_id": null
         },
         "WRK-103": {
             "id": "WRK-103",
@@ -150,7 +161,9 @@
             "state": "active",
             "version": 1,
             "history": [],
-            "governed": true
+            "governed": true,
+            "execution_mode": null,
+            "temporal_run_id": null
         },
         "WRK-104": {
             "id": "WRK-104",
@@ -163,7 +176,9 @@
             "state": "active",
             "version": 1,
             "history": [],
-            "governed": true
+            "governed": true,
+            "execution_mode": null,
+            "temporal_run_id": null
         }
     }
 }

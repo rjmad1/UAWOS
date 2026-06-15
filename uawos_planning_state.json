@@ -20,7 +20,7 @@
             "version": 5,
             "history": [
                 {
-                    "timestamp": 1781311284.3574252,
+                    "timestamp": 1781533768.2229125,
                     "state": {
                         "id": "PLN-101",
                         "objective_id": "OBJ-101",
@@ -49,7 +49,7 @@
                     }
                 },
                 {
-                    "timestamp": 1781311288.456692,
+                    "timestamp": 1781533772.314015,
                     "state": {
                         "id": "PLN-101",
                         "objective_id": "OBJ-101",
@@ -78,7 +78,7 @@
                     }
                 },
                 {
-                    "timestamp": 1781311292.5568388,
+                    "timestamp": 1781533776.4105659,
                     "state": {
                         "id": "PLN-101",
                         "objective_id": "OBJ-101",
@@ -107,7 +107,7 @@
                     }
                 },
                 {
-                    "timestamp": 1781311296.6352909,
+                    "timestamp": 1781533780.5123394,
                     "state": {
                         "id": "PLN-101",
                         "objective_id": "OBJ-101",
@@ -147,51 +147,25 @@
         "PLN-102": {
             "id": "PLN-102",
             "objective_id": "OBJ-101",
-            "title": "T",
+            "title": "Replanned strategy due to: Governance Cost Warning",
             "steps": [
-                "step"
+                "Step R1: Address constraints",
+                "Step R2: Resume execution"
             ],
-            "cost_estimate": 150.0,
-            "duration_estimate": 5,
+            "cost_estimate": 250.0,
+            "duration_estimate": 6,
             "resource_requirements": [
-                "Dev"
+                "Replanning Agent"
             ],
-            "success_probability": 0.9,
-            "status": "approved",
-            "version": 2,
-            "history": [
-                {
-                    "timestamp": 1781311280.2760687,
-                    "state": {
-                        "id": "PLN-102",
-                        "objective_id": "OBJ-101",
-                        "title": "T",
-                        "steps": [
-                            "step"
-                        ],
-                        "cost_estimate": 150.0,
-                        "duration_estimate": 5,
-                        "resource_requirements": [
-                            "Dev"
-                        ],
-                        "success_probability": 0.9,
-                        "status": "draft",
-                        "version": 1,
-                        "risks": [
-                            "General delivery risk"
-                        ],
-                        "assumptions": [
-                            "Assump X"
-                        ],
-                        "is_alternative": false
-                    }
-                }
-            ],
+            "success_probability": 0.92,
+            "status": "draft",
+            "version": 1,
+            "history": [],
             "risks": [
                 "General delivery risk"
             ],
             "assumptions": [
-                "Assump X"
+                "Required resources are available"
             ],
             "is_alternative": false
         }

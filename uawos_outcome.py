@@ -1,8 +1,14 @@
 # uawos_outcome.py
 import os
-
 import uawos_db
 from uawos_state_utils import load_state, save_state
+
+from application.use_cases.outcome_use_cases import (
+    create_outcome,
+    get_objective_outcomes,
+    update_outcome,
+    recalculate_forecasts,
+)
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_outcome_state.json")
 
@@ -42,108 +48,6 @@ def get_default_state() -> dict:
             },
         }
     }
-
-
-# FR-031 to FR-040: Create an Outcome
-def create_outcome(
-    objective_id: str,
-    title: str,
-    metric: str,
-    unit: str,
-    weight: float = 1.0,
-    dependencies: list = None,
-    confidence_score: float = 90.0,
-    owner: str = "Product Owner",
-    baseline_state: float = 0.0,
-    target_state: float = 100.0,
-    current_state: float = 0.0,
-) -> dict:
-    """Create and persist a new Outcome for a given objective."""
-    if not metric or not unit:
-        raise ValueError("metric and unit are required for a measurable Outcome.")
-    state = load_state()
-    outcome_id = f"OUT-{len(state['outcomes']) + 101:03d}"
-    dependencies = dependencies or []
-    outcome = {
-        "id": outcome_id,
-        "objective_id": objective_id,
-        "title": title,
-        "metric": metric,
-        "unit": unit,
-        "weight": weight,  # FR-033
-        "dependencies": dependencies,  # FR-034
-        "confidence_score": confidence_score,  # FR-035
-        "owner": owner,  # FR-037
-        "baseline_state": baseline_state,  # FR-038
-        "target_state": target_state,  # FR-039
-        "current_state": current_state,  # FR-040
-        "forecasted_state": current_state,  # FR-036
-    }
-
-    state["outcomes"][outcome_id] = outcome
-    save_state(state)
-    recalculate_forecasts(outcome_id)
-    return load_state()["outcomes"][outcome_id]
-
-
-def get_objective_outcomes(objective_id: str) -> list:
-    """Get all outcomes associated with a specific objective (FR-032)."""
-    state = load_state()
-    return [out for out in state["outcomes"].values() if out["objective_id"] == objective_id]
-
-
-def update_outcome(outcome_id: str, updates: dict) -> dict:
-    state = load_state()
-    outcome = state["outcomes"].get(outcome_id)
-    if not outcome:
-        raise ValueError(f"Outcome {outcome_id} not found.")
-
-    for k, v in updates.items():
-        if k in [
-            "title",
-            "metric",
-            "unit",
-            "weight",
-            "dependencies",
-            "confidence_score",
-            "owner",
-            "baseline_state",
-            "target_state",
-            "current_state",
-        ]:
-            outcome[k] = v
-
-    state["outcomes"][outcome_id] = outcome
-    save_state(state)
-    recalculate_forecasts(outcome_id)
-    return load_state()["outcomes"][outcome_id]
-
-
-def recalculate_forecasts(outcome_id: str):
-    """Estimate outcome forecasting based on progress trends (FR-036)."""
-    state = load_state()
-    outcome = state["outcomes"].get(outcome_id)
-    if not outcome:
-        return
-
-    # Heuristic forecasting: project current progress slightly forward
-    base = outcome["baseline_state"]
-    curr = outcome["current_state"]
-    target = outcome["target_state"]
-
-    diff = target - base
-    progress = curr - base
-
-    if diff == 0:
-        forecast = target
-    else:
-        # Forecast 10% progress increment as estimate
-        ratio = progress / diff
-        forecast = base + diff * min(1.0, ratio + 0.1)
-
-    outcome["forecasted_state"] = round(forecast, 2)
-    state["outcomes"][outcome_id] = outcome
-    save_state(state)
 
 
 # ----------------- VERIFICATION TESTS (FR-031 to FR-040) -----------------

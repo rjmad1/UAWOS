@@ -123,6 +123,51 @@
             "target_state": 100.0,
             "current_state": 0.0,
             "forecasted_state": 8.75
+        },
+        "OUT-109": {
+            "id": "OUT-109",
+            "objective_id": "OBJ-101",
+            "title": "Target Outcome",
+            "metric": "Conversion Rate",
+            "unit": "percent",
+            "weight": 1.0,
+            "dependencies": [],
+            "confidence_score": 90.0,
+            "owner": "Product Owner",
+            "baseline_state": 0.0,
+            "target_state": 95.0,
+            "current_state": 0.0,
+            "forecasted_state": 9.5
+        },
+        "OUT-110": {
+            "id": "OUT-110",
+            "objective_id": "OBJ-101",
+            "title": "Current State Outcome",
+            "metric": "Conversion Rate",
+            "unit": "percent",
+            "weight": 1.0,
+            "dependencies": [],
+            "confidence_score": 90.0,
+            "owner": "Product Owner",
+            "baseline_state": 0.0,
+            "target_state": 100.0,
+            "current_state": 42.0,
+            "forecasted_state": 52.0
+        },
+        "OUT-111": {
+            "id": "OUT-111",
+            "objective_id": "OBJ-115",
+            "title": "Test Metric",
+            "metric": "Metric",
+            "unit": "units",
+            "weight": 1.0,
+            "dependencies": [],
+            "confidence_score": 90.0,
+            "owner": "Product Owner",
+            "baseline_state": 0.0,
+            "target_state": 100.0,
+            "current_state": 0.0,
+            "forecasted_state": 10.0
         }
     }
 }

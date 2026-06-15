@@ -1,191 +1,191 @@
 {
-  "objective_budgets": {
-    "OBJ-101": {
-      "name": "Launch Product X Checkout Flow",
-      "budget": 1200.0,
-      "actual": 345.5,
-      "status": "Approved"
+    "objective_budgets": {
+        "OBJ-101": {
+            "name": "Launch Product X Checkout Flow",
+            "budget": 1200.0,
+            "actual": 345.5,
+            "status": "Approved"
+        },
+        "OBJ-102": {
+            "name": "OPA Compliance & SAST Auditing",
+            "budget": 500.0,
+            "actual": 485.0,
+            "status": "Approved"
+        },
+        "OBJ-103": {
+            "name": "DTASE Multi-Persona Synthesis",
+            "budget": 800.0,
+            "actual": 120.0,
+            "status": "Approved"
+        },
+        "OBJ-104": {
+            "name": "Graphiti Memory Synchronization",
+            "budget": 300.0,
+            "actual": 320.0,
+            "status": "Approved"
+        }
     },
-    "OBJ-102": {
-      "name": "OPA Compliance & SAST Auditing",
-      "budget": 500.0,
-      "actual": 485.0,
-      "status": "Approved"
+    "action_budgets": {
+        "ACT-101-1": {
+            "name": "Refactor database query logic",
+            "objective_id": "OBJ-101",
+            "budget": 400.0,
+            "actual": 150.0
+        },
+        "ACT-101-2": {
+            "name": "Integrate Redis cache headers",
+            "objective_id": "OBJ-101",
+            "budget": 300.0,
+            "actual": 195.5
+        },
+        "ACT-102-1": {
+            "name": "Configure OPA policies",
+            "objective_id": "OBJ-102",
+            "budget": 250.0,
+            "actual": 240.0
+        },
+        "ACT-102-2": {
+            "name": "Run Trivy Container Scans",
+            "objective_id": "OBJ-102",
+            "budget": 250.0,
+            "actual": 245.0
+        },
+        "ACT-103-1": {
+            "name": "Apply translation frameworks",
+            "objective_id": "OBJ-103",
+            "budget": 400.0,
+            "actual": 120.0
+        },
+        "ACT-104-1": {
+            "name": "Index memory vectors in Qdrant",
+            "objective_id": "OBJ-104",
+            "budget": 300.0,
+            "actual": 320.0
+        }
     },
-    "OBJ-103": {
-      "name": "DTASE Multi-Persona Synthesis",
-      "budget": 800.0,
-      "actual": 120.06,
-      "status": "Approved"
+    "agent_costs": {
+        "Planner Agent": {
+            "cost": 124.5,
+            "token_count": 850000,
+            "call_count": 120
+        },
+        "Orchestrator Agent": {
+            "cost": 210.2,
+            "token_count": 1420000,
+            "call_count": 340
+        },
+        "Executor Agent": {
+            "cost": 485.3,
+            "token_count": 3200000,
+            "call_count": 850
+        },
+        "Reviewer Agent": {
+            "cost": 75.6,
+            "token_count": 510000,
+            "call_count": 95
+        },
+        "Governor Agent": {
+            "cost": 15.4,
+            "token_count": 110000,
+            "call_count": 35
+        },
+        "Portfolio Governor Agent": {
+            "cost": 25.0,
+            "token_count": 180000,
+            "call_count": 40
+        },
+        "Value Analyst Agent": {
+            "cost": 30.5,
+            "token_count": 220000,
+            "call_count": 55
+        },
+        "Resource Manager Agent": {
+            "cost": 45.0,
+            "token_count": 310000,
+            "call_count": 70
+        }
     },
-    "OBJ-104": {
-      "name": "Graphiti Memory Synchronization",
-      "budget": 450.0,
-      "actual": 320.0,
-      "status": "Approved"
+    "token_consumption": {
+        "tinyllama": {
+            "input_tokens": 1500000,
+            "output_tokens": 800000,
+            "reasoning_tokens": 0,
+            "cost": 0.16
+        },
+        "llama3": {
+            "input_tokens": 2400000,
+            "output_tokens": 1200000,
+            "reasoning_tokens": 0,
+            "cost": 1.08
+        },
+        "gemini-1.5-pro": {
+            "input_tokens": 6000000,
+            "output_tokens": 4000000,
+            "reasoning_tokens": 1000000,
+            "cost": 32.5
+        },
+        "deepseek-r1": {
+            "input_tokens": 5000000,
+            "output_tokens": 3000000,
+            "reasoning_tokens": 2000000,
+            "cost": 13.7
+        }
+    },
+    "budget_approvals": [
+        {
+            "id": "APP-001",
+            "objective_id": "OBJ-104",
+            "amount": 150.0,
+            "status": "Pending",
+            "requested_by": "Resource Manager Agent",
+            "timestamp": "2026-06-08T18:40:00Z"
+        },
+        {
+            "id": "APP-002",
+            "objective_id": "OBJ-101",
+            "amount": 500.0,
+            "status": "Approved",
+            "requested_by": "Planner Agent",
+            "timestamp": "2026-06-08T12:00:00Z"
+        }
+    ],
+    "portfolio_attribution": {
+        "PORT-A": {
+            "name": "Checkout Experience Optimization",
+            "cost": 345.5,
+            "percentage": 35.6
+        },
+        "PORT-B": {
+            "name": "Regulatory & Security Infrastructure",
+            "cost": 485.0,
+            "percentage": 50.0
+        },
+        "PORT-C": {
+            "name": "AI Foundations & Memory Systems",
+            "cost": 140.0,
+            "percentage": 14.4
+        }
+    },
+    "value_to_cost": {
+        "OBJ-101": {
+            "value_score": 95.0,
+            "cost": 345.5,
+            "roi_ratio": 2.75
+        },
+        "OBJ-102": {
+            "value_score": 85.0,
+            "cost": 485.0,
+            "roi_ratio": 1.75
+        },
+        "OBJ-103": {
+            "value_score": 75.0,
+            "cost": 120.0,
+            "roi_ratio": 6.25
+        },
+        "OBJ-104": {
+            "value_score": 60.0,
+            "cost": 320.0,
+            "roi_ratio": 1.88
+        }
     }
-  },
-  "action_budgets": {
-    "ACT-101-1": {
-      "name": "Refactor database query logic",
-      "objective_id": "OBJ-101",
-      "budget": 400.0,
-      "actual": 150.0
-    },
-    "ACT-101-2": {
-      "name": "Integrate Redis cache headers",
-      "objective_id": "OBJ-101",
-      "budget": 300.0,
-      "actual": 195.5
-    },
-    "ACT-102-1": {
-      "name": "Configure OPA policies",
-      "objective_id": "OBJ-102",
-      "budget": 250.0,
-      "actual": 240.0
-    },
-    "ACT-102-2": {
-      "name": "Run Trivy Container Scans",
-      "objective_id": "OBJ-102",
-      "budget": 250.0,
-      "actual": 245.0
-    },
-    "ACT-103-1": {
-      "name": "Apply translation frameworks",
-      "objective_id": "OBJ-103",
-      "budget": 400.0,
-      "actual": 120.0
-    },
-    "ACT-104-1": {
-      "name": "Index memory vectors in Qdrant",
-      "objective_id": "OBJ-104",
-      "budget": 300.0,
-      "actual": 320.0
-    }
-  },
-  "agent_costs": {
-    "Planner Agent": {
-      "cost": 124.5,
-      "token_count": 850000,
-      "call_count": 120
-    },
-    "Orchestrator Agent": {
-      "cost": 210.21,
-      "token_count": 1455000,
-      "call_count": 341
-    },
-    "Executor Agent": {
-      "cost": 485.35,
-      "token_count": 3350000,
-      "call_count": 851
-    },
-    "Reviewer Agent": {
-      "cost": 75.6,
-      "token_count": 510000,
-      "call_count": 95
-    },
-    "Governor Agent": {
-      "cost": 15.4,
-      "token_count": 110000,
-      "call_count": 35
-    },
-    "Portfolio Governor Agent": {
-      "cost": 25.0,
-      "token_count": 180000,
-      "call_count": 40
-    },
-    "Value Analyst Agent": {
-      "cost": 30.5,
-      "token_count": 220000,
-      "call_count": 55
-    },
-    "Resource Manager Agent": {
-      "cost": 45.0,
-      "token_count": 310000,
-      "call_count": 70
-    }
-  },
-  "token_consumption": {
-    "tinyllama": {
-      "input_tokens": 1500000,
-      "output_tokens": 800000,
-      "reasoning_tokens": 0,
-      "cost": 0.16
-    },
-    "llama3": {
-      "input_tokens": 2525000,
-      "output_tokens": 1260000,
-      "reasoning_tokens": 0,
-      "cost": 1.13
-    },
-    "gemini-1.5-pro": {
-      "input_tokens": 6000000,
-      "output_tokens": 4000000,
-      "reasoning_tokens": 1000000,
-      "cost": 32.5
-    },
-    "deepseek-r1": {
-      "input_tokens": 5000000,
-      "output_tokens": 3000000,
-      "reasoning_tokens": 2000000,
-      "cost": 13.7
-    }
-  },
-  "budget_approvals": [
-    {
-      "id": "APP-001",
-      "objective_id": "OBJ-104",
-      "amount": 150.0,
-      "status": "Approved",
-      "requested_by": "Resource Manager Agent",
-      "timestamp": "2026-06-08T18:40:00Z"
-    },
-    {
-      "id": "APP-002",
-      "objective_id": "OBJ-101",
-      "amount": 500.0,
-      "status": "Approved",
-      "requested_by": "Planner Agent",
-      "timestamp": "2026-06-08T12:00:00Z"
-    }
-  ],
-  "portfolio_attribution": {
-    "PORT-A": {
-      "name": "Checkout Experience Optimization",
-      "cost": 345.5,
-      "percentage": 35.6
-    },
-    "PORT-B": {
-      "name": "Regulatory & Security Infrastructure",
-      "cost": 485.0,
-      "percentage": 50.0
-    },
-    "PORT-C": {
-      "name": "AI Foundations & Memory Systems",
-      "cost": 140.0,
-      "percentage": 14.4
-    }
-  },
-  "value_to_cost": {
-    "OBJ-101": {
-      "value_score": 95.0,
-      "cost": 345.5,
-      "roi_ratio": 2.75
-    },
-    "OBJ-102": {
-      "value_score": 85.0,
-      "cost": 485.0,
-      "roi_ratio": 1.75
-    },
-    "OBJ-103": {
-      "value_score": 75.0,
-      "cost": 120.0,
-      "roi_ratio": 6.25
-    },
-    "OBJ-104": {
-      "value_score": 60.0,
-      "cost": 320.0,
-      "roi_ratio": 1.88
-    }
-  }
 }

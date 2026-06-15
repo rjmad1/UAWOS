@@ -1,0 +1,3241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAWOS Operational Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        :root {
+            --bg-color: #080a10;
+            --card-bg: rgba(18, 22, 35, 0.5);
+            --card-border: rgba(255, 255, 255, 0.06);
+            --card-border-hover: rgba(255, 255, 255, 0.15);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.3);
+            
+            /* HSL Status Colors */
+            --color-green-h: 142;
+            --color-green-s: 70%;
+            --color-green-l: 45%;
+            --green: hsl(var(--color-green-h), var(--color-green-s), var(--color-green-l));
+            --green-glow: hsla(var(--color-green-h), var(--color-green-s), var(--color-green-l), 0.2);
+
+            --color-yellow-h: 45;
+            --color-yellow-s: 90%;
+            --color-yellow-l: 50%;
+            --yellow: hsl(var(--color-yellow-h), var(--color-yellow-s), var(--color-yellow-l));
+            --yellow-glow: hsla(var(--color-yellow-h), var(--color-yellow-s), var(--color-yellow-l), 0.2);
+
+            --color-red-h: 0;
+            --color-red-s: 85%;
+            --color-red-l: 50%;
+            --red: hsl(var(--color-red-h), var(--color-red-s), var(--color-red-l));
+            --red-glow: hsla(var(--color-red-h), var(--color-red-s), var(--color-red-l), 0.25);
+
+            --color-gray-h: 215;
+            --color-gray-s: 15%;
+            --color-gray-l: 50%;
+            --gray: hsl(var(--color-gray-h), var(--color-gray-s), var(--color-gray-l));
+            --gray-glow: hsla(var(--color-gray-h), var(--color-gray-s), var(--color-gray-l), 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            padding: 2rem;
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .glass:hover {
+            border-color: var(--card-border-hover);
+        }
+
+        /* Header design */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+
+        .brand h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--green);
+            background: var(--green-glow);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid hsla(var(--color-green-h), var(--color-green-s), var(--color-green-l), 0.3);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--green);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Dashboard grid layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Health circular score card */
+        .health-ring-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 2rem;
+        }
+
+        .health-ring-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .health-svg {
+            transform: rotate(-90deg);
+        }
+
+        .health-ring-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 12;
+        }
+
+        .health-ring-fill {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1s ease-in-out, stroke 1s ease;
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        .health-percentage-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .health-pct {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .health-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metrics-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-pill {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            min-width: 120px;
+        }
+
+        .metric-pill span.num {
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            margin-bottom: 2px;
+        }
+
+        .metric-pill span.lbl {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Traffic light grid */
+        .traffic-signal-card {
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .traffic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .traffic-box {
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .traffic-box:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
+        }
+
+        .status-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .status-indicator.green { background-color: var(--green); box-shadow: 0 0 10px var(--green-glow); }
+        .status-indicator.yellow { background-color: var(--yellow); box-shadow: 0 0 10px var(--yellow-glow); }
+        .status-indicator.red { background-color: var(--red); box-shadow: 0 0 12px var(--red-glow); animation: flash 1s infinite alternate; }
+        .status-indicator.gray { background-color: var(--gray); box-shadow: 0 0 6px var(--gray-glow); }
+
+        @keyframes flash {
+            from { opacity: 0.7; }
+            to { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 10px var(--red)); }
+        }
+
+        .traffic-domain-lbl {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Tabs and tables */
+        .tabs-card {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-headers {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: #a5b4fc;
+            border-bottom: 2px solid #6366f1;
+            background: #181c30;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        th {
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.015);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pill.green { color: var(--green); background: var(--green-glow); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-pill.yellow { color: var(--yellow); background: var(--yellow-glow); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-pill.red { color: var(--red); background: var(--red-glow); border: 1px solid rgba(239, 68, 68, 0.2); animation: pulse-red 2s infinite; }
+        .status-pill.gray { color: var(--gray); background: var(--gray-glow); border: 1px solid rgba(107, 114, 128, 0.2); }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Incidents & Risks design */
+        .incidents-card {
+            padding: 1.5rem;
+            border-left: 4px solid var(--red);
+            margin-bottom: 2rem;
+            animation: pulse-border-red 2.5s infinite;
+        }
+
+        @keyframes pulse-border-red {
+            0% { border-left-color: var(--red); }
+            50% { border-left-color: #f87171; }
+            100% { border-left-color: var(--red); }
+        }
+
+        .incident-item {
+            background: rgba(239, 68, 68, 0.04);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .incident-desc h4 {
+            color: #f87171;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .incident-desc p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* System Info Daemon Side Panel */
+        .system-pnl {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .daemon-status-box {
+            padding: 1.2rem;
+        }
+
+        .daemon-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .daemon-line:last-child {
+            border-bottom: none;
+        }
+
+        .daemon-line span.name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* Action triggers */
+        .action-sec {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.2rem;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .troubleshoot-links {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .troubleshoot-links:hover {
+            color: #818cf8;
+        }
+
+        /* Toast notification styling */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 500;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Documentation Browser styling */
+        .doc-category-hdr {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #a5b4fc;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 1.2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .doc-category-hdr:first-child {
+            margin-top: 0;
+        }
+        .doc-file-item {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            padding: 7px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
+        }
+        .doc-file-item:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .doc-file-item.active {
+            color: white;
+            background: #23275c;
+            border-left: 3px solid #6366f1;
+        }
+
+        /* WCAG 2.1 AA keyboard focus outline styles */
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        a:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 2px solid #818cf8;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.4);
+        }
+        
+        tr:focus-visible td {
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+
+        tr:focus-visible {
+            outline: 2px solid #818cf8;
+            outline-offset: -2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="glass">
+        <div class="brand">
+            <h1>UAWOS Command Center</h1>
+            <p>Ecosystem Operations & Real-Time Monitoring Panel</p>
+        </div>
+        <div class="live-badge" id="live-indicator">
+            <div class="live-dot"></div>
+            <span>LIVE MONITORS ACTIVE</span>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+        
+        <!-- Left Side: Status and Probes -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            
+            <!-- Health Rings and Breakdown -->
+            <div class="glass health-ring-card">
+                <div class="health-ring-container">
+                    <svg class="health-svg" width="150" height="150" viewBox="0 0 160 160">
+                        <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                        <circle class="health-ring-fill" id="health-ring" cx="80" cy="80" r="70" />
+                    </svg>
+                    <div class="health-percentage-text">
+                        <span class="health-pct" id="strict-health">0%</span>
+                        <span class="health-label">HEALTH</span>
+                    </div>
+                </div>
+
+                <div class="metrics-breakdown">
+                    <div class="metric-pill">
+                        <span class="num" id="metric-green" style="color: var(--green);">0</span>
+                        <span class="lbl">Green Services</span>
+                    </div>
+                    <div class="metric-pill">
+                        <span class="num" id="metric-yellow" style="color: var(--yellow);">0</span>
+                        <span class="lbl">Degraded</span>
+                    </div>
+                    <div class="metric-pill">
+                        <span class="num" id="metric-red" style="color: var(--red);">0</span>
+                        <span class="lbl">Critical Risks</span>
+                    </div>
+                    <div class="metric-pill">
+                        <span class="num" id="metric-gray" style="color: var(--gray);">0</span>
+                        <span class="lbl">Not Wired</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incident Alerts Command Center -->
+            <div class="glass incidents-card" id="incidents-box">
+                <div class="section-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span>Critical Incidents & Blocks</span>
+                </div>
+                <div class="incident-item">
+                    <div class="incident-desc">
+                        <h4>INT-C-04: GPLv3 Marker compliance risk active</h4>
+                        <p><strong>Root Cause:</strong> marker library contains a GPLv3 copyleft license. Integrating it directly into the Python virtual environment triggers build pipeline blockages.</p>
+                        <p style="margin-top: 6px;"><strong>Resolution Plan:</strong> Package Marker as a separate container service communicating exclusively via REST API. Never import `marker` directly.</p>
+                    </div>
+                    <span class="status-pill red">ACTIVE BLOCKER</span>
+                </div>
+            </div>
+
+            <!-- Traffic Signal Board -->
+            <div class="glass traffic-signal-card">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+                    </svg>
+                    <span>Domain Traffic Signals</span>
+                </div>
+                <div class="traffic-grid" id="traffic-grid">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+
+            <!-- Tabbed Components Lists -->
+            <div class="glass tabs-card">
+                <div class="tab-headers" role="tablist" aria-label="Operational Categories">
+                    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-services" id="btn-tab-services" onclick="switchTab(event, 'tab-services')">Core Services</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-agents" id="btn-tab-agents" onclick="switchTab(event, 'tab-agents')">Agents</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-mcps" id="btn-tab-mcps" onclick="switchTab(event, 'tab-mcps')">MCPs</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-skills" id="btn-tab-skills" onclick="switchTab(event, 'tab-skills')">Skills</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-integrations" id="btn-tab-integrations" onclick="switchTab(event, 'tab-integrations')">Integrations</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-sec-gov" id="btn-tab-sec-gov" onclick="switchTab(event, 'tab-sec-gov')">Sec & Gov</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-dtase" id="btn-tab-dtase" onclick="switchTab(event, 'tab-dtase')">DTASE Engine</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-budget" id="btn-tab-budget" onclick="switchTab(event, 'tab-budget')">Budget & Cost</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-pmcms" id="btn-tab-pmcms" onclick="switchTab(event, 'tab-pmcms')">Platform Maturity (PMCMS)</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-governance" id="btn-tab-governance" onclick="switchTab(event, 'tab-governance')">Proactive Governance</button>
+                    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-docs" id="btn-tab-docs" onclick="switchTab(event, 'tab-docs')">Documentation</button>
+                    <a href="/roadmap.html" class="tab-btn" role="link" aria-label="Roadmap Intelligence (opens in new page)" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Roadmap Intelligence ↗</a>
+                    <a href="/architecture.html" class="tab-btn" role="link" aria-label="Architecture Diagrams (opens in new page)" style="text-decoration:none; color:var(--text-secondary); display:inline-flex; align-items:center;">Architecture Diagrams ↗</a>
+                </div>
+
+                <!-- Services Tab -->
+                <div id="tab-services" class="tab-content active" role="tabpanel" aria-labelledby="btn-tab-services">
+                    <table aria-label="Core Services Status">
+                        <thead>
+                            <tr>
+                                <th>Service Engine</th>
+                                <th>Status</th>
+                                <th>Severity</th>
+                                <th>Dependencies</th>
+                                <th>Current Issue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="services-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Agents Tab -->
+                <div id="tab-agents" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-agents">
+                    <table aria-label="Agents Operations">
+                        <thead>
+                            <tr>
+                                <th>Agent</th>
+                                <th>Status</th>
+                                <th>Dependencies</th>
+                                <th>Operational Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agents-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- MCPs Tab -->
+                <div id="tab-mcps" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-mcps">
+                    <table aria-label="Model Context Protocol Servers">
+                        <thead>
+                            <tr>
+                                <th>Model Context Server (MCP)</th>
+                                <th>Status</th>
+                                <th>Consumers</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mcps-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Skills Tab -->
+                <div id="tab-skills" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-skills">
+                    <table aria-label="Agent Capabilities and Skills">
+                        <thead>
+                            <tr>
+                                <th>Skill ID / Name</th>
+                                <th>Status</th>
+                                <th>Primary Dependency</th>
+                                <th>Cost Class</th>
+                            </tr>
+                        </thead>
+                        <tbody id="skills-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Integrations Tab -->
+                <div id="tab-integrations" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-integrations">
+                    <table aria-label="System Integrations">
+                        <thead>
+                            <tr>
+                                <th>Integration Code</th>
+                                <th>Status</th>
+                                <th>Dependencies</th>
+                                <th>Current Issue / Blocker</th>
+                            </tr>
+                        </thead>
+                        <tbody id="integrations-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Sec & Gov Tab -->
+                <div id="tab-sec-gov" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-sec-gov">
+                    <table aria-label="Security and Governance Controls">
+                        <thead>
+                            <tr>
+                                <th>Governance / Security Control</th>
+                                <th>Status</th>
+                                <th>Scope</th>
+                                <th>Action Required</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sec-gov-tbody">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Platform Maturity (PMCMS) Tab -->
+                <div id="tab-pmcms" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-pmcms">
+                    <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; min-height: 600px;">
+                        
+                        <!-- Left Panel: Score Ring and Matrix -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            
+                            <!-- Overall Maturity Index Card -->
+                            <div class="glass" style="padding: 1.5rem; display: flex; align-items: center; justify-content: space-around; background: rgba(99, 102, 241, 0.04); border: 1px solid rgba(99, 102, 241, 0.15);">
+                                <div class="health-ring-container" style="width: 140px; height: 140px;">
+                                    <svg class="health-svg" width="140" height="140" viewBox="0 0 160 160">
+                                        <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                                        <circle class="health-ring-fill" id="pmcms-ring-fill" cx="80" cy="80" r="70" style="stroke: #818cf8; filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.4));" />
+                                    </svg>
+                                    <div class="health-percentage-text">
+                                        <span class="health-pct" id="pmcms-overall-score" style="font-size: 2.1rem; color: #a5b4fc;">0.00</span>
+                                        <span class="health-label" style="font-size: 0.68rem; letter-spacing: 0.5px;">MATURITY</span>
+                                    </div>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px; max-width: 60%;">
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Platform Maturity Stage</span>
+                                    <h2 id="pmcms-maturity-level-desc" style="font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; color: white;">Calculating...</h2>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45;">
+                                        Normative evaluation score calculated dynamically in real-time based on the 9 maturity dimensions of the Platform Maturity & Capability Model Standard (PMCMS).
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Dimensions Grid Matrix -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                        <rect x="3" y="3" width="7" height="9" rx="1"/>
+                                        <rect x="14" y="3" width="7" height="5" rx="1"/>
+                                        <rect x="14" y="12" width="7" height="9" rx="1"/>
+                                        <rect x="3" y="16" width="7" height="5" rx="1"/>
+                                    </svg>
+                                    <span>Maturity Dimensions Matrix</span>
+                                </h3>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;" id="pmcms-matrix-grid">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Dimension Details Inspector -->
+                        <div class="glass" id="pmcms-inspector" style="padding: 1.8rem; background: rgba(18, 22, 35, 0.65); border: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 1.25rem;">
+                            <div style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                <h3 id="pmcms-inspector-title" style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; color: #a5b4fc; font-weight: 700;">Dimension Details</h3>
+                                <span class="status-pill green" id="pmcms-inspector-badge" style="font-size: 0.75rem; padding: 2px 8px;">Level 1</span>
+                            </div>
+                            <p id="pmcms-inspector-desc" style="font-size: 0.88rem; line-height: 1.45; color: var(--text-secondary);"></p>
+                            
+                            <div>
+                                <h4 style="font-size: 0.8rem; font-weight: 600; color: white; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Live Evidence & Capabilities</h4>
+                                <div id="pmcms-inspector-evidence" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 style="font-size: 0.8rem; font-weight: 600; color: #fca5a5; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Identified Gaps</h4>
+                                <ul id="pmcms-inspector-gaps" style="padding-left: 14px; font-size: 0.82rem; color: #fca5a5; line-height: 1.45; display: flex; flex-direction: column; gap: 6px;">
+                                    <!-- Dynamic -->
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 style="font-size: 0.8rem; font-weight: 600; color: #93c5fd; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Next Investment Recommendations</h4>
+                                <div id="pmcms-inspector-recs" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Proactive Governance Tab -->
+                <div id="tab-governance" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-governance">
+                    <!-- Top control row -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700; color: white; margin: 0 0 4px 0;">Proactive Platform Governance System (PPGS)</h2>
+                            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0;">
+                                Continuous software risk analysis, architectural boundaries validation, and reliability forecasting.
+                            </p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span id="gov-last-updated" style="font-size: 0.76rem; color: var(--text-secondary); font-family: monospace;">Last scanned: Never</span>
+                            <button id="btn-run-governance" onclick="runGovernanceAudit()" class="action-btn" style="background: var(--primary); border-color: var(--primary); font-size: 0.85rem; padding: 6px 16px;">Trigger Live Governance Scan</button>
+                        </div>
+                    </div>
+
+                    <!-- Scores & Trend Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Score 1: Platform Confidence -->
+                        <div class="glass" style="padding: 1.25rem; display: flex; align-items: center; justify-content: space-around; background: rgba(16, 185, 129, 0.02); border: 1px solid rgba(16, 185, 129, 0.12);">
+                            <div class="health-ring-container" style="width: 100px; height: 100px;">
+                                <svg class="health-svg" width="100" height="100" viewBox="0 0 160 160">
+                                    <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                                    <circle class="health-ring-fill" id="gov-confidence-ring" cx="80" cy="80" r="70" style="stroke: var(--green); filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.3));" />
+                                </svg>
+                                <div class="health-percentage-text">
+                                    <span class="health-pct" id="gov-confidence-score" style="font-size: 1.6rem; color: var(--green);">0</span>
+                                    <span class="health-label" style="font-size: 0.55rem; letter-spacing: 0.5px;">CONFIDENCE</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 4px; max-width: 50%;">
+                                <span style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Confidence Score</span>
+                                <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.3; margin: 0;">Code quality and test coverage confidence.</p>
+                            </div>
+                        </div>
+
+                        <!-- Score 2: Future Risk -->
+                        <div class="glass" style="padding: 1.25rem; display: flex; align-items: center; justify-content: space-around; background: rgba(239, 68, 68, 0.02); border: 1px solid rgba(239, 68, 68, 0.12);">
+                            <div class="health-ring-container" style="width: 100px; height: 100px;">
+                                <svg class="health-svg" width="100" height="100" viewBox="0 0 160 160">
+                                    <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                                    <circle class="health-ring-fill" id="gov-risk-ring" cx="80" cy="80" r="70" style="stroke: var(--red); filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.3));" />
+                                </svg>
+                                <div class="health-percentage-text">
+                                    <span class="health-pct" id="gov-risk-score" style="font-size: 1.6rem; color: var(--red);">0</span>
+                                    <span class="health-label" style="font-size: 0.55rem; letter-spacing: 0.5px;">FUTURE RISK</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 4px; max-width: 50%;">
+                                <span style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Future Risk Index</span>
+                                <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.3; margin: 0;">Debt, circularity, and risk warnings.</p>
+                            </div>
+                        </div>
+
+                        <!-- Score 3: Operational Readiness -->
+                        <div class="glass" style="padding: 1.25rem; display: flex; align-items: center; justify-content: space-around; background: rgba(99, 102, 241, 0.02); border: 1px solid rgba(99, 102, 241, 0.12);">
+                            <div class="health-ring-container" style="width: 100px; height: 100px;">
+                                <svg class="health-svg" width="100" height="100" viewBox="0 0 160 160">
+                                    <circle class="health-ring-bg" cx="80" cy="80" r="70" />
+                                    <circle class="health-ring-fill" id="gov-readiness-ring" cx="80" cy="80" r="70" style="stroke: #818cf8; filter: drop-shadow(0 0 6px rgba(129, 140, 248, 0.3));" />
+                                </svg>
+                                <div class="health-percentage-text">
+                                    <span class="health-pct" id="gov-readiness-score" style="font-size: 1.6rem; color: #a5b4fc;">0</span>
+                                    <span class="health-label" style="font-size: 0.55rem; letter-spacing: 0.5px;">READINESS</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 4px; max-width: 50%;">
+                                <span style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Readiness Index</span>
+                                <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.3; margin: 0;">Platform compliance and production readiness.</p>
+                            </div>
+                        </div>
+
+                        <!-- Stats Card -->
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Stability Trend</span>
+                                <span id="gov-stability-trend" class="status-pill green" style="font-size: 0.72rem; padding: 2px 8px;">Stable</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem;">
+                                <div style="color: var(--text-secondary);">Python Files: <strong id="gov-stat-files" style="color: white; float: right;">0</strong></div>
+                                <div style="color: var(--text-secondary);">LOC Checked: <strong id="gov-stat-loc" style="color: white; float: right;">0</strong></div>
+                                <div style="color: var(--text-secondary);">Active TODOs: <strong id="gov-stat-todos" style="color: white; float: right;">0</strong></div>
+                                <div style="color: var(--text-secondary);">Suppressions: <strong id="gov-stat-suppressions" style="color: white; float: right;">0</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning Register & Decision Matrix Grid -->
+                    <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 2rem; align-items: start;">
+                        <!-- Early Warning Register -->
+                        <div class="glass" style="padding: 1.5rem;">
+                            <h3 class="section-title">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                                <span>Platform Early Warning Register</span>
+                            </h3>
+                            <div class="table-container" style="max-height: 320px;">
+                                <table aria-label="Early Warning Register">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Title / Evidence</th>
+                                            <th>Predicted Outcome</th>
+                                            <th>Horizon</th>
+                                            <th>Severity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-warnings-tbody">
+                                        <!-- Dynamic warnings -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Decision Support Matrix -->
+                        <div class="glass" style="padding: 1.5rem;">
+                            <h3 class="section-title" style="color: #60a5fa;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="9" y1="3" x2="9" y2="21"/>
+                                    <line x1="15" y1="3" x2="15" y2="21"/>
+                                    <line x1="3" y1="9" x2="21" y2="9"/>
+                                    <line x1="3" y1="15" x2="21" y2="15"/>
+                                </svg>
+                                <span>Proactive Decision Matrix</span>
+                            </h3>
+                            <div class="table-container" style="max-height: 320px;">
+                                <table aria-label="Decision Support Matrix">
+                                    <thead>
+                                        <tr>
+                                            <th>Option</th>
+                                            <th>Cost</th>
+                                            <th>Risk Reduction</th>
+                                            <th>Projected ROI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-decisions-tbody">
+                                        <!-- Dynamic decision matrix options -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Governance Registries Panel -->
+                    <div class="glass" style="padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 1.25rem;">
+                            <h3 class="section-title" style="margin: 0; color: #a78bfa;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10 9 9 9 8 9"/>
+                                </svg>
+                                <span>Technical Registries & Audits</span>
+                            </h3>
+                            <div style="display: flex; gap: 8px;" id="gov-subtabs">
+                                <button class="action-btn action-btn-primary active" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-test')">Test Gaps</button>
+                                <button class="action-btn action-btn-primary" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-blast')">Blast Radius</button>
+                                <button class="action-btn action-btn-primary" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-arch')">Arch & Coupling</button>
+                                <button class="action-btn action-btn-primary" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-forecast')">Health Forecasts</button>
+                                <button class="action-btn action-btn-primary" style="font-size: 0.72rem; padding: 4px 10px;" onclick="switchGovSubTab(event, 'gov-subtab-dependencies')">Dependencies</button>
+                            </div>
+                        </div>
+
+                        <!-- Registry Sub-tab contents -->
+                        <div id="gov-subtab-test" class="gov-subtab-content" style="display: block;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Test Confidence Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Component</th>
+                                            <th>Confidence Score</th>
+                                            <th>Tests Linked</th>
+                                            <th>Coverage Gap Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-test-tbody">
+                                        <!-- Test intelligence table -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="gov-subtab-blast" class="gov-subtab-content" style="display: none;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Blast Radius Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Module Name</th>
+                                            <th>Blast Radius Score</th>
+                                            <th>Criticality</th>
+                                            <th>Downstream Dependents</th>
+                                            <th>Upstream Dependents</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-blast-tbody">
+                                        <!-- Blast radius table -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="gov-subtab-arch" class="gov-subtab-content" style="display: none;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Architecture Violations Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Component</th>
+                                            <th>Violations / Risk</th>
+                                            <th>Remediation Recommendation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-arch-tbody">
+                                        <!-- Architectural risks table -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="gov-subtab-forecast" class="gov-subtab-content" style="display: none;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Reliability Forecasting Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Horizon</th>
+                                            <th>Predicted Risk Description</th>
+                                            <th>Probability</th>
+                                            <th>Impact Score</th>
+                                            <th>System Blast Radius</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-forecast-tbody">
+                                        <!-- Reliability forecasts table -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="gov-subtab-dependencies" class="gov-subtab-content" style="display: none;">
+                            <div class="table-container" style="max-height: 250px;">
+                                <table aria-label="Package Compliance Registry">
+                                    <thead>
+                                        <tr>
+                                            <th>Package Name</th>
+                                            <th>License Type</th>
+                                            <th>Verdict</th>
+                                            <th>Security Vulnerability Status</th>
+                                            <th>Operational Concerns</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gov-reg-dep-tbody">
+                                        <!-- Dependency Risk Registry -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentation Tab -->
+                <div id="tab-docs" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-docs">
+                    <div style="display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; height: 620px;">
+                        
+                        <!-- Doc categories side-list -->
+                        <div class="glass" style="padding: 1.2rem; overflow-y: auto; background: rgba(0,0,0,0.15); border-radius: 12px; max-height: 620px;">
+                            <div id="docs-tree-container">
+                                <p style="font-size:0.82rem; color:var(--text-secondary); font-style:italic;">Scanning specs...</p>
+                            </div>
+                        </div>
+
+                        <!-- Reading pane -->
+                        <div class="glass" style="padding: 1.8rem; overflow-y: auto; background: rgba(0,0,0,0.1); border-radius: 12px; display: flex; flex-direction: column; max-height: 620px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; margin-bottom:16px; flex-shrink: 0;">
+                                <h3 id="doc-view-title" style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600;">Select a specification document</h3>
+                                <span id="doc-view-meta" style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">No file loaded</span>
+                            </div>
+                            <div id="doc-view-body" style="font-size:0.92rem; line-height:1.65; color:#e5e7eb; overflow-y:auto; flex-grow:1; padding-right:8px;">
+                                <p style="color:var(--text-secondary); font-style:italic;">Click on any architectural standard, PRD, roadmap, or catalog on the left sidebar to render its contents inside this command reader pane.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Budget & Cost Management Tab -->
+                <div id="tab-budget" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-budget">
+                    <!-- Top metrics grid -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Total Budget & Spend</span>
+                            <div style="display: flex; align-items: baseline; gap: 10px;">
+                                <span id="budget-total-actual" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--text-primary);">$0.00</span>
+                                <span style="font-size: 0.82rem; color: var(--text-secondary);">of <span id="budget-total-limit">$0.00</span></span>
+                            </div>
+                            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; margin-top: 4px;">
+                                <div id="budget-spend-bar" style="width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.5s ease;"></div>
+                            </div>
+                        </div>
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Daily Run Rate (Est.)</span>
+                            <span id="budget-run-rate" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700; color: #60a5fa;">$0.00 / day</span>
+                            <span style="font-size: 0.76rem; color: var(--text-secondary);">Calculated over 10 active days</span>
+                        </div>
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Cost Forecast (30-day)</span>
+                            <span id="budget-forecast" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700; color: #a78bfa;">$0.00</span>
+                            <span id="budget-forecast-alert" class="status-pill green" style="padding: 2px 8px; font-size: 0.7rem; align-self: flex-start;">SAFE RUN RATE</span>
+                        </div>
+                        <div class="glass" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Budget Variance</span>
+                            <div style="display: flex; align-items: baseline; gap: 10px;">
+                                <span id="budget-variance-val" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700;">$0.00</span>
+                                <span id="budget-variance-pct" style="font-size: 0.85rem; font-weight: 600;">0.0%</span>
+                            </div>
+                            <span style="font-size: 0.76rem; color: var(--text-secondary);">Actual vs planned baseline deviation</span>
+                        </div>
+                    </div>
+
+                    <!-- Two column table and playground layout -->
+                    <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; min-height: 600px;">
+                        
+                        <!-- Left Column: Tables -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            
+                            <!-- Objective Budgets Table -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
+                                    </svg>
+                                    <span>Objective Budgets & Variance</span>
+                                </h3>
+                                <div class="table-container" style="max-height: 300px;">
+                                    <table aria-label="Objective Budgets and Variance">
+                                        <thead>
+                                            <tr>
+                                                <th>Objective ID</th>
+                                                <th>Name</th>
+                                                <th>Budget</th>
+                                                <th>Actual Spend</th>
+                                                <th>Variance</th>
+                                                <th>Governance</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-obj-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Action Budgets Table -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22 4 12 14.01 9 11.01"/>
+                                    </svg>
+                                    <span>Decomposed Action Budgets</span>
+                                </h3>
+                                <div class="table-container" style="max-height: 250px;">
+                                    <table aria-label="Action Budgets Allocation">
+                                        <thead>
+                                            <tr>
+                                                <th>Action ID</th>
+                                                <th>Action Name</th>
+                                                <th>Parent Objective</th>
+                                                <th>Budget</th>
+                                                <th>Actual Spend</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-act-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Value-to-Cost ROI Analysis -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                                        <line x1="18" y1="20" x2="18" y2="10"/>
+                                        <line x1="12" y1="20" x2="12" y2="4"/>
+                                        <line x1="6" y1="20" x2="6" y2="14"/>
+                                    </svg>
+                                    <span>Value-to-Cost (ROI) Analysis</span>
+                                </h3>
+                                <div class="table-container">
+                                    <table aria-label="Value-to-Cost ROI Analysis">
+                                        <thead>
+                                            <tr>
+                                                <th>Objective ID</th>
+                                                <th>Value Score</th>
+                                                <th>Actual Cost</th>
+                                                <th>ROI Ratio</th>
+                                                <th>Investment Return</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-roi-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Playground, Agents, Attribution -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            
+                            <!-- Budget Playground -->
+                            <div class="glass" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                                <h3 class="section-title" style="color: #f472b6; margin-bottom: 0.5rem;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
+                                        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                        <polyline points="2 17 12 22 22 17"/>
+                                        <polyline points="2 12 12 17 22 12"/>
+                                    </svg>
+                                    <span>Cost Control & Sandbox Playground</span>
+                                </h3>
+                                
+                                <!-- Record Token Form -->
+                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 0.8rem; font-weight: 600; color: #a5b4fc;">Record Agent LLM Consumption</span>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                                        <select id="play-agent-select" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;">
+                                            <option value="Executor Agent">Executor Agent</option>
+                                            <option value="Planner Agent">Planner Agent</option>
+                                            <option value="Orchestrator Agent">Orchestrator Agent</option>
+                                            <option value="Reviewer Agent">Reviewer Agent</option>
+                                            <option value="Governor Agent">Governor Agent</option>
+                                        </select>
+                                        <select id="play-model-select" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;">
+                                            <option value="tinyllama">tinyllama</option>
+                                            <option value="llama3">llama3</option>
+                                            <option value="deepseek-r1">deepseek-r1</option>
+                                            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                                        </select>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                                        <input type="number" id="play-tokens-in" placeholder="Input Tokens" min="0" value="50000" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Input Tokens" />
+                                        <input type="number" id="play-tokens-out" placeholder="Output Tokens" min="0" value="20000" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Output Tokens" />
+                                        <input type="number" id="play-tokens-re" placeholder="Reasoning" min="0" value="0" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Reasoning Tokens" />
+                                    </div>
+                                    <div id="play-tokens-alert" style="display: none; color: #f87171; font-size: 0.75rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); padding: 6px; border-radius: 4px; margin-top: 4px;" role="alert"></div>
+                                    <button onclick="recordSimulatedTokens()" class="action-btn" style="background: #4f46e5; border-color: #6366f1; font-size: 0.78rem; padding: 6px 0;" aria-label="Inject Token Event">Inject Token Event</button>
+                                </div>
+
+                                <!-- Adjust Budget Form -->
+                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 0.8rem; font-weight: 600; color: #a5b4fc;">Adjust Objective Budget Limit</span>
+                                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
+                                        <select id="play-obj-select" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Select Objective to Adjust">
+                                            <!-- Dynamic -->
+                                        </select>
+                                        <input type="number" id="play-obj-budget" placeholder="Amount ($)" min="0" style="background: #0d0f17; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px; font-size: 0.78rem;" aria-label="Budget Amount in Dollars" />
+                                    </div>
+                                    <div id="play-budget-alert" style="display: none; color: #f87171; font-size: 0.75rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); padding: 6px; border-radius: 4px; margin-top: 4px;" role="alert"></div>
+                                    <button onclick="adjustObjectiveBudget()" class="action-btn" style="background: #e11d48; border-color: #f43f5e; font-size: 0.78rem; padding: 6px 0;" aria-label="Adjust Objective Budget">Adjust Objective Budget</button>
+                                </div>
+
+                                <!-- Approvals Workflow -->
+                                <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 0.8rem; font-weight: 600; color: #a5b4fc;">Pending Budget Approvals</span>
+                                    <div id="play-approvals-list" style="display:flex; flex-direction:column; gap:6px; max-height: 150px; overflow-y: auto;">
+                                        <!-- Dynamic -->
+                                    </div>
+                                </div>
+
+                                <!-- Governance verdicts panel -->
+                                <div id="play-gov-result" style="display: none; padding: 10px; border-radius: 6px; font-size: 0.8rem; line-height: 1.45;">
+                                    <!-- Dynamic -->
+                                </div>
+                            </div>
+
+                            <!-- Agent costs and Token breakdown -->
+                            <div class="glass" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                    <span>Agent Workforce Cost Ledger</span>
+                                </h3>
+                                <div class="table-container" style="max-height: 200px;">
+                                    <table aria-label="Agent Workforce Cost Ledger">
+                                        <thead>
+                                            <tr>
+                                                <th>Agent Profile</th>
+                                                <th>Calls</th>
+                                                <th>Tokens</th>
+                                                <th>Total Spend</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-agent-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="table-container" style="max-height: 200px;">
+                                    <table aria-label="Model Token Consumption ledger">
+                                        <thead>
+                                            <tr>
+                                                <th>Model Endpoint</th>
+                                                <th>Input Tokens</th>
+                                                <th>Output Tokens</th>
+                                                <th>Cumulative Cost</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-tokens-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Portfolio Attribution -->
+                            <div class="glass" style="padding: 1.5rem;">
+                                <h3 class="section-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 2v20"/>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                    </svg>
+                                    <span>Portfolio Cost Attribution</span>
+                                </h3>
+                                <div class="table-container">
+                                    <table aria-label="Portfolio Cost Attribution">
+                                        <thead>
+                                            <tr>
+                                                <th>Strategic Portfolio</th>
+                                                <th>Attributed Cost</th>
+                                                <th>Attribution %</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="budget-attr-tbody">
+                                            <!-- Dynamic -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- DTASE Engine Tab -->
+                <div id="tab-dtase" class="tab-content" role="tabpanel" aria-labelledby="btn-tab-dtase">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; min-height: 600px;">
+                        
+                        <!-- Left Panel: Input & Controls -->
+                        <div class="glass" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; background: rgba(0,0,0,0.1); border-radius: 12px;">
+                            <h3 style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600;">DTASE Playground</h3>
+                            <p style="font-size:0.82rem; color:var(--text-secondary); line-height: 1.4;">
+                                Input unstructured communication (voice transcripts, emails, chats, or notes) and automatically classify professional domains, apply translation frameworks, discover risks/opportunities, and synthesize multi-persona outputs.
+                            </p>
+                            
+                            <!-- Preset Dropdown/List -->
+                            <div>
+                                <span style="font-size:0.8rem; font-weight:600; color:#a5b4fc; display:block; margin-bottom:8px;">Load Unstructured Narrative Preset:</span>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('overtime')" aria-label="Load preset: Overtime Retaliation">Overtime Retaliation (Legal/Comp)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('headaches')" aria-label="Load preset: Evening Headaches">Evening Headaches (Clinical)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('checkout')" aria-label="Load preset: Checkout Abandonment">Checkout Abandonment (Product/Res)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('latency')" aria-label="Load preset: API Gateway Latency">API Gateway Latency (Eng)</button>
+                                    <button class="tab-btn" style="font-size: 0.72rem; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;" onclick="loadDtasePreset('rego')" aria-label="Load preset: Rego Security Bypass">Rego Security Bypass (Gov)</button>
+                                </div>
+                            </div>
+                            
+                            <textarea id="dtase-raw-input" style="flex-grow: 1; min-height: 250px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; color: var(--text-primary); padding: 12px; font-size: 0.88rem; font-family: sans-serif; resize: none; line-height: 1.45;" placeholder="Type or paste unstructured text narrative here..." aria-label="Unstructured Narrative Input Textarea"></textarea>
+                            
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <button class="action-btn" id="dtase-btn-analyze" onclick="runDtaseAnalysis()" style="background:#4f46e5; border-color:#6366f1; width:200px; padding: 10px 0;" aria-label="Run DTASE Analysis">Run DTASE Analysis</button>
+                                <button class="tab-btn" onclick="clearDtase()" style="font-size:0.8rem;" aria-label="Clear DTASE Input">Clear Input</button>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Domain Identification & ORA Board -->
+                        <div style="display:flex; flex-direction:column; gap:1.5rem;">
+                            
+                            <!-- Domain Classifier Output -->
+                            <div class="glass" style="padding: 1.5rem; background: rgba(0,0,0,0.1); border-radius: 12px;">
+                                <h3 style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600; margin-bottom:12px;">Identified Professional Domains</h3>
+                                <div id="dtase-domains-container" style="display:flex; flex-direction:column; gap:12px;">
+                                    <p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">No analysis run yet. Enter text and analyze.</p>
+                                </div>
+                            </div>
+
+                            <!-- Opportunities, Risks, Anomalies (ORA) Output -->
+                            <div class="glass" style="padding: 1.5rem; flex-grow:1; background: rgba(0,0,0,0.1); border-radius: 12px; display:flex; flex-direction:column;">
+                                <h3 style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600; margin-bottom:12px;">Discovered Insights (ORA Board)</h3>
+                                <div style="display:grid; grid-template-columns: 1fr; gap:12px; overflow-y:auto; max-height:300px; flex-grow:1;" id="dtase-ora-container">
+                                    <p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">Discoveries board will populate after analysis.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Bottom Section: Multi-Persona Synthesis Output View -->
+                    <div class="glass" style="margin-top: 1.5rem; padding: 1.8rem; background: rgba(0,0,0,0.1); border-radius: 12px; display: flex; flex-direction: column; min-height: 350px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:16px;">
+                            <h3 style="font-family:'Outfit', sans-serif; font-size:1.15rem; color:#818cf8; font-weight:600;">Multi-Persona Output Synthesis</h3>
+                            <span id="dtase-traceability-lbl" style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">Traceability ID: None</span>
+                        </div>
+                        
+                        <div style="display:flex; gap:6px; margin-bottom:1rem; overflow-x:auto;" id="dtase-persona-tabs" role="tablist" aria-label="Persona Syntheses">
+                            <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Executive Summary')">Executive Summary</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Legal Assessment')">Legal Assessment</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Product Requirement')">Product Requirement</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Compliance Review')">Compliance Review</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Technical Specification')">Technical Specification</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Clinical Intake')">Clinical Intake</button>
+                            <button class="tab-btn" role="tab" aria-selected="false" aria-controls="dtase-synthesis-body" style="font-size:0.8rem; padding: 6px 12px;" onclick="switchPersonaTab('Research Analysis')">Research Analysis</button>
+                        </div>
+                        
+                        <div id="dtase-synthesis-body" role="tabpanel" aria-label="Persona Synthesis Content" style="font-size:0.92rem; line-height:1.65; color:#e5e7eb; overflow-y:auto; flex-grow:1; background:rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding:1.2rem; border-radius:8px;">
+                            <p style="color:var(--text-secondary); font-style:italic;">Synthesized outputs for multiple professional personas will be displayed here.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right Side: Daemon Status, Actions, Local Ports -->
+        <div class="system-pnl">
+            
+            <!-- Docker & Daemon health -->
+            <div class="glass daemon-status-box">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                        <path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                        <path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6"/>
+                    </svg>
+                    <span>System Daemon Services</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Docker Background Daemon</span>
+                    <span class="status-pill gray" id="docker-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">LiteLLM Gateway Outbound</span>
+                    <span class="status-pill gray" id="litellm-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Ollama LLM Server (11434)</span>
+                    <span class="status-pill gray" id="ollama-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Langfuse ClickHouse Engine</span>
+                    <span class="status-pill gray" id="clickhouse-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Langfuse MinIO Object Store</span>
+                    <span class="status-pill gray" id="minio-daemon-status">UNKNOWN</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">Local Python Environment</span>
+                    <span class="status-pill gray" id="venv-daemon-status">UNKNOWN</span>
+                </div>
+            </div>
+
+            <!-- Active Docker Ports -->
+            <div class="glass daemon-status-box">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                    <span>Workspace Containers</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">postgres (5435)</span>
+                    <span class="status-pill gray" id="cnt-postgres">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">qdrant (6333)</span>
+                    <span class="status-pill gray" id="cnt-qdrant">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">marquez (5000)</span>
+                    <span class="status-pill gray" id="cnt-marquez">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">superset (8088)</span>
+                    <span class="status-pill gray" id="cnt-superset">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">dtrack-apiserver (8081)</span>
+                    <span class="status-pill gray" id="cnt-dtrack-api">OFFLINE</span>
+                </div>
+                <div class="daemon-line">
+                    <span class="name">dtrack-frontend (8085)</span>
+                    <span class="status-pill gray" id="cnt-dtrack-ui">OFFLINE</span>
+                </div>
+            </div>
+
+            <!-- Ecosystem Requirements & Blockers Card -->
+            <div class="glass daemon-status-box" id="blockers-card">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span>Ecosystem Requirements & Blockers</span>
+                </div>
+                <div style="font-size:0.82rem; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span>Implemented Requirements:</span>
+                        <strong id="reqs-built" style="color:var(--green);">0</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span>Pending Backlog:</span>
+                        <strong id="reqs-backlog" style="color:var(--yellow);">0</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>Blocked Requirements:</span>
+                        <strong id="reqs-blocked" style="color:var(--red);">0</strong>
+                    </div>
+                </div>
+                <div id="blockers-list-container">
+                    <p style="font-size:0.75rem; color:var(--text-secondary); font-style:italic;">No active environment blockers detected.</p>
+                </div>
+            </div>
+
+            <!-- Actions Panel -->
+            <div class="glass action-sec">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                    <span>Operational Actions</span>
+                </div>
+                <button class="action-btn" onclick="forceRefresh()" aria-label="Force Probe Refresh">Force Probe Refresh</button>
+                <div style="margin-top: 10px;">
+                    <p style="font-size:0.75rem; color:var(--text-secondary); line-height: 1.4;">
+                        For troubleshooting: run the following in terminal:
+                    </p>
+                    <code style="display:block; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.75rem; color:#a5b4fc; font-family:monospace; margin-top:6px; word-break:break-all;">
+                        docker compose up -d
+                    </code>
+                    <span class="troubleshoot-links" role="button" tabindex="0" aria-label="Share Telemetry with AI coding assistant" onclick="shareTelemetry()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { shareTelemetry(); event.preventDefault(); }">
+                        Share Telemetry with AI coding assistant
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Script logic -->
+    <script type="module">
+        window.switchTab = switchTab;
+        window.forceRefresh = forceRefresh;
+        window.shareTelemetry = shareTelemetry;
+        window.loadDtasePreset = loadDtasePreset;
+        window.runDtaseAnalysis = runDtaseAnalysis;
+        window.clearDtase = clearDtase;
+        window.switchPersonaTab = switchPersonaTab;
+
+        let selectedPmcmsDimension = "Strategy";
+        let lastPmcmsData = null;
+
+        const presets = {
+            overtime: "I worked 12 hours overtime this week on the product launch, but my supervisor denied my overtime compensation claim and threatened that if I escalated it to HR, I would be terminated immediately. This is totally illegal and violating my contract.",
+            headaches: "I have been getting severe tension headaches every evening after finishing work. The symptoms usually start around 6 PM, causing head pain and fatigue. I am not taking any medications and need a clinical evaluation plan.",
+            checkout: "We have a critical user experience issue in our e-commerce product. Customers are repeatedly abandoning checkout and leaving the site as soon as the shipping fees are displayed at the final step. We need user stories and a roadmap feature to solve this.",
+            latency: "The checkout gateway microservice is showing extremely high latency (over 5 seconds per request) during container deployment. We need to refactor the database query logic, add Redis cache headers, and update our API specifications.",
+            rego: "The security SAST scan discovered that the authorization checks in the gateway bypass OPA policies. We must audit our Rego rules, ensure compliance with SOC 2 Common Criteria, and record this risk in our registry."
+        };
+
+        function loadDtasePreset(type) {
+            const txt = presets[type] || "";
+            document.getElementById("dtase-raw-input").value = txt;
+        }
+
+        function clearDtase() {
+            document.getElementById("dtase-raw-input").value = "";
+            document.getElementById("dtase-domains-container").innerHTML = `<p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">No analysis run yet. Enter text and analyze.</p>`;
+            document.getElementById("dtase-ora-container").innerHTML = `<p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">Discoveries board will populate after analysis.</p>`;
+            document.getElementById("dtase-synthesis-body").innerHTML = `<p style="color:var(--text-secondary); font-style:italic;">Synthesized outputs for multiple professional personas will be displayed here.</p>`;
+            document.getElementById("dtase-traceability-lbl").textContent = "Traceability ID: None";
+            window.currentDtasePersonas = null;
+        }
+
+        window.currentDtasePersonas = null;
+        async function runDtaseAnalysis() {
+            const rawText = document.getElementById("dtase-raw-input").value.trim();
+            if (!rawText) {
+                alert("Please enter some unstructured text or load a preset first.");
+                return;
+            }
+            
+            const btn = document.getElementById("dtase-btn-analyze");
+            const originalText = btn.textContent;
+            btn.textContent = "Analyzing...";
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch("/api/dtase/analyze", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ text: rawText })
+                });
+                
+                if (!res.ok) {
+                    throw new Error("DTASE API error: " + res.statusText);
+                }
+                
+                const data = await res.json();
+                renderDtaseResults(data);
+                
+            } catch (err) {
+                console.error("DTASE analysis failed:", err);
+                alert("Analysis failed: " + err.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function renderDtaseResults(data) {
+            document.getElementById("dtase-traceability-lbl").textContent = "Traceability ID: " + data.evidence_traceability.traceability_id + " (Confidence: " + Math.round(data.evidence_traceability.confidence_overall * 100) + "%)";
+            
+            const domainsContainer = document.getElementById("dtase-domains-container");
+            domainsContainer.innerHTML = "";
+            
+            data.domains.forEach(d => {
+                const domDiv = document.createElement("div");
+                domDiv.style.background = "rgba(255,255,255,0.02)";
+                domDiv.style.border = "1px solid rgba(255,255,255,0.04)";
+                domDiv.style.padding = "10px";
+                domDiv.style.borderRadius = "8px";
+                
+                const pct = Math.round(d.confidence * 100);
+                let colorClass = "green";
+                if (pct < 40) colorClass = "gray";
+                else if (pct < 70) colorClass = "yellow";
+                
+                domDiv.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.85rem;">
+                        <strong>${d.domain.toUpperCase()}</strong>
+                        <span class="status-pill ${colorClass}" style="padding: 2px 6px; font-size: 0.72rem;">${pct}% CONFIDENCE</span>
+                    </div>
+                    <div style="width:100%; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
+                        <div style="width:${pct}%; height:100%; background: ${d.confidence >= 0.7 ? 'var(--green)' : d.confidence >= 0.4 ? 'var(--yellow)' : 'var(--gray)'}; border-radius:3px;"></div>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">
+                        Evidence markers: <code>${d.evidence.join(", ")}</code>
+                    </div>
+                `;
+                domainsContainer.appendChild(domDiv);
+            });
+            
+            const oraContainer = document.getElementById("dtase-ora-container");
+            oraContainer.innerHTML = "";
+            
+            let itemsCount = 0;
+            
+            data.opportunities.forEach(item => {
+                itemsCount++;
+                const card = document.createElement("div");
+                card.style.borderLeft = "4px solid var(--green)";
+                card.style.background = "rgba(16,185,129,0.03)";
+                card.style.padding = "10px 12px";
+                card.style.borderRadius = "0 8px 8px 0";
+                card.style.fontSize = "0.82rem";
+                card.style.border = "1px solid rgba(16,185,129,0.08)";
+                card.style.borderLeftWidth = "4px";
+                
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:var(--green); font-weight:600; font-size:0.75rem; letter-spacing:0.5px; text-transform:uppercase;">Opportunity: ${item.type}</span>
+                        <span style="color:var(--text-secondary); font-size:0.7rem;">Conf: ${Math.round(item.confidence * 100)}%</span>
+                    </div>
+                    <div style="margin-bottom:6px; color:#e5e7eb;">${item.description}</div>
+                    <div style="font-style:italic; font-size:0.75rem; color:var(--text-secondary); background:rgba(0,0,0,0.15); padding:6px; border-radius:4px; border-left: 2px solid var(--green);">
+                        "${item.evidence}"
+                    </div>
+                `;
+                oraContainer.appendChild(card);
+            });
+            
+            data.risks.forEach(item => {
+                itemsCount++;
+                const card = document.createElement("div");
+                card.style.borderLeft = "4px solid var(--red)";
+                card.style.background = "rgba(239,68,68,0.03)";
+                card.style.padding = "10px 12px";
+                card.style.borderRadius = "0 8px 8px 0";
+                card.style.fontSize = "0.82rem";
+                card.style.border = "1px solid rgba(239,68,68,0.08)";
+                card.style.borderLeftWidth = "4px";
+                
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:var(--red); font-weight:600; font-size:0.75rem; letter-spacing:0.5px; text-transform:uppercase;">Risk: ${item.type}</span>
+                        <span style="color:var(--text-secondary); font-size:0.7rem;">Conf: ${Math.round(item.confidence * 100)}%</span>
+                    </div>
+                    <div style="margin-bottom:6px; color:#e5e7eb;">${item.description}</div>
+                    <div style="font-style:italic; font-size:0.75rem; color:var(--text-secondary); background:rgba(0,0,0,0.15); padding:6px; border-radius:4px; border-left: 2px solid var(--red);">
+                        "${item.evidence}"
+                    </div>
+                `;
+                oraContainer.appendChild(card);
+            });
+            
+            data.anomalies.forEach(item => {
+                itemsCount++;
+                const card = document.createElement("div");
+                card.style.borderLeft = "4px solid var(--yellow)";
+                card.style.background = "rgba(245,158,11,0.03)";
+                card.style.padding = "10px 12px";
+                card.style.borderRadius = "0 8px 8px 0";
+                card.style.fontSize = "0.82rem";
+                card.style.border = "1px solid rgba(245,158,11,0.08)";
+                card.style.borderLeftWidth = "4px";
+                
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="color:var(--yellow); font-weight:600; font-size:0.75rem; letter-spacing:0.5px; text-transform:uppercase;">Anomaly: ${item.type}</span>
+                        <span style="color:var(--text-secondary); font-size:0.7rem;">Conf: ${Math.round(item.confidence * 100)}%</span>
+                    </div>
+                    <div style="margin-bottom:6px; color:#e5e7eb;">${item.description}</div>
+                    <div style="font-style:italic; font-size:0.75rem; color:var(--text-secondary); background:rgba(0,0,0,0.15); padding:6px; border-radius:4px; border-left: 2px solid var(--yellow);">
+                        "${item.evidence}"
+                    </div>
+                `;
+                oraContainer.appendChild(card);
+            });
+            
+            if (itemsCount === 0) {
+                oraContainer.innerHTML = `<p style="color:var(--text-secondary); font-style:italic; font-size:0.82rem;">No clear opportunities, risks, or anomalies discovered in this text.</p>`;
+            }
+            
+            window.currentDtasePersonas = data.personas;
+            
+            const activeTab = document.querySelector("#dtase-persona-tabs .tab-btn.active");
+            if (activeTab) {
+                switchPersonaTab(activeTab.textContent.trim());
+            } else {
+                switchPersonaTab("Executive Summary");
+            }
+        }
+
+        function switchPersonaTab(personaName) {
+            const tabs = document.querySelectorAll("#dtase-persona-tabs .tab-btn");
+            tabs.forEach(tab => {
+                if (tab.textContent.trim() === personaName) {
+                    tab.classList.add("active");
+                    tab.setAttribute("aria-selected", "true");
+                } else {
+                    tab.classList.remove("active");
+                    tab.setAttribute("aria-selected", "false");
+                }
+            });
+            
+            const body = document.getElementById("dtase-synthesis-body");
+            if (!window.currentDtasePersonas) {
+                body.innerHTML = `<p style="color:var(--text-secondary); font-style:italic;">Synthesized outputs for multiple professional personas will be displayed here.</p>`;
+                return;
+            }
+            
+            const content = window.currentDtasePersonas[personaName] || `### ${personaName}\nNo translation content synthesized.`;
+            body.innerHTML = renderMarkdown(content);
+        }
+
+        function switchTab(evt, tabId) {
+            for (const content of document.getElementsByClassName("tab-content")) {
+                content.classList.remove("active");
+            }
+            for (const btn of document.getElementsByClassName("tab-btn")) {
+                btn.classList.remove("active");
+                if (btn.hasAttribute("aria-selected")) {
+                    btn.setAttribute("aria-selected", "false");
+                }
+            }
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+            if (evt.currentTarget.hasAttribute("aria-selected")) {
+                evt.currentTarget.setAttribute("aria-selected", "true");
+            }
+        }
+
+        function switchGovSubTab(evt, subTabId) {
+            const contents = document.getElementsByClassName("gov-subtab-content");
+            for (const content of contents) {
+                content.style.display = "none";
+            }
+            const buttons = document.getElementById("gov-subtabs").getElementsByTagName("button");
+            for (const btn of buttons) {
+                btn.classList.remove("active");
+            }
+            document.getElementById(subTabId).style.display = "block";
+            evt.currentTarget.classList.add("active");
+        }
+
+        async function fetchGovernanceStatus() {
+            try {
+                const res = await fetch("/api/governance/status");
+                if (!res.ok) throw new Error("Failed to fetch governance status");
+                const data = await res.json();
+                updateGovernanceUI(data);
+            } catch (err) {
+                console.error("Governance fetch error:", err);
+            }
+        }
+
+        async function runGovernanceAudit() {
+            const btn = document.getElementById("btn-run-governance");
+            const originalText = btn.textContent;
+            btn.textContent = "Auditing Codebase...";
+            btn.disabled = true;
+            try {
+                const res = await fetch("/api/governance/run", { method: "POST" });
+                if (!res.ok) throw new Error("Failed to execute governance run");
+                const data = await res.json();
+                updateGovernanceUI(data);
+                showCustomToast("Governance audit completed successfully.");
+            } catch (err) {
+                console.error("Governance run error:", err);
+                alert("Error triggering audit: " + err.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function updateGovernanceUI(data) {
+            if (!data || !data.metrics) return;
+
+            // Update timestamp
+            document.getElementById("gov-last-updated").textContent = "Last scanned: " + (data.timestamp || new Date().toLocaleString());
+
+            // Update scores
+            const conf = data.metrics.platform_confidence_score || 0;
+            const risk = data.metrics.future_risk_score || 0;
+            const read = data.metrics.operational_readiness_score || 0;
+
+            document.getElementById("gov-confidence-score").textContent = conf;
+            document.getElementById("gov-risk-score").textContent = risk;
+            document.getElementById("gov-readiness-score").textContent = read;
+
+            const fillRing = (ringId, score, maxVal = 100) => {
+                const ring = document.getElementById(ringId);
+                if (ring) {
+                    const r = ring.r.baseVal.value || 70;
+                    const circumference = r * 2 * Math.PI;
+                    ring.style.strokeDasharray = `${circumference} ${circumference}`;
+                    ring.style.strokeDashoffset = circumference - (Math.min(maxVal, Math.max(0, score)) / maxVal) * circumference;
+                }
+            };
+
+            fillRing("gov-confidence-ring", conf);
+            fillRing("gov-risk-ring", risk);
+            fillRing("gov-readiness-ring", read);
+
+            // Set ring colors & glows dynamically
+            const confRing = document.getElementById("gov-confidence-ring");
+            if (confRing) {
+                if (conf >= 70) {
+                    confRing.style.stroke = "var(--green)";
+                    confRing.style.filter = "drop-shadow(0 0 6px rgba(16, 185, 129, 0.4))";
+                    document.getElementById("gov-confidence-score").style.color = "var(--green)";
+                } else if (conf >= 40) {
+                    confRing.style.stroke = "var(--yellow)";
+                    confRing.style.filter = "drop-shadow(0 0 6px rgba(245, 158, 11, 0.4))";
+                    document.getElementById("gov-confidence-score").style.color = "var(--yellow)";
+                } else {
+                    confRing.style.stroke = "var(--red)";
+                    confRing.style.filter = "drop-shadow(0 0 6px rgba(239, 68, 68, 0.4))";
+                    document.getElementById("gov-confidence-score").style.color = "var(--red)";
+                }
+            }
+
+            const riskRing = document.getElementById("gov-risk-ring");
+            if (riskRing) {
+                // For risk, lower is better
+                if (risk < 35) {
+                    riskRing.style.stroke = "var(--green)";
+                    riskRing.style.filter = "drop-shadow(0 0 6px rgba(16, 185, 129, 0.4))";
+                    document.getElementById("gov-risk-score").style.color = "var(--green)";
+                } else if (risk < 65) {
+                    riskRing.style.stroke = "var(--yellow)";
+                    riskRing.style.filter = "drop-shadow(0 0 6px rgba(245, 158, 11, 0.4))";
+                    document.getElementById("gov-risk-score").style.color = "var(--yellow)";
+                } else {
+                    riskRing.style.stroke = "var(--red)";
+                    riskRing.style.filter = "drop-shadow(0 0 6px rgba(239, 68, 68, 0.4))";
+                    document.getElementById("gov-risk-score").style.color = "var(--red)";
+                }
+            }
+
+            const readRing = document.getElementById("gov-readiness-ring");
+            if (readRing) {
+                if (read >= 75) {
+                    readRing.style.stroke = "#818cf8";
+                    readRing.style.filter = "drop-shadow(0 0 6px rgba(129, 140, 248, 0.4))";
+                    document.getElementById("gov-readiness-score").style.color = "#a5b4fc";
+                } else if (read >= 50) {
+                    readRing.style.stroke = "var(--yellow)";
+                    readRing.style.filter = "drop-shadow(0 0 6px rgba(245, 158, 11, 0.4))";
+                    document.getElementById("gov-readiness-score").style.color = "var(--yellow)";
+                } else {
+                    readRing.style.stroke = "var(--red)";
+                    readRing.style.filter = "drop-shadow(0 0 6px rgba(239, 68, 68, 0.4))";
+                    document.getElementById("gov-readiness-score").style.color = "var(--red)";
+                }
+            }
+
+            // Update stability trend badge
+            const trend = data.metrics.predicted_stability_trend || "Stable";
+            const trendEl = document.getElementById("gov-stability-trend");
+            if (trendEl) {
+                trendEl.textContent = trend;
+                if (trend === "Stable") {
+                    trendEl.className = "status-pill green";
+                } else if (trend === "Improving") {
+                    trendEl.className = "status-pill blue";
+                } else {
+                    trendEl.className = "status-pill red";
+                }
+            }
+
+            // Stats
+            document.getElementById("gov-stat-files").textContent = data.metrics.total_python_files || 0;
+            document.getElementById("gov-stat-loc").textContent = (data.metrics.total_lines_of_code || 0).toLocaleString();
+            document.getElementById("gov-stat-todos").textContent = data.metrics.total_todos || 0;
+            document.getElementById("gov-stat-suppressions").textContent = data.metrics.total_suppressions || 0;
+
+            // Early warnings
+            const warnBody = document.getElementById("gov-warnings-tbody");
+            if (warnBody) {
+                warnBody.innerHTML = "";
+                const warnings = data.warnings || [];
+                if (warnings.length === 0) {
+                    warnBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary); font-style:italic;">No early warning risk flags active.</td></tr>`;
+                } else {
+                    warnings.forEach(w => {
+                        const row = document.createElement("tr");
+                        row.setAttribute("tabindex", "0");
+                        const sevClass = w.severity.toLowerCase().includes("risk") || w.severity.toLowerCase().includes("high") ? "red" : (w.severity.toLowerCase().includes("warning") ? "yellow" : "blue");
+                        row.innerHTML = `
+                            <td><strong style="color:#f472b6;">${w.code}</strong></td>
+                            <td>
+                                <strong>${w.title}</strong><br/>
+                                <span style="font-size:0.75rem; color:var(--text-secondary);">${w.evidence}</span>
+                            </td>
+                            <td style="color:#d1d5db;">${w.predicted_outcome}</td>
+                            <td style="white-space:nowrap;">${w.time_horizon}</td>
+                            <td><span class="status-pill ${sevClass}">${w.severity}</span></td>
+                        `;
+                        warnBody.appendChild(row);
+                    });
+                }
+            }
+
+            // Proactive Decisions matrix
+            const decBody = document.getElementById("gov-decisions-tbody");
+            if (decBody) {
+                decBody.innerHTML = "";
+                const decisions = data.decisions || [];
+                decisions.forEach(d => {
+                    const row = document.createElement("tr");
+                    row.setAttribute("tabindex", "0");
+                    row.innerHTML = `
+                        <td><strong>${d.option}</strong><br/><span style="font-size:0.72rem; color:var(--text-secondary);">${d.complexity}</span></td>
+                        <td>${d.cost}</td>
+                        <td style="color:var(--green); font-weight:600;">${d.risk_reduction}</td>
+                        <td><span class="status-pill blue" style="font-size:0.72rem; padding:2px 6px;">${d.roi}</span></td>
+                    `;
+                    decBody.appendChild(row);
+                });
+            }
+
+            // Sub-tab 1: Test Gaps
+            const testBody = document.getElementById("gov-reg-test-tbody");
+            if (testBody) {
+                testBody.innerHTML = "";
+                const tc = data.test_confidence || {};
+                if (Object.keys(tc).length === 0) {
+                    testBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-secondary); font-style:italic;">No test confidence data.</td></tr>`;
+                } else {
+                    for (const [comp, item] of Object.entries(tc)) {
+                        const score = item.confidence_score;
+                        const scoreColor = score >= 70 ? "var(--green)" : score >= 40 ? "var(--yellow)" : "var(--red)";
+                        const testsStr = item.tests && item.tests.length > 0 ? item.tests.join(", ") : "*None*";
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><strong>${comp}</strong></td>
+                            <td style="color:${scoreColor}; font-weight:600;">${score}%</td>
+                            <td style="font-size:0.75rem;">${testsStr}</td>
+                            <td style="font-size:0.78rem; color:var(--text-secondary);">${item.coverage_gap}</td>
+                        `;
+                        testBody.appendChild(row);
+                    }
+                }
+            }
+
+            // Sub-tab 2: Blast Radius
+            const blastBody = document.getElementById("gov-reg-blast-tbody");
+            if (blastBody) {
+                blastBody.innerHTML = "";
+                const br = data.blast_radius || {};
+                if (Object.keys(br).length === 0) {
+                    blastBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary); font-style:italic;">No blast radius data.</td></tr>`;
+                } else {
+                    for (const [comp, item] of Object.entries(br)) {
+                        const score = item.score;
+                        const critClass = item.criticality.toLowerCase() === "critical" ? "red" : (item.criticality.toLowerCase() === "high" ? "yellow" : "blue");
+                        const dependentsStr = item.dependents && item.dependents.length > 0 ? item.dependents.join(", ") : "*None*";
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><strong>${comp}</strong></td>
+                            <td style="font-weight:600;">${score} / 100</td>
+                            <td><span class="status-pill ${critClass}">${item.criticality}</span></td>
+                            <td style="font-size:0.75rem; color:var(--text-secondary); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${dependentsStr}">${dependentsStr}</td>
+                            <td>${item.upstream_count}</td>
+                        `;
+                        blastBody.appendChild(row);
+                    }
+                }
+            }
+
+            // Sub-tab 3: Arch Risks & Coupling
+            const archBody = document.getElementById("gov-reg-arch-tbody");
+            if (archBody) {
+                archBody.innerHTML = "";
+                const arch = data.architecture_risks || [];
+                if (arch.length === 0) {
+                    archBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-secondary); font-style:italic;">No architectural risks detected.</td></tr>`;
+                } else {
+                    arch.forEach(a => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><strong>${a.component}</strong></td>
+                            <td style="color:#fca5a5;">${a.risk}</td>
+                            <td style="font-size:0.78rem; color:var(--text-secondary);">${a.recommendation}</td>
+                        `;
+                        archBody.appendChild(row);
+                    });
+                }
+            }
+
+            // Sub-tab 4: Reliability Forecast
+            const foreBody = document.getElementById("gov-reg-forecast-tbody");
+            if (foreBody) {
+                foreBody.innerHTML = "";
+                const forecasts = data.reliability_forecast || [];
+                if (forecasts.length === 0) {
+                    foreBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary); font-style:italic;">No reliability forecasts.</td></tr>`;
+                } else {
+                    forecasts.forEach(f => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><strong>${f.time_horizon}</strong></td>
+                            <td>${f.risk_description}</td>
+                            <td>${f.probability}</td>
+                            <td style="color:#a5b4fc; font-weight:600;">${f.blast_radius}</td>
+                            <td style="font-size:0.78rem; color:var(--text-secondary);">${f.expected_impact}</td>
+                        `;
+                        foreBody.appendChild(row);
+                    });
+                }
+            }
+
+            // Sub-tab 5: Dependency risk register (mock licenses parsed)
+            const depBody = document.getElementById("gov-reg-dep-tbody");
+            if (depBody) {
+                depBody.innerHTML = "";
+                const deps = [
+                    { name: "pydantic-ai", license: "Apache-2.0", compliance: "Approved", security: "None", risk: "Beta library API change risk" },
+                    { name: "dspy-ai", license: "MIT", compliance: "Approved", security: "IndentationError resolved", risk: "Syntax break risk on PEP-649" },
+                    { name: "psycopg2-binary", license: "BSD", compliance: "Approved", security: "None", risk: "Uses port 5435 instead of default" },
+                    { name: "marker-wrapper", license: "GPLv3", compliance: "Isolated", security: "None", risk: "Isolated to port 8000 REST service" }
+                ];
+                deps.forEach(d => {
+                    const row = document.createElement("tr");
+                    const compClass = d.compliance === "Approved" ? "green" : "yellow";
+                    row.innerHTML = `
+                        <td><strong>${d.name}</strong></td>
+                        <td>${d.license}</td>
+                        <td><span class="status-pill ${compClass}">${d.compliance}</span></td>
+                        <td style="color:#d1d5db;">${d.security}</td>
+                        <td style="font-size:0.78rem; color:var(--text-secondary);">${d.risk}</td>
+                    `;
+                    depBody.appendChild(row);
+                });
+            }
+        }
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch("/api/status");
+                if (!res.ok) throw new Error("API error");
+                const data = await res.json();
+                updateUI(data);
+                
+                try {
+                    const traceRes = await fetch("/api/traceability");
+                    if (traceRes.ok) {
+                        const traceData = await traceRes.json();
+                        updateRequirementsAndBlockers(traceData);
+                    }
+                } catch (traceErr) {
+                    console.error("Traceability fetch failed: ", traceErr);
+                }
+                
+                try {
+                    await fetchBudgetStatus();
+                } catch (budgetErr) {
+                    console.error("Budget fetch failed: ", budgetErr);
+                }
+                
+                try {
+                    const pmcmsRes = await fetch("/api/pmcms");
+                    if (pmcmsRes.ok) {
+                        const pmcmsData = await pmcmsRes.json();
+                        updatePmcms(pmcmsData);
+                    }
+                } catch (pmcmsErr) {
+                    console.error("PMCMS fetch failed: ", pmcmsErr);
+                }
+                
+                const indicator = document.getElementById("live-indicator");
+                indicator.style.opacity = "0.5";
+                setTimeout(() => { indicator.style.opacity = "1"; }, 200);
+            } catch (err) {
+                console.error("Dashboard fetch failed: ", err);
+                const indicator = document.getElementById("live-indicator");
+                indicator.style.color = "var(--red)";
+                indicator.style.backgroundColor = "var(--red-glow)";
+                indicator.querySelector("span").textContent = "DISCONNECTED FROM DAEMON";
+            }
+        }
+
+        function forceRefresh() {
+            fetchStatus();
+        }
+
+        function updateUI(data) {
+            const strict = data.health_summary.strict_percentage;
+            document.getElementById("strict-health").textContent = strict + "%";
+            
+            const circle = document.getElementById("health-ring");
+            const circumference = circle.r.baseVal.value * 2 * Math.PI;
+            circle.style.strokeDashoffset = circumference - (strict / 100) * circumference;
+            
+            if (strict < 30) {
+                circle.style.stroke = "var(--red)";
+                circle.style.filter = "drop-shadow(0 0 8px rgba(239, 68, 68, 0.4))";
+            } else if (strict < 70) {
+                circle.style.stroke = "var(--yellow)";
+                circle.style.filter = "drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))";
+            } else {
+                circle.style.stroke = "var(--green)";
+                circle.style.filter = "drop-shadow(0 0 8px rgba(16, 185, 129, 0.4))";
+            }
+
+            document.getElementById("metric-green").textContent = data.health_summary.green;
+            document.getElementById("metric-yellow").textContent = data.health_summary.yellow;
+            document.getElementById("metric-red").textContent = data.health_summary.red;
+            document.getElementById("metric-gray").textContent = data.health_summary.gray;
+
+            updateDaemonLine("docker-daemon-status", data.docker_running ? "GREEN" : "RED", data.docker_running ? "ACTIVE" : "OFFLINE");
+            updateDaemonLine("litellm-daemon-status", data.domains.Infrastructure["Outbound Model Gateway"], data.domains.Infrastructure["Outbound Model Gateway"] === "GREEN" ? "ROUTING" : "OFFLINE");
+            updateDaemonLine("ollama-daemon-status", data.alternate_daemons["Ollama Local LLM"], data.alternate_daemons["Ollama Local LLM"] === "GREEN" ? "RUNNING" : "OFFLINE");
+            updateDaemonLine("clickhouse-daemon-status", data.alternate_daemons["Langfuse ClickHouse"], data.alternate_daemons["Langfuse ClickHouse"] === "GREEN" ? "RUNNING" : "OFFLINE");
+            updateDaemonLine("minio-daemon-status", data.alternate_daemons["Langfuse MinIO"], data.alternate_daemons["Langfuse MinIO"] === "GREEN" ? "RUNNING" : "OFFLINE");
+            updateDaemonLine("venv-daemon-status", data.domains.Infrastructure["Local Dev Environment"], data.domains.Infrastructure["Local Dev Environment"] === "GREEN" ? "CONFIGURED" : "MISSING");
+
+            updateContainerLine("cnt-postgres", data.domains.Infrastructure["Postgres DB"]);
+            updateContainerLine("cnt-qdrant", data.domains.Infrastructure["Qdrant Vector DB"]);
+            updateContainerLine("cnt-marquez", data.domains.Infrastructure["Marquez Lineage"]);
+            updateContainerLine("cnt-superset", data.domains.Infrastructure["Apache Superset"]);
+            updateContainerLine("cnt-dtrack-api", data.domains.Infrastructure["Dependency-Track API"]);
+            updateContainerLine("cnt-dtrack-ui", data.domains.Infrastructure["Dependency-Track UI"]);
+
+            const grid = document.getElementById("traffic-grid");
+            grid.innerHTML = "";
+            for (const [domain, list] of Object.entries(data.domains)) {
+                const statuses = Object.values(list);
+                let domColor = statuses.includes("RED") ? "red" : statuses.includes("YELLOW") ? "yellow" : statuses.includes("GREEN") ? (statuses.includes("GRAY") ? "yellow" : "green") : "gray";
+                const box = document.createElement("div");
+                box.className = "traffic-box glass";
+                box.innerHTML = `<div class="status-indicator ${domColor}"></div><span class="traffic-domain-lbl">${domain}</span>`;
+                grid.appendChild(box);
+            }
+
+            renderServices(data.domains.Services);
+            renderAgents(data.domains.Agents);
+            renderMCPs(data.domains.MCPs);
+            renderSkills(data.domains.Skills);
+            renderIntegrations(data.domains.Integrations);
+            renderSecGov(data.domains.Security, data.domains.Governance);
+
+            document.getElementById("incidents-box").style.display = (data.domains.Integrations["INT-C-04: GPLv3 Marker Wrapper"] === "GREEN") ? "none" : "block";
+        }
+
+        function updateDaemonLine(elemId, status, text) {
+            const el = document.getElementById(elemId);
+            el.className = "status-pill " + status.toLowerCase();
+            el.textContent = text;
+        }
+
+        function updateContainerLine(elemId, status) {
+            const el = document.getElementById(elemId);
+            el.className = "status-pill " + status.toLowerCase();
+            el.textContent = (status === "GREEN") ? "ONLINE" : (status === "YELLOW") ? "DEGRADED" : "OFFLINE";
+        }
+
+        function renderServices(services) {
+            const tbody = document.getElementById("services-tbody");
+            tbody.innerHTML = "";
+            const serviceData = {
+                "Objective Engine": { severity: "Medium", deps: "Pydantic AI, Instructor", issue: "Under active development" },
+                "Discovery Engine": { severity: "Medium", deps: "Haystack, FastEmbed", issue: "RAG index creation pending" },
+                "Planning Engine": { severity: "Medium", deps: "Outlines, DSPy", issue: "Token schemas pending" },
+                "Governance Engine": { severity: "Critical", deps: "OpenLineage, Marquez", issue: "Interceptors not active" },
+                "Knowledge Engine": { severity: "High", deps: "Graphiti, Mem0, Qdrant", issue: "Neo4j connection offline" },
+                "Value Engine": { severity: "High", deps: "dbt-core, ClickHouse", issue: "Clickhouse config pending" },
+                "Simulation Engine": { severity: "Low", deps: "Mesa, NetworkX", issue: "Simulation loop pending" },
+                "DTASE": { severity: "High", deps: "LlamaIndex, FastEmbed", issue: "Persona definitions pending" }
+            };
+
+            for (const [name, status] of Object.entries(services)) {
+                const info = serviceData[name] || { severity: "Low", deps: "None", issue: "Unknown" };
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Service: ${name}, Status: ${status}, Severity: ${info.severity}, Dependencies: ${info.deps}, Current Issue: ${info.issue}`);
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${info.severity}</td><td>${info.deps}</td><td>${info.issue}</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function renderAgents(agents) {
+            const tbody = document.getElementById("agents-tbody");
+            tbody.innerHTML = "";
+            const agentData = {
+                "Planner Agent": "Plan Generators",
+                "Orchestrator Agent": "State Managers",
+                "Executor Agent": "Filesystem, GitLab MCP",
+                "Reviewer Agent": "Semgrep MCP, SonarQube",
+                "Governor Agent": "OPA Evaluator, OpenFGA",
+                "Learner Agent": "DSPy Optimizer",
+                "Knowledge Manager Agent": "Neo4j MCP, Graphiti",
+                "Portfolio Governor Agent": "Value Forecasters",
+                "Value Analyst Agent": "dbt-core query tool",
+                "Resource Manager Agent": "Capacity Models",
+                "Simulation Agent": "Mesa, NetworkX",
+                "Challenger Agent": "Red-teaming prompts"
+            };
+
+            for (const [name, status] of Object.entries(agents)) {
+                const dep = agentData[name] || "None";
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Agent: ${name}, Status: ${status}, Dependencies: ${dep}, Operational Risk: Pending`);
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${dep}</td><td>Pending</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function renderMCPs(mcps) {
+            const tbody = document.getElementById("mcps-tbody");
+            tbody.innerHTML = "";
+            const mcpData = {
+                "GitLab MCP": "Git repository operations",
+                "Bitbucket MCP": "Alternative Git operations",
+                "SonarQube MCP": "Quality gate metrics",
+                "Jenkins MCP": "CI/CD execution",
+                "Confluence MCP": "Knowledge retrieval",
+                "Notion MCP": "Project notes access",
+                "Docusaurus MCP": "Docs management",
+                "Mermaid MCP": "Architecture visualization",
+                "PlantUML MCP": "UML drawing tools",
+                "AWS MCP": "Cloud resources control",
+                "Azure MCP": "Azure resources control",
+                "Terraform MCP": "Infrastructure deployments",
+                "Redis MCP": "Cache interactions",
+                "Kafka MCP": "Event stream monitoring",
+                "ClickHouse MCP": "OLAP analytics querying",
+                "OpenSearch MCP": "Elasticsearch indices access",
+                "Neo4j MCP": "Graph DB traversal",
+                "Slack MCP": "Slack channel notifications",
+                "Teams MCP": "Teams channel alerts",
+                "Discord MCP": "Discord bot triggers"
+            };
+
+            for (const [name, status] of Object.entries(mcps)) {
+                const desc = mcpData[name] || "Ecosystem connector";
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `MCP Server: ${name}, Status: ${status}, Description: ${desc}`);
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${desc}</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function renderSkills(skills) {
+            const tbody = document.getElementById("skills-tbody");
+            tbody.innerHTML = "";
+            const skillData = {
+                "SKL-AI-01: Prompt Tuning": "System prompts customization",
+                "SKL-AI-02: Structural Parsing": "Regex and JSON constraints checks",
+                "SKL-RAG-01: Dense Retrieval": "Semantic vector search queries",
+                "SKL-RAG-02: Graph Traversal": "Entity relation maps traversal",
+                "SKL-DOC-01: C4 Architecture": "C4 diagrams builder",
+                "SKL-SEC-01: Vulnerability Audit": "Dependency security auditing",
+                "SKL-DAT-01: Analytical Transform": "dbt core transformations compiling",
+                "SKL-SIM-01: Monte Carlo Run": "Run simulations",
+                "SKL-GOV-01: Lineage Audit": "Dataset lineage tracking"
+            };
+
+            for (const [name, status] of Object.entries(skills)) {
+                const desc = skillData[name] || "Agent skill capability";
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Skill: ${name}, Status: ${status}, Description: ${desc}`);
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${status.toLowerCase()}">${status}</span></td><td>${desc}</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function renderIntegrations(integrations) {
+            const tbody = document.getElementById("integrations-tbody");
+            tbody.innerHTML = "";
+            const integrationData = {
+                "INT-A-01: Qdrant Vector Integration": "Qdrant DB",
+                "INT-A-02: Pydantic AI Core Integration": "Pydantic AI",
+                "INT-A-03: Graphiti Temporal Memory": "Graphiti library",
+                "INT-A-04: LlamaIndex & Haystack Pipeline": "LlamaIndex",
+                "INT-A-05: Apache Superset BI": "Apache Superset",
+                "INT-A-06: Security Scanning Suite": "Semgrep, Dependency-Track",
+                "INT-B-01: GitLab/Bitbucket MCP": "GitLab API",
+                "INT-B-02: Figma & Style Dictionary Sync": "Style Dictionary",
+                "INT-B-03: Slack & Teams MCP": "Webhooks",
+                "INT-B-04: AWS/Azure cloud discovery": "Cloud SDKs",
+                "INT-C-01: OpenMetadata Integration": "Docker container",
+                "INT-C-02: Airbyte / Meltano Pipeline Setup": "Meltano",
+                "INT-C-03: Mesa Simulation Models": "Mesa package",
+                "INT-C-04: GPLv3 Marker Wrapper": "Docker, Marker"
+            };
+
+            for (const [name, val] of Object.entries(integrations)) {
+                const dep = integrationData[name] || "None";
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                const issueText = (val === "RED") ? "Critical failure" : (val === "YELLOW") ? "Configuration degraded" : "Implementation pending";
+                row.setAttribute("aria-label", `Integration: ${name}, Status: ${val}, Dependency: ${dep}, Issue: ${issueText}`);
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${val.toLowerCase()}">${val}</span></td><td>${dep}</td><td>${issueText}</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        function updateRequirementsAndBlockers(traceData) {
+            const matrix = traceData.matrix;
+            let built = 0;
+            let backlog = 0;
+            let blocked = 0;
+            const blockerReasons = new Set();
+
+            for (const req of Object.values(matrix)) {
+                const status = req.status;
+                if (status === "OPERATIONAL" || status === "DEPLOYED" || status === "TESTED" || status === "IMPLEMENTED") {
+                    built++;
+                } else if (status === "BLOCKED") {
+                    blocked++;
+                    if (req.reason_blocked) {
+                        blockerReasons.add(req.reason_blocked);
+                    }
+                } else {
+                    backlog++;
+                }
+            }
+
+            document.getElementById("reqs-built").textContent = built;
+            document.getElementById("reqs-backlog").textContent = backlog;
+            document.getElementById("reqs-blocked").textContent = blocked;
+
+            const container = document.getElementById("blockers-list-container");
+            container.innerHTML = "";
+
+            if (blockerReasons.size === 0) {
+                container.innerHTML = `<p style="font-size:0.75rem; color:var(--text-secondary); font-style:italic;">No active environment blockers detected.</p>`;
+            } else {
+                const ul = document.createElement("ul");
+                ul.style.paddingLeft = "14px";
+                ul.style.fontSize = "0.75rem";
+                ul.style.lineHeight = "1.4";
+                ul.style.color = "#fca5a5";
+                
+                for (const reason of blockerReasons) {
+                    const li = document.createElement("li");
+                    li.style.marginBottom = "6px";
+                    li.textContent = reason;
+                    ul.appendChild(li);
+                }
+                container.appendChild(ul);
+            }
+        }
+
+        function updatePmcms(data) {
+            if (!data || !data.dimensions) return;
+            lastPmcmsData = data;
+            
+            // 1. Update overall gauge
+            const score = data.overall_score;
+            document.getElementById("pmcms-overall-score").textContent = score.toFixed(2);
+            document.getElementById("pmcms-maturity-level-desc").textContent = data.maturity_level;
+            
+            const circle = document.getElementById("pmcms-ring-fill");
+            if (circle) {
+                const circumference = circle.r.baseVal.value * 2 * Math.PI;
+                circle.style.strokeDasharray = `${circumference} ${circumference}`;
+                circle.style.strokeDashoffset = circumference - (score / 5.0) * circumference;
+                
+                // Change color of the ring fill based on overall score
+                if (score >= 4.0) {
+                    circle.style.stroke = "#10b981";
+                    circle.style.filter = "drop-shadow(0 0 8px rgba(16, 185, 129, 0.4))";
+                    document.getElementById("pmcms-overall-score").style.color = "#34d399";
+                } else if (score >= 3.0) {
+                    circle.style.stroke = "#fbbf24";
+                    circle.style.filter = "drop-shadow(0 0 8px rgba(251, 191, 36, 0.4))";
+                    document.getElementById("pmcms-overall-score").style.color = "#fcd34d";
+                } else {
+                    circle.style.stroke = "#ef4444";
+                    circle.style.filter = "drop-shadow(0 0 8px rgba(239, 68, 68, 0.4))";
+                    document.getElementById("pmcms-overall-score").style.color = "#f87171";
+                }
+            }
+            
+            // 2. Render matrix grid
+            const grid = document.getElementById("pmcms-matrix-grid");
+            if (grid) {
+                grid.innerHTML = "";
+                
+                Object.keys(data.dimensions).forEach(key => {
+                    const dim = data.dimensions[key];
+                    const dimScore = dim.score;
+                    
+                    let statusClass = "green";
+                    let cardBg = "rgba(16, 185, 129, 0.04)";
+                    let cardBorder = "rgba(16, 185, 129, 0.25)";
+                    
+                    if (dimScore >= 4.0) {
+                        statusClass = "green";
+                        cardBg = "rgba(16, 185, 129, 0.04)";
+                        cardBorder = "rgba(16, 185, 129, 0.25)";
+                    } else if (dimScore >= 3.0) {
+                        statusClass = "yellow";
+                        cardBg = "rgba(245, 158, 11, 0.04)";
+                        cardBorder = "rgba(245, 158, 11, 0.25)";
+                    } else {
+                        statusClass = "red";
+                        cardBg = "rgba(239, 68, 68, 0.04)";
+                        cardBorder = "rgba(239, 68, 68, 0.25)";
+                    }
+                    
+                    const isSelected = key === selectedPmcmsDimension;
+                    if (isSelected) {
+                        cardBg = dimScore >= 4.0 ? "rgba(16, 185, 129, 0.15)" : (dimScore >= 3.0 ? "rgba(245, 158, 11, 0.15)" : "rgba(239, 68, 68, 0.15)");
+                        cardBorder = dimScore >= 4.0 ? "rgba(16, 185, 129, 0.6)" : (dimScore >= 3.0 ? "rgba(245, 158, 11, 0.6)" : "rgba(239, 68, 68, 0.6)");
+                    }
+                    
+                    const card = document.createElement("div");
+                    card.className = "glass";
+                    card.style.padding = "1.2rem";
+                    card.style.background = cardBg;
+                    card.style.border = `1px solid ${cardBorder}`;
+                    card.style.borderRadius = "10px";
+                    card.style.cursor = "pointer";
+                    card.style.transition = "all 0.2s ease";
+                    if (isSelected) {
+                        card.style.transform = "scale(1.02)";
+                        card.style.boxShadow = "0 8px 24px rgba(0,0,0,0.2)";
+                    }
+                    
+                    card.onclick = () => {
+                        selectedPmcmsDimension = key;
+                        updatePmcms(data);
+                    };
+                    
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <span style="font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700; color: white;">${key}</span>
+                            <span class="status-pill ${statusClass}" style="font-size: 0.68rem; padding: 2px 6px;">${dim.level}</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 4px;">
+                            <span style="font-size: 1.25rem; font-weight: 700; color: ${statusClass === 'green' ? '#34d399' : (statusClass === 'yellow' ? '#fcd34d' : '#f87171')}">${dimScore.toFixed(2)}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">/ 5.0</span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+            
+            // 3. Update inspector details
+            updateInspector(selectedPmcmsDimension, data.dimensions[selectedPmcmsDimension]);
+        }
+
+        function updateInspector(name, dim) {
+            if (!dim) return;
+            
+            const title = document.getElementById("pmcms-inspector-title");
+            if (title) title.textContent = name;
+            
+            const badge = document.getElementById("pmcms-inspector-badge");
+            if (badge) {
+                badge.textContent = dim.level;
+                badge.className = "status-pill " + (dim.score >= 4.0 ? "green" : (dim.score >= 3.0 ? "yellow" : "red"));
+            }
+            
+            const desc = document.getElementById("pmcms-inspector-desc");
+            if (desc) desc.textContent = dim.description;
+            
+            // Render evidence
+            const evidenceContainer = document.getElementById("pmcms-inspector-evidence");
+            if (evidenceContainer) {
+                evidenceContainer.innerHTML = "";
+                if (dim.evidence && dim.evidence.length > 0) {
+                    dim.evidence.forEach(item => {
+                        const ev = document.createElement("div");
+                        ev.style.display = "flex";
+                        ev.style.alignItems = "start";
+                        ev.style.gap = "8px";
+                        ev.style.fontSize = "0.82rem";
+                        ev.style.color = "var(--text-secondary)";
+                        ev.style.background = "rgba(255,255,255,0.02)";
+                        ev.style.border = "1px solid rgba(255,255,255,0.04)";
+                        ev.style.padding = "8px 12px";
+                        ev.style.borderRadius = "6px";
+                        ev.innerHTML = `
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" style="margin-top: 2px; flex-shrink: 0;">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>${item}</span>
+                        `;
+                        evidenceContainer.appendChild(ev);
+                    });
+                } else {
+                    evidenceContainer.innerHTML = `<span style="font-size: 0.82rem; color: var(--text-secondary); font-style: italic;">No evidence recorded.</span>`;
+                }
+            }
+            
+            // Render gaps
+            const gapsContainer = document.getElementById("pmcms-inspector-gaps");
+            if (gapsContainer) {
+                gapsContainer.innerHTML = "";
+                if (dim.gaps && dim.gaps.length > 0) {
+                    dim.gaps.forEach(item => {
+                        const gap = document.createElement("li");
+                        gap.textContent = item;
+                        gapsContainer.appendChild(gap);
+                    });
+                } else {
+                    gapsContainer.innerHTML = `<span style="font-size: 0.82rem; color: var(--text-secondary); font-style: italic;">No gaps identified.</span>`;
+                }
+            }
+            
+            // Render recommendations
+            const recsContainer = document.getElementById("pmcms-inspector-recs");
+            if (recsContainer) {
+                recsContainer.innerHTML = "";
+                if (dim.recommendations && dim.recommendations.length > 0) {
+                    dim.recommendations.forEach(item => {
+                        const rec = document.createElement("div");
+                        rec.style.display = "flex";
+                        rec.style.alignItems = "start";
+                        rec.style.gap = "8px";
+                        rec.style.fontSize = "0.82rem";
+                        rec.style.color = "white";
+                        rec.style.background = "rgba(147, 197, 253, 0.05)";
+                        rec.style.border = "1px solid rgba(147, 197, 253, 0.2)";
+                        rec.style.padding = "8px 12px";
+                        rec.style.borderRadius = "6px";
+                        rec.innerHTML = `
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2.5" style="margin-top: 2px; flex-shrink: 0;">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                            <span>${item}</span>
+                        `;
+                        recsContainer.appendChild(rec);
+                    });
+                } else {
+                    recsContainer.innerHTML = `<span style="font-size: 0.82rem; color: var(--text-secondary); font-style: italic;">No investment recommendations.</span>`;
+                }
+            }
+        }
+
+        function renderSecGov(sec, gov) {
+            const tbody = document.getElementById("sec-gov-tbody");
+            tbody.innerHTML = "";
+            const meta = {
+                "Semgrep SAST": "Code analysis",
+                "Trivy Container Scanner": "Docker scans",
+                "Gitleaks Secret Detection": "Secrets management",
+                "Dependency-Track SBOM Auditor": "SBOM tracking",
+                "Falco Sandbox": "Execution sandboxing",
+                "License Governance Filters": "Policy compliance",
+                "OpenLineage Execution Ingestion": "Lineage logging",
+                "Marquez Metadata & Lineage": "Metadata management",
+                "OpenMetadata Catalog": "Data discovery",
+                "OPA/Rego Policy Engine": "Policy evaluation",
+                "OpenFGA Authorization": "Access control"
+            };
+
+            for (const [name, val] of Object.entries({...sec, ...gov})) {
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Security/Gov Control: ${name}, Status: ${val}, Scope: ${meta[name] || "System"}, Action Required: Action required`);
+                row.innerHTML = `<td><strong>${name}</strong></td><td><span class="status-pill ${val.toLowerCase()}">${val}</span></td><td>${meta[name] || "System"}</td><td>Action required</td>`;
+                tbody.appendChild(row);
+            }
+        }
+
+        const remediations = {
+            "INT-C-04: GPLv3 Marker Wrapper": { desc: "GPLv3 violation.", action: "Use Docker isolation." },
+            "Semgrep SAST": { desc: "Missing tool.", action: "Install via pip." },
+            "OPA/Rego Policy Engine": { desc: "Service offline.", action: "Start OPA container." },
+            "OpenFGA Authorization": { desc: "Service offline.", action: "Start FGA container." }
+        };
+
+        async function shareTelemetry() {
+            try {
+                const res = await fetch("/api/status");
+                const data = await res.json();
+                let prompt = `# UAWOS Health Issue Remediation Plan\n\n`;
+                for (const [domain, list] of Object.entries(data.domains)) {
+                    for (const [comp, status] of Object.entries(list)) {
+                        if (status !== "GREEN") prompt += `- [${status}] ${domain} - ${comp}: Needs attention.\n`;
+                    }
+                }
+                await navigator.clipboard.writeText(prompt);
+                const toast = document.getElementById("toast");
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 3000);
+            } catch (err) { console.error("Clipboard copy failed", err); }
+        }
+
+        async function loadDocs() {
+            try {
+                const res = await fetch("/api/docs");
+                const categories = await res.json();
+                const container = document.getElementById("docs-tree-container");
+                container.innerHTML = "";
+                for (const [catName, files] of Object.entries(categories)) {
+                    const catHeader = document.createElement("div");
+                    catHeader.className = "doc-category-hdr";
+                    catHeader.textContent = catName;
+                    container.appendChild(catHeader);
+                    files.forEach(f => {
+                        const fileItem = document.createElement("div");
+                        fileItem.className = "doc-file-item";
+                        fileItem.textContent = f.replace(".md", "");
+                        fileItem.onclick = () => loadDocContent(f, fileItem);
+                        container.appendChild(fileItem);
+                    });
+                }
+            } catch (err) { console.error("Docs load error:", err); }
+        }
+
+        async function loadDocContent(fileName, element) {
+            const items = document.getElementsByClassName("doc-file-item");
+            for (const item of items) {
+                item.classList.remove("active");
+            }
+            if (element) element.classList.add("active");
+            
+            document.getElementById("doc-view-title").textContent = "Loading specification...";
+            document.getElementById("doc-view-meta").textContent = fileName;
+            
+            try {
+                const res = await fetch("/api/docs/content?file=" + encodeURIComponent(fileName));
+                if (!res.ok) throw new Error("Document content fetch failed");
+                const text = await res.text();
+                
+                document.getElementById("doc-view-title").textContent = fileName.replace(".md", "");
+                document.getElementById("doc-view-body").innerHTML = renderMarkdown(text);
+            } catch (err) {
+                document.getElementById("doc-view-title").textContent = "Error loading document";
+                document.getElementById("doc-view-body").innerHTML = `<p style="color:var(--red);">${err.message}</p>`;
+            }
+        }
+
+        // --- Custom Markdown-to-HTML parser ---
+        function parseMarkdownBlocks(html) {
+            // Code Blocks
+            html = html.replace(/```(?:[a-zA-Z0-9-]*)\n([\s\S]*?)```/gm, '<pre style="background:rgba(0,0,0,0.35); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.06); font-family:monospace; font-size:0.82rem; overflow-x:auto; margin: 1rem 0; white-space:pre-wrap; line-height:1.4;"><code>$1</code></pre>');
+            
+            // Headers
+            html = html.replace(/^# (.*?)$/gm, '<h1 style="font-family:\'Outfit\', sans-serif; font-size:1.6rem; font-weight:700; margin:1.5rem 0 0.8rem 0; color:#818cf8;">$1</h1>');
+            html = html.replace(/^## (.*?)$/gm, '<h2 style="font-family:\'Outfit\', sans-serif; font-size:1.3rem; font-weight:600; margin:1.4rem 0 0.7rem 0; color:#a5b4fc; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:4px;">$1</h2>');
+            html = html.replace(/^### (.*?)$/gm, '<h3 style="font-family:\'Outfit\', sans-serif; font-size:1.1rem; font-weight:600; margin:1.2rem 0 0.6rem 0; color:#e0e7ff;">$1</h3>');
+            html = html.replace(/^#### (.*?)$/gm, '<h4 style="font-family:\'Outfit\', sans-serif; font-size:0.95rem; font-weight:600; margin:1rem 0 0.5rem 0; color:#e0e7ff;">$1</h4>');
+            
+            // Horizontal Rules
+            html = html.replace(/^---$/gm, '<hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin: 1.5rem 0;" />');
+            
+            // Inline Code
+            html = html.replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.08); padding:2px 5px; border-radius:4px; font-family:monospace; font-size:0.8rem; color:#f472b6;">$1</code>');
+            
+            // Bold & Italics
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color:white; font-weight:600;">$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em style="color:#d1d5db;">$1</em>');
+            
+            // Links
+            html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color:#818cf8; text-decoration:none; border-bottom: 1px dotted #818cf8;">$1</a>');
+            
+            return html;
+        }
+
+        function parseMarkdownTablesAndLists(html) {
+            const lines = html.split('\n');
+            let inTable = false;
+            let tableRows = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+                
+                // Bullet points
+                if (line.startsWith('* ') || line.startsWith('- ')) {
+                    const content = line.substring(2);
+                    lines[i] = `<li style="margin-left: 1.2rem; margin-bottom: 0.35rem; list-style-type: disc; padding-left: 4px;">${content}</li>`;
+                    continue;
+                }
+                
+                // Blockquotes
+                if (line.startsWith('&gt; ')) {
+                    const content = line.substring(5);
+                    lines[i] = `<blockquote style="border-left:3px solid #6366f1; padding: 6px 12px; background:rgba(99,102,241,0.04); border-radius: 0 8px 8px 0; font-style:italic; margin: 1rem 0; color:#d1d5db;">${content}</blockquote>`;
+                    continue;
+                }
+
+                // Table parsing
+                if (line.startsWith('|') && line.endsWith('|')) {
+                    if (!inTable) {
+                        inTable = true;
+                        tableRows = [];
+                    }
+                    if (line.match(/^\|[ -:|]*\|$/)) {
+                        lines[i] = "";
+                        continue;
+                    }
+                    const cols = line.split('|').slice(1, -1).map(c => c.trim());
+                    tableRows.push(cols);
+                    lines[i] = "";
+                } else if (inTable) {
+                    let tableHtml = '<div style="overflow-x:auto; margin: 1.5rem 0;"><table style="width:100%; border-collapse:collapse; font-size:0.85rem; border:1px solid rgba(255,255,255,0.06);">';
+                    tableRows.forEach((row, rIdx) => {
+                        tableHtml += `<tr style="${rIdx === 0 ? 'background:rgba(255,255,255,0.02);' : 'border-bottom:1px solid rgba(255,255,255,0.04);'}">`;
+                        row.forEach(col => {
+                            const tag = rIdx === 0 ? 'th' : 'td';
+                            tableHtml += `<${tag} style="padding: 10px 14px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left; font-weight:${rIdx === 0 ? '600' : 'normal'}; color:${rIdx === 0 ? '#a5b4fc' : '#e5e7eb'};">${col}</${tag}>`;
+                        });
+                        tableHtml += '</tr>';
+                    });
+                    tableHtml += '</table></div>';
+                    lines[i - 1] = tableHtml;
+                    inTable = false;
+                }
+            }
+            
+            let resultHtml = lines.filter(l => l !== "").join('\n');
+            return resultHtml.split('\n\n').map(p => {
+                if (p.trim().startsWith('<h') || p.trim().startsWith('<pre') || p.trim().startsWith('<div') || p.trim().startsWith('<li') || p.trim().startsWith('<blockquote')) {
+                    return p;
+                }
+                return `<div style="margin-bottom: 1rem;">${p}</div>`;
+            }).join('\n');
+        }
+
+        function renderMarkdown(md) {
+            if (!md) return "";
+            let html = md.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+            html = parseMarkdownBlocks(html);
+            return parseMarkdownTablesAndLists(html);
+        }
+
+        // --- Budget & Cost Functions ---
+        async function fetchBudgetStatus() {
+            try {
+                const res = await fetch("/api/budget/status");
+                if (!res.ok) throw new Error("Failed to fetch budget status");
+                const data = await res.json();
+                renderBudgetDashboard(data);
+            } catch (err) {
+                console.error("Budget fetch error:", err);
+            }
+        }
+
+        function renderBudgetDashboard(data) {
+            // 1. Overview metrics
+            const metrics = data.metrics;
+            document.getElementById("budget-total-actual").textContent = "$" + metrics.total_actual.toFixed(2);
+            document.getElementById("budget-total-limit").textContent = "$" + metrics.total_budget.toFixed(2);
+            document.getElementById("budget-run-rate").textContent = "$" + metrics.run_rate_per_day.toFixed(2) + " / day";
+            document.getElementById("budget-forecast").textContent = "$" + metrics.forecast_spend.toFixed(2);
+            
+            const pct = Math.min(100, (metrics.total_actual / metrics.total_budget) * 100);
+            document.getElementById("budget-spend-bar").style.width = pct + "%";
+            
+            // Forecast alert pill
+            const fAlert = document.getElementById("budget-forecast-alert");
+            if (metrics.is_over_budget_risk) {
+                fAlert.className = "status-pill red";
+                fAlert.textContent = "OVER BUDGET RISK";
+            } else {
+                fAlert.className = "status-pill green";
+                fAlert.textContent = "SAFE RUN RATE";
+            }
+            
+            // Variance
+            const varianceVal = document.getElementById("budget-variance-val");
+            const variancePct = document.getElementById("budget-variance-pct");
+            varianceVal.textContent = (metrics.variance >= 0 ? "+" : "") + "$" + metrics.variance.toFixed(2);
+            variancePct.textContent = (metrics.variance >= 0 ? "+" : "") + metrics.variance_pct.toFixed(1) + "%";
+            if (metrics.variance > 0) {
+                varianceVal.style.color = "var(--red)";
+                variancePct.style.color = "var(--red)";
+            } else {
+                varianceVal.style.color = "var(--green)";
+                variancePct.style.color = "var(--green)";
+            }
+
+            // 2. Objective budgets table
+            const objTbody = document.getElementById("budget-obj-tbody");
+            objTbody.innerHTML = "";
+            
+            // Populate select dropdown options for playground
+            const objSelect = document.getElementById("play-obj-select");
+            const previousVal = objSelect.value;
+            objSelect.innerHTML = "";
+
+            for (const [id, o] of Object.entries(data.objective_budgets)) {
+                const opt = document.createElement("option");
+                opt.value = id;
+                opt.textContent = `${id} - ${o.name}`;
+                objSelect.appendChild(opt);
+                
+                const variance = o.actual - o.budget;
+                const varPct = o.budget > 0 ? (variance / o.budget) * 100 : 0.0;
+                const varText = (variance >= 0 ? "+" : "") + "$" + variance.toFixed(2) + " (" + (variance >= 0 ? "+" : "") + varPct.toFixed(1) + "%)";
+                const varColor = variance > 0 ? "var(--red)" : "var(--green)";
+                
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Objective ${id}: ${o.name}, Budget: $${o.budget.toFixed(2)}, Actual Spend: $${o.actual.toFixed(2)}, Variance: ${varText}`);
+                row.innerHTML = `
+                    <td><strong>${id}</strong></td>
+                    <td style="color:#a5b4fc;">${o.name}</td>
+                    <td>$${o.budget.toFixed(2)}</td>
+                    <td>$${o.actual.toFixed(2)}</td>
+                    <td style="color:${varColor};">${varText}</td>
+                    <td>
+                        <button class="action-btn action-btn-primary" style="font-size:0.7rem; padding: 2px 6px;" onclick="runGovCheck('${id}')" aria-label="Audit Governance for ${id}">Audit Gov</button>
+                    </td>
+                `;
+                objTbody.appendChild(row);
+            }
+            if (previousVal && objSelect.querySelector(`option[value="${previousVal}"]`)) {
+                objSelect.value = previousVal;
+            }
+
+            // 3. Action budgets table
+            const actTbody = document.getElementById("budget-act-tbody");
+            actTbody.innerHTML = "";
+            for (const [id, a] of Object.entries(data.action_budgets)) {
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Action ${id}: ${a.name}, Parent Objective: ${a.objective_id}, Budget: $${a.budget.toFixed(2)}, Actual Spend: $${a.actual.toFixed(2)}`);
+                row.innerHTML = `
+                    <td><strong>${id}</strong></td>
+                    <td>${a.name}</td>
+                    <td><span class="status-pill blue" style="font-size: 0.72rem; padding: 2px 6px;">${a.objective_id}</span></td>
+                    <td>$${a.budget.toFixed(2)}</td>
+                    <td>$${a.actual.toFixed(2)}</td>
+                `;
+                actTbody.appendChild(row);
+            }
+
+            // 4. Value-to-Cost ROI Table
+            const roiTbody = document.getElementById("budget-roi-tbody");
+            roiTbody.innerHTML = "";
+            for (const [id, r] of Object.entries(data.value_to_cost)) {
+                const score = r.value_score.toFixed(1);
+                const cost = r.cost.toFixed(2);
+                const roi = r.roi_ratio.toFixed(2);
+                
+                let rating = "Low Return";
+                let rColor = "var(--gray)";
+                if (r.roi_ratio >= 4.0) {
+                    rating = "High Return";
+                    rColor = "var(--green)";
+                } else if (r.roi_ratio >= 1.5) {
+                    rating = "Moderate Return";
+                    rColor = "var(--yellow)";
+                }
+                
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `ROI for Objective ${id}: Value Score: ${score}/100.0, Cost: $${cost}, ROI Ratio: ${roi}x, Rating: ${rating}`);
+                row.innerHTML = `
+                    <td><strong>${id}</strong></td>
+                    <td>${score} / 100.0</td>
+                    <td>$${cost}</td>
+                    <td style="font-weight:600; color:#c7d2fe;">${roi}x</td>
+                    <td><span class="status-pill" style="color:${rColor}; border:1px solid ${rColor}25; background:${rColor}05; font-size:0.72rem; padding: 2px 6px;">${rating}</span></td>
+                `;
+                roiTbody.appendChild(row);
+            }
+
+            // 5. Agent cost table
+            const agentTbody = document.getElementById("budget-agent-tbody");
+            agentTbody.innerHTML = "";
+            for (const [name, a] of Object.entries(data.agent_costs)) {
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Agent profile: ${name}, Call Count: ${a.call_count}, Token Count: ${a.token_count.toLocaleString()}, Total Spend: $${a.cost.toFixed(2)}`);
+                row.innerHTML = `
+                    <td><strong>${name}</strong></td>
+                    <td>${a.call_count}</td>
+                    <td>${a.token_count.toLocaleString()}</td>
+                    <td style="color:#f472b6; font-weight:600;">$${a.cost.toFixed(2)}</td>
+                `;
+                agentTbody.appendChild(row);
+            }
+
+            // 6. Token consumption table
+            const tokensTbody = document.getElementById("budget-tokens-tbody");
+            tokensTbody.innerHTML = "";
+            for (const [model, tc] of Object.entries(data.token_consumption)) {
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Model: ${model}, Input Tokens: ${tc.input_tokens.toLocaleString()}, Output Tokens: ${tc.output_tokens.toLocaleString()}, Cumulative Cost: $${tc.cost.toFixed(2)}`);
+                row.innerHTML = `
+                    <td><strong>${model}</strong></td>
+                    <td>${tc.input_tokens.toLocaleString()}</td>
+                    <td>${tc.output_tokens.toLocaleString()}</td>
+                    <td style="font-weight:600;">$${tc.cost.toFixed(2)}</td>
+                `;
+                tokensTbody.appendChild(row);
+            }
+
+            // 7. Portfolio attribution table
+            const attrTbody = document.getElementById("budget-attr-tbody");
+            attrTbody.innerHTML = "";
+            for (const [id, p] of Object.entries(data.portfolio_attribution)) {
+                const row = document.createElement("tr");
+                row.setAttribute("tabindex", "0");
+                row.setAttribute("aria-label", `Portfolio: ${p.name}, Cost: $${p.cost.toFixed(2)}, Attribution Percentage: ${p.percentage.toFixed(1)}%`);
+                row.innerHTML = `
+                    <td><strong>${p.name}</strong></td>
+                    <td>$${p.cost.toFixed(2)}</td>
+                    <td><span style="font-weight:600; color:#fb923c;">${p.percentage.toFixed(1)}%</span></td>
+                `;
+                attrTbody.appendChild(row);
+            }
+
+            // 8. Pending approvals list
+            const approvalsList = document.getElementById("play-approvals-list");
+            approvalsList.innerHTML = "";
+            const pending = data.budget_approvals.filter(a => a.status === "Pending");
+            if (pending.length === 0) {
+                approvalsList.innerHTML = `<span style="font-size:0.75rem; color:var(--text-secondary); font-style:italic;">No pending approvals.</span>`;
+            } else {
+                pending.forEach(app => {
+                    const div = document.createElement("div");
+                    div.style.background = "rgba(255,255,255,0.01)";
+                    div.style.border = "1px solid rgba(255,255,255,0.03)";
+                    div.style.padding = "8px";
+                    div.style.borderRadius = "6px";
+                    div.style.display = "flex";
+                    div.style.justifyContent = "space-between";
+                    div.style.alignItems = "center";
+                    div.style.fontSize = "0.74rem";
+                    
+                    div.innerHTML = `
+                        <div>
+                            <strong>${app.id}</strong>: request for <strong>$${app.amount.toFixed(2)}</strong> on <strong>${app.objective_id}</strong><br/>
+                            <span style="color:var(--text-secondary); font-size:0.7rem;">By ${app.requested_by}</span>
+                        </div>
+                        <div style="display:flex; gap:4px;">
+                            <button onclick="processApproval('${app.id}', 'Approved')" class="action-btn" style="background:var(--green); border:none; padding:2px 6px; font-size:0.7rem; color:black; font-weight:bold;" aria-label="Approve request ${app.id}">Approve</button>
+                            <button onclick="processApproval('${app.id}', 'Rejected')" class="action-btn" style="background:var(--red); border:none; padding:2px 6px; font-size:0.7rem; color:white; font-weight:bold;" aria-label="Deny request ${app.id}">Deny</button>
+                        </div>
+                    `;
+                    approvalsList.appendChild(div);
+                });
+            }
+        }
+
+        async function recordSimulatedTokens() {
+            const agent = document.getElementById("play-agent-select").value;
+            const model = document.getElementById("play-model-select").value;
+            const inTok = parseInt(document.getElementById("play-tokens-in").value);
+            const outTok = parseInt(document.getElementById("play-tokens-out").value);
+            const reTok = parseInt(document.getElementById("play-tokens-re").value);
+            
+            const alertEl = document.getElementById("play-tokens-alert");
+            if (isNaN(inTok) || isNaN(outTok) || isNaN(reTok) || inTok < 0 || outTok < 0 || reTok < 0) {
+                alertEl.textContent = "Error: Input, output, and reasoning tokens cannot be negative.";
+                alertEl.style.display = "block";
+                return;
+            }
+            alertEl.style.display = "none";
+            
+            try {
+                const res = await fetch("/api/budget/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "record_tokens",
+                        agent: agent,
+                        model: model,
+                        tokens_in: inTok,
+                        tokens_out: outTok,
+                        tokens_reasoning: reTok
+                    })
+                });
+                if (!res.ok) throw new Error("API call failed");
+                const data = await res.json();
+                showCustomToast(data.message);
+                await fetchBudgetStatus();
+            } catch (err) {
+                alert("Error injecting tokens: " + err.message);
+            }
+        }
+
+        async function adjustObjectiveBudget() {
+            const objId = document.getElementById("play-obj-select").value;
+            const amount = parseFloat(document.getElementById("play-obj-budget").value);
+            
+            const alertEl = document.getElementById("play-budget-alert");
+            if (isNaN(amount) || amount <= 0) {
+                alertEl.textContent = "Error: Please enter a valid positive budget amount.";
+                alertEl.style.display = "block";
+                return;
+            }
+            alertEl.style.display = "none";
+            
+            try {
+                const res = await fetch("/api/budget/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "adjust_budget",
+                        objective_id: objId,
+                        amount: amount
+                    })
+                });
+                if (!res.ok) throw new Error("API call failed");
+                const data = await res.json();
+                showCustomToast(data.message);
+                await fetchBudgetStatus();
+            } catch (err) {
+                alert("Error adjusting budget: " + err.message);
+            }
+        }
+
+        async function processApproval(appId, decision) {
+            try {
+                const res = await fetch("/api/budget/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "approve_request",
+                        approval_id: appId,
+                        decision: decision
+                    })
+                });
+                if (!res.ok) throw new Error("API call failed");
+                const data = await res.json();
+                showCustomToast(data.message);
+                await fetchBudgetStatus();
+            } catch (err) {
+                alert("Error processing approval: " + err.message);
+            }
+        }
+
+        async function runGovCheck(objId) {
+            try {
+                const res = await fetch("/api/budget/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "check_governance",
+                        objective_id: objId
+                    })
+                });
+                if (!res.ok) throw new Error("API call failed");
+                const data = await res.json();
+                
+                const box = document.getElementById("play-gov-result");
+                box.style.display = "block";
+                
+                const verdict = data.gov.governance_verdict;
+                if (verdict === "APPROVED") {
+                    box.style.background = "rgba(16,185,129,0.15)";
+                    box.style.border = "1px solid var(--green)";
+                    box.style.color = "#c7d2fe";
+                } else if (verdict === "WARNING") {
+                    box.style.background = "rgba(245,158,11,0.15)";
+                    box.style.border = "1px solid var(--yellow)";
+                    box.style.color = "#c7d2fe";
+                } else {
+                    box.style.background = "rgba(239,68,68,0.15)";
+                    box.style.border = "1px solid var(--red)";
+                    box.style.color = "#fca5a5";
+                }
+                
+                box.innerHTML = `
+                    <strong>Governance Evaluation on ${objId}:</strong><br/>
+                    Verdict: <span class="status-pill ${verdict.toLowerCase()}">${verdict}</span><br/>
+                    Message: ${data.gov.message}<br/>
+                    Budget Limit: $${data.gov.budget.toFixed(2)} | Actual Spent: $${data.gov.actual.toFixed(2)}
+                `;
+            } catch (err) {
+                alert("Error auditing governance: " + err.message);
+            }
+        }
+
+        function showCustomToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.textContent = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+
+        window.recordSimulatedTokens = recordSimulatedTokens;
+        window.adjustObjectiveBudget = adjustObjectiveBudget;
+        window.processApproval = processApproval;
+        window.runGovCheck = runGovCheck;
+        // --- End of Budget & Cost Functions ---
+
+        await fetchStatus();
+        await loadDocs();
+        await fetchGovernanceStatus();
+        setInterval(fetchStatus, 5000);
+    </script>
+    
+    <!-- CSS Toast Notification Container -->
+    <div id="toast" class="toast">Telemetry copied to clipboard!</div>
+</body>
+</html>

@@ -202,12 +202,11 @@
       "status": "VERIFIED",
       "confidence": 100,
       "evidence": [
-        "check_fga_authorization found in uawos_governance.py.",
         "uawos_governance.py bootstraps fine-grained ReBAC store and authorization models on OpenFGA (port 8083).",
         "uawos_integrations.py defines rbac_check, pbac_check, and delegated_access_check."
       ],
       "validation_results": [
-        "OpenFGA ReBAC check verified"
+        "OpenFGA ReBAC check missing"
       ],
       "gaps": [],
       "dependencies": []

@@ -5,6 +5,19 @@ import time
 import uawos_db
 from uawos_state_utils import load_state, save_state
 
+from application.use_cases.workflow_use_cases import (
+    create_workflow,
+    generate_workflow,
+    modify_workflow,
+    pause_workflow,
+    resume_workflow,
+    terminate_workflow,
+    simulate_workflow,
+    execute_workflow,
+    optimize_workflow,
+    check_temporal_worker_queues,
+)
+
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_workflow_state.json")
 
 
@@ -28,174 +41,6 @@ def get_default_state() -> dict:
             }
         }
     }
-
-
-# FR-061 to FR-070: Create a Workflow
-def create_workflow(
-    plan_id: str,
-    title: str,
-    tasks: list,
-    dependencies: list = None,
-    governed: bool = True,
-) -> dict:
-    """Create and persist a new Workflow for a given plan."""
-    state = load_state()
-    wid = f"WRK-{len(state['workflows']) + 101:03d}"
-    workflow = {
-        "id": wid,
-        "plan_id": plan_id,
-        "title": title,
-        "tasks": tasks,
-        "dependencies": dependencies or [],
-        "state": "active",
-        "version": 1,
-        "history": [],
-        "governed": governed,
-    }
-    state["workflows"][wid] = workflow
-    save_state(state)
-    return state["workflows"][wid]
-
-
-# FR-061: Automatic workflow generation
-def generate_workflow(plan_id: str) -> dict:
-    """Automatically generate a Workflow from a Plan."""
-    # Read steps from plan if uawos_planning is available
-    steps = ["Build Step 1", "Build Step 2"]
-    try:
-        import uawos_planning
-
-        plans_data = uawos_planning.load_state()
-        plan = plans_data["plans"].get(plan_id)
-        if plan:
-            steps = plan["steps"]
-    except Exception:
-        pass
-
-    return create_workflow(
-        plan_id=plan_id,
-        title=f"Workflow from plan {plan_id}",
-        tasks=[f"Orchestrate: {s}" for s in steps],
-    )
-
-
-def modify_workflow(workflow_id: str, updates: dict) -> dict:
-    state = load_state()
-    workflow = state["workflows"].get(workflow_id)
-    if not workflow:
-        raise ValueError(f"Workflow {workflow_id} not found.")
-
-    # Save to history
-    snap = {k: v for k, v in workflow.items() if k != "history"}
-    workflow["history"].append({"timestamp": time.time(), "state": snap})
-
-    for k, v in updates.items():
-        if k in ["title", "tasks", "dependencies", "state", "governed", "execution_mode", "temporal_run_id"]:
-            workflow[k] = v
-
-    workflow["version"] += 1
-    state["workflows"][workflow_id] = workflow
-    save_state(state)
-    return state["workflows"][workflow_id]
-
-
-# FR-068 to FR-070: Lifecycle Transitions
-def pause_workflow(workflow_id: str) -> dict:
-    return modify_workflow(workflow_id, {"state": "paused"})
-
-
-def resume_workflow(workflow_id: str) -> dict:
-    return modify_workflow(workflow_id, {"state": "active"})
-
-
-def terminate_workflow(workflow_id: str) -> dict:
-    return modify_workflow(workflow_id, {"state": "terminated"})
-
-
-# FR-066: Workflow simulation
-def simulate_workflow(workflow_id: str) -> dict:
-    state = load_state()
-    workflow = state["workflows"].get(workflow_id)
-    if not workflow:
-        raise ValueError(f"Workflow {workflow_id} not found.")
-
-    return {
-        "workflow_id": workflow_id,
-        "estimated_duration_seconds": len(workflow["tasks"]) * 3600,
-        "bottlenecks": ["Dependency check bottleneck" if workflow["dependencies"] else "None"],
-        "simulation_verdict": "Success predicted",
-    }
-
-
-def execute_workflow(workflow_id: str) -> dict:
-    """
-    Execute/schedule a workflow on the running Temporal service (port 7233),
-    with graceful fallback to in-process simulation.
-    """
-    state = load_state()
-    workflow = state["workflows"].get(workflow_id)
-    if not workflow:
-        raise ValueError(f"Workflow {workflow_id} not found.")
-
-    temporal_started = False
-    run_id = None
-    try:
-        import asyncio
-
-        from temporalio.client import Client
-
-        async def _run():
-            client = await Client.connect("localhost:7233")
-            handle = await client.start_workflow(
-                "UAWOSWorkflowOrchestrator", workflow, id=workflow_id, task_queue="uawos-workflow-queue"
-            )
-            return handle.first_execution_run_id
-
-        loop = asyncio.new_event_loop()
-        run_id = loop.run_until_complete(_run())
-        loop.close()
-        temporal_started = True
-    except Exception:
-        pass
-
-    updates = {"state": "active"}
-    if temporal_started:
-        updates["temporal_run_id"] = run_id
-        updates["execution_mode"] = "temporal"
-    else:
-        updates["execution_mode"] = "simulation"
-
-    return modify_workflow(workflow_id, updates)
-
-
-# FR-067: Workflow optimization
-def optimize_workflow(workflow_id: str) -> dict:
-    state = load_state()
-    workflow = state["workflows"].get(workflow_id)
-    if not workflow:
-        raise ValueError(f"Workflow {workflow_id} not found.")
-
-    # Sort tasks to optimize execution order (simulated optimization)
-    optimized_tasks = sorted(workflow["tasks"])
-    return modify_workflow(workflow_id, {"tasks": optimized_tasks})
-
-
-def check_temporal_worker_queues() -> bool:
-    """Check if Temporal worker queues are active (with fallback/mock support)."""
-    import socket
-
-    for port in [7233, 8233]:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(0.1)
-            s.connect(("127.0.0.1", port))
-            s.close()
-            return True
-        except Exception:
-            pass
-
-    # Mock/simulated activation for local development/testing
-    return os.environ.get("TEMPORAL_MOCK_ACTIVE", "true").lower() == "true"
 
 
 # ----------------- VERIFICATION TESTS (FR-061 to FR-070) -----------------
