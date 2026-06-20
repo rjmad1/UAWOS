@@ -23,6 +23,10 @@ def main():
     mcp_parser.add_argument("--agent", required=True, help="Agent name or ID")
     mcp_parser.add_argument("--mcp-url", required=True, help="External MCP server url")
 
+    # ingest-catalog
+    ing_parser = subparsers.add_parser("ingest-catalog", help="Ingest an Agentic Resource Discovery (ARD) catalog")
+    ing_parser.add_argument("--domain", required=True, help="Domain hosting the ai-catalog.json manifest")
+
     args = parser.parse_args()
 
     if args.command == "register-agent":
@@ -42,6 +46,19 @@ def main():
             print(f"SUCCESS: MCP server connection established for '{args.agent}' to {args.mcp_url}.")
         except Exception as e:
             print(f"ERROR: Failed to connect MCP: {e}")
+            sys.exit(1)
+
+    elif args.command == "ingest-catalog":
+        try:
+            result = uawos_integrations.ingest_ard_catalog(domain=args.domain)
+            print(f"SUCCESS: Ingested ARD catalog from '{args.domain}'.")
+            print(f"Discovered and registered {result['agents_ingested_count']} agents:")
+            for agent in result["agents"]:
+                print(f"  - [{agent['id']}] {agent['name']} ({agent['class']}) -> {agent['url']}")
+            if result["trusted"]:
+                print("Trust Manifest verified successfully.")
+        except Exception as e:
+            print(f"ERROR: Failed to ingest ARD catalog: {e}")
             sys.exit(1)
 
     else:

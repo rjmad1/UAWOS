@@ -36,7 +36,15 @@ COPY uawos_dashboard.html uawos_delivery.html uawos_roadmap.html \
 
 # Copy requirements and supporting files
 COPY requirements.txt pyproject.toml ./
-COPY Requirements\ Master/ ./Requirements\ Master/
+COPY ["Requirements Master/", "./Requirements Master/"]
+COPY domains/ ./domains/
+COPY application/ ./application/
+COPY infrastructure/ ./infrastructure/
+COPY shared/ ./shared/
+COPY interfaces/ ./interfaces/
+COPY config/ ./config/
+COPY apps/ ./apps/
+
 
 # Set ownership
 RUN chown -R uawos:uawos /app

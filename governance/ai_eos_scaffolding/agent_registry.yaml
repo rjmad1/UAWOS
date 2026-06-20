@@ -1,0 +1,97 @@
+# AI-EOS Multi-Agent Registry Template
+# Location: /agents/agent_registry.yaml
+
+version: "1.0.0"
+agents:
+  - id: "product-agent"
+    role: "Product Owner"
+    description: "Responsible for product specs, requirements, and user stories. Maps business ideas to specification files."
+    mcp_servers:
+      - "github-mcp-server"
+    permissions:
+      read: ["/specs", "/knowledge"]
+      write: ["/specs"]
+    validation_gate: "spec-completeness"
+
+  - id: "architect-agent"
+    role: "System Architect"
+    description: "Responsible for ADRs, service boundaries, technology choices, API contracts, and structural design."
+    mcp_servers:
+      - "github-mcp-server"
+    permissions:
+      read: ["/specs", "/architecture", "/contracts"]
+      write: ["/architecture", "/contracts", "/adrs"]
+    validation_gate: "architecture-alignment"
+
+  - id: "backend-agent"
+    role: "Backend Engineer"
+    description: "Writes server side applications, APIs, database logic, and data layer integrations."
+    mcp_servers:
+      - "github-mcp-server"
+    permissions:
+      read: ["/specs", "/contracts", "/architecture"]
+      write: ["/src/backend", "/tests/backend"]
+    validation_gate: "contract-compliance"
+
+  - id: "frontend-agent"
+    role: "Frontend Engineer"
+    description: "Writes user interfaces, styling, routing, and integrates API calls."
+    mcp_servers: []
+    permissions:
+      read: ["/specs", "/contracts", "/architecture"]
+      write: ["/src/frontend", "/tests/frontend"]
+    validation_gate: "contract-compliance"
+
+  - id: "infra-agent"
+    role: "Platform Engineer"
+    description: "Provisions cloud resources, configures pipelines, writes IaC code."
+    mcp_servers: []
+    permissions:
+      read: ["/specs", "/architecture", "/infra"]
+      write: ["/infra", "/ci", "/platform"]
+    validation_gate: "observability-readiness"
+
+  - id: "security-agent"
+    role: "Security Assessor"
+    description: "Audits codebase for vulnerabilities, runs static scans, manages credentials."
+    mcp_servers: []
+    permissions:
+      read: ["/"]
+      write: ["/security"]
+    validation_gate: "security-review"
+
+  - id: "qa-agent"
+    role: "Test Engineer"
+    description: "Writes and executes unit, integration, E2E, load, and contract tests."
+    mcp_servers: []
+    permissions:
+      read: ["/specs", "/contracts", "/src"]
+      write: ["/tests", "/evals"]
+    validation_gate: "coverage-verification"
+
+  - id: "docs-agent"
+    role: "Technical Writer"
+    description: "Creates and maintains readmes, developer guides, and inline documentation."
+    mcp_servers: []
+    permissions:
+      read: ["/"]
+      write: ["/docs", "/knowledge/glossary"]
+    validation_gate: "documentation-completeness"
+
+  - id: "sre-agent"
+    role: "Site Reliability Engineer"
+    description: "Monitors application health, defines SLOs/SLIs, maintains runbooks and incident responses."
+    mcp_servers: []
+    permissions:
+      read: ["/"]
+      write: ["/runbooks", "/observability"]
+    validation_gate: "observability-readiness"
+
+  - id: "review-agent"
+    role: "Governance Auditor"
+    description: "Performs final audit of code changes, checks test results, runs code quality gates."
+    mcp_servers: []
+    permissions:
+      read: ["/"]
+      write: ["/evals"]
+    validation_gate: "deployment-readiness"

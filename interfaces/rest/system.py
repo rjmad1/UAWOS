@@ -738,3 +738,16 @@ def get_docs_content(file: str = ""):
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error reading file: {e}")
     raise HTTPException(status_code=404, detail="Document not found or access denied.")
+
+
+@router.post("/api/integrations/ingest-catalog")
+async def integrations_ingest_catalog(payload: dict):
+    if uawos_integrations is None:
+        raise HTTPException(status_code=500, detail="Integrations module unavailable.")
+    try:
+        domain = payload.get("domain", "")
+        if not domain:
+            raise HTTPException(status_code=400, detail="Domain name is required.")
+        return uawos_integrations.ingest_ard_catalog(domain)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -23,6 +23,15 @@ def test_api_performance_benchmarks():
     tokens = uawos_context.set_context(tenant_id, "Admin", "admin_user")
 
     try:
+        os.environ["OPA_MOCK_ACTIVE"] = "true"
+        os.environ["OPENFGA_MOCK_ACTIVE"] = "true"
+        os.environ["QDRANT_MOCK_ACTIVE"] = "true"
+        os.environ["POSTGRES_MOCK_ACTIVE"] = "true"
+        os.environ["CLICKHOUSE_MOCK_ACTIVE"] = "true"
+        os.environ["MARQUEZ_MOCK_ACTIVE"] = "true"
+        os.environ["SUPERSET_MOCK_ACTIVE"] = "true"
+        os.environ["DTRACK_MOCK_ACTIVE"] = "true"
+        os.environ["NEO4J_MOCK_ACTIVE"] = "true"
         # Seed cache status
         status_cache = run_health_checks()
 

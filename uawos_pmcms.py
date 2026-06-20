@@ -61,24 +61,25 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     dtrack_host = os.environ.get("DTRACK_HOST", "127.0.0.1")
     dtrack_port = int(os.environ.get("DTRACK_PORT", 8081))
 
-    opa_online = check_port(opa_host, opa_port) or os.environ.get("OPA_MOCK_ACTIVE", "false").lower() == "true"
+    opa_online = os.environ.get("OPA_MOCK_ACTIVE", "false").lower() == "true" or check_port(opa_host, opa_port)
     openfga_online = (
-        check_port(openfga_host, openfga_port) or os.environ.get("OPENFGA_MOCK_ACTIVE", "false").lower() == "true"
+        os.environ.get("OPENFGA_MOCK_ACTIVE", "false").lower() == "true" or check_port(openfga_host, openfga_port)
     )
     qdrant_online = (
-        check_port(qdrant_host, qdrant_port) or os.environ.get("QDRANT_MOCK_ACTIVE", "false").lower() == "true"
+        os.environ.get("QDRANT_MOCK_ACTIVE", "false").lower() == "true" or check_port(qdrant_host, qdrant_port)
     )
     postgres_online = (
-        check_port(postgres_host, postgres_port) or os.environ.get("POSTGRES_MOCK_ACTIVE", "false").lower() == "true"
+        os.environ.get("POSTGRES_MOCK_ACTIVE", "false").lower() == "true" or check_port(postgres_host, postgres_port)
     )
     (
-        check_port(clickhouse_host, 8124)
+        os.environ.get("CLICKHOUSE_MOCK_ACTIVE", "false").lower() == "true"
+        or check_port(clickhouse_host, 8124)
         or check_port(clickhouse_host, clickhouse_port)
-        or os.environ.get("CLICKHOUSE_MOCK_ACTIVE", "false").lower() == "true"
     )
-    (check_port(marquez_host, marquez_port) or os.environ.get("MARQUEZ_MOCK_ACTIVE", "false").lower() == "true")
-    (check_port(superset_host, superset_port) or os.environ.get("SUPERSET_MOCK_ACTIVE", "false").lower() == "true")
-    (check_port(dtrack_host, dtrack_port) or os.environ.get("DTRACK_MOCK_ACTIVE", "false").lower() == "true")
+    (os.environ.get("MARQUEZ_MOCK_ACTIVE", "false").lower() == "true" or check_port(marquez_host, marquez_port))
+    (os.environ.get("SUPERSET_MOCK_ACTIVE", "false").lower() == "true" or check_port(superset_host, superset_port))
+    (os.environ.get("DTRACK_MOCK_ACTIVE", "false").lower() == "true" or check_port(dtrack_host, dtrack_port))
+
 
     # Engine import checks
     has_obj = check_module("uawos_objective")

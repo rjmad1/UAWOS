@@ -35,48 +35,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# AI Engineering Platform Layer
-ai = [
-    "pydantic-ai>=0.0.18",
-    "dspy-ai>=2.4.0",
-    "instructor>=1.3.0",
-    "outlines>=0.0.34",
-    "guidance>=0.1.15",
-]
-
-# Agent Memory Layer
-memory = [
-    "mem0ai>=0.1.10",
-    "graphiti-core>=0.1.0",
-]
-
-# RAG & Knowledge Layer
-rag = [
-    "haystack-ai>=2.0.0",
-    "llama-index>=0.10.35",
-    "fastembed>=0.2.7",
-    "unstructured[all-docs]>=0.14.0",
-]
-
-# Data & Analytics Engineering
-data = [
-    "dbt-core>=1.8.0",
-    "meltano>=3.4.0",
-]
-
-# Digital Twin & Agent Simulation
-simulation = [
-    "mesa>=2.2.0",
-]
-
-# Governance & Data Lineage
-governance = [
-    "openlineage-python>=1.15.0",
-    "marquez-python>=0.36.0",
-    "openmetadata-ingestion>=1.4.0",
-]
-
-# Development tools
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
@@ -87,10 +45,8 @@ dev = [
     "pip-audit>=2.7.0",
 ]
 
-# Install everything
-all = [
-    "uawos[ai,memory,rag,data,simulation,governance]",
-]
+all = []
+
 
 [project.urls]
 Homepage = "https://github.com/rjmad1/UAWOS"

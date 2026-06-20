@@ -1,0 +1,54 @@
+# GitHub SpecKit Configuration Template for AI-EOS
+# Location: .specify/config.yaml (to be placed in target repo)
+
+project:
+  name: "AI-EOS Managed Project"
+  version: "1.0.0"
+  description: "Enterprise project governed by Spec-Driven Development"
+
+rules:
+  # Enforce spec-first development: No code execution/implementation is permitted without an approved spec.
+  require_approved_spec: true
+  require_approved_architecture: true
+  require_approved_contracts: true
+  require_approved_test_strategy: true
+
+  # Paths where artifacts are placed
+  paths:
+    constitution: "docs/constitution.md"
+    specifications: "specs/"
+    plans: "plans/"
+    tasks: "plans/tasks.md"
+    adrs: "adrs/"
+    contracts: "contracts/"
+
+integrations:
+  default_agent: "copilot"
+  allowed_agents:
+    - "copilot"
+    - "claude-dev"
+    - "custom-agent"
+  mcp_servers:
+    enabled: true
+    config_path: ".specify/mcp_config.json"
+
+templates:
+  overrides_dir: ".specify/templates/overrides/"
+  presets_dir: ".specify/presets/templates/"
+  extensions_dir: ".specify/extensions/templates/"
+
+validation_gates:
+  # Quality gates executed prior to PR merges
+  gates:
+    - name: "spec-completeness"
+      cli_command: "specify analyze --target spec"
+      blocking: true
+    - name: "contract-compliance"
+      cli_command: "specify analyze --target contracts"
+      blocking: true
+    - name: "architecture-alignment"
+      cli_command: "specify analyze --target architecture"
+      blocking: true
+    - name: "coverage-verification"
+      cli_command: "specify analyze --target coverage"
+      blocking: true
