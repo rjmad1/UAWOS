@@ -114,6 +114,20 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-06-20 — Clean Architecture Refactoring, Dependency Pruning, and ARD Catalog Ingestion
+
+### Added
+- **Agentic Resource Discovery (ARD)**: Implemented `ingest_ard_catalog` in `uawos_integrations.py` to ingest agent configurations from domain `ai-catalog.json` manifests, including SPIFFE trust manifest verification.
+- **REST Endpoints and CLI Command**: Added `/api/integrations/ingest-catalog` REST endpoint and `ingest-catalog` CLI command.
+- **AI-EOS Governance Specification**: Added `governance/AI_EOS_SPECIFICATION.md` defining the Engineering Constitution, directory taxonomy, and multi-tiered memory architecture, along with configuration templates in `governance/ai_eos_scaffolding/`.
+- **Validation Script**: Added `scratch/validate_templates.py` to verify scaffolding configuration schemas.
+
+### Changed
+- **Clean Architecture Migration**: Finalized structure refactoring and moved legacy adapters (`uawos_autogen_adapter.py`, `uawos_langgraph_adapter.py`, `uawos_semantic_kernel_adapter.py`) into the `adapters/` subdirectory. Deleted legacy hyphenated directories `application/use-cases/`.
+- **Dependency Minimization**: Pruned redundant development and runtime dependencies (`pydantic-ai`, `dspy-ai`, `instructor`, `mem0ai`, `graphiti-core`, `haystack-ai`, `llama-index`, etc.) from `requirements.txt` and `pyproject.toml` to reduce repository footprint and speed up environment loading.
+- **Mock Benchmarking Configuration**: Modified `scratch/test_performance.py` and `uawos_pmcms.py` to support environment-based service mocking.
+
+
 ### Planned
 - Migrate tests to `pytest` framework
 - Add `alembic` for database schema versioning
