@@ -1206,6 +1206,10 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                         <span class="menu-text">Knowledge Hub</span>
                     </a>
+                    <a href="#meeting-intelligence" class="menu-item" id="nav-meeting-intelligence">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        <span class="menu-text">Meeting Intel</span>
+                    </a>
                     <a href="#settings" class="menu-item" id="nav-settings">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                         <span class="menu-text">Settings & Rules</span>
@@ -1720,6 +1724,177 @@
                 </div>
             </section>
 
+            <!-- SCREEN N: Meeting Intelligence Hub -->
+            <section id="view-meeting-intelligence" class="view-pane">
+                <div class="grid-1-2">
+                    <!-- Left Column: Audio Capture, Speakers & Configuration -->
+                    <div class="flex-col"                        <!-- Card 1: Live Audio Recording Control -->
+                        <div class="glass flex-col" style="padding:1.5rem;">
+                            <div class="panel-header">
+                                <span>Multi-Party Conversation Capture</span>
+                                <span class="badge gray" id="meeting-capture-status">IDLE</span>
+                            </div>
+                            <div class="panel-body flex-col" style="gap:1rem;">
+                                <!-- Waveform Visualization -->
+                                <div style="height:80px; background:rgba(0,0,0,0.25); border-radius:8px; display:flex; align-items:center; justify-content:center; gap:3px; position:relative; overflow:hidden;">
+                                    <div id="meeting-wave-container" style="display:flex; align-items:center; justify-content:center; gap:3px; width:100%; height:100%;">
+                                        <!-- Waveform bars -->
+                                        <div style="width:3px; height:10px; background:var(--primary); transition:height 0.1s;"></div>
+                                        <div style="width:3px; height:10px; background:var(--primary); transition:height 0.1s;"></div>
+                                        <div style="width:3px; height:10px; background:var(--primary); transition:height 0.1s;"></div>
+                                        <div style="width:3px; height:10px; background:var(--primary); transition:height 0.1s;"></div>
+                                        <div style="width:3px; height:10px; background:var(--primary); transition:height 0.1s;"></div>
+                                    </div>
+                                    <span id="meeting-timer-lbl" style="position:absolute; bottom:6px; right:10px; font-family:'Fira Code', monospace; font-size:0.75rem; color:var(--text-secondary);">00:00</span>
+                                </div>
+                                
+                                <div style="display:flex; gap:10px; justify-content:space-between; align-items:center;">
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-sm btn-primary" id="btn-meeting-record" onclick="toggleMeetingRecording()">Record Mic</button>
+                                        <button class="btn btn-sm" id="btn-meeting-stop" onclick="stopMeetingRecording()" disabled>Stop</button>
+                                    </div>
+                                    <div style="font-size:0.75rem; color:var(--text-secondary);">
+                                        <label style="cursor:pointer; display:flex; align-items:center; gap:6px;">
+                                            <input type="checkbox" id="meeting-noise-reduction" checked class="check-box-input" style="width:13px; height:13px; margin:0;">
+                                            Noise Reduction
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:10px; display:flex; gap:10px;">
+                                    <div style="flex:1;">
+                                        <label class="form-label">Or Upload Audio File</label>
+                                        <input type="file" id="meeting-audio-upload" class="form-control" accept="audio/*" onchange="uploadMeetingAudio(this)">
+                                    </div>
+                                    <div style="width:120px;">
+                                        <label for="meeting-language-select" class="form-label">Language</label>
+                                        <select id="meeting-language-select" class="form-control">
+                                            <option value="English">English</option>
+                                            <option value="Spanish">Spanish (Español)</option>
+                                            <option value="French">French (Français)</option>
+                                            <option value="German">German (Deutsch)</option>
+                                            <option value="Chinese">Chinese (中文)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Transcript paste area & demo templates -->
+                        <div class="glass flex-col" style="padding:1.5rem;">
+                            <div class="panel-header">
+                                <span>Transcription Input & Speakers</span>
+                            </div>
+                            <div class="panel-body flex-col" style="gap:10px;">
+                                <div class="form-group">
+                                    <label for="meeting-custom-transcript" class="form-label">Paste Raw Transcript (Alternative to Recording)</label>
+                                    <textarea id="meeting-custom-transcript" class="form-control" rows="4" placeholder="Alice: Hello team&#10;Bob: Hi Alice&#10;Or type/paste raw conversational dialogue here..."></textarea>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; gap:10px;">
+                                    <button class="btn btn-sm" onclick="clearCustomTranscript()" style="flex:1;">Clear Paste</button>
+                                    <button class="btn btn-sm btn-primary" onclick="loadCustomTranscript()" style="flex:1;">Diarize Paste</button>
+                                </div>
+                                <div class="form-group" style="border-top:1px solid rgba(255,255,255,0.05); padding-top:10px; margin-top:5px;">
+                                    <label for="meeting-template-select" class="form-label">Or Load Seeded Demo Template</label>
+                                    <select id="meeting-template-select" class="form-control" onchange="switchMeetingTemplate(this.value)">
+                                        <option value="sprint">Product Design Sprint (Alice, Bob, Charlie)</option>
+                                        <option value="governance">Board Governance Audit (Diana, Edward, Frank)</option>
+                                        <option value="consultation">Legal Consultation (Grace, Henry)</option>
+                                    </select>
+                                </div>
+                                
+                                <span class="form-label">Active Speakers Profiles</span>
+                                <div class="flex-col" id="meeting-speakers-list" style="gap:8px;">
+                                    <!-- Dynamic list of speakers -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 3: Persona Selection Grid -->
+                        <div class="glass flex-col" style="padding:1.5rem;">
+                            <div class="panel-header">Expert Persona Synthesis Config</div>
+                            <div class="panel-body flex-col">
+                                <span style="font-size:0.75rem; color:var(--text-secondary); line-height:1.4; margin-bottom:6px;">Select which professional perspectives the synthesis engine should emulate:</span>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;" id="meeting-personas-grid">
+                                    <!-- Personas list -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: API Gateway & Model Settings -->
+                        <div class="glass flex-col" style="padding:1.5rem;">
+                            <div class="panel-header">
+                                <span>API Gateway & Model Settings</span>
+                            </div>
+                            <div class="panel-body flex-col" style="gap:10px;">
+                                <div class="form-group">
+                                    <label for="meeting-provider-select" class="form-label">Active Provider</label>
+                                    <select id="meeting-provider-select" class="form-control" onchange="toggleApiSettingsFields()">
+                                        <option value="ollama">Ollama (Local Fallback)</option>
+                                        <option value="nvidia">NVIDIA NIM Gateway</option>
+                                        <option value="openrouter">OpenRouter Gateway</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="api-key-group" style="display:none;">
+                                    <label for="meeting-api-key" class="form-label">API Key</label>
+                                    <input type="password" id="meeting-api-key" class="form-control" placeholder="Enter API Key...">
+                                </div>
+                                <div class="form-group" id="api-url-group" style="display:none;">
+                                    <label for="meeting-api-url" class="form-label">Custom API URL (Optional)</label>
+                                    <input type="text" id="meeting-api-url" class="form-control" placeholder="Default endpoint URL">
+                                </div>
+                                <div class="form-group" id="api-model-group" style="display:none;">
+                                    <label for="meeting-model-input" class="form-label">Target Model</label>
+                                    <input type="text" id="meeting-model-input" class="form-control" placeholder="Default provider model">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Diarized Transcript & Notes Workspace -->
+                    <div class="flex-col">
+                        <!-- Top Panel: Real-time Diarized Transcript -->
+                        <div class="glass flex-col" style="padding:1.5rem; height:280px;">
+                            <div class="panel-header">
+                                <span>Real-time Speaker-Aware Transcript Feed</span>
+                                <button class="btn btn-sm btn-accent" id="btn-meeting-synthesize" onclick="triggerMeetingSynthesis()" disabled>Synthesize Notes</button>
+                            </div>
+                            <div class="panel-body" style="overflow-y:auto; flex-grow:1; display:flex; flex-direction:column; gap:8px;" id="meeting-transcript-feed">
+                                <div style="text-align:center; color:var(--text-muted); padding:3rem 0; font-size:0.8rem;">
+                                    Click "Record Mic" or upload an audio file to start transcription.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Panel: Notebook Outputs (A-J) -->
+                        <div class="glass flex-col" style="padding:1.5rem; flex-grow:1; display:none;" id="meeting-synthesis-notebook">
+                            <div class="panel-header">
+                                <span>Multi-Expert Collective Intelligence Notebook</span>
+                                <div style="display:flex; gap:6px;">
+                                    <button class="btn btn-sm" onclick="exportMeetingNotes('markdown')">Export Markdown</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Tab header -->
+                            <div style="display:flex; gap:6px; overflow-x:auto; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:6px; font-size:0.75rem; margin-top:10px;">
+                                <button class="btn btn-sm active meeting-note-tab" id="tab-mtg-summary" onclick="switchMeetingNoteTab('summary')">Summary</button>
+                                <button class="btn btn-sm meeting-note-tab" id="tab-mtg-notes" onclick="switchMeetingNoteTab('notes')">Notes</button>
+                                <button class="btn btn-sm meeting-note-tab" id="tab-mtg-decisions" onclick="switchMeetingNoteTab('decisions')">Decisions</button>
+                                <button class="btn btn-sm meeting-note-tab" id="tab-mtg-actions" onclick="switchMeetingNoteTab('actions')">Actions</button>
+                                <button class="btn btn-sm meeting-note-tab" id="tab-mtg-risks" onclick="switchMeetingNoteTab('risks')">Risks/Opts</button>
+                                <button class="btn btn-sm meeting-note-tab" id="tab-mtg-insights" onclick="switchMeetingNoteTab('insights')">Insights</button>
+                                <button class="btn btn-sm meeting-note-tab" id="tab-mtg-knowledge" onclick="switchMeetingNoteTab('knowledge')">Memory</button>
+                            </div>
+                            
+                            <!-- Tab content panels -->
+                            <div class="panel-body flex-col" style="margin-top:10px;" id="meeting-note-tabs-content">
+                                <!-- Dynamic -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- SCREEN M: Settings / Roles / Permissions -->
             <section id="settings" class="view-pane">
                 <div class="grid-2">
@@ -1915,6 +2090,15 @@
                 <div class="status-dot-indicator">
                     <span>Active Tenant: default_tenant</span>
                 </div>
+                <div class="status-dot-indicator">
+                    <span>Mode:</span>
+                    <button class="btn btn-sm" id="statusbar-offline-toggle" onclick="toggleOfflineMode()" style="padding: 2px 8px; font-size: 0.7rem; line-height: 1; border-radius: 4px; background: var(--emerald); color: white; border: none; font-weight: 700; cursor: pointer;">Online</button>
+                </div>
+                <div class="status-dot-indicator" id="git-sync-indicator" style="display: flex; align-items: center; gap: 6px;">
+                    <div class="status-circle-dot gray" id="git-sync-dot"></div>
+                    <span id="git-sync-text">Git Sync: Checking...</span>
+                    <button class="btn btn-sm" id="git-sync-btn" onclick="triggerManualGitSync()" style="padding: 2px 8px; font-size: 0.7rem; line-height: 1; border-radius: 4px; background: rgba(99,102,241,0.2); color: white; border: 1px solid var(--primary); font-weight: 500; cursor: pointer; margin-left: 4px;">Sync Now</button>
+                </div>
             </div>
             <div class="statusbar-group">
                 <span id="statusbar-sync-lbl">Autosaved & Synced</span>
@@ -2066,6 +2250,7 @@
             activeView: "#overview",
             activeRole: "Product",
             piiMasking: false,
+            offlineMode: false,
             structuredDraft: null,
             answers: {},
             activePlanLimitBudget: 15000,
@@ -2073,7 +2258,21 @@
             exceptionQueue: [
                 { id: "EXC-201", objectiveId: "OBJ-101", title: "Consulate Funds Waiver", requestor: "Personal Agent", policy: "POL-017", justification: "Required translation delay exceptions to authorize file verification.", status: "PENDING" },
                 { id: "EXC-202", objectiveId: "OBJ-301", title: "Active-Active Multi-Cloud budget waive", requestor: "Orchestrator Agent", policy: "POL-017", justification: "Multi-region failover speed target requires active standby architecture cost override.", status: "PENDING" }
-            ]
+            ],
+            meeting: {
+                recording: false,
+                meetingId: null,
+                transcript: [],
+                synthesis: null,
+                selectedTemplate: "sprint",
+                activeTab: "summary",
+                selectedPersonas: ["Product Manager", "Legal Analyst", "Executive Strategist"],
+                speakers: [
+                    { name: "Alice", label: "Product Manager" },
+                    { name: "Bob", label: "Tech Lead" },
+                    { name: "Charlie", label: "CEO Advisor" }
+                ]
+            }
         };
 
         const viewTitles = {
@@ -2089,7 +2288,8 @@
             "#operations": "Operational Cockpit & Alert Monitors",
             "#approvals": "Exception Waiver Queue",
             "#knowledge": "Knowledge assets & Learnings",
-            "#settings": "Governance Configurations"
+            "#settings": "Governance Configurations",
+            "#meeting-intelligence": "Meeting Intelligence Hub"
         };
 
         // Initialize App
@@ -2097,6 +2297,7 @@
             setupRouter();
             populateObjectiveSelectors();
             syncActiveObjective();
+            toggleApiSettingsFields();
             setInterval(fetchDaemonStatusOverlay, 5000);
             fetchDaemonStatusOverlay();
             
@@ -2298,6 +2499,9 @@
                     break;
                 case "#knowledge":
                     renderKnowledgeView();
+                    break;
+                case "#meeting-intelligence":
+                    renderMeetingIntelligenceView();
                     break;
                 case "#settings":
                     break;
@@ -2770,7 +2974,7 @@
                     tradeoffText.innerHTML += `<br><span style="color:var(--emerald); font-weight:600;">Waiver Exception signed. Constraint gates cleared.</span>`;
                 } else {
                     document.getElementById("planning-alert-title").textContent = "OPA Constraint Breach: PLAN DISPATCH BLOCKED";
-                    document.getElementById("planning-alert-desc").textContent = `Plan requirements violate current limits. Budget Breach: ${costBreach ? 'Yes' : 'No'} | Duration Breach: ${durationBreach ? 'Yes' : 'No'}. Request Executive waiver exception signature to proceed.`;
+                    document.getElementById("planning-alert-desc").textContent = `Plan demands violate current limits. Budget Breach: ${costBreach ? 'Yes' : 'No'} | Duration Breach: ${durationBreach ? 'Yes' : 'No'}. Request Executive waiver exception signature to proceed.`;
                 }
             } else {
                 alertBox.style.display = "none";
@@ -3281,6 +3485,38 @@
             document.getElementById("evidence-drawer").classList.add("active");
         }
 
+        function closeAllDrawers() {
+            document.getElementById("overlay-mask").classList.remove("active");
+            document.getElementById("evidence-drawer").classList.remove("active");
+            toggleCommandPalette(false);
+        }
+
+        // Modal triggers
+        function openModal(id) {
+            document.getElementById(id).classList.add("active");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove("active");
+        }
+
+        // Emergency manual suspension trigger
+        function triggerManualSuspension() {
+            openModal("suspension-modal");
+        }
+
+        function confirmManualSuspension() {
+            const obj = db.objectives[session.activeObjectiveId];
+            if (obj) {
+                obj.health = 20; // drop health score
+                obj.milestones.forEach(m => m.blocked = true);
+                syncActiveObjective();
+                closeModal("suspension-modal");
+                showToast("Objective execution manually suspended!", true);
+                routeHandler();
+            }
+        }
+
         // Command Palette Command Search trigger
         function toggleCommandPalette(show) {
             const drawer = document.getElementById("search-drawer");
@@ -3354,8 +3590,23 @@
             }
         }
 
+        function refreshTokenSessionKey() {
+            const key = document.getElementById("token-auth-input").value;
+            if (key) {
+                session.authToken = key;
+                showToast("Authorization key confirmed.");
+                closeModal("token-modal");
+            }
+        }
+
         // Live connection probes
         function fetchDaemonStatusOverlay() {
+            if (session.offlineMode) {
+                document.getElementById("statusbar-sync-lbl").textContent = "Offline Mode (Isolated Edge)";
+                const time = new Date();
+                document.getElementById("statusbar-time-lbl").textContent = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return;
+            }
             // Ping daemon status endpoint
             fetch("/api/status")
                 .then(res => {
@@ -3366,6 +3617,36 @@
                     // Update status bar sync labels and daemon status if available
                     document.getElementById("statusbar-sync-lbl").textContent = "Synced with Backend Daemon";
                     
+                    // Update Git Sync status
+                    if (data.git_sync) {
+                        const gitDot = document.getElementById("git-sync-dot");
+                        const gitText = document.getElementById("git-sync-text");
+                        const gitBtn = document.getElementById("git-sync-btn");
+                        
+                        gitText.textContent = `Git: ${data.git_sync.message}`;
+                        gitText.title = `Last synced: ${data.git_sync.last_sync_time_str}\n${data.git_sync.message}`;
+                        
+                        gitDot.className = "status-circle-dot";
+                        if (data.git_sync.status === "GREEN") {
+                            gitDot.classList.add("green");
+                            gitBtn.removeAttribute("disabled");
+                            gitBtn.textContent = "Sync Now";
+                        } else if (data.git_sync.status === "YELLOW") {
+                            gitDot.classList.add("yellow");
+                            gitDot.classList.add("pulse-circle-dot");
+                            gitBtn.setAttribute("disabled", "true");
+                            gitBtn.textContent = "Syncing...";
+                        } else if (data.git_sync.status === "RED") {
+                            gitDot.classList.add("red");
+                            gitBtn.removeAttribute("disabled");
+                            gitBtn.textContent = "Sync Now";
+                        } else {
+                            gitDot.classList.add("gray");
+                            gitBtn.removeAttribute("disabled");
+                            gitBtn.textContent = "Sync Now";
+                        }
+                    }
+                    
                     const time = new Date();
                     document.getElementById("statusbar-time-lbl").textContent = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 })
@@ -3373,6 +3654,42 @@
                     // Fallback offline UI mode
                     document.getElementById("statusbar-sync-lbl").textContent = "Offline Mode (Local Sandbox State)";
                 });
+        }
+
+        function triggerManualGitSync() {
+            if (session.offlineMode) {
+                showToast("Cannot sync Git in offline mode.", true);
+                return;
+            }
+            const gitBtn = document.getElementById("git-sync-btn");
+            const gitDot = document.getElementById("git-sync-dot");
+            const gitText = document.getElementById("git-sync-text");
+            
+            gitBtn.setAttribute("disabled", "true");
+            gitBtn.textContent = "Syncing...";
+            gitDot.className = "status-circle-dot yellow pulse-circle-dot";
+            gitText.textContent = "Git: Syncing now...";
+            showToast("Triggering Git synchronization...");
+            
+            fetch("/api/git/sync", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-uawos-token": "SECURE_ADMIN_TOKEN_99A"
+                }
+            })
+            .then(res => {
+                if (!res.ok) return res.json().then(d => { throw new Error(d.detail || "Sync failed"); });
+                return res.json();
+            })
+            .then(data => {
+                showToast("Git synchronization complete!");
+                fetchDaemonStatusOverlay();
+            })
+            .catch(err => {
+                showToast(`Git sync failed: ${err.message}`, true);
+                fetchDaemonStatusOverlay();
+            });
         }
 
         // Generic Toast helper
@@ -3390,6 +3707,677 @@
                 toast.classList.remove("show");
             }, 3000);
         }
+
+        // --- MEETING INTELLIGENCE OPERATIONS ---
+        let recordingInterval = null;
+        let recordingSeconds = 0;
+
+        function renderMeetingIntelligenceView() {
+            // Render Speakers Registry
+            renderSpeakerRegistry();
+
+            // Render Persona Configuration Grid
+            renderPersonaConfigGrid();
+
+            // Render Transcript Feed
+            renderTranscriptFeed();
+
+            // Render Synthesis Notebook if exists
+            renderSynthesisNotebook();
+        }
+
+        function renderSpeakerRegistry() {
+            const list = document.getElementById("meeting-speakers-list");
+            list.innerHTML = "";
+            session.meeting.speakers.forEach(spk => {
+                const item = document.createElement("div");
+                item.className = "check-list-row";
+                item.style.alignItems = "center";
+                item.innerHTML = `
+                    <div style="width:24px; height:24px; background:var(--primary-glow); border:1px solid var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; color:white;">
+                        ${spk.name.charAt(0)}
+                    </div>
+                    <div>
+                        <strong style="color:white; font-size:0.8rem;">${spk.name}</strong>
+                        <span style="font-size:0.7rem; color:var(--text-secondary); margin-left:6px;">(${spk.label})</span>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        const ALL_AVAILABLE_PERSONAS = [
+            "Executive Strategist", "CEO Advisor", "Product Manager", 
+            "Legal Analyst", "Financial Analyst", "Operations Expert",
+            "Risk Analyst", "Technical Architect"
+        ];
+
+        function renderPersonaConfigGrid() {
+            const grid = document.getElementById("meeting-personas-grid");
+            grid.innerHTML = "";
+            ALL_AVAILABLE_PERSONAS.forEach(p => {
+                const isChecked = session.meeting.selectedPersonas.includes(p);
+                const label = document.createElement("label");
+                label.className = "check-list-row";
+                label.style.cursor = "pointer";
+                label.style.padding = "6px 8px";
+                label.innerHTML = `
+                    <input type="checkbox" class="check-box-input" style="width:13px; height:13px; margin:0;" ${isChecked ? 'checked' : ''} onchange="toggleMeetingPersona('${p}', this.checked)">
+                    <span style="font-size:0.75rem; color:white;">${p}</span>
+                `;
+                grid.appendChild(label);
+            });
+        }
+
+        function toggleMeetingPersona(p, checked) {
+            if (checked) {
+                if (!session.meeting.selectedPersonas.includes(p)) {
+                    session.meeting.selectedPersonas.push(p);
+                }
+            } else {
+                session.meeting.selectedPersonas = session.meeting.selectedPersonas.filter(x => x !== p);
+            }
+        }
+
+        function switchMeetingTemplate(val) {
+            session.meeting.selectedTemplate = val;
+            
+            // Switch speakers registry mapping
+            if (val === "sprint") {
+                session.meeting.speakers = [
+                    { name: "Alice", label: "Product Manager" },
+                    { name: "Bob", label: "Tech Lead" },
+                    { name: "Charlie", label: "CEO Advisor" }
+                ];
+            } else if (val === "governance") {
+                session.meeting.speakers = [
+                    { name: "Diana", label: "Compliance Officer" },
+                    { name: "Edward", label: "CFO" },
+                    { name: "Frank", label: "Legal Counsel" }
+                ];
+            } else if (val === "consultation") {
+                session.meeting.speakers = [
+                    { name: "Grace", label: "Client" },
+                    { name: "Henry", label: "Attorney" }
+                ];
+            }
+            
+            // Clear current transcript & synthesis
+            session.meeting.transcript = [];
+            session.meeting.synthesis = null;
+            
+            renderMeetingIntelligenceView();
+        }
+
+        function toggleMeetingRecording() {
+            const statusBadge = document.getElementById("meeting-capture-status");
+            const recordBtn = document.getElementById("btn-meeting-record");
+            const stopBtn = document.getElementById("btn-meeting-stop");
+            const waveContainer = document.getElementById("meeting-wave-container");
+
+            if (!session.meeting.recording) {
+                // Start Recording
+                session.meeting.recording = true;
+                recordingSeconds = 0;
+                statusBadge.textContent = "RECORDING";
+                statusBadge.className = "badge red";
+                recordBtn.textContent = "Pause Mic";
+                stopBtn.removeAttribute("disabled");
+                showToast("Recording started...");
+
+                // Waveform animation
+                waveContainer.innerHTML = Array.from({ length: 25 }, () => `<div class="wave-bar" style="width:3px; height:10px; background:var(--primary); transition:height 0.1s; border-radius:1px;"></div>`).join('');
+                
+                recordingInterval = setInterval(() => {
+                    recordingSeconds++;
+                    const minutes = Math.floor(recordingSeconds / 60);
+                    const seconds = recordingSeconds % 60;
+                    document.getElementById("meeting-timer-lbl").textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                    // Simulate wave bar movements
+                    document.querySelectorAll(".wave-bar").forEach(bar => {
+                        const h = Math.floor(5 + Math.random() * 55);
+                        bar.style.height = `${h}px`;
+                    });
+                }, 1000);
+            } else {
+                // Pause Recording
+                session.meeting.recording = false;
+                statusBadge.textContent = "PAUSED";
+                statusBadge.className = "badge yellow";
+                recordBtn.textContent = "Resume Mic";
+                clearInterval(recordingInterval);
+                showToast("Recording paused.");
+            }
+        }
+
+        function stopMeetingRecording() {
+            if (!session.meeting.recording && recordingSeconds === 0) return;
+
+            clearInterval(recordingInterval);
+            session.meeting.recording = false;
+            recordingSeconds = 0;
+            document.getElementById("meeting-timer-lbl").textContent = "00:00";
+            
+            const statusBadge = document.getElementById("meeting-capture-status");
+            statusBadge.textContent = "PROCESSING TRANSCRIPT";
+            statusBadge.className = "badge yellow";
+            
+            document.getElementById("btn-meeting-record").textContent = "Record Mic";
+            document.getElementById("btn-meeting-stop").setAttribute("disabled", "true");
+            document.getElementById("meeting-wave-container").innerHTML = `<div style="color:var(--text-muted); font-size:0.75rem;">Processing audio features...</div>`;
+
+            // Request transcription from backend API
+            fetch("/api/meeting/transcribe", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-uawos-token": "SECURE_ADMIN_TOKEN_99A"
+                },
+                body: JSON.stringify({
+                    template: session.meeting.selectedTemplate
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Offline transcription failed");
+                return res.json();
+            })
+            .then(data => {
+                session.meeting.meetingId = data.meeting_id;
+                session.meeting.transcript = data.transcript;
+                
+                statusBadge.textContent = "COMPLETED";
+                statusBadge.className = "badge green";
+                
+                showToast("Transcription complete!");
+                renderTranscriptFeed();
+                document.getElementById("btn-meeting-synthesize").removeAttribute("disabled");
+            })
+            .catch(() => {
+                statusBadge.textContent = "IDLE";
+                statusBadge.className = "badge gray";
+                showToast("Offline mode: failed to fetch transcription.", true);
+            });
+        }
+
+        function uploadMeetingAudio(fileInput) {
+            if (!fileInput.files.length) return;
+            const file = fileInput.files[0];
+            showToast(`Uploading ${file.name} for diarized transcription...`);
+            
+            const statusBadge = document.getElementById("meeting-capture-status");
+            statusBadge.textContent = "UPLOADING";
+            statusBadge.className = "badge yellow";
+
+            setTimeout(() => {
+                stopMeetingRecording();
+            }, 1500);
+        }
+
+        function renderTranscriptFeed() {
+            const feed = document.getElementById("meeting-transcript-feed");
+            feed.innerHTML = "";
+
+            if (session.meeting.transcript.length === 0) {
+                feed.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:3rem 0; font-size:0.8rem;">Click "Record Mic" or upload an audio file to start transcription.</div>`;
+                return;
+            }
+
+            session.meeting.transcript.forEach(turn => {
+                const row = document.createElement("div");
+                row.className = "check-list-row";
+                row.style.flexDirection = "column";
+                row.style.gap = "4px";
+                row.style.padding = "8px 12px";
+                row.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; width:100%;">
+                        <strong style="color:var(--primary);">${turn.speaker}</strong>
+                        <span style="color:var(--text-muted); font-family:monospace;">${turn.timestamp}</span>
+                    </div>
+                    <p style="font-size:0.8rem; color:white; line-height:1.4;">${turn.text}</p>
+                `;
+                feed.appendChild(row);
+            });
+        }
+
+        function toggleOfflineMode() {
+            session.offlineMode = !session.offlineMode;
+            const btn = document.getElementById("statusbar-offline-toggle");
+            if (session.offlineMode) {
+                btn.textContent = "Offline";
+                btn.style.background = "var(--color-red)";
+                showToast("Switched to Offline Mode (Isolated Edge). All external calls will bypass LLM APIs.");
+            } else {
+                btn.textContent = "Online";
+                btn.style.background = "var(--emerald)";
+                showToast("Switched to Online Mode (Connected Gateway).");
+            }
+            fetchDaemonStatusOverlay();
+        }
+
+        function toggleApiSettingsFields() {
+            const providerSelect = document.getElementById("meeting-provider-select");
+            if (!providerSelect) return;
+            const provider = providerSelect.value;
+            const keyGroup = document.getElementById("api-key-group");
+            const urlGroup = document.getElementById("api-url-group");
+            const modelGroup = document.getElementById("api-model-group");
+
+            if (provider === "ollama") {
+                keyGroup.style.display = "none";
+                urlGroup.style.display = "none";
+                modelGroup.style.display = "none";
+            } else {
+                keyGroup.style.display = "block";
+                urlGroup.style.display = "block";
+                modelGroup.style.display = "block";
+                
+                const keyInput = document.getElementById("meeting-api-key");
+                const urlInput = document.getElementById("meeting-api-url");
+                const modelInput = document.getElementById("meeting-model-input");
+                
+                if (provider === "nvidia") {
+                    urlInput.placeholder = "https://integrate.api.nvidia.com/v1/chat/completions";
+                    modelInput.placeholder = "meta/llama3-70b-instruct";
+                } else if (provider === "openrouter") {
+                    urlInput.placeholder = "https://openrouter.ai/api/v1/chat/completions";
+                    modelInput.placeholder = "meta-llama/llama-3-70b-instruct:free";
+                }
+            }
+        }
+
+        function loadCustomTranscript() {
+            const rawText = document.getElementById("meeting-custom-transcript").value.trim();
+            if (!rawText) {
+                showToast("Please paste some conversational dialogue first.", true);
+                return;
+            }
+
+            const statusBadge = document.getElementById("meeting-capture-status");
+            statusBadge.textContent = "PROCESSING PASTE";
+            statusBadge.className = "badge yellow";
+            showToast("Diarizing custom transcript...");
+
+            fetch("/api/meeting/transcribe", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-uawos-token": "SECURE_ADMIN_TOKEN_99A"
+                },
+                body: JSON.stringify({
+                    text: rawText
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Offline transcription failed");
+                return res.json();
+            })
+            .then(data => {
+                session.meeting.meetingId = data.meeting_id;
+                session.meeting.transcript = data.transcript;
+                
+                statusBadge.textContent = "COMPLETED";
+                statusBadge.className = "badge green";
+                
+                showToast("Custom transcript diarized!");
+                renderTranscriptFeed();
+                document.getElementById("btn-meeting-synthesize").removeAttribute("disabled");
+                
+                // Dynamically update active speakers list based on parsed speakers in the transcript
+                const speakerNames = [...new Set(data.transcript.map(t => t.speaker))];
+                session.meeting.speakers = speakerNames.map(name => ({
+                    name: name,
+                    label: name.includes("(") ? name.split("(")[1].replace(")", "").trim() : "Participant"
+                }));
+                renderSpeakerRegistry();
+            })
+            .catch(() => {
+                statusBadge.textContent = "IDLE";
+                statusBadge.className = "badge gray";
+                showToast("Failed to parse custom transcript.", true);
+            });
+        }
+
+        function clearCustomTranscript() {
+            document.getElementById("meeting-custom-transcript").value = "";
+            showToast("Transcript input cleared.");
+        }
+
+        function triggerMeetingSynthesis() {
+            if (session.meeting.transcript.length === 0) return;
+
+            showToast("Synthesizing multi-expert notebooks...");
+            const notebook = document.getElementById("meeting-synthesis-notebook");
+            notebook.style.display = "flex";
+            
+            const content = document.getElementById("meeting-note-tabs-content");
+            content.innerHTML = `
+                <div style="text-align:center; padding:3rem 0; color:var(--text-muted);">
+                    <div style="margin-bottom:12px;">Running multi-persona prompt chains...</div>
+                    <pre class="terminal-block" style="height:60px; font-size:0.72rem; text-align:left;">[Meeting Intelligence] Emulating lenses: ${session.meeting.selectedPersonas.join(', ')}</pre>
+                </div>
+            `;
+
+            const provider = document.getElementById("meeting-provider-select")?.value || "ollama";
+            const apiKey = document.getElementById("meeting-api-key")?.value || "";
+            const apiUrl = document.getElementById("meeting-api-url")?.value || "";
+            const model = document.getElementById("meeting-model-input")?.value || "";
+            const language = document.getElementById("meeting-language-select")?.value || "English";
+            const offline = !!session.offlineMode;
+
+            fetch("/api/meeting/synthesize", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-uawos-token": "SECURE_ADMIN_TOKEN_99A"
+                },
+                body: JSON.stringify({
+                    meeting_id: session.meeting.meetingId,
+                    transcript: session.meeting.transcript,
+                    personas: session.meeting.selectedPersonas,
+                    provider: provider,
+                    api_key: apiKey,
+                    api_url: apiUrl,
+                    model: model,
+                    language: language,
+                    offline: offline
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Offline synthesis failed");
+                return res.json();
+            })
+            .then(data => {
+                session.meeting.synthesis = data.synthesis;
+                showToast("Notes synthesis completed!");
+                renderSynthesisNotebook();
+            })
+            .catch(() => {
+                showToast("Failed to compile multi-expert synthesis.", true);
+            });
+        }
+
+        function renderSynthesisNotebook() {
+            const notebook = document.getElementById("meeting-synthesis-notebook");
+            if (!session.meeting.synthesis) {
+                notebook.style.display = "none";
+                return;
+            }
+
+            notebook.style.display = "flex";
+            switchMeetingNoteTab(session.meeting.activeTab);
+        }
+
+        function switchMeetingNoteTab(tab) {
+            session.meeting.activeTab = tab;
+            
+            document.querySelectorAll(".meeting-note-tab").forEach(btn => {
+                btn.classList.remove("active");
+                if (btn.id === `tab-mtg-${tab}`) {
+                    btn.classList.add("active");
+                }
+            });
+
+            const content = document.getElementById("meeting-note-tabs-content");
+            content.innerHTML = "";
+            const s = session.meeting.synthesis;
+            if (!s) return;
+
+            switch (tab) {
+                case "summary":
+                    content.innerHTML = `
+                        <div>
+                            <span class="form-label">Meeting Strategic Purpose</span>
+                            <p style="font-size:0.82rem; color:white; line-height:1.5;">${s.executive_summary.purpose}</p>
+                        </div>
+                        <div>
+                            <span class="form-label">Context & Participants</span>
+                            <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.5;">${s.executive_summary.context}</p>
+                        </div>
+                        <div>
+                            <span class="form-label">Strategic Implications Summary</span>
+                            <p style="font-size:0.82rem; color:var(--accent); line-height:1.5;">${s.executive_summary.strategic_implications}</p>
+                        </div>
+                    `;
+                    break;
+                case "notes":
+                    s.detailed_notes.forEach(note => {
+                        const card = document.createElement("div");
+                        card.className = "check-list-row";
+                        card.style.flexDirection = "column";
+                        card.style.gap = "4px";
+                        card.innerHTML = `
+                            <strong style="color:var(--primary); font-size:0.85rem;">Topic: ${note.topic}</strong>
+                            <p style="font-size:0.8rem; color:white; line-height:1.4;">${note.summary}</p>
+                            <span style="font-size:0.72rem; color:var(--text-muted); font-style:italic;">Evidence: ${note.evidence}</span>
+                        `;
+                        content.appendChild(card);
+                    });
+                    break;
+                case "decisions":
+                    s.decisions_register.forEach(dec => {
+                        const card = document.createElement("div");
+                        card.className = "check-list-row";
+                        card.style.justifyContent = "space-between";
+                        card.style.alignItems = "center";
+                        card.innerHTML = `
+                            <div style="flex-grow:1;">
+                                <strong style="color:white; font-size:0.82rem;">${dec.id}: ${dec.decision}</strong>
+                                <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">
+                                    Owner: <strong>${dec.owner}</strong> | Rationale: <i>${dec.rationale}</i>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-primary" onclick="promoteItemToObjective('${dec.decision}', '${dec.rationale}', '${dec.owner}', '${dec.priority}', 'Decision Resolution Rate', 'percent')">Promote ↗</button>
+                        `;
+                        content.appendChild(card);
+                    });
+                    break;
+                case "actions":
+                    s.action_items.forEach(act => {
+                        const card = document.createElement("div");
+                        card.className = "check-list-row";
+                        card.style.justifyContent = "space-between";
+                        card.style.alignItems = "center";
+                        card.innerHTML = `
+                            <div style="flex-grow:1;">
+                                <strong style="color:white; font-size:0.82rem;">${act.id}: ${act.task}</strong>
+                                <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">
+                                    Owner: <strong>${act.owner}</strong> | Deadline: <strong>${act.deadline}</strong> | Priority: <strong>${act.priority}</strong>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-primary" onclick="promoteItemToObjective('${act.task}', 'Action Task from Meeting', '${act.owner}', '${act.priority}', 'Completion Rate', 'percent')">Promote ↗</button>
+                        `;
+                        content.appendChild(card);
+                    });
+                    break;
+                case "risks":
+                    content.innerHTML = `<span class="form-label">Identified Risks Register</span>`;
+                    s.risks.forEach(r => {
+                        const card = document.createElement("div");
+                        card.className = "check-list-row";
+                        card.style.flexDirection = "column";
+                        card.style.gap = "4px";
+                        card.innerHTML = `
+                            <strong style="color:var(--color-red); font-size:0.8rem;">Risk: ${r.risk} (Severity: ${r.severity})</strong>
+                            <p style="font-size:0.75rem; color:var(--text-secondary);">Mitigation: ${r.mitigation}</p>
+                        `;
+                        content.appendChild(card);
+                    });
+                    
+                    const optHeader = document.createElement("span");
+                    optHeader.className = "form-label";
+                    optHeader.style.marginTop = "15px";
+                    optHeader.textContent = "Opportunities Log";
+                    content.appendChild(optHeader);
+                    
+                    s.opportunities.forEach(o => {
+                        const card = document.createElement("div");
+                        card.className = "check-list-row";
+                        card.style.flexDirection = "column";
+                        card.style.gap = "4px";
+                        card.innerHTML = `
+                            <strong style="color:var(--emerald); font-size:0.8rem;">Opportunity: ${o.opportunity}</strong>
+                            <div style="font-size:0.75rem; color:var(--text-secondary);">
+                                Expected Value: <strong>${o.value}</strong> | Recommended Action: ${o.action}
+                            </div>
+                        `;
+                        content.appendChild(card);
+                    });
+                    break;
+                case "insights":
+                    content.innerHTML = `
+                        <div>
+                            <span class="form-label">Stakeholder Influence & Concerns</span>
+                            <p style="font-size:0.8rem; color:white; line-height:1.4;">${s.stakeholder_analysis.influence}</p>
+                            <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px; line-height:1.4;">Concerns: ${s.stakeholder_analysis.concerns}</p>
+                        </div>
+                        <div style="margin-top:15px;">
+                            <span class="form-label">Strategic Insights Brief</span>
+                            <p style="font-size:0.8rem; color:white; line-height:1.5;">${s.strategic_insights}</p>
+                        </div>
+                    `;
+                    break;
+                case "knowledge":
+                    content.innerHTML = `
+                        <div>
+                            <span class="form-label">Facts Extracted</span>
+                            <ul style="font-size:0.8rem; color:white; padding-left:20px; line-height:1.5;">
+                                ${s.knowledge_extraction.facts.map(f => `<li>${f}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <span class="form-label">Implicit Assumptions</span>
+                            <ul style="font-size:0.8rem; color:var(--text-secondary); padding-left:20px; line-height:1.5;">
+                                ${s.knowledge_extraction.assumptions.map(a => `<li>${a}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <span class="form-label">Organizational Memory & Lessons Learned</span>
+                            <ul style="font-size:0.8rem; color:var(--accent); padding-left:20px; line-height:1.5;">
+                                ${s.knowledge_extraction.lessons_learned.map(l => `<li>${l}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+
+        function promoteItemToObjective(title, description, owner, priority, metricName, metricUnit) {
+            showToast("Promoting item to core UAWOS Objective portfolio...");
+            
+            fetch("/api/meeting/promote", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-uawos-token": "SECURE_ADMIN_TOKEN_99A"
+                },
+                body: JSON.stringify({
+                    meeting_id: session.meeting.meetingId,
+                    title: title,
+                    description: description,
+                    owner: owner,
+                    priority: priority || "Medium",
+                    metric_name: metricName,
+                    metric_unit: metricUnit
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Offline promotion failed");
+                return res.json();
+            })
+            .then(data => {
+                showToast(`Success! Created Objective ${data.objective_id}`);
+                
+                // Refresh core objective database local state
+                const newId = data.objective_id;
+                db.objectives[newId] = {
+                    id: newId,
+                    title: title,
+                    category: "Promoted Task",
+                    priority: priority || "Medium",
+                    description: description,
+                    health: 100,
+                    readiness: 100,
+                    sponsor: "Executive Board",
+                    owner: owner || "System Agent",
+                    outcomes: [
+                        { id: `OUT-${newId}A`, title: `Verify target: ${title}`, metric: metricName, target: 100, current: 0, baseline: 0, progress: 0 }
+                    ],
+                    plans: [
+                        { id: `PLN-${newId}`, name: "Default AI Scenario Scoping", cost: 1000, duration: 15, probability: 90, risk: "Low", recommended: true, selected: true }
+                    ],
+                    milestones: [
+                        { id: `M-${newId}`, name: "Resolution Path", start: 30, width: 90, blocked: false, tasks: [
+                            { id: `T-${newId}A`, name: `Implement target workflow: ${title}`, done: false, evidence: null }
+                        ]}
+                    ],
+                    learnings: []
+                };
+
+                // Sync UI and switch view
+                populateObjectiveSelectors();
+                swapActiveObjective(newId);
+                location.hash = "#overview";
+            })
+            .catch(() => {
+                showToast("Local promotion simulation executed successfully!");
+                // Direct local fallback creation for offline sandbox
+                const mockId = `OBJ-${100 + Object.keys(db.objectives).length + 1}`;
+                db.objectives[mockId] = {
+                    id: mockId,
+                    title: title,
+                    category: "Simulated Promotion",
+                    priority: priority || "Medium",
+                    description: description,
+                    health: 100,
+                    readiness: 100,
+                    sponsor: "Executive Board",
+                    owner: owner || "System Agent",
+                    outcomes: [
+                        { id: `OUT-${mockId}A`, title: `Verify: ${title}`, metric: metricName, target: 100, current: 0, baseline: 0, progress: 0 }
+                    ],
+                    plans: [
+                        { id: `PLN-${mockId}`, name: "Default Local Scenario Scoping", cost: 1000, duration: 15, probability: 90, risk: "Low", recommended: true, selected: true }
+                    ],
+                    milestones: [
+                        { id: `M-${mockId}`, name: "Resolution Path", start: 30, width: 90, blocked: false, tasks: [
+                            { id: `T-${mockId}A`, name: `Implement: ${title}`, done: false, evidence: null }
+                        ]}
+                    ],
+                    learnings: []
+                };
+
+                populateObjectiveSelectors();
+                swapActiveObjective(mockId);
+                location.hash = "#overview";
+            });
+        }
+
+        function exportMeetingNotes(format) {
+            const s = session.meeting.synthesis;
+            if (!s) return;
+
+            let text = `# Meeting Notes: ${s.executive_summary.purpose}\n\n`;
+            text += `## Executive Summary\n- **Context**: ${s.executive_summary.context}\n- **Strategic Implications**: ${s.executive_summary.strategic_implications}\n\n`;
+            text += `## Decisions\n`;
+            s.decisions_register.forEach(d => {
+                text += `- **${d.id}**: ${d.decision} (Owner: ${d.owner})\n`;
+            });
+            text += `\n## Action Items\n`;
+            s.action_items.forEach(a => {
+                text += `- **${a.id}**: ${a.task} (Owner: ${a.owner}, Deadline: ${a.deadline})\n`;
+            });
+
+            // Create download
+            const blob = new Blob([text], { type: "text/markdown" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `meeting_notes_${session.meeting.meetingId}.md`;
+            a.click();
+            showToast("Markdown exported!");
+        }
+
 
     </script>
 </body>

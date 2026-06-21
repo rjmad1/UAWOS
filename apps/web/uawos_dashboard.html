@@ -2094,6 +2094,11 @@
                     <span>Mode:</span>
                     <button class="btn btn-sm" id="statusbar-offline-toggle" onclick="toggleOfflineMode()" style="padding: 2px 8px; font-size: 0.7rem; line-height: 1; border-radius: 4px; background: var(--emerald); color: white; border: none; font-weight: 700; cursor: pointer;">Online</button>
                 </div>
+                <div class="status-dot-indicator" id="git-sync-indicator" style="display: flex; align-items: center; gap: 6px;">
+                    <div class="status-circle-dot gray" id="git-sync-dot"></div>
+                    <span id="git-sync-text">Git Sync: Checking...</span>
+                    <button class="btn btn-sm" id="git-sync-btn" onclick="triggerManualGitSync()" style="padding: 2px 8px; font-size: 0.7rem; line-height: 1; border-radius: 4px; background: rgba(99,102,241,0.2); color: white; border: 1px solid var(--primary); font-weight: 500; cursor: pointer; margin-left: 4px;">Sync Now</button>
+                </div>
             </div>
             <div class="statusbar-group">
                 <span id="statusbar-sync-lbl">Autosaved & Synced</span>
@@ -3612,6 +3617,36 @@
                     // Update status bar sync labels and daemon status if available
                     document.getElementById("statusbar-sync-lbl").textContent = "Synced with Backend Daemon";
                     
+                    // Update Git Sync status
+                    if (data.git_sync) {
+                        const gitDot = document.getElementById("git-sync-dot");
+                        const gitText = document.getElementById("git-sync-text");
+                        const gitBtn = document.getElementById("git-sync-btn");
+                        
+                        gitText.textContent = `Git: ${data.git_sync.message}`;
+                        gitText.title = `Last synced: ${data.git_sync.last_sync_time_str}\n${data.git_sync.message}`;
+                        
+                        gitDot.className = "status-circle-dot";
+                        if (data.git_sync.status === "GREEN") {
+                            gitDot.classList.add("green");
+                            gitBtn.removeAttribute("disabled");
+                            gitBtn.textContent = "Sync Now";
+                        } else if (data.git_sync.status === "YELLOW") {
+                            gitDot.classList.add("yellow");
+                            gitDot.classList.add("pulse-circle-dot");
+                            gitBtn.setAttribute("disabled", "true");
+                            gitBtn.textContent = "Syncing...";
+                        } else if (data.git_sync.status === "RED") {
+                            gitDot.classList.add("red");
+                            gitBtn.removeAttribute("disabled");
+                            gitBtn.textContent = "Sync Now";
+                        } else {
+                            gitDot.classList.add("gray");
+                            gitBtn.removeAttribute("disabled");
+                            gitBtn.textContent = "Sync Now";
+                        }
+                    }
+                    
                     const time = new Date();
                     document.getElementById("statusbar-time-lbl").textContent = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 })
@@ -3619,6 +3654,42 @@
                     // Fallback offline UI mode
                     document.getElementById("statusbar-sync-lbl").textContent = "Offline Mode (Local Sandbox State)";
                 });
+        }
+
+        function triggerManualGitSync() {
+            if (session.offlineMode) {
+                showToast("Cannot sync Git in offline mode.", true);
+                return;
+            }
+            const gitBtn = document.getElementById("git-sync-btn");
+            const gitDot = document.getElementById("git-sync-dot");
+            const gitText = document.getElementById("git-sync-text");
+            
+            gitBtn.setAttribute("disabled", "true");
+            gitBtn.textContent = "Syncing...";
+            gitDot.className = "status-circle-dot yellow pulse-circle-dot";
+            gitText.textContent = "Git: Syncing now...";
+            showToast("Triggering Git synchronization...");
+            
+            fetch("/api/git/sync", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-uawos-token": "SECURE_ADMIN_TOKEN_99A"
+                }
+            })
+            .then(res => {
+                if (!res.ok) return res.json().then(d => { throw new Error(d.detail || "Sync failed"); });
+                return res.json();
+            })
+            .then(data => {
+                showToast("Git synchronization complete!");
+                fetchDaemonStatusOverlay();
+            })
+            .catch(err => {
+                showToast(`Git sync failed: ${err.message}`, true);
+                fetchDaemonStatusOverlay();
+            });
         }
 
         // Generic Toast helper

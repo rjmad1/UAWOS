@@ -4,6 +4,7 @@ import os
 import socket
 import subprocess
 import sys
+import threading
 import time
 
 from fastapi import APIRouter, HTTPException
@@ -608,12 +609,100 @@ def run_health_checks():
     return status_data
 
 
+last_git_sync_time = 0.0
+last_git_sync_status = "UNKNOWN"
+last_git_sync_msg = "No sync performed yet."
+git_sync_thread_started = False
+git_sync_lock = threading.Lock()
+
+
+def run_git_sync_now():
+    """Execute git sync via sync-git.ps1 on Windows, or direct git commands on Linux/other."""
+    global last_git_sync_time, last_git_sync_status, last_git_sync_msg
+    with git_sync_lock:
+        last_git_sync_status = "YELLOW"
+        last_git_sync_msg = "Synchronization in progress..."
+        try:
+            # On Windows, try running sync-git.ps1 first for full compatibility
+            is_windows = sys.platform == "win32" or os.name == "nt"
+            if is_windows:
+                cmd = ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "sync-git.ps1"]
+                res = subprocess.run(cmd, cwd=ROOT_DIR, capture_output=True, text=True, timeout=120.0)
+                if res.returncode == 0:
+                    last_git_sync_status = "GREEN"
+                    last_git_sync_msg = res.stdout.strip() or "Synchronization completed successfully."
+                    last_git_sync_time = time.time()
+                    return True, last_git_sync_msg
+            
+            # Direct Git commands fallback (crucial for Linux/Docker)
+            # 1. Check status
+            status_res = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=10.0)
+            if status_res.returncode != 0:
+                raise Exception(f"git status failed: {status_res.stderr.strip()}")
+            
+            if status_res.stdout.strip():
+                # Staging & committing
+                subprocess.run(["git", "add", "."], cwd=ROOT_DIR, capture_output=True, timeout=10.0)
+                timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+                subprocess.run(["git", "commit", "-m", f"auto-sync: {timestamp}"], cwd=ROOT_DIR, capture_output=True, timeout=10.0)
+            
+            # 2. Pull with rebase
+            pull_res = subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=60.0)
+            if pull_res.returncode != 0:
+                raise Exception(f"git pull failed: {pull_res.stderr.strip()}")
+            
+            # 3. Check if ahead and push
+            sb_res = subprocess.run(["git", "status", "-sb"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=10.0)
+            if sb_res.returncode == 0 and "ahead" in sb_res.stdout:
+                push_res = subprocess.run(["git", "push", "origin", "main"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=60.0)
+                if push_res.returncode != 0:
+                    raise Exception(f"git push failed: {push_res.stderr.strip()}")
+            
+            last_git_sync_status = "GREEN"
+            last_git_sync_msg = "Synchronization complete!"
+            last_git_sync_time = time.time()
+            return True, last_git_sync_msg
+            
+        except Exception as e:
+            last_git_sync_status = "RED"
+            last_git_sync_msg = f"Sync failed: {str(e)}"
+            return False, last_git_sync_msg
+
+
+def git_sync_loop():
+    """Background loop that runs git sync every 5 minutes."""
+    global git_sync_thread_started
+    git_sync_thread_started = True
+    # Wait a few seconds on startup before running first sync
+    time.sleep(5.0)
+    while True:
+        try:
+            run_git_sync_now()
+        except Exception as e:
+            print(f"Error in background git sync loop: {e}", file=sys.stderr)
+        # Sleep for 5 minutes (300 seconds)
+        time.sleep(300.0)
+
+
 def daemon_loop():
     """Periodic health checks background loop."""
-    global status_cache
+    global status_cache, git_sync_thread_started
+    
+    # Start the Git Sync thread if not already running
+    if not git_sync_thread_started:
+        t = threading.Thread(target=git_sync_loop, daemon=True)
+        t.start()
+        
     while True:
         try:
             status_cache = run_health_checks()
+            # Include git sync status in the cache
+            status_cache["git_sync"] = {
+                "status": last_git_sync_status,
+                "message": last_git_sync_msg,
+                "last_sync_time": last_git_sync_time,
+                "last_sync_time_str": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(last_git_sync_time)) if last_git_sync_time > 0 else "Never"
+            }
             with open(STATUS_FILE, "w", encoding="utf-8") as f:
                 json.dump(status_cache, f, indent=2)
         except Exception as e:
@@ -771,3 +860,12 @@ async def integrations_ingest_catalog(payload: dict):
         return uawos_integrations.ingest_ard_catalog(domain)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/api/git/sync")
+def trigger_manual_git_sync():
+    """Endpoint to trigger a manual Git sync."""
+    success, msg = run_git_sync_now()
+    if not success:
+        raise HTTPException(status_code=500, detail=msg)
+    return {"status": "success", "message": msg}
