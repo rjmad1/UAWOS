@@ -1,0 +1,216 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: Ω
+      - generic [ref=e6]: uawOS
+    - navigation "Main Navigation" [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]: Portfolio Views
+        - link "Objective Portfolio" [ref=e10] [cursor=pointer]:
+          - /url: "#portfolio"
+          - img [ref=e11]
+          - generic [ref=e16]: Objective Portfolio
+      - generic [ref=e17]:
+        - generic [ref=e18]: Active Objective Workspace
+        - link "Overview & Health" [ref=e19] [cursor=pointer]:
+          - /url: "#overview"
+          - img [ref=e20]
+          - generic [ref=e23]: Overview & Health
+        - link "Objective Ingest Studio" [ref=e24] [cursor=pointer]:
+          - /url: "#capture"
+          - img [ref=e25]
+          - generic [ref=e28]: Objective Ingest Studio
+        - link "Outcomes & Metrics" [ref=e29] [cursor=pointer]:
+          - /url: "#outcomes"
+          - img [ref=e30]
+          - generic [ref=e31]: Outcomes & Metrics
+        - link "Planning & Scenarios" [ref=e32] [cursor=pointer]:
+          - /url: "#planning"
+          - img [ref=e33]
+          - generic [ref=e37]: Planning & Scenarios
+        - link "Timeline & Roadmap" [ref=e38] [cursor=pointer]:
+          - /url: "#roadmap"
+          - img [ref=e39]
+          - generic [ref=e41]: Timeline & Roadmap
+        - link "Execution Desk" [ref=e42] [cursor=pointer]:
+          - /url: "#execution"
+          - img [ref=e43]
+          - generic [ref=e46]: Execution Desk
+        - link "Lineage & Traceability" [ref=e47] [cursor=pointer]:
+          - /url: "#traceability"
+          - img [ref=e48]
+          - generic [ref=e50]: Lineage & Traceability
+        - link "Value ROI Dashboard" [ref=e51] [cursor=pointer]:
+          - /url: "#value"
+          - img [ref=e52]
+          - generic [ref=e54]: Value ROI Dashboard
+      - generic [ref=e55]:
+        - generic [ref=e56]: Governance & Hubs
+        - link "Operations Center" [ref=e57] [cursor=pointer]:
+          - /url: "#operations"
+          - img [ref=e58]
+          - generic [ref=e62]: Operations Center
+        - link "Exception Queue" [ref=e63] [cursor=pointer]:
+          - /url: "#approvals"
+          - img [ref=e64]
+          - generic [ref=e66]: Exception Queue
+        - link "Knowledge Hub" [ref=e67] [cursor=pointer]:
+          - /url: "#knowledge"
+          - img [ref=e68]
+          - generic [ref=e70]: Knowledge Hub
+        - link "Settings & Rules" [ref=e71] [cursor=pointer]:
+          - /url: "#settings"
+          - img [ref=e72]
+          - generic [ref=e75]: Settings & Rules
+    - button "Toggle navigation sidebar width" [ref=e77] [cursor=pointer]:
+      - img [ref=e78]
+  - banner [ref=e81]:
+    - generic [ref=e82]:
+      - generic [ref=e83]:
+        - heading "Traceability Ledger" [level=2] [ref=e458]
+        - generic [ref=e87]: "Strict Health: 62%"
+      - generic [ref=e88]: Objectives / Launch Multi-Region Cloud Service / Traceability Ledger
+    - generic [ref=e89]:
+      - generic [ref=e90] [cursor=pointer]:
+        - generic [ref=e91]: Search Workspace...
+        - generic [ref=e92]: Ctrl+K
+      - generic [ref=e93]:
+        - generic [ref=e94]: "Objective:"
+        - combobox "Objective:" [ref=e95] [cursor=pointer]:
+          - option "OBJ-101 — Relocate Family to Madrid"
+          - option "OBJ-201 — Reduce Customer Churn by 15%"
+          - option "OBJ-301 — Launch Multi-Region Cloud Service" [selected]
+          - option "OBJ-401 — Pass Advanced Cybersecurity Exam"
+      - generic [ref=e96]:
+        - generic [ref=e97]: "Active Role:"
+        - combobox "Active Role:" [ref=e98] [cursor=pointer]:
+          - option "Lead / PM"
+          - option "Individual Contributor"
+          - option "Executive Sponsor" [selected]
+          - option "Compliance Auditor"
+  - main [ref=e99]:
+    - generic [ref=e460]:
+      - generic [ref=e461]: Objective Traceability Matrix
+      - generic [ref=e462]:
+        - paragraph [ref=e463]: Progressively trace Intent from Objective definition, down to active Milestones, Action tasks, resulting Artifact files, and verifying Evidence.
+        - table [ref=e465]:
+          - rowgroup [ref=e466]:
+            - row "Target / Outcome Plan Path Active Milestone Action Task Compliance State Trace Evidence" [ref=e467]:
+              - columnheader "Target / Outcome" [ref=e468]
+              - columnheader "Plan Path" [ref=e469]
+              - columnheader "Active Milestone" [ref=e470]
+              - columnheader "Action Task" [ref=e471]
+              - columnheader "Compliance State" [ref=e472]
+              - columnheader "Trace Evidence" [ref=e473]
+          - rowgroup [ref=e474]:
+            - 'row "OUT-301A — Failover RTO Performance PLN-302 Cross-Region Routing T-301A: Setup VPC cross-region peering links VERIFIED Trace Lineage 🔍" [ref=e475]':
+              - cell "OUT-301A — Failover RTO Performance" [ref=e476]:
+                - strong [ref=e477]: OUT-301A
+                - text: — Failover RTO Performance
+              - cell "PLN-302" [ref=e478]
+              - cell "Cross-Region Routing" [ref=e479]
+              - 'cell "T-301A: Setup VPC cross-region peering links" [ref=e480]'
+              - cell "VERIFIED" [ref=e481]:
+                - generic [ref=e482]: VERIFIED
+              - cell "Trace Lineage 🔍" [ref=e483]
+            - 'row "OUT-301A — Failover RTO Performance PLN-302 Cross-Region Routing T-301B: Deploy global DNS failover profiles VERIFIED Trace Lineage 🔍" [ref=e484]':
+              - cell "OUT-301A — Failover RTO Performance" [ref=e485]:
+                - strong [ref=e486]: OUT-301A
+                - text: — Failover RTO Performance
+              - cell "PLN-302" [ref=e487]
+              - cell "Cross-Region Routing" [ref=e488]
+              - 'cell "T-301B: Deploy global DNS failover profiles" [ref=e489]'
+              - cell "VERIFIED" [ref=e490]:
+                - generic [ref=e491]: VERIFIED
+              - cell "Trace Lineage 🔍" [ref=e492]
+            - 'row "OUT-301A — Failover RTO Performance PLN-302 Data replication replication sync T-302A: Deploy database passive replica targets PENDING None" [ref=e493]':
+              - cell "OUT-301A — Failover RTO Performance" [ref=e494]:
+                - strong [ref=e495]: OUT-301A
+                - text: — Failover RTO Performance
+              - cell "PLN-302" [ref=e496]
+              - cell "Data replication replication sync" [ref=e497]
+              - 'cell "T-302A: Deploy database passive replica targets" [ref=e498]'
+              - cell "PENDING" [ref=e499]:
+                - generic [ref=e500]: PENDING
+              - cell "None" [ref=e501]
+            - 'row "OUT-301A — Failover RTO Performance PLN-302 Data replication replication sync T-302B: Simulate failure disaster recovery run PENDING None" [ref=e502]':
+              - cell "OUT-301A — Failover RTO Performance" [ref=e503]:
+                - strong [ref=e504]: OUT-301A
+                - text: — Failover RTO Performance
+              - cell "PLN-302" [ref=e505]
+              - cell "Data replication replication sync" [ref=e506]
+              - 'cell "T-302B: Simulate failure disaster recovery run" [ref=e507]'
+              - cell "PENDING" [ref=e508]:
+                - generic [ref=e509]: PENDING
+              - cell "None" [ref=e510]
+            - 'row "OUT-301B — Target SLA Uptime Met PLN-302 Cross-Region Routing T-301A: Setup VPC cross-region peering links VERIFIED Trace Lineage 🔍" [ref=e511]':
+              - cell "OUT-301B — Target SLA Uptime Met" [ref=e512]:
+                - strong [ref=e513]: OUT-301B
+                - text: — Target SLA Uptime Met
+              - cell "PLN-302" [ref=e514]
+              - cell "Cross-Region Routing" [ref=e515]
+              - 'cell "T-301A: Setup VPC cross-region peering links" [ref=e516]'
+              - cell "VERIFIED" [ref=e517]:
+                - generic [ref=e518]: VERIFIED
+              - cell "Trace Lineage 🔍" [ref=e519]
+            - 'row "OUT-301B — Target SLA Uptime Met PLN-302 Cross-Region Routing T-301B: Deploy global DNS failover profiles VERIFIED Trace Lineage 🔍" [ref=e520]':
+              - cell "OUT-301B — Target SLA Uptime Met" [ref=e521]:
+                - strong [ref=e522]: OUT-301B
+                - text: — Target SLA Uptime Met
+              - cell "PLN-302" [ref=e523]
+              - cell "Cross-Region Routing" [ref=e524]
+              - 'cell "T-301B: Deploy global DNS failover profiles" [ref=e525]'
+              - cell "VERIFIED" [ref=e526]:
+                - generic [ref=e527]: VERIFIED
+              - cell "Trace Lineage 🔍" [ref=e528]
+            - 'row "OUT-301B — Target SLA Uptime Met PLN-302 Data replication replication sync T-302A: Deploy database passive replica targets PENDING None" [ref=e529]':
+              - cell "OUT-301B — Target SLA Uptime Met" [ref=e530]:
+                - strong [ref=e531]: OUT-301B
+                - text: — Target SLA Uptime Met
+              - cell "PLN-302" [ref=e532]
+              - cell "Data replication replication sync" [ref=e533]
+              - 'cell "T-302A: Deploy database passive replica targets" [ref=e534]'
+              - cell "PENDING" [ref=e535]:
+                - generic [ref=e536]: PENDING
+              - cell "None" [ref=e537]
+            - 'row "OUT-301B — Target SLA Uptime Met PLN-302 Data replication replication sync T-302B: Simulate failure disaster recovery run PENDING None" [ref=e538]':
+              - cell "OUT-301B — Target SLA Uptime Met" [ref=e539]:
+                - strong [ref=e540]: OUT-301B
+                - text: — Target SLA Uptime Met
+              - cell "PLN-302" [ref=e541]
+              - cell "Data replication replication sync" [ref=e542]
+              - 'cell "T-302B: Simulate failure disaster recovery run" [ref=e543]'
+              - cell "PENDING" [ref=e544]:
+                - generic [ref=e545]: PENDING
+              - cell "None" [ref=e546]
+  - generic [ref=e161]:
+    - generic [ref=e162]:
+      - heading "Evidence & Lineage Trace" [level=3] [ref=e163]
+      - button "Close evidence panel" [ref=e164] [cursor=pointer]: ×
+    - generic [ref=e165]:
+      - generic [ref=e166]:
+        - generic [ref=e167]: Provenance Source
+        - strong [ref=e168]: PRD Ingest Document
+      - generic [ref=e169]:
+        - generic [ref=e170]: Verification Logs
+        - paragraph [ref=e171]: Automated parser completed syntax and structural checks.
+      - generic [ref=e172]:
+        - generic [ref=e173]: Traceability Schema Metadata
+        - generic [ref=e174]: "{}"
+    - button "Close Panel" [ref=e176] [cursor=pointer]
+  - generic [ref=e177]:
+    - generic [ref=e178]:
+      - heading "Command & Search Palette" [level=3] [ref=e179]
+      - button "×" [ref=e180] [cursor=pointer]
+    - generic [ref=e181]:
+      - textbox "Search objectives, outcomes, plans, tasks..." [ref=e183]
+      - generic [ref=e184]: Search Results
+  - generic:
+    - generic: Sequence loop warning!
+  - contentinfo [ref=e185]:
+    - generic [ref=e186]:
+      - generic [ref=e189]: "Daemon Live Connection: ACTIVE"
+      - generic [ref=e191]: "Active Tenant: default_tenant"
+    - generic [ref=e192]:
+      - generic [ref=e193]: Synced with Backend Daemon
+      - generic [ref=e194]: 06:47 PM

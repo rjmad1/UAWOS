@@ -10,6 +10,7 @@ import contextlib
 import hashlib
 
 from shared.utilities.context import get_tenant_id
+from config.settings import settings
 
 # Global lock repository to handle concurrent writes on file fallbacks
 _file_locks = {}
@@ -27,6 +28,27 @@ def _get_db_key(state_file: str) -> str:
     return os.path.splitext(os.path.basename(state_file))[0]
 
 
+def _resolve_state_file(state_file: str) -> str:
+    import tempfile
+    if state_file and os.path.isabs(state_file):
+        try:
+            norm_state_file = os.path.normpath(state_file)
+            temp_dir = os.path.normpath(tempfile.gettempdir())
+            if os.name == "nt":
+                import ctypes
+                buf = ctypes.create_unicode_buffer(1024)
+                if ctypes.windll.kernel32.GetLongPathNameW(norm_state_file, buf, 1024) > 0:
+                    norm_state_file = buf.value
+                buf = ctypes.create_unicode_buffer(1024)
+                if ctypes.windll.kernel32.GetLongPathNameW(temp_dir, buf, 1024) > 0:
+                    temp_dir = buf.value
+            if norm_state_file.lower().startswith(temp_dir.lower()):
+                return state_file
+        except Exception:
+            pass
+    return os.path.join(settings.STATE_DIR, os.path.basename(state_file))
+
+
 def load_state(state_file: str = None, default_state_func: Callable[[], Any] = None, tenant_id: str = "default_tenant"):
     """Load state from PostgreSQL database, falling back to local JSON file if offline."""
     # Resolve state_file if not provided
@@ -39,6 +61,8 @@ def load_state(state_file: str = None, default_state_func: Callable[[], Any] = N
         default_state_func = caller_globals.get("get_default_state")
     if state_file is None or default_state_func is None:
         raise ValueError("STATE_FILE and get_default_state must be defined in the caller module or passed explicitly.")
+
+    state_file = _resolve_state_file(state_file)
 
     if tenant_id == "default_tenant":
         tenant_id = get_tenant_id()
@@ -96,6 +120,8 @@ def save_state(state_file: str = None, state: Any = None, tenant_id: str = "defa
     if state_file is None or state is None:
         raise ValueError("STATE_FILE and state must be provided to save_state.")
 
+    state_file = _resolve_state_file(state_file)
+
     if tenant_id == "default_tenant":
         tenant_id = get_tenant_id()
 
@@ -133,6 +159,8 @@ def state_transaction(state_file: str = None, tenant_id: str = "default_tenant")
             pass
     if state_file is None:
         raise ValueError("STATE_FILE must be defined in the caller or passed explicitly.")
+
+    state_file = _resolve_state_file(state_file)
 
     if tenant_id == "default_tenant":
         tenant_id = get_tenant_id()

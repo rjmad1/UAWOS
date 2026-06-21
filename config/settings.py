@@ -103,4 +103,7 @@ class Settings:
     NEO4J_PORT_1: int = int(os.environ.get("NEO4J_PORT_1", 7687))
     NEO4J_PORT_2: int = int(os.environ.get("NEO4J_PORT_2", 7474))
 
+    # State Directory Configuration
+    STATE_DIR: str = os.environ.get("UAWOS_STATE_DIR", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 settings = Settings()

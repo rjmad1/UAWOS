@@ -16,6 +16,7 @@ from application.use_cases.governance_use_cases import (
     get_dynamic_agent_autonomy_level,
     run_governor_audit_analysis,
 )
+from infrastructure.security.opa_client import evaluate_via_opa
 
 # Exposed variables for compatibility/tests
 OPA_HOST = os.environ.get("OPA_HOST", "127.0.0.1")
@@ -202,3 +203,21 @@ def run_self_tests():
 
 if __name__ == "__main__":
     run_self_tests()
+
+
+# Module-level property routing for backwards compatibility in tests
+import sys
+import types
+
+class GovernanceModule(types.ModuleType):
+    @property
+    def _policy_uploaded(self):
+        import infrastructure.security.opa_client as client
+        return client._policy_uploaded
+
+    @_policy_uploaded.setter
+    def _policy_uploaded(self, value):
+        import infrastructure.security.opa_client as client
+        client._policy_uploaded = value
+
+sys.modules[__name__].__class__ = GovernanceModule

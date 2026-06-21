@@ -1,0 +1,162 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: Ω
+      - generic [ref=e6]: uawOS
+    - navigation "Main Navigation" [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]: Portfolio Views
+        - link "Objective Portfolio" [ref=e10] [cursor=pointer]:
+          - /url: "#portfolio"
+          - img [ref=e11]
+          - generic [ref=e16]: Objective Portfolio
+      - generic [ref=e17]:
+        - generic [ref=e18]: Active Objective Workspace
+        - link "Overview & Health" [ref=e19] [cursor=pointer]:
+          - /url: "#overview"
+          - img [ref=e20]
+          - generic [ref=e23]: Overview & Health
+        - link "Objective Ingest Studio" [ref=e24] [cursor=pointer]:
+          - /url: "#capture"
+          - img [ref=e25]
+          - generic [ref=e28]: Objective Ingest Studio
+        - link "Outcomes & Metrics" [ref=e29] [cursor=pointer]:
+          - /url: "#outcomes"
+          - img [ref=e30]
+          - generic [ref=e31]: Outcomes & Metrics
+        - link "Planning & Scenarios" [ref=e32] [cursor=pointer]:
+          - /url: "#planning"
+          - img [ref=e33]
+          - generic [ref=e37]: Planning & Scenarios
+        - link "Timeline & Roadmap" [ref=e38] [cursor=pointer]:
+          - /url: "#roadmap"
+          - img [ref=e39]
+          - generic [ref=e41]: Timeline & Roadmap
+        - link "Execution Desk" [ref=e42] [cursor=pointer]:
+          - /url: "#execution"
+          - img [ref=e43]
+          - generic [ref=e46]: Execution Desk
+        - link "Lineage & Traceability" [ref=e47] [cursor=pointer]:
+          - /url: "#traceability"
+          - img [ref=e48]
+          - generic [ref=e50]: Lineage & Traceability
+        - link "Value ROI Dashboard" [ref=e51] [cursor=pointer]:
+          - /url: "#value"
+          - img [ref=e52]
+          - generic [ref=e54]: Value ROI Dashboard
+      - generic [ref=e55]:
+        - generic [ref=e56]: Governance & Hubs
+        - link "Operations Center" [ref=e57] [cursor=pointer]:
+          - /url: "#operations"
+          - img [ref=e58]
+          - generic [ref=e62]: Operations Center
+        - link "Exception Queue" [ref=e63] [cursor=pointer]:
+          - /url: "#approvals"
+          - img [ref=e64]
+          - generic [ref=e66]: Exception Queue
+        - link "Knowledge Hub" [ref=e67] [cursor=pointer]:
+          - /url: "#knowledge"
+          - img [ref=e68]
+          - generic [ref=e70]: Knowledge Hub
+        - link "Settings & Rules" [ref=e71] [cursor=pointer]:
+          - /url: "#settings"
+          - img [ref=e72]
+          - generic [ref=e75]: Settings & Rules
+    - button "Toggle navigation sidebar width" [ref=e77] [cursor=pointer]:
+      - img [ref=e78]
+  - banner [ref=e81]:
+    - generic [ref=e82]:
+      - generic [ref=e83]:
+        - heading "Exception Waiver Queue" [level=2] [ref=e281]
+        - generic [ref=e87]: "Strict Health: 56%"
+      - generic [ref=e88]: Objectives / Reduce Customer Churn by 15% / Exception Waiver Queue
+    - generic [ref=e89]:
+      - generic [ref=e90] [cursor=pointer]:
+        - generic [ref=e91]: Search Workspace...
+        - generic [ref=e92]: Ctrl+K
+      - generic [ref=e93]:
+        - generic [ref=e94]: "Objective:"
+        - combobox "Objective:" [ref=e95] [cursor=pointer]:
+          - option "OBJ-101 — Relocate Family to Madrid"
+          - option "OBJ-201 — Reduce Customer Churn by 15%" [selected]
+          - option "OBJ-301 — Launch Multi-Region Cloud Service"
+          - option "OBJ-401 — Pass Advanced Cybersecurity Exam"
+      - generic [ref=e96]:
+        - generic [ref=e97]: "Active Role:"
+        - combobox "Active Role:" [ref=e98] [cursor=pointer]:
+          - option "Lead / PM"
+          - option "Individual Contributor"
+          - option "Executive Sponsor" [selected]
+          - option "Compliance Auditor"
+  - main [ref=e99]:
+    - generic [ref=e283]:
+      - generic [ref=e284]:
+        - generic [ref=e285]: Active Exception & Approval Requests
+        - generic [ref=e286]:
+          - generic [ref=e287] [cursor=pointer]:
+            - generic [ref=e288]:
+              - strong [ref=e289]: "EXC-201: Consulate Funds Waiver"
+              - generic [ref=e290]: PENDING
+            - generic [ref=e291]:
+              - text: "Requestor:"
+              - strong [ref=e292]: Personal Agent
+              - text: "| Gate:"
+              - strong [ref=e293]: POL-017
+          - generic [ref=e294] [cursor=pointer]:
+            - generic [ref=e295]:
+              - strong [ref=e296]: "EXC-202: Active-Active Multi-Cloud budget waive"
+              - generic [ref=e297]: PENDING
+            - generic [ref=e298]:
+              - text: "Requestor:"
+              - strong [ref=e299]: Orchestrator Agent
+              - text: "| Gate:"
+              - strong [ref=e300]: POL-017
+      - generic [ref=e301]:
+        - generic [ref=e302]: Waiver Sign-off Terminal
+        - generic [ref=e303]:
+          - generic [ref=e304]:
+            - generic [ref=e305]: Exception Title
+            - strong [ref=e306]: "EXC-201: Consulate Funds Waiver"
+          - generic [ref=e307]:
+            - generic [ref=e308]: Waiver Justification Statement
+            - paragraph [ref=e309]: Required translation delay exceptions to authorize file verification.
+          - generic [ref=e310]:
+            - generic [ref=e311]: OPA Rego Constraint Rule
+            - generic [ref=e312]: "# Rule validation logic package opa.rules.gating deny[msg] { input.breach_type == \"POL-017\" not input.has_signed_waiver msg := \"Waiver authorization signature required\" }"
+          - generic [ref=e313]:
+            - generic [ref=e314]: Supervisor Digital Signature Key
+            - textbox "Enter key signature..." [ref=e315]
+          - generic [ref=e316]:
+            - button "Reject" [ref=e317] [cursor=pointer]
+            - button "Sign Waiver Exception" [ref=e318] [cursor=pointer]
+  - generic [ref=e161]:
+    - generic [ref=e162]:
+      - heading "Evidence & Lineage Trace" [level=3] [ref=e163]
+      - button "Close evidence panel" [ref=e164] [cursor=pointer]: ×
+    - generic [ref=e165]:
+      - generic [ref=e166]:
+        - generic [ref=e167]: Provenance Source
+        - strong [ref=e168]: PRD Ingest Document
+      - generic [ref=e169]:
+        - generic [ref=e170]: Verification Logs
+        - paragraph [ref=e171]: Automated parser completed syntax and structural checks.
+      - generic [ref=e172]:
+        - generic [ref=e173]: Traceability Schema Metadata
+        - generic [ref=e174]: "{}"
+    - button "Close Panel" [ref=e176] [cursor=pointer]
+  - generic [ref=e177]:
+    - generic [ref=e178]:
+      - heading "Command & Search Palette" [level=3] [ref=e179]
+      - button "×" [ref=e180] [cursor=pointer]
+    - generic [ref=e181]:
+      - textbox "Search objectives, outcomes, plans, tasks..." [ref=e183]
+      - generic [ref=e184]: Search Results
+  - generic:
+    - generic: "Switched active context to: Executive"
+  - contentinfo [ref=e185]:
+    - generic [ref=e186]:
+      - generic [ref=e189]: "Daemon Live Connection: ACTIVE"
+      - generic [ref=e191]: "Active Tenant: default_tenant"
+    - generic [ref=e192]:
+      - generic [ref=e193]: Synced with Backend Daemon
+      - generic [ref=e194]: 06:38 PM

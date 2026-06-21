@@ -728,16 +728,36 @@ def get_docs():
 
 @router.get("/api/docs/content", response_class=PlainTextResponse)
 def get_docs_content(file: str = ""):
-    file_name = os.path.basename(file)
-    docs_dir = os.path.join(ROOT_DIR, "Requirements Master")
-    file_path = os.path.join(docs_dir, file_name)
-    if file_name and os.path.exists(file_path) and file_name.endswith(".md"):
-        try:
-            with open(file_path, encoding="utf-8") as f:
-                return f.read()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error reading file: {e}")
-    raise HTTPException(status_code=404, detail="Document not found or access denied.")
+    if not file:
+        raise HTTPException(status_code=400, detail="File path parameter is required.")
+    
+    # Resolve the absolute path relative to ROOT_DIR
+    # Normalize paths to handle backslashes and relative paths safely
+    normalized_file = file.replace("\\", "/").lstrip("/")
+    safe_path = os.path.abspath(os.path.join(ROOT_DIR, normalized_file))
+    
+    # Security check: must reside inside ROOT_DIR
+    # Using commonpath to securely verify containment
+    try:
+        common_prefix = os.path.commonpath([os.path.abspath(ROOT_DIR), safe_path])
+        if os.path.abspath(ROOT_DIR) != common_prefix:
+            raise HTTPException(status_code=403, detail="Access denied. Path traversal detected.")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid path format.")
+        
+    # Check if the file is a markdown file
+    if not safe_path.lower().endswith(".md"):
+        raise HTTPException(status_code=400, detail="Only Markdown (.md) files are accessible.")
+        
+    # Check if file exists
+    if not os.path.exists(safe_path) or not os.path.isfile(safe_path):
+        raise HTTPException(status_code=404, detail=f"Document not found: {file}")
+        
+    try:
+        with open(safe_path, encoding="utf-8") as f:
+            return f.read()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading file: {e}")
 
 
 @router.post("/api/integrations/ingest-catalog")

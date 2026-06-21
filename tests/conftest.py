@@ -10,3 +10,13 @@ def setup_test_context():
     tokens = set_context("default_tenant", "Developer", "system")
     yield
     reset_context(tokens)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def configure_test_state_directory(tmp_path_factory):
+    """Automatically isolate state files in a temporary directory for test duration."""
+    test_state_dir = tmp_path_factory.mktemp("uawos_test_state")
+    os.environ["UAWOS_STATE_DIR"] = str(test_state_dir)
+    yield
+    if "UAWOS_STATE_DIR" in os.environ:
+        del os.environ["UAWOS_STATE_DIR"]

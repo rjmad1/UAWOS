@@ -7,7 +7,7 @@ from typing import List
 from domains.objective.objective import Objective
 from domains.objective.conflict_detector import detect_conflicts
 from domains.objective.scoring import calculate_health, calculate_confidence
-from infrastructure.storage.json_fallback_store import load_state, save_state
+from infrastructure.storage.json_fallback_store import load_state, save_state, state_transaction
 from shared.utilities.context import get_tenant_id
 
 STATE_FILE = os.path.join(
@@ -30,55 +30,55 @@ def create_objective(
     priority: str = "Medium",
     dependencies: List[str] = None,
 ) -> dict:
-    state = load_state()
-    tenant_id = get_tenant_id()
-    
-    objective_id = f"OBJ-{len(state['objectives']) + 101:03d}"
-    dependencies = dependencies or []
-    
-    obj = Objective(
-        id=objective_id,
-        title=title,
-        description=description,
-        source_type=source_type,
-        source_uri=source_uri,
-        owner=owner,
-        sponsor=sponsor,
-        priority=priority,
-        dependencies=dependencies,
-        tenant_id=tenant_id,
-    )
-    
-    state["objectives"][objective_id] = obj.to_dict()
-    save_state(state)
+    with state_transaction(STATE_FILE):
+        state = load_state(STATE_FILE)
+        tenant_id = get_tenant_id()
+        
+        objective_id = f"OBJ-{len(state['objectives']) + 101:03d}"
+        dependencies = dependencies or []
+        
+        obj = Objective(
+            id=objective_id,
+            title=title,
+            description=description,
+            source_type=source_type,
+            source_uri=source_uri,
+            owner=owner,
+            sponsor=sponsor,
+            priority=priority,
+            dependencies=dependencies,
+            tenant_id=tenant_id,
+        )
+        
+        state["objectives"][objective_id] = obj.to_dict()
+        save_state(STATE_FILE, state)
     
     recalculate_scores(objective_id)
-    state = load_state()
-    return state["objectives"][objective_id]
+    return load_state(STATE_FILE)["objectives"][objective_id]
 
 
 def update_objective(objective_id: str, updates: dict) -> dict:
-    state = load_state()
-    obj_dict = state["objectives"].get(objective_id)
-    if not obj_dict:
-        return {"error": f"Objective {objective_id} not found."}
-        
-    obj = Objective.from_dict(obj_dict)
-    
-    snapshot = {k: v for k, v in obj.to_dict().items() if k != "history"}
-    obj.history.append({"timestamp": time.time(), "state": snapshot})
-    
-    for k, v in updates.items():
-        if k in ["title", "description", "owner", "sponsor", "priority", "dependencies", "status"]:
-            setattr(obj, k, v)
+    with state_transaction(STATE_FILE):
+        state = load_state(STATE_FILE)
+        obj_dict = state["objectives"].get(objective_id)
+        if not obj_dict:
+            return {"error": f"Objective {objective_id} not found."}
             
-    obj.version += 1
-    state["objectives"][objective_id] = obj.to_dict()
-    save_state(state)
+        obj = Objective.from_dict(obj_dict)
+        
+        snapshot = {k: v for k, v in obj.to_dict().items() if k != "history"}
+        obj.history.append({"timestamp": time.time(), "state": snapshot})
+        
+        for k, v in updates.items():
+            if k in ["title", "description", "owner", "sponsor", "priority", "dependencies", "status"]:
+                setattr(obj, k, v)
+                
+        obj.version += 1
+        state["objectives"][objective_id] = obj.to_dict()
+        save_state(STATE_FILE, state)
     
     recalculate_scores(objective_id)
-    state = load_state()
-    return state["objectives"][objective_id]
+    return load_state(STATE_FILE)["objectives"][objective_id]
 
 
 def archive_objective(objective_id: str) -> dict:
@@ -215,12 +215,13 @@ def create_objective_from_input(
         dependencies=dependencies,
     )
     
-    state = load_state()
-    state["objectives"][obj_dict["id"]]["confidence_score"] = float(parser_confidence)
-    save_state(state)
+    with state_transaction(STATE_FILE):
+        state = load_state(STATE_FILE)
+        state["objectives"][obj_dict["id"]]["confidence_score"] = float(parser_confidence)
+        save_state(STATE_FILE, state)
     recalculate_scores(obj_dict["id"])
     
-    return load_state()["objectives"][obj_dict["id"]]
+    return load_state(STATE_FILE)["objectives"][obj_dict["id"]]
 
 
 def detect_objective_conflicts() -> list:

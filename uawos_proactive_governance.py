@@ -37,6 +37,7 @@ class CodeRiskScanner:
     def __init__(self, directory=BASE_DIR):
         self.directory = directory
         self.python_files = []
+        self.file_paths = {}
         self.import_graph = nx.DiGraph()
         self.todos = []
         self.suppressions = []
@@ -45,6 +46,7 @@ class CodeRiskScanner:
 
     def scan(self):
         self.python_files = []
+        self.file_paths = {}
         self.import_graph.clear()
         self.todos = []
         self.suppressions = []
@@ -60,6 +62,7 @@ class CodeRiskScanner:
                 if f.startswith("uawos_") and f.endswith(".py"):
                     full_path = os.path.join(root, f)
                     self.python_files.append(f)
+                    self.file_paths[f] = full_path
                     self._scan_file(f, full_path)
 
         self._build_dependency_graph()
@@ -109,7 +112,7 @@ class CodeRiskScanner:
             self.import_graph.add_node(module_name)
 
             # Read file to find imports of other uawos modules
-            path = os.path.join(self.directory, f)
+            path = self.file_paths[f]
             with open(path, encoding="utf-8", errors="ignore") as file:
                 content = file.read()
                 # Find all import statements

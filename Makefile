@@ -87,7 +87,7 @@ test: ## Run all self-tests
 
 .PHONY: test-pytest
 test-pytest: ## Run tests via pytest (if installed)
-	$(PYTHON) -m pytest scratch/ -v --tb=short
+	$(PYTHON) -m pytest -v --tb=short
 
 .PHONY: lint
 lint: ## Run ruff linting and formatting checks

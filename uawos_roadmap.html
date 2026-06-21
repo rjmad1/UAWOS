@@ -3,888 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAWOS - Roadmap Intelligence Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <title>UAWOS - Redirecting...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@600;800&display=swap" rel="stylesheet" crossorigin="anonymous">
     <style>
         :root {
             --bg-color: #080a10;
-            --card-bg: rgba(18, 22, 35, 0.6);
-            --card-border: rgba(255, 255, 255, 0.06);
-            --card-border-hover: rgba(255, 255, 255, 0.15);
             --text-primary: #f3f4f6;
             --text-secondary: #9ca3af;
             --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.25);
-            
-            /* Status Colors */
-            --green: #10b981;
-            --green-glow: rgba(16, 185, 129, 0.15);
-            --yellow: #f59e0b;
-            --yellow-glow: rgba(245, 158, 11, 0.15);
-            --red: #ef4444;
-            --red-glow: rgba(239, 68, 68, 0.2);
-            --gray: #6b7280;
-            --gray-glow: rgba(107, 114, 128, 0.1);
-            --blue: #3b82f6;
-            --blue-glow: rgba(59, 130, 246, 0.15);
+            --green: hsl(142, 70%, 45%);
+            --yellow: hsl(45, 90%, 50%);
+            --red: hsl(0, 85%, 50%);
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
             min-height: 100vh;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.04) 0%, transparent 40%);
-            background-attachment: fixed;
-            padding: 2rem;
-        }
-
-        /* Glass header card */
-        header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            justify-content: center;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 60%);
         }
-
-        .brand h1 {
+        .redirect-card {
+            background: rgba(18, 22, 35, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+        .logo {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 800;
             background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
-        }
-
-        .brand p {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 0.8rem;
-        }
-
-        .btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--card-border);
-            color: var(--text-primary);
-            padding: 10px 18px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--card-border-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary {
-            background-color: #4f46e5;
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            border: none;
-            color: white;
-            box-shadow: 0 4px 12px var(--primary-glow);
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
-        }
-
-        /* Layout wrapper */
-        .layout-container {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .section-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.35rem;
-            font-weight: 600;
-            color: #818cf8;
-            margin-bottom: 1.25rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Table design */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: 1rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.88rem;
-        }
-
-        th {
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.02);
-            color: var(--text-secondary);
-            font-weight: 600;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            text-transform: uppercase;
-            font-size: 0.76rem;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            color: var(--text-primary);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.015);
-        }
-
-        /* Status pills */
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        .status-pill.green { color: var(--green); background: var(--green-glow); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .status-pill.yellow { color: var(--yellow); background: var(--yellow-glow); border: 1px solid rgba(245, 158, 11, 0.2); }
-        .status-pill.red { color: var(--red); background: var(--red-glow); border: 1px solid rgba(239, 68, 68, 0.2); }
-        .status-pill.blue { color: var(--blue); background: var(--blue-glow); border: 1px solid rgba(59, 130, 246, 0.2); }
-        .status-pill.gray { color: var(--gray); background: var(--gray-glow); border: 1px solid rgba(107, 114, 128, 0.2); }
-
-        /* Action Buttons inside Table */
-        .action-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: var(--text-primary);
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .action-btn-primary {
-            background-color: #1b1b3a;
-            color: #a5b4fc;
-            border-color: rgba(99, 102, 241, 0.2);
-        }
-
-        .action-btn-primary:hover {
-            background: rgba(99, 102, 241, 0.2);
-            border-color: rgba(99, 102, 241, 0.35);
-        }
-
-        .action-btn-accent {
-            background-color: #2e1122;
-            color: #f472b6;
-            border-color: rgba(236, 72, 153, 0.15);
-        }
-
-        .action-btn-accent:hover {
-            background: rgba(236, 72, 153, 0.18);
-            border-color: rgba(236, 72, 153, 0.3);
-        }
-
-        /* Alert styling */
-        .alert-box {
-            padding: 1.25rem;
-            border-left: 4px solid var(--yellow);
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            background: rgba(245, 158, 11, 0.03);
-            border-top: 1px solid rgba(255,255,255,0.02);
-            border-right: 1px solid rgba(255,255,255,0.02);
-            border-bottom: 1px solid rgba(255,255,255,0.02);
-        }
-
-        .alert-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--yellow);
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 600;
             margin-bottom: 0.5rem;
         }
-
-        /* Prompt codeblock preview */
-        .prompt-block {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 1.5rem;
-            font-family: monospace;
-            font-size: 0.82rem;
-            line-height: 1.5;
-            color: #d1d5db;
-            overflow-y: auto;
-            max-height: 400px;
-            margin-top: 1.5rem;
-            white-space: pre-wrap;
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
         }
-
-        /* CSS Toast notifications */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: #10b981;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s ease;
-            font-weight: 500;
-            pointer-events: none;
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
         }
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        /* WCAG 2.1 AA keyboard focus outline styles */
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible,
-        a:focus-visible,
-        [tabindex]:focus-visible {
-            outline: 2px solid #818cf8;
+        .message {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        .btn-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            transition: color 0.2s;
+        }
+        .btn-link:hover {
+            color: #a5b4fc;
+        }
+        /* WCAG 2.1 AA keyboard focus indicators */
+        a:focus-visible {
+            outline: 2px solid var(--primary);
             outline-offset: 2px;
-            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.4);
         }
     </style>
+    <script>
+        window.location.replace("/index.html#roadmap-timeline");
+    </script>
 </head>
 <body>
-
-    <!-- Header Block -->
-    <header>
-        <div class="brand">
-            <h1>Roadmap Intelligence Center</h1>
-            <p>Living Source of Truth between Backlog Planning, Epics and AI Execution Prompts</p>
-        </div>
-        <div class="nav-buttons">
-            <a href="/index.html" class="btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="19" y1="12" x2="5" y2="12"/>
-                    <polyline points="12 19 5 12 12 5"/>
-                </svg>
-                Operations Center
-            </a>
-            <a href="/delivery.html" class="btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                </svg>
-                Rich Delivery View
-            </a>
-            <a href="/requirement_studio.html" class="btn" style="background: linear-gradient(135deg, rgba(217, 70, 239, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%); border-color: rgba(217,70,239,0.3); color:#e0a7ff;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-                    <polyline points="2 17 12 22 22 17"/>
-                    <polyline points="2 12 12 17 22 12"/>
-                </svg>
-                Requirement Studio
-            </a>
-            <a href="/architecture.html" class="btn" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%); border-color: rgba(79,70,229,0.3); color:#a5b4fc;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-                Architecture Diagrams
-            </a>
-            <button class="btn btn-primary" onclick="syncRoadmapData()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-                </svg>
-                Reconcile Scopes
-            </button>
-        </div>
-    </header>
-
-    <div class="layout-container">
-
-        <!-- Scope Creep & Change Detection Alert -->
-        <div id="scope-creep-alert" class="alert-box" style="display: none;">
-            <div class="alert-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-                <span>Scope Creep & Baseline Shift Detected</span>
-            </div>
-            <p id="scope-creep-text" style="font-size:0.86rem; color:var(--text-secondary); line-height:1.45;"></p>
-        </div>
-
-        <!-- Roadmap Items Dashboard Card -->
-        <section class="card">
-            <div class="section-title">
-                <span>Enterprise Roadmap Commitments</span>
-                <span id="reconciled-timestamp" style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">Reconciliation Inactive</span>
-            </div>
-            <p style="font-size:0.86rem; color:var(--text-secondary); margin-bottom: 12px; line-height: 1.45;">
-                This dashboard tracks commit progress, value delivery rollups, and production readiness percentages calculated directly from the underlying requirement traceability matrix.
-            </p>
-            
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Roadmap ID</th>
-                            <th>Roadmap Item Name</th>
-                            <th>Business Capability</th>
-                            <th>Priority</th>
-                            <th>Release</th>
-                            <th>Owner</th>
-                            <th>Values (B/T/I)</th>
-                            <th>Reqs (Total/Impl/Open)</th>
-                            <th>Completion Metrics</th>
-                            <th>Readiness Status</th>
-                            <th style="text-align: right;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="roadmap-table-body">
-                        <tr><td colspan="11" style="text-align:center; color:var(--text-secondary);">Querying roadmap records...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Strategic Portfolio Alignment & Capacity Insights Heatmap -->
-        <section class="card" id="portfolio-insights-card">
-            <div class="section-title">
-                <span>Strategic Portfolio Alignment & Capacity Insights</span>
-                <span style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">Real-Time Sequencing Heatmap</span>
-            </div>
-            
-            <div style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap:2rem;">
-                <div>
-                    <h4 style="font-size:0.95rem; font-family:'Outfit',sans-serif; color:#a5b4fc; margin-bottom:12px;">Strategic Alignment Heatmap</h4>
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; text-align:center; font-size:0.75rem;" id="alignment-heatmap">
-                        <!-- Filled dynamically -->
-                    </div>
-                    <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.72rem; color:var(--text-secondary);">
-                        <span>Theme 1: Local Foundation</span>
-                        <span>Theme 2: RAG & Memory</span>
-                        <span>Theme 3: Security & Gov</span>
-                        <span>Theme 4: Simulation & Twin</span>
-                    </div>
-                </div>
-                
-                <div>
-                    <h4 style="font-size:0.95rem; font-family:'Outfit',sans-serif; color:#a5b4fc; margin-bottom:12px;">Workforce Capacity Allocation</h4>
-                    <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.04); padding:1rem; border-radius:10px;">
-                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">
-                            <span>Cumulative Capacity Utilized</span>
-                            <span id="roadmap-capacity-percentage">0% / 100%</span>
-                        </div>
-                        <div style="background:rgba(255,255,255,0.04); border-radius:6px; height:12px; overflow:hidden;">
-                            <div id="roadmap-capacity-fill" style="background:linear-gradient(90deg, #6366f1 0%, #d946ef 100%); height:100%; width: 0%;"></div>
-                        </div>
-                        <p style="font-size:0.72rem; color:var(--text-secondary); margin-top:8px;" id="roadmap-capacity-conflict-text">
-                            Workforce allocations within safe limits. No overlaps detected.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Portfolio Prioritization & Resequencing Ledger -->
-        <section class="card" id="resequencing-ledger-card">
-            <div class="section-title">
-                <span>Portfolio Prioritization & Resequencing Ledger</span>
-                <span id="resequenced-timestamp-sub" style="font-size:0.75rem; color:var(--text-secondary); font-family:monospace;">Reconciliation Active</span>
-            </div>
-            <p style="font-size:0.84rem; color:var(--text-secondary); margin-bottom: 12px; line-height: 1.45;">
-                This ledger visualizes all active commitments and new requirement candidates, dynamically sorted by Composite Priority Score with historical movement tracks.
-            </p>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Initiative Name</th>
-                            <th>Initiative ID</th>
-                            <th>Priority Score</th>
-                            <th>Position Shift</th>
-                            <th>Milestone Impact</th>
-                            <th>Capacity Allocation</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resequencing-table-body">
-                        <!-- Dynamic list -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Segment Traceability & Prompt Card (shown on item selection) -->
-        <section id="segment-details-card" class="card" style="display: none;">
-            <div class="section-title">
-                <span id="segment-details-title">Roadmap Item Requirements</span>
-                <button onclick="closeDetails()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1.3rem; font-weight:bold;">&times;</button>
-            </div>
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; font-size:0.88rem; line-height:1.5; margin-bottom:1.5rem;">
-                <div>
-                    <p><strong>Planned scope:</strong> <span id="segment-planned-scope" style="color:var(--text-secondary);"></span></p>
-                    <p style="margin-top:6px;"><strong>Delivered scope:</strong> <span id="segment-delivered-scope" style="color:var(--green);"></span></p>
-                </div>
-                <div>
-                    <p><strong>Remaining scope:</strong> <span id="segment-remaining-scope" style="color:var(--yellow);"></span></p>
-                </div>
-            </div>
-
-            <div class="table-container" style="max-height: 280px; margin-bottom: 1.5rem;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Requirement ID</th>
-                            <th>Description</th>
-                            <th>Category</th>
-                            <th>Related Epic</th>
-                            <th>Implementation Status</th>
-                            <th>Supporting Evidence</th>
-                        </tr>
-                    </thead>
-                    <tbody id="segment-table-body">
-                        <!-- Dynamic -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <button class="btn btn-primary" onclick="generateSegmentPromptActive()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="5 3 19 12 5 21 5 3"/>
-                    </svg>
-                    Generate Segment Prompt
-                </button>
-                <a href="/delivery.html" class="btn">Open Rich Delivery View</a>
-            </div>
-
-            <pre id="segment-prompt-preview" class="prompt-block" style="display: none;"></pre>
-        </section>
-
+    <div class="redirect-card">
+        <div class="logo">UAWOS</div>
+        <h2>Universal AI Workforce Operating System</h2>
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="message">Redirecting to Roadmap Timeline...</p>
+        <p><a href="/index.html#roadmap-timeline" class="btn-link">Click here if you are not redirected automatically</a></p>
     </div>
-
-    <!-- Toast notify container -->
-    <div id="toast-notify" class="toast">Copied to clipboard!</div>
-
-    <script type="module">
-        window.syncRoadmapData = syncRoadmapData;
-        window.showRoadmapDetails = showRoadmapDetails;
-        window.generateRoadmapPromptDirect = generateRoadmapPromptDirect;
-        window.generateSegmentPromptActive = generateSegmentPromptActive;
-        window.closeDetails = closeDetails;
-
-        let loadedRoadmap = {};
-        let loadedTraceability = {};
-        let activeRoadmapId = "";
-
-        async function fetchRoadmapDataCenter() {
-            try {
-                // 1. Fetch roadmap items
-                const roadmapRes = await fetch("/api/roadmap");
-                if (!roadmapRes.ok) throw new Error("Failed to load roadmap data");
-                loadedRoadmap = await roadmapRes.json();
-
-                // 2. Fetch requirement traceability matrix
-                const traceRes = await fetch("/api/traceability");
-                if (!traceRes.ok) throw new Error("Failed to load traceability data");
-                const traceData = await traceRes.json();
-                loadedTraceability = traceData.matrix;
-
-                // Update UI Table
-                renderRoadmapTable(loadedRoadmap);
-                document.getElementById("reconciled-timestamp").textContent = "RECONCILED: " + new Date().toLocaleTimeString();
-
-                // 3. Fetch scope changes
-                const changeRes = await fetch("/api/changes");
-                if (changeRes.ok) {
-                    const changes = await changeRes.json();
-                    renderChangeAlert(changes);
-                }
-
-                // 4. Fetch Requirement Studio state
-                const reqRes = await fetch("/api/requirement/list");
-                if (reqRes.ok) {
-                    const reqData = await reqRes.json();
-                    renderHeatmapAndLedger(reqData.resequenced_portfolio || [], reqData.roadmap_candidates || {}, loadedRoadmap);
-                }
-            } catch (err) {
-                console.error("Roadmap fetch failed:", err);
-                showToast("Connection to backend failed: " + err.message, true);
-            }
-        }
-
-        function renderHeatmapAndLedger(resequenced, candidates, roadmapData) {
-            // 1. Build Heatmap
-            const heatmap = document.getElementById("alignment-heatmap");
-            if (heatmap) {
-                heatmap.innerHTML = "";
-                
-                const itemsToShow = resequenced.length > 0 ? resequenced.slice(0, 5) : [
-                    { id: "RD-01", name: "Local Enablement" },
-                    { id: "RD-03", name: "Security & Governance" },
-                    { id: "RD-02", name: "RAG & Memory" },
-                    { id: "RD-04", name: "Enterprise Rollout" }
-                ];
-
-                itemsToShow.forEach(item => {
-                    const id = item.id;
-                    let alignments = [false, false, false, false];
-                    if (id === "RD-01") alignments = [true, false, false, false];
-                    else if (id === "RD-02") alignments = [true, true, false, false];
-                    else if (id === "RD-03") alignments = [true, true, true, false];
-                    else if (id === "RD-04") alignments = [true, true, true, true];
-                    else {
-                        const score = item.priority_score || 70;
-                        alignments = [score > 40, score > 60, score > 70, score > 80];
-                    }
-
-                    alignments.forEach((aligned, idx) => {
-                        const cell = document.createElement("div");
-                        cell.style.padding = "10px 4px";
-                        cell.style.borderRadius = "4px";
-                        cell.style.fontWeight = "600";
-                        cell.style.color = "white";
-                        if (aligned) {
-                            cell.style.background = idx === 2 ? "rgba(16, 185, 129, 0.4)" : "rgba(99, 102, 241, 0.4)";
-                            cell.style.border = "1px solid rgba(255,255,255,0.15)";
-                            cell.textContent = `${id} (Fit)`;
-                        } else {
-                            cell.style.background = "rgba(255, 255, 255, 0.02)";
-                            cell.style.border = "1px solid rgba(255,255,255,0.03)";
-                            cell.style.color = "var(--text-secondary)";
-                            cell.textContent = "-";
-                        }
-                        heatmap.appendChild(cell);
-                    });
-                });
-            }
-
-            // 2. Render Resequencing Ledger Table
-            const ledgerBody = document.getElementById("resequencing-table-body");
-            if (ledgerBody) {
-                ledgerBody.innerHTML = "";
-                
-                const list = resequenced.length > 0 ? resequenced : [
-                    { id: "RD-01", name: "Local Enablement", previous_position: 1, new_position: 1, movement: "↔", delivery_effort: 15, capacity_impact: "15% effort", milestone_impact: "On Schedule" },
-                    { id: "RD-03", name: "Security & Governance Enforcement", previous_position: 2, new_position: 2, movement: "↔", delivery_effort: 20, capacity_impact: "20% effort", milestone_impact: "On Schedule" },
-                    { id: "RD-02", name: "RAG & Memory Integration", previous_position: 3, new_position: 3, movement: "↔", delivery_effort: 25, capacity_impact: "25% effort", milestone_impact: "On Schedule" },
-                    { id: "RD-04", name: "Full Enterprise Production Rollout", previous_position: 4, new_position: 4, movement: "↔", delivery_effort: 35, capacity_impact: "35% effort", milestone_impact: "On Schedule" }
-                ];
-
-                let cumulativeEffort = 0;
-                list.forEach((seq, idx) => {
-                    const row = document.createElement("tr");
-                    const isCandidate = !["RD-01", "RD-02", "RD-03", "RD-04"].includes(seq.id);
-                    
-                    let pScore = 0;
-                    if (seq.id === "RD-01") pScore = 90.0;
-                    else if (seq.id === "RD-03") pScore = 82.0;
-                    else if (seq.id === "RD-02") pScore = 75.0;
-                    else if (seq.id === "RD-04") pScore = 60.0;
-                    else {
-                        const cand = Object.values(candidates).find(c => c.roadmap_id === seq.id);
-                        pScore = cand ? cand.priority_score : 70.0;
-                    }
-
-                    let mColor = "gray";
-                    if (seq.movement === "↑") mColor = "green";
-                    else if (seq.movement === "↓") mColor = "red";
-
-                    cumulativeEffort += seq.delivery_effort || 15;
-
-                    row.innerHTML = `
-                        <td><span class="status-pill ${isCandidate ? 'blue' : 'gray'}" style="font-weight:700;">Rank ${idx + 1}</span></td>
-                        <td><span style="font-weight:600; color:${isCandidate ? '#e0a7ff' : '#a5b4fc'};">${seq.name}</span></td>
-                        <td><strong>${seq.id}</strong></td>
-                        <td style="font-family:monospace;">${pScore}</td>
-                        <td><span class="status-pill ${mColor}">${seq.movement} ${seq.previous_position ? `(was ${seq.previous_position})` : ''}</span></td>
-                        <td style="color:${seq.milestone_impact.includes('Delayed') ? 'var(--red)' : 'var(--green)'};">${seq.milestone_impact}</td>
-                        <td style="font-family:monospace; font-size:0.82rem;">${seq.capacity_impact || `${seq.delivery_effort}% capacity`}</td>
-                    `;
-                    ledgerBody.appendChild(row);
-                });
-
-                // Capacity indicators
-                const capPct = Math.min(100, cumulativeEffort);
-                document.getElementById("roadmap-capacity-percentage").textContent = `${capPct}% / 100% capacity`;
-                const capFill = document.getElementById("roadmap-capacity-fill");
-                if (capFill) {
-                    capFill.style.width = `${capPct}%`;
-                    if (capPct > 90) {
-                        capFill.style.background = "var(--red)";
-                        document.getElementById("roadmap-capacity-conflict-text").textContent = "WARNING: Portfolio capacity exceeds 90%! Schedule slippage or resource conflicts predicted.";
-                        document.getElementById("roadmap-capacity-conflict-text").style.color = "var(--red)";
-                    } else {
-                        capFill.style.background = "linear-gradient(90deg, #6366f1 0%, #d946ef 100%)";
-                        document.getElementById("roadmap-capacity-conflict-text").textContent = "Workforce allocations within safe limits. No overlaps detected.";
-                        document.getElementById("roadmap-capacity-conflict-text").style.color = "";
-                    }
-                }
-            }
-        }
-
-        function syncRoadmapData() {
-            fetchRoadmapDataCenter();
-            showToast("Roadmap and requirements successfully reconciled.");
-        }
-
-        function renderRoadmapTable(roadmap) {
-            const tbody = document.getElementById("roadmap-table-body");
-            tbody.innerHTML = "";
-
-            for (const item of Object.values(roadmap)) {
-                const row = document.createElement("tr");
-
-                // Badge priorities
-                let pColor = "gray";
-                if (item.priority.includes("Critical")) {
-                    pColor = "red";
-                } else if (item.priority.includes("High")) {
-                    pColor = "blue";
-                }
-                
-                // Status mapping
-                let sColor = "gray";
-                if (item.status.includes("Fully")) sColor = "green";
-                else if (item.status.includes("Partially")) sColor = "yellow";
-                else if (item.status.includes("Progress")) sColor = "blue";
-                else if (item.status.includes("Blocked")) sColor = "red";
-
-                row.innerHTML = `
-                    <td><strong>${item.id}</strong></td>
-                    <td><span style="font-weight:600; color:#a5b4fc;">${item.name}</span></td>
-                    <td>${item.capability}</td>
-                    <td><span class="status-pill ${pColor}">${item.priority}</span></td>
-                    <td><span style="font-family:monospace;">${item.release}</span></td>
-                    <td>${item.owner}</td>
-                    <td style="font-family:monospace; font-size:0.8rem;">B: ${item.business_value} / T: ${item.technical_value} / I: ${item.infrastructure_value}</td>
-                    <td style="font-family:monospace; font-size:0.82rem;">${item.req_count} / <span style="color:var(--green); font-weight:600;">${item.impl_count}</span> / <span style="color:var(--yellow); font-weight:600;">${item.open_count}</span></td>
-                    <td>
-                        <div style="font-size:0.75rem; color:var(--text-secondary); display:flex; flex-direction:column; gap:2px;">
-                            <span>Impl: ${item.impl_pct}% | Test: ${item.test_pct}%</span>
-                            <span>Deploy: ${item.deploy_pct}% | Prod: ${item.prod_readiness_pct}%</span>
-                        </div>
-                    </td>
-                    <td><span class="status-pill ${sColor}">${item.status}</span></td>
-                    <td style="text-align: right;">
-                        <div style="display:flex; justify-content: flex-end; gap:6px;">
-                            <button class="action-btn action-btn-primary" onclick="showRoadmapDetails('${item.id}', '${item.name}')">Traceability</button>
-                            <button class="action-btn action-btn-accent" onclick="generateRoadmapPromptDirect('${item.id}')">Prompt</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            }
-        }
-
-        function renderChangeAlert(changes) {
-            const alertBox = document.getElementById("scope-creep-alert");
-            if (changes.added.length > 0) {
-                alertBox.style.display = "block";
-                
-                const text = document.getElementById("scope-creep-text");
-                text.innerHTML = `
-                    <strong>${changes.description}</strong><br/>
-                    <div style="margin-top:6px; display:grid; grid-template-columns: 1.2fr 1fr 1.2fr; gap:10px;">
-                        <span>➕ <strong>Unplanned Scope Added</strong>: ${changes.added.slice(0, 6).join(', ')}...</span>
-                        <span>✏️ <strong>Modified Requirements</strong>: ${changes.changed.join(', ')}</span>
-                        <span>📈 <strong>Scope Creep Ratio</strong>: <span style="color:var(--yellow); font-weight:600;">${changes.scope_creep_ratio}%</span> | <strong>Tech Debt Growth</strong>: <span style="color:var(--yellow); font-weight:600;">+${changes.tech_debt_growth_percentage}%</span></span>
-                    </div>
-                `;
-            } else {
-                alertBox.style.display = "none";
-            }
-        }
-
-        function showRoadmapDetails(id, name) {
-            activeRoadmapId = id;
-            
-            const card = document.getElementById("segment-details-card");
-            card.style.display = "block";
-            
-            document.getElementById("segment-details-title").textContent = `${id} — ${name} Traceability Mapping`;
-
-            const item = loadedRoadmap[id];
-            if (item) {
-                document.getElementById("segment-planned-scope").textContent = item.planned_scope;
-                document.getElementById("segment-delivered-scope").textContent = item.delivered_scope;
-                document.getElementById("segment-remaining-scope").textContent = item.remaining_scope;
-            }
-
-            const tbody = document.getElementById("segment-table-body");
-            tbody.innerHTML = "";
-
-            const requirements = Object.values(loadedTraceability).filter(r => r.roadmap_item === id);
-            
-            requirements.forEach(req => {
-                const sColor = getStatusColorClass(req.status);
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td><strong>${req.id}</strong></td>
-                    <td>${req.description}</td>
-                    <td>${req.category}</td>
-                    <td><span style="font-family:monospace; font-size:0.8rem;">${req.epic}</span></td>
-                    <td><span class="status-pill ${sColor}">${req.status}</span></td>
-                    <td style="color:${req.status === 'BLOCKED' ? '#f87171' : 'var(--text-secondary)'}; font-size:0.82rem; font-family:monospace;">${req.reason_blocked || req.test_evidence || 'N/A'}</td>
-                `;
-                tbody.appendChild(row);
-            });
-
-            // Hide previous preview if open
-            document.getElementById("segment-prompt-preview").style.display = "none";
-            
-            // Smooth scroll to details
-            card.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function closeDetails() {
-            document.getElementById("segment-details-card").style.display = "none";
-        }
-
-        function getStatusColorClass(status) {
-            switch(status) {
-                case "OPERATIONAL":
-                case "IMPLEMENTED":
-                case "DEPLOYED":
-                case "TESTED":
-                    return "green";
-                case "PARTIALLY_IMPLEMENTED":
-                case "IN_PROGRESS":
-                    return "blue";
-                case "BLOCKED":
-                    return "red";
-                case "APPROVED":
-                case "ANALYZED":
-                    return "yellow";
-                default:
-                    return "gray";
-            }
-        }
-
-        async function generateRoadmapPromptDirect(roadmapId) {
-            try {
-                const res = await fetch(`/api/generate_prompt?roadmap_id=${encodeURIComponent(roadmapId)}`);
-                if (!res.ok) throw new Error("API generate prompt failed");
-                const data = await res.json();
-                
-                await navigator.clipboard.writeText(data.prompt);
-                showToast(`Antigravity Prompt for ${roadmapId} copied to clipboard!`);
-            } catch (err) {
-                showToast("Prompt generation failed: " + err.message, true);
-            }
-        }
-
-        async function generateSegmentPromptActive() {
-            if (!activeRoadmapId) return;
-            try {
-                const res = await fetch(`/api/generate_prompt?roadmap_id=${encodeURIComponent(activeRoadmapId)}`);
-                if (!res.ok) throw new Error("API generate prompt failed");
-                const data = await res.json();
-
-                const preview = document.getElementById("segment-prompt-preview");
-                preview.textContent = data.prompt;
-                preview.style.display = "block";
-
-                await navigator.clipboard.writeText(data.prompt);
-                showToast("Prompt compiled and copied to clipboard!");
-            } catch (err) {
-                showToast("Prompt generation failed: " + err.message, true);
-            }
-        }
-
-        function showToast(message, isError = false) {
-            const toast = document.getElementById("toast-notify");
-            toast.textContent = message;
-            toast.style.background = isError ? "var(--red)" : "#10b981";
-            toast.classList.add("show");
-            setTimeout(() => {
-                toast.classList.remove("show");
-            }, 3000);
-        }
-
-        // Init page loading
-        await fetchRoadmapDataCenter();
-    </script>
 </body>
 </html>

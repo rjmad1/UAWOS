@@ -4,7 +4,7 @@ import time
 from typing import List, Dict
 
 from domains.governance.governance import Policy, ExceptionRequest, RiskAcceptance, AuditLog
-from infrastructure.storage.json_fallback_store import load_state, save_state
+from infrastructure.storage.json_fallback_store import load_state, save_state, state_transaction
 from infrastructure.security.opa_client import evaluate_via_opa
 from infrastructure.security.fga_client import check_fga_authorization
 
@@ -41,19 +41,20 @@ def get_default_state() -> dict:
 
 
 def create_policy(name: str, rule: str, category: str) -> dict:
-    state = load_state()
-    pid = f"POL-{len(state['policies']) + 1:02d}"
+    with state_transaction(STATE_FILE):
+        state = load_state(STATE_FILE)
+        pid = f"POL-{len(state['policies']) + 1:02d}"
 
-    policy = Policy(
-        id=pid,
-        name=name,
-        rule=rule,
-        category=category,
-        version=1,
-        status="draft",
-    )
-    state["policies"][pid] = policy.to_dict()
-    save_state(state)
+        policy = Policy(
+            id=pid,
+            name=name,
+            rule=rule,
+            category=category,
+            version=1,
+            status="draft",
+        )
+        state["policies"][pid] = policy.to_dict()
+        save_state(STATE_FILE, state)
     return state["policies"][pid]
 
 
@@ -121,71 +122,76 @@ def detect_policy_conflicts() -> list:
 
 
 def approve_policy(policy_id: str) -> dict:
-    state = load_state()
-    policy_dict = state["policies"].get(policy_id)
-    if not policy_dict:
-        raise ValueError(f"Policy {policy_id} not found.")
-    
-    policy = Policy.from_dict(policy_dict)
-    policy.status = "approved"
-    state["policies"][policy_id] = policy.to_dict()
-    save_state(state)
+    with state_transaction(STATE_FILE):
+        state = load_state(STATE_FILE)
+        policy_dict = state["policies"].get(policy_id)
+        if not policy_dict:
+            raise ValueError(f"Policy {policy_id} not found.")
+        
+        policy = Policy.from_dict(policy_dict)
+        policy.status = "approved"
+        state["policies"][policy_id] = policy.to_dict()
+        save_state(STATE_FILE, state)
     return policy.to_dict()
 
 
 def request_exception(action_id: str, reason: str) -> dict:
-    state = load_state()
-    exc_id = f"EXC-{len(state['exceptions']) + 1:03d}"
-    
-    exc = ExceptionRequest(
-        id=exc_id,
-        action_id=action_id,
-        reason=reason,
-        status="Pending",
-        timestamp=time.time(),
-    )
-    state["exceptions"][action_id] = exc.to_dict()
-    save_state(state)
+    with state_transaction(STATE_FILE):
+        state = load_state(STATE_FILE)
+        exc_id = f"EXC-{len(state['exceptions']) + 1:03d}"
+        
+        exc = ExceptionRequest(
+            id=exc_id,
+            action_id=action_id,
+            reason=reason,
+            status="Pending",
+            timestamp=time.time(),
+        )
+        state["exceptions"][action_id] = exc.to_dict()
+        save_state(STATE_FILE, state)
     return exc.to_dict()
 
 
 def process_exception(action_id: str, decision: str) -> dict:
-    state = load_state()
-    exc_dict = state["exceptions"].get(action_id)
-    if not exc_dict:
-        raise ValueError(f"Exception request for {action_id} not found.")
-    
-    exc = ExceptionRequest.from_dict(exc_dict)
-    exc.status = decision
-    state["exceptions"][action_id] = exc.to_dict()
-    save_state(state)
+    with state_transaction(STATE_FILE):
+        state = load_state(STATE_FILE)
+        exc_dict = state["exceptions"].get(action_id)
+        if not exc_dict:
+            raise ValueError(f"Exception request for {action_id} not found.")
+        
+        exc = ExceptionRequest.from_dict(exc_dict)
+        exc.status = decision
+        state["exceptions"][action_id] = exc.to_dict()
+        save_state(STATE_FILE, state)
     return exc.to_dict()
 
 
 def accept_risk(risk_id: str, justification: str) -> dict:
-    state = load_state()
-    
-    ra = RiskAcceptance(
-        risk_id=risk_id,
-        justification=justification,
-        status="Accepted",
-        timestamp=time.time(),
-    )
-    state["risk_acceptances"][risk_id] = ra.to_dict()
-    save_state(state)
+    with state_transaction(STATE_FILE):
+        state = load_state(STATE_FILE)
+        
+        ra = RiskAcceptance(
+            risk_id=risk_id,
+            justification=justification,
+            status="Accepted",
+            timestamp=time.time(),
+        )
+        state["risk_acceptances"][risk_id] = ra.to_dict()
+        save_state(STATE_FILE, state)
     return ra.to_dict()
 
 
 def log_audit(event_type: str, details: dict):
-    state = load_state()
-    
-    log = AuditLog(
-        event_type=event_type,
-        details=details,
-        timestamp=time.time(),
-    )
-    state["audit_logs"].append(log.to_dict())
-    save_state(state)
+    with state_transaction(STATE_FILE):
+        state = load_state(STATE_FILE)
+        
+        log = AuditLog(
+            event_type=event_type,
+            details=details,
+            timestamp=time.time(),
+        )
+        state["audit_logs"].append(log.to_dict())
+        save_state(STATE_FILE, state)
 
 
 def get_dynamic_agent_autonomy_level(agent_name: str) -> int:

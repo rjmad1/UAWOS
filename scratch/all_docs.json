@@ -1,0 +1,1898 @@
+[
+  {
+    "name": "AI Engineer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/ai-engineer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/ai-engineer A specialist in designing, building, and optimizing LLM-po...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "API Developer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/api-developer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/api-developer A specialist in API design, implementation, and document...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Accessibility Expert",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/accessibility-expert.md",
+    "description": "Source: https://www.claudedirectory.org/agents/accessibility-expert A specialist in ensuring web applications are acc...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Backend Architect",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/backend-architect.md",
+    "description": "Source: https://www.claudedirectory.org/agents/backend-architect A senior backend engineer specializing in scalable A...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Cloud Architect",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/cloud-architect.md",
+    "description": "Source: https://www.claudedirectory.org/agents/cloud-architect A specialist in designing enterprise cloud infrastruct...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Code Architect",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/code-architect.md",
+    "description": "Source: https://www.claudedirectory.org/agents/code-architect You are a specialized agent for designing feature archi...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Code Reviewer Pro",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/code-reviewer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/code-reviewer A comprehensive code review agent designed to function a...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Database Expert",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/database-expert.md",
+    "description": "Source: https://www.claudedirectory.org/agents/database-expert A specialist in database architecture, query optimizat...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Debugger",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/debugger.md",
+    "description": "Source: https://www.claudedirectory.org/agents/debugger A systematic debugging specialist focused on identifying and ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Deployment Engineer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/deployment-engineer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/deployment-engineer A CI/CD specialist focused on building reliable de...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Design System Engineer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/design-system-engineer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/design-system-engineer You are a senior design system engineer special...",
+    "lastUpdated": "2026-06-08",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "DevOps Incident Responder",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/devops-incident-responder.md",
+    "description": "Source: https://www.claudedirectory.org/agents/devops-incident-responder A Senior DevOps Incident Response Engineer f...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Documentation Expert",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/documentation-expert.md",
+    "description": "Source: https://www.claudedirectory.org/agents/documentation-expert A technical writing specialist focused on creatin...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Frontend Developer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/frontend-developer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/frontend-developer A modern frontend specialist with deep expertise in...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Next.js Pro",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/nextjs-pro.md",
+    "description": "Source: https://www.claudedirectory.org/agents/nextjs-pro A senior-level Next.js engineer specializing in high-perfor...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Observability Engineer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/observability-engineer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/observability-engineer You are an observability engineer. Your job is ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Performance Optimizer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/performance-optimizer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/performance-optimizer A specialist in identifying and resolving perfor...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Product Manager",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/product-manager.md",
+    "description": "Source: https://www.claudedirectory.org/agents/product-manager A strategic product thinking specialist focused on fea...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Prompt Engineer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/prompt-engineer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/prompt-engineer A specialist in architecting sophisticated LLM interac...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Python Pro",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/python-pro.md",
+    "description": "Source: https://www.claudedirectory.org/agents/python-pro An expert Python developer specializing in web applications...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "SRE Engineer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/sre-engineer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/sre-engineer A Site Reliability Engineering specialist focused on buil...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Software Configuration Manager",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/software-configuration-manager.md",
+    "description": "Source: https://www.claudedirectory.org/agents/software-configuration-manager An enterprise-grade configuration and p...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Technical Writer",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/technical-writer.md",
+    "description": "Source: https://www.claudedirectory.org/agents/technical-writer A technical documentation specialist focused on creat...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Test Automator",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/test-automator.md",
+    "description": "Source: https://www.claudedirectory.org/agents/test-automator A QA automation specialist focused on building comprehe...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "TypeScript Pro",
+    "type": "Agent Personas",
+    "path": "Requirements Master/claudedirectory_imports/agents/typescript-pro.md",
+    "description": "Source: https://www.claudedirectory.org/agents/typescript-pro A professional TypeScript engineer specializing in scal...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "API Documentation Generator",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/api-docs.md",
+    "description": "Source: https://www.claudedirectory.org/skills/api-docs Automatically generate OpenAPI 3.0 specifications from your A...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Architecture Diagram Generator",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/architecture-diagram.md",
+    "description": "Source: https://www.claudedirectory.org/skills/architecture-diagram Generate visual architecture diagrams in Mermaid ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Changelog Generator",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/changelog.md",
+    "description": "Source: https://www.claudedirectory.org/skills/changelog Generate well-structured changelogs from git commit history ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Code Refactor",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/refactor.md",
+    "description": "Source: https://www.claudedirectory.org/skills/refactor Systematically analyze and refactor code to improve quality w...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Code Walkthrough",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/code-walkthrough.md",
+    "description": "Source: https://www.claudedirectory.org/skills/code-walkthrough Generate a comprehensive walkthrough of a feature or ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "D3.js Data Visualization",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/d3js-visualization.md",
+    "description": "Source: https://www.claudedirectory.org/skills/d3js-visualization Create beautiful, interactive data visualizations u...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Database Migration Planner",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/migrate-db.md",
+    "description": "Source: https://www.claudedirectory.org/skills/migrate-db Plan and generate safe database migrations with built-in sa...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Dependency Audit",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/deps-audit.md",
+    "description": "Source: https://www.claudedirectory.org/skills/deps-audit Comprehensive dependency analysis covering security vulnera...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Docker Compose Generator",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/docker-compose.md",
+    "description": "Source: https://www.claudedirectory.org/skills/docker-compose Generate production-ready Docker Compose configurations...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Executing Plans",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/superpowers-executing-plans.md",
+    "description": "Source: https://www.claudedirectory.org/skills/superpowers-executing-plans Load plan, review critically, execute all ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Frontend Design",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/skills-frontend-design.md",
+    "description": "Source: https://www.claudedirectory.org/skills/skills-frontend-design This skill guides creation of distinctive, prod...",
+    "lastUpdated": "2026-06-08",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Git Bisect Helper",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/git-bisect.md",
+    "description": "Source: https://www.claudedirectory.org/skills/git-bisect Automate git bisect to quickly identify the commit that int...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Monorepo Manager",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/monorepo-manager.md",
+    "description": "Source: https://www.claudedirectory.org/skills/monorepo-manager A skill for navigating and managing monorepo workspac...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Performance Benchmark",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/perf-benchmark.md",
+    "description": "Source: https://www.claudedirectory.org/skills/perf-benchmark Identify performance bottlenecks and measure the impact...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Playwright Browser Automation",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/playwright-skill.md",
+    "description": "Source: https://www.claudedirectory.org/skills/playwright-skill Automate browser interactions for testing and web scr...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Project Environment Setup",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/env-setup.md",
+    "description": "Source: https://www.claudedirectory.org/skills/env-setup Analyze a project and set up the complete local development ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "SQL Query Optimizer",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/sql-optimizer.md",
+    "description": "Source: https://www.claudedirectory.org/skills/sql-optimizer Analyze a SQL query that's running too slowly. Read the ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Security Audit",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/security-audit.md",
+    "description": "Source: https://www.claudedirectory.org/skills/security-audit Comprehensive security analysis covering common vulnera...",
+    "lastUpdated": "2026-06-08",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Subagent Driven Development",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/superpowers-subagent-driven-development.md",
+    "description": "Source: https://www.claudedirectory.org/skills/superpowers-subagent-driven-development Execute plan by dispatching fr...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Test Driven Development",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/superpowers-test-driven-development.md",
+    "description": "Source: https://www.claudedirectory.org/skills/superpowers-test-driven-development Write the test first. Watch it fai...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Test Generator",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/test-gen.md",
+    "description": "Source: https://www.claudedirectory.org/skills/test-gen Generate comprehensive test suites by analyzing source code a...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Using Git Worktrees",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/superpowers-using-git-worktrees.md",
+    "description": "Source: https://www.claudedirectory.org/skills/superpowers-using-git-worktrees Ensure work happens in an isolated wor...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Verification Before Completion",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/superpowers-verification-before-completion.md",
+    "description": "Source: https://www.claudedirectory.org/skills/superpowers-verification-before-completion Claiming work is complete w...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Web App Testing",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/webapp-testing.md",
+    "description": "Source: https://www.claudedirectory.org/skills/webapp-testing Drive a real browser to exercise your web app end-to-en...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Web Assets Generator",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/web-asset-generator.md",
+    "description": "Source: https://www.claudedirectory.org/skills/web-asset-generator A skill for generating web assets including favico...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Writing Plans",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/superpowers-writing-plans.md",
+    "description": "Source: https://www.claudedirectory.org/skills/superpowers-writing-plans Write comprehensive implementation plans ass...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "Writing Skills",
+    "type": "Agent Skills",
+    "path": "Requirements Master/claudedirectory_imports/skills/superpowers-writing-skills.md",
+    "description": "Source: https://www.claudedirectory.org/skills/superpowers-writing-skills You write test cases (pressure scenarios wi...",
+    "lastUpdated": "2026-06-08",
+    "owner": "AI Workforce Dev"
+  },
+  {
+    "name": "AGENTS.md",
+    "type": "Core Guides",
+    "path": "AGENTS.md",
+    "description": "No description available.",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "CLAUDE.md",
+    "type": "Core Guides",
+    "path": "CLAUDE.md",
+    "description": "<!-- SPECKIT START --> For additional context about technologies to be used, project structure,",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Changelog",
+    "type": "Core Guides",
+    "path": "CHANGELOG.md",
+    "description": "All notable changes to UAWOS are documented in this file. Format follows [Keep a Changelog](https://keepachangelog.co...",
+    "lastUpdated": "2026-06-20",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Contributing to UAWOS",
+    "type": "Core Guides",
+    "path": "CONTRIBUTING.md",
+    "description": "Thank you for your interest in contributing to the **Universal AI Workforce Operating System (UAWOS)**! This guide co...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Ecosystem Building Blocks Reference Guide",
+    "type": "Core Guides",
+    "path": "Ecosystem_Building_Blocks_Reference_Guide.md",
+    "description": "Enterprise operations today are severely fragmented by disconnected communication systems, inconsistent ticketing wor...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Project Provenance Summary",
+    "type": "Core Guides",
+    "path": "PROJECT_ATTRIBUTION_PROVENANCE.md",
+    "description": "The **Universal AI Workforce Operating System (UAWOS)** is a governed, objective-centric execution fabric designed to...",
+    "lastUpdated": "2026-06-12",
+    "owner": "System Architect"
+  },
+  {
+    "name": "TEST_INTELLIGENCE_REGISTRY.md",
+    "type": "Core Guides",
+    "path": "TEST_INTELLIGENCE_REGISTRY.md",
+    "description": "2026-06-12 60",
+    "lastUpdated": "2026-06-14",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "Core Guides",
+    "path": "README.md",
+    "description": "<img width=\"2752\" height=\"1536\" alt=\"image-1781314175139\" src=\"https://github.com/user-attachments/assets/d165d541-74...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "Core Guides",
+    "path": "UAWOS_Discovery_Report.md",
+    "description": "The objective of discovery is not simply to understand the product, but to eliminate uncertainty before design and en...",
+    "lastUpdated": "2026-06-10",
+    "owner": "System Architect"
+  },
+  {
+    "name": "AI Engineering Operating System (AI-EOS) Specification",
+    "type": "Governance Policies",
+    "path": "governance/AI_EOS_SPECIFICATION.md",
+    "description": "This document defines the core architecture, operational workflows, and governance models for the **AI Engineering Op...",
+    "lastUpdated": "2026-06-20",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Architectural Risk Register",
+    "type": "Governance Policies",
+    "path": "governance/ARCHITECTURE_RISK_REGISTER.md",
+    "description": "| Component | Architectural Risk / Violation | Remediation Action | | :--- | :--- | :--- |",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Blast Radius Registry",
+    "type": "Governance Policies",
+    "path": "governance/BLAST_RADIUS_REGISTRY.md",
+    "description": "| Service / Module | Blast Radius Score | Criticality | Downstream Dependents | Upstream Dependencies | | :--- | :---...",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Dependency Risk Register",
+    "type": "Governance Policies",
+    "path": "governance/DEPENDENCY_RISK_REGISTER.md",
+    "description": "| Package Name | License Type | Compliance Verdict | Security Vulnerabilities | Operational Risks | | :--- | :--- | :...",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Engineering Debt Register",
+    "type": "Governance Policies",
+    "path": "governance/ENGINEERING_DEBT_REGISTER.md",
+    "description": "| File | Line | Task / Details | | :--- | :--- | :--- |",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Incident Learning Registry",
+    "type": "Governance Policies",
+    "path": "governance/INCIDENT_LEARNING_REGISTRY.md",
+    "description": "No description available.",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Operational Runbook: [Incident Type/System Outage]",
+    "type": "Governance Policies",
+    "path": "governance/ai_eos_scaffolding/runbook_template.md",
+    "description": "1.  **Check Process Locks**: Identify if another agent or system process is holding a write lock on the SQLite file. ...",
+    "lastUpdated": "2026-06-20",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Platform Governance Report",
+    "type": "Governance Policies",
+    "path": "governance/PLATFORM_GOVERNANCE_REPORT.md",
+    "description": "| Warning Code | Title | Evidence | Predicted Outcome | Time Horizon | Severity | | :--- | :--- | :--- | :--- | :--- ...",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Service Health Registry",
+    "type": "Governance Policies",
+    "path": "governance/SERVICE_HEALTH_REGISTRY.md",
+    "description": "| Time Horizon | Predicted Risk Description | Probability | Blast Radius Impact | Expected System Impact | | :--- | :...",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "TEST_INTELLIGENCE_REGISTRY.md",
+    "type": "Governance Policies",
+    "path": "governance/TEST_INTELLIGENCE_REGISTRY.md",
+    "description": "2026-06-12 60",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Threat Model Template: [Component/Service Name]",
+    "type": "Governance Policies",
+    "path": "governance/ai_eos_scaffolding/threat_model_template.md",
+    "description": "| ID | Threat Category | Threat Description | Severity | Mitigation Strategy | Validation Verification | | :--- | :--...",
+    "lastUpdated": "2026-06-20",
+    "owner": "Security Office"
+  },
+  {
+    "name": "UAWOS Contributor Onboarding Guide",
+    "type": "Governance Policies",
+    "path": "governance/CONTRIBUTOR_ONBOARDING.md",
+    "description": "Welcome to the Universal AI Workforce Operating System (UAWOS) developer onboarding guide. This document establishes ...",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "UAWOS Site Reliability Engineering (SRE) Runbook",
+    "type": "Governance Policies",
+    "path": "governance/SRE_RUNBOOK.md",
+    "description": "This runbook contains Standard Operating Procedures (SOPs) for managing and troubleshooting operational issues in the...",
+    "lastUpdated": "2026-06-14",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Implementation Plans",
+    "type": "Implementation Plans",
+    "path": "plans/README.md",
+    "description": "Generated by the `improve` skill on 2026-06-13. Execute in the order below unless dependencies say otherwise. Each ex...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Plan 001: Fix JWT Authentication Bypass",
+    "type": "Implementation Plans",
+    "path": "plans/001-jwt-auth-bypass.md",
+    "description": "> **Executor instructions**: Follow this plan step by step. Run every > verification command and confirm the expected...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Plan 002: Fix Silent Failure of Concurrency Advisory Locks",
+    "type": "Implementation Plans",
+    "path": "plans/002-concurrency-advisory-locks.md",
+    "description": "> **Executor instructions**: Follow this plan step by step. Run every > verification command and confirm the expected...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Plan 003: Fix OPA Policy Cache Drift on Container Restart",
+    "type": "Implementation Plans",
+    "path": "plans/003-opa-policy-drift.md",
+    "description": "> **Executor instructions**: Follow this plan step by step. Run every > verification command and confirm the expected...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Plan 004: Enforce Environment Variable for Symmetric Encryption Key",
+    "type": "Implementation Plans",
+    "path": "plans/004-encryption-key-fallback.md",
+    "description": "> **Executor instructions**: Follow this plan step by step. Run every > verification command and confirm the expected...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Plan 005: Fix Technical Debt Matches in TODO Scanner",
+    "type": "Implementation Plans",
+    "path": "plans/005-todo-scanner-self-match.md",
+    "description": "> **Executor instructions**: Follow this plan step by step. Run every > verification command and confirm the expected...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Plan 006: Introduce SQLite/JSON Local State Fallback for Testing / Dev",
+    "type": "Implementation Plans",
+    "path": "plans/006-state-utils-db-fallback.md",
+    "description": "> **Executor instructions**: Follow this plan step by step. Run every > verification command and confirm the expected...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Auto-Commit Changes",
+    "type": "Other Specs",
+    "path": ".specify/extensions/git/commands/speckit.git.commit.md",
+    "description": "description: \"Auto-commit changes after a Spec Kit command completes\" Automatically stage and commit all changes afte...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Coding Agent Context Extension",
+    "type": "Other Specs",
+    "path": ".specify/extensions/agent-context/README.md",
+    "description": "This bundled extension manages the **coding agent context/instruction file** (e.g. `CLAUDE.md`, `.github/copilot-inst...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Create Feature Branch",
+    "type": "Other Specs",
+    "path": ".specify/extensions/git/commands/speckit.git.feature.md",
+    "description": "description: \"Create a feature branch with sequential or timestamp numbering\" Create and switch to a new git feature ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Detect Git Remote URL",
+    "type": "Other Specs",
+    "path": ".specify/extensions/git/commands/speckit.git.remote.md",
+    "description": "description: \"Detect Git remote URL for GitHub integration\" Detect the Git remote URL for integration with GitHub ser...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 1 \u2014 System Context (C4-L1)",
+    "type": "Other Specs",
+    "path": "diagrams/01-system-context.md",
+    "description": "Defines the system boundary of UAWOS and shows who interacts with it and what upstream/downstream systems connect. Pr...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 2 \u2014 Container Diagram (C4-L2)",
+    "type": "Other Specs",
+    "path": "diagrams/02-container-diagram.md",
+    "description": "Explains the major internal components of UAWOS, their responsibilities, technology choices, and how they communicate...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 3 \u2014 E2E Sequence Diagram (Happy Path)",
+    "type": "Other Specs",
+    "path": "diagrams/03-e2e-sequence.md",
+    "description": "Makes execution flow explicit across services \u2014 from user intent to realized outcome \u2014 for the primary \"Objective Int...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 4 \u2014 Domain Model (Bounded Context + Entities)",
+    "type": "Other Specs",
+    "path": "diagrams/04-domain-model.md",
+    "description": "Establishes shared language for business logic, prevents domain mismatch across teams, and defines canonical entity o...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 5 \u2014 State Machine (Objective Lifecycle)",
+    "type": "Other Specs",
+    "path": "diagrams/05-state-machine.md",
+    "description": "Defines the canonical lifecycle and all allowable transitions for the **Objective** \u2014 the most critical entity in the...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 6 \u2014 Data Flow Diagram (PII + Trust Boundaries)",
+    "type": "Other Specs",
+    "path": "diagrams/06-data-flow.md",
+    "description": "Establishes security/compliance truth \u2014 where PII data lives, who can access it, where it is encrypted, and how audit...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 7 \u2014 Deployment Architecture",
+    "type": "Other Specs",
+    "path": "diagrams/07-deployment-architecture.md",
+    "description": "Shows the runtime reality of the UAWOS system \u2014 where each service runs, how they are connected, what the HA strategy...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 8 \u2014 Observability + Operations",
+    "type": "Other Specs",
+    "path": "diagrams/08-observability-operations.md",
+    "description": "Makes UAWOS operable, measurable, and supportable. Defines SLIs, SLOs, metrics/logs/traces flow, alert routing, runbo...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Feature Specification: [FEATURE NAME]",
+    "type": "Other Specs",
+    "path": ".specify/templates/spec-template.md",
+    "description": "<!-- IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Git Branching Workflow Extension",
+    "type": "Other Specs",
+    "path": ".specify/extensions/git/README.md",
+    "description": "Git repository initialization, feature branch creation, numbering (sequential/timestamp), validation, remote detectio...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Implementation Plan: [FEATURE]",
+    "type": "Other Specs",
+    "path": ".specify/templates/plan-template.md",
+    "description": "[Extract from feature spec: primary requirement + technical approach from research] <!--",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Initialize Git Repository",
+    "type": "Other Specs",
+    "path": ".specify/extensions/git/commands/speckit.git.initialize.md",
+    "description": "description: \"Initialize a Git repository with an initial commit\" Initialize a Git repository in the current project ...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Tasks: [FEATURE NAME]",
+    "type": "Other Specs",
+    "path": ".specify/templates/tasks-template.md",
+    "description": "description: \"Task list template for feature implementation\" <!--",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "UAWOS System Diagrams",
+    "type": "Other Specs",
+    "path": "diagrams/README.md",
+    "description": "> **Universal AI Workforce Operating System** > Minimal System Diagram Set \u2014 derived from the Engineering Standards PDF",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS) Constitution",
+    "type": "Other Specs",
+    "path": ".specify/memory/constitution.md",
+    "description": "This Constitution is the highest governing authority of the UAWOS platform. All standards, architectures, implementat...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Update Coding Agent Context",
+    "type": "Other Specs",
+    "path": ".specify/extensions/agent-context/commands/speckit.agent-context.update.md",
+    "description": "description: \"Refresh the managed Spec Kit section in the coding agent context file\" Refresh the managed Spec Kit sec...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Validate Feature Branch",
+    "type": "Other Specs",
+    "path": ".specify/extensions/git/commands/speckit.git.validate.md",
+    "description": "description: \"Validate current branch follows feature branch naming conventions\" Validate that the current Git branch...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "[CHECKLIST TYPE] Checklist: [FEATURE NAME]",
+    "type": "Other Specs",
+    "path": ".specify/templates/checklist-template.md",
+    "description": "<!-- ============================================================================",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "[PROJECT_NAME] Constitution",
+    "type": "Other Specs",
+    "path": ".specify/templates/constitution-template.md",
+    "description": "<!-- Example: Spec Constitution, TaskFlow Constitution, etc. --> <!-- Example: I. Library-First -->",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Canonical Ontology Specification (COS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Canonical Ontology Specification (COS).md",
+    "description": "1.0 Foundational Baseline",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Competitive Intelligence & Strategic Positioning Analysis: UAWOS",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/competitive_positioning_analysis.md",
+    "description": "This report delivers a rigorous, evidence-based competitive intelligence and strategic positioning analysis of the **...",
+    "lastUpdated": "2026-06-12",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Delivery Roadmap",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Ecosystem Stand-Up and Delivery Roadmap.md",
+    "description": "The **Universal AI Workforce Operating System (UAWOS)** is a category-defining execution platform that introduces a p...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "UAWOS Requirements Master Baseline",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/README.md",
+    "description": "This directory contains the canonical specifications, standards, and catalogs for the Universal AI Workforce Operatin...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Adoption Roadmap.md",
+    "description": "1.0 Normative Catalog Specification",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Agent Catalog.md",
+    "description": "1.0 Normative Catalog Specification",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/API & Contract Standard (ACS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Architecture Decision Records.md",
+    "description": "This document contains the formal Architecture Decision Records for the Delta Ecosystem Discovery & Acceleration Laye...",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Architecture Definition Document (ADD).md",
+    "description": "0.1 Draft Foundational Architecture Baseline",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Bootstrap Directive (BD).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Constitutional Architecture (UCA).md",
+    "description": "1.0 Supreme Governing Document",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Context, Identity & Access Standard (CIAS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Dependency Graph.md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Domain Translation & Artifact Synthesis Engine (DTASE).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Event, State & Lifecycle Standard (ESLS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Federated Graph & Knowledge Architecture Standard (FGKAS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Governance & Control Framework Standard (GCF v1.0).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Governance Catalog.md",
+    "description": "1.0 Normative Catalog Specification",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Integration Backlog.md",
+    "description": "1.0 Normative Catalog Specification",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Integration, Tooling & MCP Standard (ITMS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Knowledge, Memory & Learning Standard (KMLS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/MCP Catalog.md",
+    "description": "1.0 Normative Catalog Specification",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Objective, Planning & Execution Standard (OPES).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Observability, Telemetry & Digital Twin Standard (OTDTS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/OSS Ecosystem Catalog.md",
+    "description": "1.0 Normative Catalog Specification",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Pack, Capability & Extensibility Standard (PCES).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Platform Maturity & Capability Model Standard (PMCMS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Platform Services & Engine Architecture Standard (PSEAS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Policy, Risk, Trust & Compliance Standard (PRTCS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Portfolio, Value & Resource Standard (PVRS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/PRD 1.md",
+    "description": "Version: 1.0 Status: Product Definition",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/PRD 2.md",
+    "description": "Version: 1.0 Status: Normative",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/PRD 3.md",
+    "description": "Version: 1.0 Status: Normative",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/PRD 4.md",
+    "description": "Version: 1.0 Status: Normative",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/PRD 5.md",
+    "description": "Version: 1.0 Status: Engineering Delivery Plan",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/ProductStrategyAndCommercializationBluePrint.md",
+    "description": "Version: 1.0 Status: Strategic Business Blueprint",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Recommendation, Reasoning & Decision Intelligence Standard (RRDIS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Reference Architecture Standard (RAS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Reference Data Model Standard (RDMS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Security Catalog.md",
+    "description": "1.0 Normative Catalog Specification",
+    "lastUpdated": "2026-06-08",
+    "owner": "Security Office"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Simulation & Forecasting Standard (SFS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Skill Catalog.md",
+    "description": "1.0 Normative Catalog Specification",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/SolutionDesignDocument.md",
+    "description": "Version: 1.0 Status: Strategic Solution Definition",
+    "lastUpdated": "2026-06-08",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Value Realization Measurement Standard (VRMS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Requirements & Standards",
+    "path": "Requirements Master/Workforce, Agent & Autonomy Standard (WAAS).md",
+    "description": "1.0 Normative Standard",
+    "lastUpdated": "2026-06-08",
+    "owner": "System Architect"
+  },
+  {
+    "name": "AI Workforce Model",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/AI-Workforce-Model.md",
+    "description": "UAWOS treats AI agents as **first-class workforce entities** \u2014 not tools. Agents are organized into defined roles, op...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "API Reference",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/API-Reference.md",
+    "description": "All API endpoints are served by the UAWOS Control Plane daemon running on **port 8099**. Write/mutation endpoints req...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Architecture Overview",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Architecture-Overview.md",
+    "description": "UAWOS is built on a six-layer architecture that separates concerns from user experience through to raw infrastructure...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Data Model",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Data-Model.md",
+    "description": "UAWOS uses a hybrid persistence layer combining a PostgreSQL relational database for structured state tracking and a ...",
+    "lastUpdated": "2026-06-12",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Development Guide",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Development-Guide.md",
+    "description": "This guide describes how to set up, run, test, and develop UAWOS locally. .\\bootstrap.ps1",
+    "lastUpdated": "2026-06-12",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 1 \u2014 System Context (C4-L1)",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/01-system-context.md",
+    "description": "Defines the system boundary of UAWOS and shows who interacts with it and what upstream/downstream systems connect. Pr...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 2 \u2014 Container Diagram (C4-L2)",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/02-container-diagram.md",
+    "description": "Explains the major internal components of UAWOS, their responsibilities, technology choices, and how they communicate...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 3 \u2014 E2E Sequence Diagram (Happy Path)",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/03-e2e-sequence.md",
+    "description": "Makes execution flow explicit across services \u2014 from user intent to realized outcome \u2014 for the primary \"Objective Int...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 4 \u2014 Domain Model (Bounded Context + Entities)",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/04-domain-model.md",
+    "description": "Establishes shared language for business logic, prevents domain mismatch across teams, and defines canonical entity o...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 5 \u2014 State Machine (Objective Lifecycle)",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/05-state-machine.md",
+    "description": "Defines the canonical lifecycle and all allowable transitions for the **Objective** \u2014 the most critical entity in the...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 6 \u2014 Data Flow Diagram (PII + Trust Boundaries)",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/06-data-flow.md",
+    "description": "Establishes security/compliance truth \u2014 where PII data lives, who can access it, where it is encrypted, and how audit...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 7 \u2014 Deployment Architecture",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/07-deployment-architecture.md",
+    "description": "Shows the runtime reality of the UAWOS system \u2014 where each service runs, how they are connected, what the HA strategy...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Diagram 8 \u2014 Observability + Operations",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/08-observability-operations.md",
+    "description": "Makes UAWOS operable, measurable, and supportable. Defines SLIs, SLOs, metrics/logs/traces flow, alert routing, runbo...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Governance & Compliance",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Governance-and-Compliance.md",
+    "description": "UAWOS operates under a **Constitutional Architecture (UCA)** \u2014 a set of immutable laws that govern all platform behav...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Implementation Status",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Implementation-Status.md",
+    "description": "Current validation status of UAWOS platform capabilities after Release 0.8.0. | # | Capability Name | Status | Confid...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Infrastructure & Deployment",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Infrastructure-and-Deployment.md",
+    "description": "| Component | Requirement | |-----------|-------------|",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Installation Guide",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Installation-Guide.md",
+    "description": "This guide walks you through a complete installation of the **Universal AI Workforce Operating System (UAWOS)** from ...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Platform Engines",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Platform-Engines.md",
+    "description": "UAWOS is composed of **21 specialized platform engines**, each responsible for a distinct domain capability. Every en...",
+    "lastUpdated": "2026-06-12",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Platform Maturity Model (PMCMS)",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Platform-Maturity-Model.md",
+    "description": "The **Platform Maturity & Capability Model (PMCMS)** is a 9-dimensional framework that evaluates the operational capa...",
+    "lastUpdated": "2026-06-12",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Requirement Intelligence Studio",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Requirement-Intelligence-Studio.md",
+    "description": "The **Requirement Intelligence Studio** is an AI-powered ingestion and refinement pipeline that transforms raw unstru...",
+    "lastUpdated": "2026-06-12",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Roadmap",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Roadmap.md",
+    "description": "UAWOS follows a four-milestone release roadmap aligned to the four **Strategic Themes** of the platform. Each milesto...",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Technical Debt & Known Issues",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Technical-Debt.md",
+    "description": "This page tracks refactored debt, resolved issues, and long-term architectural improvements across the UAWOS codebase...",
+    "lastUpdated": "2026-06-13",
+    "owner": "System Architect"
+  },
+  {
+    "name": "UAWOS System Diagrams",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/README.md",
+    "description": "> **Universal AI Workforce Operating System** > Minimal System Diagram Set \u2014 derived from the Engineering Standards PDF",
+    "lastUpdated": "2026-06-11",
+    "owner": "System Architect"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "System Wiki & Design",
+    "path": "wiki_repo/Home.md",
+    "description": "> **Transforming Objectives into Measurable Value through Governed Human and AI Workforce Execution.** Users define o...",
+    "lastUpdated": "2026-06-12",
+    "owner": "System Architect"
+  },
+  {
+    "name": "2. Design Philosophy",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/design.md",
+    "description": "This document defines the canonical design language, UX principles, component architecture, layout system, interactio...",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "UAWOS Design Generation Package (DGP)",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/uawos_design_generation_package.md",
+    "description": "This document represents the complete, reverse-engineered Design Generation Package (DGP) for the Universal AI Workfo...",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/uawos_ainative_experience.md",
+    "description": "> **Workspace Context:** `rjmad1/UAWOS` > **Standards References:** UCA v1.0, WAAS v1.0, OPES v1.0, CIAS v1.0, GCF v1...",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/uawos_dashboard_strategy.md",
+    "description": "> **Workspace Context:** `rjmad1/UAWOS` > **Standards References:** UCA v1.0, WAAS v1.0, OPES v1.0, CIAS v1.0, GCF v1...",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/uawos_design_system.md",
+    "description": "> **Prepared by:** Principal UX Architect & Design Systems Lead > **Workspace Context:** `rjmad1/UAWOS`",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/uawos_engineering_deliverables.md",
+    "description": "> **Workspace Context:** `rjmad1/UAWOS` > **Standards References:** UCA v1.0, WAAS v1.0, OPES v1.0, CIAS v1.0, GCF v1...",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/uawos_product_blueprint.md",
+    "description": "> **Standards References:** UCA v1.0, WAAS v1.0, OPES v1.0, CIAS v1.0, GCF v1.0, PMCMS v1.0, VRMS v1.0, PRTCS v1.0, P...",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/uawos_screen_architecture.md",
+    "description": "> **Workspace Context:** `rjmad1/UAWOS` > **Standards References:** UCA v1.0, WAAS v1.0, OPES v1.0, CIAS v1.0, GCF v1...",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/uawos_technical_blueprint.md",
+    "description": "> **Workspace Context:** `rjmad1/UAWOS` > **Standards References:** UCA v1.0, WAAS v1.0, OPES v1.0, CIAS v1.0, GCF v1...",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "Universal AI Workforce Operating System (UAWOS)",
+    "type": "UI & UX Strategy",
+    "path": "Requirements Master/UI UX Needs/uawos_visualization_architecture.md",
+    "description": "> **Workspace Context:** `rjmad1/UAWOS` > **Standards References:** UCA v1.0, WAAS v1.0, OPES v1.0, CIAS v1.0, GCF v1...",
+    "lastUpdated": "2026-06-20",
+    "owner": "UX Designer"
+  },
+  {
+    "name": "1. Drop a provider key in. OpenRouter is the recommended baseline.",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/README.md",
+    "description": "<div align=\"center\"> <img width=\"7559\" height=\"1200\" alt=\"Group 1(1)\" src=\"https://github.com/user-attachments/assets...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "@workweave/router",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/npm/README.md",
+    "description": "One command, anywhere, to point Claude Code, Codex, or opencode at the Weave Router. npx @workweave/router           ...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "Cluster routing artifacts",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/cluster/artifacts/README.md",
+    "description": "Each subdirectory is one frozen bundle that the cluster scorer can load at boot. The `latest` pointer file names the ...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "Configuration reference",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/docs/CONFIGURATION.md",
+    "description": "All router configuration is via environment variables ([12-factor](https://12factor.net/config)). This page is the ex...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "Contributing",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/CONTRIBUTING.md",
+    "description": "Thanks for your interest in contributing to router. This document covers the things you'll need to know \u2014 layering, b...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "Legacy v1-format cluster artifacts",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/cluster/artifacts/legacy/README.md",
+    "description": "Every bundle in this directory is `format_version=1`: the per-(cluster, model) score in `rankings.json` is the pre-bl...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "Weave Router pi extension",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/pi-router/README.md",
+    "description": "> Bundled inside the [`@workweave/router`](https://www.npmjs.com/package/@workweave/router) package \u2014 not published s...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "Weave Router \u2014 Claude Code + Codex + opencode installer",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/README.md",
+    "description": "One command to point Claude Code, the OpenAI Codex CLI, or opencode at the Weave Router permanently. No shell exports...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "cmd \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/cmd/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Composit...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "cmd \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/cmd/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Composit...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "db \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/db/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Migratio...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "db \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/db/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Migratio...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "fm.md",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/commands/fm.md",
+    "description": "description: Alias for /force-model - pin this session to a specific model via the Weave Router argument-hint: <model...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "force-model.md",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/commands/force-model.md",
+    "description": "description: Pin this session to a specific model via the Weave Router argument-hint: <model-id>",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/api \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/api/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Presenta...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/api \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/api/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Presenta...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/auth \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/auth/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Identity...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/auth \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/auth/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Identity...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/postgres \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/postgres/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Postgres...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/postgres \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/postgres/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Postgres...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/providers \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/providers/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Provider...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/providers \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/providers/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Provider...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/proxy \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/proxy/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Routing/...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/proxy \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/proxy/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Routing/...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/proxy/usage \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/proxy/usage/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Anthropi...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/proxy/usage \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/proxy/usage/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Anthropi...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Inner-ri...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Inner-ri...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/cache \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/cache/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Cross-re...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/cache \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/cache/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Cross-re...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/catalog \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/catalog/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Single s...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/catalog \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/catalog/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Single s...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/cluster \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/cluster/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Avengers...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/cluster \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/cluster/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Avengers...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/handover \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/handover/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. `Summari...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/handover \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/handover/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. `Summari...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/planner \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/planner/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Prism-st...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/planner \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/planner/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Prism-st...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/sessionpin \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/sessionpin/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. `Pin` ty...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/sessionpin \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/sessionpin/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. `Pin` ty...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/turntype \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/turntype/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Inbound ...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/router/turntype \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/router/turntype/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Inbound ...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/translate \u2014 AGENTS",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/translate/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [CLAUDE.md](CLAUDE.md). **Update both together** \u2014 divergence = bug. Cross-fo...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "internal/translate \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/internal/translate/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). **Update both together** \u2014 divergence = bug. Cross-fo...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "record_provider_fixtures",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/scripts/record_provider_fixtures/README.md",
+    "description": "Refreshes the translation-conformance **upstream fixtures** from live providers. The conformance suite (`internal/pro...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "rf.md",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/commands/rf.md",
+    "description": "description: Alias for /router-feedback - submit feedback about router decision or model performance argument-hint: <...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "router \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/AGENTS.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). Claude Code reads `CLAUDE.md`; Cursor + generic agent...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "router \u2014 CLAUDE",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/CLAUDE.md",
+    "description": "> **Mirror notice.** Verbatim sync with [AGENTS.md](AGENTS.md). Claude Code reads `CLAUDE.md`; Cursor + generic agent...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "router-feedback.md",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/commands/router-feedback.md",
+    "description": "description: Submit feedback about router decision or model performance argument-hint: <feedback-text>",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "router-off.md",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/commands/router-off.md",
+    "description": "description: Route Claude Code directly to Anthropic again (turn the Weave Router off) allowed-tools: Bash(npx:*)",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "router-on.md",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/commands/router-on.md",
+    "description": "description: Route Claude Code through the Weave Router again (turn it back on) allowed-tools: Bash(npx:*)",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "router-status.md",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/commands/router-status.md",
+    "description": "description: Show whether Claude Code is routing through the Weave Router or directly to Anthropic allowed-tools: Bas...",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "ufm.md",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/commands/ufm.md",
+    "description": "description: Alias for /unforce-model - clear an active /force-model pin and resume automatic routing /unforce-model",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  },
+  {
+    "name": "unforce-model.md",
+    "type": "WeaveRouter Specs",
+    "path": "weaverouter/install/commands/unforce-model.md",
+    "description": "description: Clear an active /force-model pin and resume automatic routing /unforce-model",
+    "lastUpdated": "2026-06-12",
+    "owner": "Router Team"
+  }
+]

@@ -1,0 +1,173 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: Ω
+      - generic [ref=e6]: uawOS
+    - navigation "Main Navigation" [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]: Portfolio Views
+        - link "Objective Portfolio" [ref=e10] [cursor=pointer]:
+          - /url: "#portfolio"
+          - img [ref=e11]
+          - generic [ref=e16]: Objective Portfolio
+      - generic [ref=e17]:
+        - generic [ref=e18]: Active Objective Workspace
+        - link "Overview & Health" [ref=e19] [cursor=pointer]:
+          - /url: "#overview"
+          - img [ref=e20]
+          - generic [ref=e23]: Overview & Health
+        - link "Objective Ingest Studio" [ref=e24] [cursor=pointer]:
+          - /url: "#capture"
+          - img [ref=e25]
+          - generic [ref=e28]: Objective Ingest Studio
+        - link "Outcomes & Metrics" [ref=e29] [cursor=pointer]:
+          - /url: "#outcomes"
+          - img [ref=e30]
+          - generic [ref=e31]: Outcomes & Metrics
+        - link "Planning & Scenarios" [ref=e32] [cursor=pointer]:
+          - /url: "#planning"
+          - img [ref=e33]
+          - generic [ref=e37]: Planning & Scenarios
+        - link "Timeline & Roadmap" [ref=e38] [cursor=pointer]:
+          - /url: "#roadmap"
+          - img [ref=e39]
+          - generic [ref=e41]: Timeline & Roadmap
+        - link "Execution Desk" [ref=e42] [cursor=pointer]:
+          - /url: "#execution"
+          - img [ref=e43]
+          - generic [ref=e46]: Execution Desk
+        - link "Lineage & Traceability" [ref=e47] [cursor=pointer]:
+          - /url: "#traceability"
+          - img [ref=e48]
+          - generic [ref=e50]: Lineage & Traceability
+        - link "Value ROI Dashboard" [ref=e51] [cursor=pointer]:
+          - /url: "#value"
+          - img [ref=e52]
+          - generic [ref=e54]: Value ROI Dashboard
+      - generic [ref=e55]:
+        - generic [ref=e56]: Governance & Hubs
+        - link "Operations Center" [ref=e57] [cursor=pointer]:
+          - /url: "#operations"
+          - img [ref=e58]
+          - generic [ref=e62]: Operations Center
+        - link "Exception Queue" [ref=e63] [cursor=pointer]:
+          - /url: "#approvals"
+          - img [ref=e64]
+          - generic [ref=e66]: Exception Queue
+        - link "Knowledge Hub" [ref=e67] [cursor=pointer]:
+          - /url: "#knowledge"
+          - img [ref=e68]
+          - generic [ref=e70]: Knowledge Hub
+        - link "Settings & Rules" [ref=e71] [cursor=pointer]:
+          - /url: "#settings"
+          - img [ref=e72]
+          - generic [ref=e75]: Settings & Rules
+    - button "Toggle navigation sidebar width" [ref=e77] [cursor=pointer]:
+      - img [ref=e78]
+  - banner [ref=e81]:
+    - generic [ref=e82]:
+      - generic [ref=e83]:
+        - heading "Objective Overview & Health Status" [level=2] [ref=e84]
+        - generic [ref=e87]: "Strict Health: 56%"
+      - generic [ref=e88]: Objectives / Reduce Customer Churn by 15% / Objective Overview & Health Status
+    - generic [ref=e89]:
+      - generic [ref=e90] [cursor=pointer]:
+        - generic [ref=e91]: Search Workspace...
+        - generic [ref=e92]: Ctrl+K
+      - generic [ref=e93]:
+        - generic [ref=e94]: "Objective:"
+        - combobox "Objective:" [ref=e95] [cursor=pointer]:
+          - option "OBJ-101 — Relocate Family to Madrid"
+          - option "OBJ-201 — Reduce Customer Churn by 15%" [selected]
+          - option "OBJ-301 — Launch Multi-Region Cloud Service"
+          - option "OBJ-401 — Pass Advanced Cybersecurity Exam"
+      - generic [ref=e96]:
+        - generic [ref=e97]: "Active Role:"
+        - combobox "Active Role:" [ref=e98] [cursor=pointer]:
+          - option "Lead / PM" [selected]
+          - option "Individual Contributor"
+          - option "Executive Sponsor"
+          - option "Compliance Auditor"
+  - main [ref=e99]:
+    - generic [ref=e100]:
+      - generic [ref=e101]:
+        - generic [ref=e102]:
+          - generic [ref=e103]:
+            - generic [ref=e104]: Objective Summary
+            - generic [ref=e105]: High
+          - generic [ref=e106]:
+            - heading "Reduce Customer Churn by 15%" [level=3] [ref=e107]
+            - paragraph [ref=e108]: Construct proactive client outreach sequences and train automated ML churn predictor engines to secure ARR retention.
+            - generic [ref=e109]:
+              - generic [ref=e110]:
+                - img [ref=e111]
+                - generic [ref=e114]:
+                  - generic [ref=e115]: 56%
+                  - generic [ref=e116]: Health
+              - generic [ref=e117]:
+                - img [ref=e118]
+                - generic [ref=e121]:
+                  - generic [ref=e122]: 100%
+                  - generic [ref=e123]: Readiness
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - generic [ref=e126]: Key Measurable Outcomes
+            - generic [ref=e127]: 65% Avg Progress
+          - generic [ref=e128]:
+            - generic [ref=e131]:
+              - strong [ref=e132]: "OUT-201A: Monthly Churn Rate Reduced"
+              - generic [ref=e133]: 7.2/6.8 (67%)
+            - generic [ref=e138]:
+              - strong [ref=e139]: "OUT-201B: CSAT Score Improved"
+              - generic [ref=e140]: 40/45 (62%)
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - strong [ref=e145]: "OPA Constraint Breach: PLAN EXECUTION BLOCKED"
+          - generic [ref=e146]: OPA constraint triggered (POL-017). Estimated budget of $24,000 exceeds constraint limits ($15,000). Waiver Exception signature required.
+        - button "Resolve in Queue" [ref=e148] [cursor=pointer]
+      - generic [ref=e149]:
+        - generic [ref=e150]:
+          - generic [ref=e151]: Recommended Actions
+          - generic [ref=e152]:
+            - link "▸ Authorize budget waiver signature" [ref=e153] [cursor=pointer]:
+              - /url: "#approvals"
+              - generic [ref=e154]: ▸
+              - text: Authorize budget waiver signature
+            - 'link "▸ Execute next task: Deploy automated email campaigns to accounts" [ref=e155] [cursor=pointer]':
+              - /url: "#execution"
+              - generic [ref=e156]: ▸
+              - text: "Execute next task: Deploy automated email campaigns to accounts"
+        - generic [ref=e157]:
+          - generic [ref=e158]: Recent Audit Logs
+          - generic [ref=e160]: "[Ecosystem Monitor] Loading trace audit trail for OBJ-201... [Lineage Tracker] Checked 6 domains, loaded 2 outcomes, 2 milestones. [OPA Engine] Evaluating active constraints: budget verification = WARN_BREACH. [State Sync] UI state synced. Active role: Product."
+  - generic [ref=e161]:
+    - generic [ref=e162]:
+      - heading "Evidence & Lineage Trace" [level=3] [ref=e163]
+      - button "Close evidence panel" [ref=e164] [cursor=pointer]: ×
+    - generic [ref=e165]:
+      - generic [ref=e166]:
+        - generic [ref=e167]: Provenance Source
+        - strong [ref=e168]: PRD Ingest Document
+      - generic [ref=e169]:
+        - generic [ref=e170]: Verification Logs
+        - paragraph [ref=e171]: Automated parser completed syntax and structural checks.
+      - generic [ref=e172]:
+        - generic [ref=e173]: Traceability Schema Metadata
+        - generic [ref=e174]: "{}"
+    - button "Close Panel" [ref=e176] [cursor=pointer]
+  - generic [ref=e177]:
+    - generic [ref=e178]:
+      - heading "Command & Search Palette" [level=3] [ref=e179]
+      - button "×" [ref=e180] [cursor=pointer]
+    - generic [ref=e181]:
+      - textbox "Search objectives, outcomes, plans, tasks..." [ref=e183]
+      - generic [ref=e184]: Search Results
+  - generic:
+    - generic: Action completed successfully.
+  - contentinfo [ref=e185]:
+    - generic [ref=e186]:
+      - generic [ref=e189]: "Daemon Live Connection: ACTIVE"
+      - generic [ref=e191]: "Active Tenant: default_tenant"
+    - generic [ref=e192]:
+      - generic [ref=e193]: Synced with Backend Daemon
+      - generic [ref=e194]: 06:37 PM

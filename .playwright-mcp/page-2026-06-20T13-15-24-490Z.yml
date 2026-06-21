@@ -1,0 +1,187 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: Ω
+      - generic [ref=e6]: uawOS
+    - navigation "Main Navigation" [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]: Portfolio Views
+        - link "Objective Portfolio" [ref=e10] [cursor=pointer]:
+          - /url: "#portfolio"
+          - img [ref=e11]
+          - generic [ref=e16]: Objective Portfolio
+      - generic [ref=e17]:
+        - generic [ref=e18]: Active Objective Workspace
+        - link "Overview & Health" [ref=e19] [cursor=pointer]:
+          - /url: "#overview"
+          - img [ref=e20]
+          - generic [ref=e23]: Overview & Health
+        - link "Objective Ingest Studio" [ref=e24] [cursor=pointer]:
+          - /url: "#capture"
+          - img [ref=e25]
+          - generic [ref=e28]: Objective Ingest Studio
+        - link "Outcomes & Metrics" [ref=e29] [cursor=pointer]:
+          - /url: "#outcomes"
+          - img [ref=e30]
+          - generic [ref=e31]: Outcomes & Metrics
+        - link "Planning & Scenarios" [ref=e32] [cursor=pointer]:
+          - /url: "#planning"
+          - img [ref=e33]
+          - generic [ref=e37]: Planning & Scenarios
+        - link "Timeline & Roadmap" [ref=e38] [cursor=pointer]:
+          - /url: "#roadmap"
+          - img [ref=e39]
+          - generic [ref=e41]: Timeline & Roadmap
+        - link "Execution Desk" [ref=e42] [cursor=pointer]:
+          - /url: "#execution"
+          - img [ref=e43]
+          - generic [ref=e46]: Execution Desk
+        - link "Lineage & Traceability" [ref=e47] [cursor=pointer]:
+          - /url: "#traceability"
+          - img [ref=e48]
+          - generic [ref=e50]: Lineage & Traceability
+        - link "Value ROI Dashboard" [ref=e51] [cursor=pointer]:
+          - /url: "#value"
+          - img [ref=e52]
+          - generic [ref=e54]: Value ROI Dashboard
+      - generic [ref=e55]:
+        - generic [ref=e56]: Governance & Hubs
+        - link "Operations Center" [ref=e57] [cursor=pointer]:
+          - /url: "#operations"
+          - img [ref=e58]
+          - generic [ref=e62]: Operations Center
+        - link "Exception Queue" [ref=e63] [cursor=pointer]:
+          - /url: "#approvals"
+          - img [ref=e64]
+          - generic [ref=e66]: Exception Queue
+        - link "Knowledge Hub" [ref=e67] [cursor=pointer]:
+          - /url: "#knowledge"
+          - img [ref=e68]
+          - generic [ref=e70]: Knowledge Hub
+        - link "Settings & Rules" [ref=e71] [cursor=pointer]:
+          - /url: "#settings"
+          - img [ref=e72]
+          - generic [ref=e75]: Settings & Rules
+    - button "Toggle navigation sidebar width" [ref=e77] [cursor=pointer]:
+      - img [ref=e78]
+  - banner [ref=e81]:
+    - generic [ref=e82]:
+      - generic [ref=e83]:
+        - heading "Candidate Scenarios & Trade-offs" [level=2] [ref=e363]
+        - generic [ref=e87]: "Strict Health: 56%"
+      - generic [ref=e88]: Objectives / Reduce Customer Churn by 15% / Candidate Scenarios & Trade-offs
+    - generic [ref=e89]:
+      - generic [ref=e90] [cursor=pointer]:
+        - generic [ref=e91]: Search Workspace...
+        - generic [ref=e92]: Ctrl+K
+      - generic [ref=e93]:
+        - generic [ref=e94]: "Objective:"
+        - combobox "Objective:" [ref=e95] [cursor=pointer]:
+          - option "OBJ-101 — Relocate Family to Madrid"
+          - option "OBJ-201 — Reduce Customer Churn by 15%" [selected]
+          - option "OBJ-301 — Launch Multi-Region Cloud Service"
+          - option "OBJ-401 — Pass Advanced Cybersecurity Exam"
+      - generic [ref=e96]:
+        - generic [ref=e97]: "Active Role:"
+        - combobox "Active Role:" [ref=e98] [cursor=pointer]:
+          - option "Lead / PM"
+          - option "Individual Contributor"
+          - option "Executive Sponsor" [selected]
+          - option "Compliance Auditor"
+  - main [ref=e99]:
+    - generic [ref=e197]:
+      - generic [ref=e198]:
+        - generic [ref=e200]:
+          - generic [ref=e201]: Candidate Planning Scenarios
+          - generic [ref=e202]:
+            - generic [ref=e364] [cursor=pointer]:
+              - generic [ref=e365]:
+                - strong [ref=e366]: AI Predictor Campaign Retargeting (PLN-201)
+                - generic [ref=e367]: RECOMMENDED
+              - generic [ref=e368]:
+                - generic [ref=e369]:
+                  - text: "Success Likelihood:"
+                  - strong [ref=e370]: 90%
+                - generic [ref=e371]:
+                  - text: "Estimated Cost:"
+                  - strong [ref=e372]: $24,000
+                - generic [ref=e373]:
+                  - text: "Duration:"
+                  - strong [ref=e374]: 45 Days
+                - generic [ref=e375]:
+                  - text: "Risk Assessment:"
+                  - strong [ref=e376]: Medium
+            - generic [ref=e377] [cursor=pointer]:
+              - generic [ref=e378]:
+                - strong [ref=e379]: Direct Human Sales Expansion (PLN-202)
+                - generic [ref=e380]: ALTERNATIVE
+              - generic [ref=e381]:
+                - generic [ref=e382]:
+                  - text: "Success Likelihood:"
+                  - strong [ref=e383]: 75%
+                - generic [ref=e384]:
+                  - text: "Estimated Cost:"
+                  - strong [ref=e385]: $50,000
+                - generic [ref=e386]:
+                  - text: "Duration:"
+                  - strong [ref=e387]: 90 Days
+                - generic [ref=e388]:
+                  - text: "Risk Assessment:"
+                  - strong [ref=e389]: Low
+        - generic [ref=e229]:
+          - generic [ref=e230]: Governance Resource Constraints
+          - generic [ref=e231]:
+            - generic [ref=e232]:
+              - generic [ref=e233]:
+                - generic [ref=e234]: Budget Cap Limit
+                - strong [ref=e235]: $15,000
+              - slider [ref=e236]: "15000"
+            - generic [ref=e237]:
+              - generic [ref=e238]:
+                - generic [ref=e239]: Duration Cap Limit
+                - strong [ref=e240]: 45 Days
+              - slider [ref=e241]: "45"
+      - generic [ref=e242]:
+        - generic [ref=e243]:
+          - strong [ref=e244]: "OPA Constraint Breach: PLAN DISPATCH BLOCKED"
+          - generic [ref=e245]: "Plan requirements violate current limits. Budget Breach: Yes | Duration Breach: No. Request Executive waiver exception signature to proceed."
+        - button "Request Waiver" [ref=e247] [cursor=pointer]
+      - generic [ref=e248]:
+        - generic [ref=e249]: Scenario Analysis & Verification
+        - generic [ref=e250]:
+          - generic [ref=e251]:
+            - heading "Trade-off Explanations" [level=4] [ref=e252]
+            - paragraph [ref=e253]: AI Predictor Campaign Retargeting is configured with a cost budget of $24,000 over a period of 45 days. Confidence level stands at 90%. Risk profile is Medium.
+          - generic [ref=e254]:
+            - button "Approve & Dispatch Selected Plan" [disabled]
+  - generic [ref=e161]:
+    - generic [ref=e162]:
+      - heading "Evidence & Lineage Trace" [level=3] [ref=e163]
+      - button "Close evidence panel" [ref=e164] [cursor=pointer]: ×
+    - generic [ref=e165]:
+      - generic [ref=e166]:
+        - generic [ref=e167]: Provenance Source
+        - strong [ref=e168]: PRD Ingest Document
+      - generic [ref=e169]:
+        - generic [ref=e170]: Verification Logs
+        - paragraph [ref=e171]: Automated parser completed syntax and structural checks.
+      - generic [ref=e172]:
+        - generic [ref=e173]: Traceability Schema Metadata
+        - generic [ref=e174]: "{}"
+    - button "Close Panel" [ref=e176] [cursor=pointer]
+  - generic [ref=e177]:
+    - generic [ref=e178]:
+      - heading "Command & Search Palette" [level=3] [ref=e179]
+      - button "×" [ref=e180] [cursor=pointer]
+    - generic [ref=e181]:
+      - textbox "Search objectives, outcomes, plans, tasks..." [ref=e183]
+      - generic [ref=e184]: Search Results
+  - generic:
+    - generic: Waiver exception authorized!
+  - contentinfo [ref=e185]:
+    - generic [ref=e186]:
+      - generic [ref=e189]: "Daemon Live Connection: ACTIVE"
+      - generic [ref=e191]: "Active Tenant: default_tenant"
+    - generic [ref=e192]:
+      - generic [ref=e193]: Synced with Backend Daemon
+      - generic [ref=e194]: 06:45 PM

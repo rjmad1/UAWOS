@@ -16,6 +16,7 @@ from interfaces.rest.objectives import router as objectives_router
 from interfaces.rest.requirements import router as requirements_router
 from interfaces.rest.system import daemon_loop
 from interfaces.rest.system import router as system_router
+from interfaces.rest.meeting import router as meeting_router
 from shared.utilities.context import reset_context, set_context
 
 # HTML paths
@@ -77,6 +78,7 @@ app.include_router(billing_router)
 app.include_router(governance_router)
 app.include_router(dtase_router)
 app.include_router(system_router)
+app.include_router(meeting_router)
 
 
 # HTML routers
@@ -89,6 +91,17 @@ def serve_dashboard():
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Dashboard UI file not found.")
 
+
+@app.get("/operations", response_class=HTMLResponse)
+@app.get("/operations_dashboard.html", response_class=HTMLResponse)
+def serve_operations_dashboard():
+    try:
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        ops_file = os.path.join(root_dir, "operations_dashboard.html")
+        with open(ops_file, encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Operations Dashboard file not found.")
 
 @app.get("/delivery", response_class=HTMLResponse)
 @app.get("/delivery.html", response_class=HTMLResponse)

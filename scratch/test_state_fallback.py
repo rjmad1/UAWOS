@@ -15,8 +15,8 @@ def test_local_json_fallback_on_db_offline():
         state_path = os.path.join(tmpdir, "test_state.json")
         default_data = {"score": 100}
         
-        # 2. Mock uawos_db.DB_AVAILABLE as False to force fallback
-        with patch("uawos_db.DB_AVAILABLE", False):
+        # 2. Mock DB_AVAILABLE as False to force fallback
+        with patch("infrastructure.database.db.DB_AVAILABLE", False), patch("uawos_db.DB_AVAILABLE", False):
             # Save state
             uawos_state_utils.save_state(state_path, default_data)
             
