@@ -1,14 +1,12 @@
 // src/components/RoadmapView.tsx
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Milestone, Objective } from '@/services/api';
-import { Calendar, AlertTriangle, CheckCircle, HelpCircle, Layers, Sliders } from 'lucide-react';
+import { type Objective } from '@/services/api';
+import { AlertTriangle, CheckCircle, Sliders } from 'lucide-react';
 
 interface RoadmapViewProps {
   objective: Objective;
@@ -108,7 +106,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ objective }) => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-zinc-200/60 dark:border-zinc-800/80">
         <div className="flex flex-col">
           <span className="text-[10px] text-primary uppercase font-bold tracking-wider">Operational roadmap engine</span>
-          <h2 className="text-xl font-bold tracking-tight mt-0.5">Timeline & Gantt Tracks</h2>
+          <h2 className="text-xl font-bold tracking-tight mt-0.5">Timeline & Gantt Tracks ({objective.title})</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Milestones sequence offsets and dependency cycle detection</p>
         </div>
       </div>

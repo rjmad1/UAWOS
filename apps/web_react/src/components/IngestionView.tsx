@@ -4,11 +4,10 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Eye, ShieldAlert, Sparkles, CheckCircle, ListTodo, FileText, ArrowRight } from 'lucide-react';
+import { Eye, ShieldAlert, Sparkles, ArrowRight } from 'lucide-react';
 
 interface IngestionViewProps {
   onSubmit: (text: string, options: { owner: string; sponsor: string; input_type: string }) => void;

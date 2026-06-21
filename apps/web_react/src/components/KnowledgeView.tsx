@@ -1,11 +1,11 @@
 // src/components/KnowledgeView.tsx
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Network, Info, Link2, BookOpen } from 'lucide-react';
+import { Search, Network, Link2, BookOpen } from 'lucide-react';
 
 interface KnowledgeNode {
   id: string;

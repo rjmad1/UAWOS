@@ -5,8 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { SystemStatus, api } from '@/services/api';
-import { Activity, Server, AlertOctagon, Terminal, Play, Pause, RefreshCw, Cpu, Layers } from 'lucide-react';
+import { type SystemStatus } from '@/services/api';
+import { Activity, Server, AlertOctagon, Play, Pause, RefreshCw, Cpu, Layers } from 'lucide-react';
 
 interface DashboardViewProps {
   status: SystemStatus | null;

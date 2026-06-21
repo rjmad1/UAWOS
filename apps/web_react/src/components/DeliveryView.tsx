@@ -1,11 +1,11 @@
 // src/components/DeliveryView.tsx
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TraceRecord } from '@/services/api';
-import { CheckCircle2, XCircle, Search, Eye, Clipboard, ShieldCheck, X } from 'lucide-react';
+import { type TraceRecord } from '@/services/api';
+import { Eye, Clipboard, ShieldCheck, X, RefreshCw } from 'lucide-react';
 
 interface DeliveryViewProps {
   matrix: TraceRecord[];
@@ -32,6 +32,9 @@ export const DeliveryView: React.FC<DeliveryViewProps> = ({ matrix, health, onRe
           <h2 className="text-xl font-bold tracking-tight mt-0.5">Delivery Traceability Board</h2>
           <p className="text-xs text-muted-foreground mt-0.5">End-to-end trace mapping from raw requirement checkpoints to output artifacts</p>
         </div>
+        <Button variant="outline" size="sm" className="h-8 text-xs" onClick={onRefresh}>
+          <RefreshCw className="w-3.5 h-3.5 mr-1" /> Scan Traceability
+        </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-4">

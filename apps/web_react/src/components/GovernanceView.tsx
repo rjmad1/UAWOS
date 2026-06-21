@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ExceptionWaiver } from '@/services/api';
-import { ShieldAlert, CheckCircle2, Lock, Unlock, FileCheck, CircleCheck, Info, XCircle } from 'lucide-react';
+import { type ExceptionWaiver } from '@/services/api';
+import { Lock, Unlock, CircleCheck, Info, XCircle } from 'lucide-react';
 
 interface GovernanceViewProps {
   waivers: ExceptionWaiver[];
@@ -161,10 +161,13 @@ export const GovernanceView: React.FC<GovernanceViewProps> = ({ waivers, activeR
                             placeholder="Enter signature authorization token..."
                             value={signatureToken}
                             onChange={(e) => setSignatureToken(e.target.value)}
-                            className="h-8 text-xs border-zinc-200/60 dark:border-zinc-800/80 focus-visible:ring-emerald-500/20"
+                            className="h-8 text-xs border-zinc-200/60 dark:border-zinc-800/80 focus-visible:ring-emerald-500/20 flex-grow"
                           />
                           <Button type="submit" size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-500 text-white shrink-0">
-                            <Unlock className="w-3.5 h-3.5 mr-1" /> Approve Waiver
+                            <Unlock className="w-3.5 h-3.5 mr-1" /> Approve
+                          </Button>
+                          <Button type="button" size="sm" variant="destructive" className="h-8 text-xs shrink-0" onClick={handleReject}>
+                            <XCircle className="w-3.5 h-3.5 mr-1" /> Reject
                           </Button>
                         </div>
                         {validationError && <span className="text-[10px] text-red-500 font-semibold">{validationError}</span>}
