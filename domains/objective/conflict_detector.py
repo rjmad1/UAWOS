@@ -1,11 +1,11 @@
 # domains/objective/conflict_detector.py
-from typing import List, Dict
+
 from .objective import Objective
 
 PRIORITY_LEVELS = {"Low": 1, "Medium": 2, "High": 3, "Critical": 4}
 
 
-def detect_conflicts(objectives: Dict[str, Objective]) -> List[dict]:
+def detect_conflicts(objectives: dict[str, Objective]) -> list[dict]:
     """Scan objectives and detect circular dependency cycles, priority mismatches, and status mismatches."""
     conflicts = []
 

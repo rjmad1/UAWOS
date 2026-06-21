@@ -1,14 +1,12 @@
 # uawos_outcome.py
 import os
-import uawos_db
-from uawos_state_utils import load_state, save_state
 
+import uawos_db
 from application.use_cases.outcome_use_cases import (
     create_outcome,
     get_objective_outcomes,
-    update_outcome,
-    recalculate_forecasts,
 )
+from uawos_state_utils import save_state
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_outcome_state.json")
 

@@ -1,6 +1,6 @@
 # domains/objective/objective.py
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import Any
 
 
 @dataclass
@@ -13,10 +13,10 @@ class Objective:
     owner: str = "System Agent"
     sponsor: str = "CPO"
     priority: str = "Medium"
-    dependencies: List[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
     status: str = "active"
     version: int = 1
-    history: List[Dict[str, Any]] = field(default_factory=list)
+    history: list[dict[str, Any]] = field(default_factory=list)
     health_score: float = 100.0
     confidence_score: float = 100.0
     tenant_id: str = "default_tenant"

@@ -1,24 +1,21 @@
 # uawos_planning.py
 import os
-import time
 
 import uawos_db
-from uawos_state_utils import load_state, save_state
-
 from application.use_cases.planning_use_cases import (
+    approve_plan,
+    archive_plan,
+    compare_plans,
     create_plan,
     generate_plans,
-    rank_plans,
-    simulate_plan,
-    compare_plans,
-    approve_plan,
-    reject_plan,
-    archive_plan,
-    modify_plan,
-    trigger_replanning,
     get_planning_traceability,
-    route_action_to_agent,
+    modify_plan,
+    rank_plans,
+    reject_plan,
+    simulate_plan,
+    trigger_replanning,
 )
+from uawos_state_utils import save_state
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_planning_state.json")
 

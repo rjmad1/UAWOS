@@ -1,6 +1,6 @@
 # domains/workflow/workflow.py
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import Any
 
 
 @dataclass
@@ -8,11 +8,11 @@ class Workflow:
     id: str
     plan_id: str
     title: str
-    tasks: List[str]
-    dependencies: List[str] = field(default_factory=list)
+    tasks: list[str]
+    dependencies: list[str] = field(default_factory=list)
     state: str = "active"
     version: int = 1
-    history: List[Dict[str, Any]] = field(default_factory=list)
+    history: list[dict[str, Any]] = field(default_factory=list)
     governed: bool = True
     execution_mode: str = None
     temporal_run_id: str = None
@@ -57,6 +57,6 @@ class Workflow:
             "simulation_verdict": "Success predicted",
         }
 
-    def optimize(self) -> List[str]:
+    def optimize(self) -> list[str]:
         """Sort tasks to optimize execution order (simulated optimization)."""
         return sorted(self.tasks)

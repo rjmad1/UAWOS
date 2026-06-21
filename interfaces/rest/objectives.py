@@ -10,10 +10,7 @@ router = APIRouter()
 @router.get("/api/objective/list")
 def get_objective_list():
     try:
-        return objective_use_cases.load_state(
-            objective_use_cases.STATE_FILE,
-            objective_use_cases.get_default_state
-        )
+        return objective_use_cases.load_state(objective_use_cases.STATE_FILE, objective_use_cases.get_default_state)
     except Exception as e:
         return {"error": str(e)}
 

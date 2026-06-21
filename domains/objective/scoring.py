@@ -1,12 +1,12 @@
 # domains/objective/scoring.py
-from typing import List
+
 from .objective import Objective
 
 
 def calculate_health(
     objective: Objective,
     in_cycle: bool,
-    dependency_statuses: List[str],
+    dependency_statuses: list[str],
     budget_verdict: str = "APPROVED",
     has_outcomes: bool = True,
 ) -> float:

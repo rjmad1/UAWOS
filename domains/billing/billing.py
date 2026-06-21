@@ -1,6 +1,5 @@
 # domains/billing/billing.py
-from dataclasses import dataclass, field
-from typing import Dict, List
+from dataclasses import dataclass
 
 # Model pricing structures per 1M tokens
 MODEL_PRICING = {
@@ -140,7 +139,7 @@ class BudgetApproval:
         )
 
 
-def calculate_cost_run_rate(objective_budgets: Dict[str, ObjectiveBudget]) -> dict:
+def calculate_cost_run_rate(objective_budgets: dict[str, ObjectiveBudget]) -> dict:
     """Calculate linear forecast and variances across all objective budgets."""
     total_budget = sum(o.budget for o in objective_budgets.values())
     total_actual = sum(o.actual for o in objective_budgets.values())

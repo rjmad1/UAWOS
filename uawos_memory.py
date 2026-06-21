@@ -1,33 +1,16 @@
 # uawos_memory.py
 import os
-import time
-import json
-import uuid
-
-import uawos_db
-from uawos_state_utils import load_state, save_state
 
 from application.use_cases.memory_use_cases import (
     append_memory,
     apply_overlay,
+    apply_retention_policy,
     curate_memory,
     export_memory,
-    apply_retention_policy,
-    create_stm_session,
-    add_stm_message,
-    get_stm_sliding_context,
-    update_agent_scratchpad,
-    get_agent_scratchpad,
-    create_episode,
-    add_episode_event,
-    add_episode_decision,
-    get_episode_timeline,
-    reflect_on_episode,
-    auto_consolidate_memories,
 )
 
 # Advisory lock wrappers for compatibility
-from infrastructure.database.db import acquire_advisory_lock, release_advisory_lock
+from uawos_state_utils import load_state, save_state
 
 STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_memory_state.json")
 

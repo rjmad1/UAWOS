@@ -1,9 +1,10 @@
 # scratch/test_weaverouter_fallback.py
 import sys
-sys.path.append('.')
 
-import uawos_dtase
+sys.path.append(".")
+
 import uawos_budget
+import uawos_dtase
 
 print("1. Running DTASE unstructured input ingestion...")
 text = "OBJ-101: The system is experiencing high latency on checkout. We need to optimize the database queries."

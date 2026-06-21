@@ -1,14 +1,13 @@
 import os
 import time
-from typing import List, Dict
 
 from domains.planning.plan import Plan
 from infrastructure.storage.json_fallback_store import load_state, save_state
 
 STATE_FILE = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "uawos_planning_state.json"
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uawos_planning_state.json"
 )
+
 
 def get_default_state() -> dict:
     return {
@@ -53,7 +52,6 @@ def get_default_state() -> dict:
     }
 
 
-
 def create_plan(
     objective_id: str,
     title: str,
@@ -68,7 +66,7 @@ def create_plan(
 ) -> dict:
     state = load_state()
     plan_id = f"PLN-{len(state['plans']) + 100:03d}"
-    
+
     plan = Plan(
         id=plan_id,
         objective_id=objective_id,
@@ -124,7 +122,7 @@ def simulate_plan(plan_id: str) -> dict:
     plan_dict = state["plans"].get(plan_id)
     if not plan_dict:
         raise ValueError(f"Plan {plan_id} not found.")
-    
+
     plan = Plan.from_dict(plan_dict)
     return plan.simulate()
 
@@ -166,7 +164,7 @@ def modify_plan(plan_id: str, updates: dict) -> dict:
         raise ValueError(f"Plan {plan_id} not found.")
 
     plan = Plan.from_dict(plan_dict)
-    
+
     # Save to history
     snap = {k: v for k, v in plan.to_dict().items() if k != "history"}
     plan.history.append({"timestamp": time.time(), "state": snap})
@@ -218,7 +216,7 @@ def get_planning_traceability(plan_id: str) -> dict:
     plan_dict = state["plans"].get(plan_id)
     if not plan_dict:
         raise ValueError(f"Plan {plan_id} not found.")
-    
+
     plan = Plan.from_dict(plan_dict)
     return {
         "plan_id": plan_id,
@@ -229,8 +227,8 @@ def get_planning_traceability(plan_id: str) -> dict:
 
 def route_action_to_agent(action_id: str, tenant_id: str = "default_tenant") -> str:
     """Dynamically route an action to the best-matching workforce agent based on required skills/capabilities."""
-    import uawos_agent_workforce
     import infrastructure.database.db as db_module
+    import uawos_agent_workforce
 
     # 1. Fetch action details from DB (or state)
     actions_data = db_module.db_load_actions()

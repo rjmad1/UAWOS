@@ -1,25 +1,25 @@
 # application/use_cases/billing_use_cases.py
 import os
 import time
-from typing import Dict
 
 from domains.billing.billing import (
     MODEL_PRICING,
-    ObjectiveBudget,
     ActionBudget,
     AgentCost,
-    TokenConsumption,
     BudgetApproval,
+    ObjectiveBudget,
+    TokenConsumption,
     calculate_cost_run_rate,
+)
+from domains.billing.billing import (
     evaluate_cost_governance as domain_evaluate_cost_governance,
 )
 from infrastructure.storage.json_fallback_store import load_state, save_state
-from shared.utilities.context import get_tenant_id
 
 STATE_FILE = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "uawos_budget_state.json"
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uawos_budget_state.json"
 )
+
 
 def get_default_state() -> dict:
     return {
@@ -187,7 +187,6 @@ def get_default_state() -> dict:
     }
 
 
-
 def allocate_objective_budget(objective_id: str, name: str, budget: float) -> dict:
     state = load_state()
     if objective_id not in state["objective_budgets"]:
@@ -217,13 +216,13 @@ def record_agent_cost(
     reasoning_tokens: int = 0,
 ):
     state = load_state()
-    
+
     pricing = MODEL_PRICING.get(model_name, MODEL_PRICING["default"])
     in_cost = (input_tokens / 1000000.0) * pricing["input"]
     out_cost = (output_tokens / 1000000.0) * pricing["output"]
     reason_cost = (reasoning_tokens / 1000000.0) * pricing["reasoning"]
     run_cost = round(in_cost + out_cost + reason_cost, 4)
-    
+
     # Update Token Consumption
     if model_name not in state["token_consumption"]:
         tc = TokenConsumption()
@@ -234,7 +233,7 @@ def record_agent_cost(
     tc.reasoning_tokens += reasoning_tokens
     tc.cost = round(tc.cost + run_cost, 2)
     state["token_consumption"][model_name] = tc.to_dict()
-    
+
     # Update Agent Cost
     if agent_name not in state["agent_costs"]:
         ac = AgentCost()
@@ -244,13 +243,13 @@ def record_agent_cost(
     ac.token_count += input_tokens + output_tokens + reasoning_tokens
     ac.call_count += 1
     state["agent_costs"][agent_name] = ac.to_dict()
-    
+
     # Add to default OBJ-103 DTASE or active objectives
     if "OBJ-103" in state["objective_budgets"]:
         ob = ObjectiveBudget.from_dict(state["objective_budgets"]["OBJ-103"])
         ob.actual = round(ob.actual + run_cost, 2)
         state["objective_budgets"]["OBJ-103"] = ob.to_dict()
-        
+
     save_state(state)
 
 
@@ -259,7 +258,7 @@ def evaluate_cost_governance(objective_id: str, threshold_ratio: float = 0.9) ->
     obj_dict = state["objective_budgets"].get(objective_id)
     if not obj_dict:
         return {"status": "Error", "message": f"Objective {objective_id} not found."}
-        
+
     ob = ObjectiveBudget.from_dict(obj_dict)
     res = domain_evaluate_cost_governance(ob.budget, ob.actual, threshold_ratio)
     res["objective_id"] = objective_id
@@ -303,11 +302,11 @@ def process_approval_request(approval_id: str, decision: str) -> dict:
 
 def get_summary() -> dict:
     state = load_state()
-    
+
     # Map domain dictionaries to entities for cost forecasts
     objective_budgets = {oid: ObjectiveBudget.from_dict(o) for oid, o in state["objective_budgets"].items()}
     metrics = calculate_cost_run_rate(objective_budgets)
-    
+
     # Calculate attribution
     total_cost = sum(o.actual for o in objective_budgets.values())
     attribution = state["portfolio_attribution"]
@@ -321,7 +320,7 @@ def get_summary() -> dict:
                 state["objective_budgets"]["OBJ-103"]["actual"] + state["objective_budgets"]["OBJ-104"]["actual"]
             )
         p_val["percentage"] = round((p_val["cost"] / total_cost) * 100, 1) if total_cost > 0 else 0.0
-        
+
     # Calculate value-to-cost
     v_to_c = state["value_to_cost"]
     for obj_id, val_dict in v_to_c.items():
@@ -331,7 +330,7 @@ def get_summary() -> dict:
             val_dict["roi_ratio"] = (
                 round(val_dict["value_score"] / (obj["actual"] / 100.0), 2) if obj["actual"] > 0 else 0.0
             )
-            
+
     return {
         "metrics": metrics,
         "objective_budgets": state["objective_budgets"],

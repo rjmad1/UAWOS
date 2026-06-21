@@ -1,8 +1,8 @@
 # infrastructure/security/fga_client.py
 import json
 import os
-import urllib.request
 import urllib.error
+import urllib.request
 
 # OpenFGA Connection Settings
 OPENFGA_HOST = os.environ.get("OPENFGA_HOST", "127.0.0.1")

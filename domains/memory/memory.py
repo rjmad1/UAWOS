@@ -1,7 +1,6 @@
 # domains/memory/memory.py
-from dataclasses import dataclass, field
-import time
-from typing import Optional
+from dataclasses import dataclass
+
 
 @dataclass
 class MemoryEntry:
@@ -11,8 +10,8 @@ class MemoryEntry:
     scope: str = "workspace"  # workspace, organizational
     owner: str = "system"
     status: str = "active"  # active, archived
-    original_content: Optional[str] = None
-    curated_timestamp: Optional[int] = None
+    original_content: str | None = None
+    curated_timestamp: int | None = None
 
     def to_dict(self) -> dict:
         data = {

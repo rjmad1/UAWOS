@@ -87,18 +87,23 @@ class CodeRiskScanner:
             # TODO
             if "TODO" in line_strip or "FIXME" in line_strip:
                 # Exclude self-matching lines in the scanner code itself
-                if filename == "uawos_proactive_governance.py":
-                    if any(term in line_strip for term in [
-                        "Scan for TODOs",
-                        "if \"TODO\" in",
-                        "re.search(r\"(?:TODO|FIXME)",
-                        "Warning 2: TODO Accumulation",
-                        "active TODO/FIXME lines in source files",
-                        "block merging critical TODO comments",
-                        "derived from TODOs",
-                        "Active TODOs and FIXMEs"
-                    ]) or line_strip == "# TODO":
-                        continue
+                if filename == "uawos_proactive_governance.py" and (
+                    any(
+                        term in line_strip
+                        for term in [
+                            "Scan for TODOs",
+                            'if "TODO" in',
+                            're.search(r"(?:TODO|FIXME)',
+                            "Warning 2: TODO Accumulation",
+                            "active TODO/FIXME lines in source files",
+                            "block merging critical TODO comments",
+                            "derived from TODOs",
+                            "Active TODOs and FIXMEs",
+                        ]
+                    )
+                    or line_strip == "# TODO"
+                ):
+                    continue
                 match = re.search(r"(?:TODO|FIXME)[:\s]+(.*)", line_strip, re.IGNORECASE)
                 text = match.group(1) if match else line_strip
                 self.todos.append({"file": filename, "line": idx, "text": text})

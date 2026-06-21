@@ -1,7 +1,8 @@
-import os
 import ast
 import json
+import os
 import re
+
 
 class CodebaseAuditor(ast.NodeVisitor):
     def __init__(self, filepath):
@@ -26,18 +27,17 @@ class CodebaseAuditor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_ClassDef(self, node):
-        self.classes.append({
-            "name": node.name,
-            "lineno": node.lineno,
-            "methods": [n.name for n in node.body if isinstance(n, ast.FunctionDef)]
-        })
+        self.classes.append(
+            {
+                "name": node.name,
+                "lineno": node.lineno,
+                "methods": [n.name for n in node.body if isinstance(n, ast.FunctionDef)],
+            }
+        )
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node):
-        self.functions.append({
-            "name": node.name,
-            "lineno": node.lineno
-        })
+        self.functions.append({"name": node.name, "lineno": node.lineno})
         self.generic_visit(node)
 
     def visit_Call(self, node):
@@ -50,8 +50,9 @@ class CodebaseAuditor(ast.NodeVisitor):
             self.urllib_calls.append(node.lineno)
         self.generic_visit(node)
 
+
 def audit_file(filepath):
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         content = f.read()
 
     # Find comments like TODO/FIXME
@@ -64,29 +65,39 @@ def audit_file(filepath):
         tree = ast.parse(content, filename=filepath)
         auditor = CodebaseAuditor(filepath)
         auditor.visit(tree)
-        
+
         # Check for AI terms in content
         ai_terms = []
-        for term in ["agent", "prompt", "rag", "embed", "llm", "openai", "claude", "gemini", "litellm", "telemetry", "opentelemetry"]:
-            matches = list(re.finditer(r'\b' + re.escape(term) + r'\b', content, re.IGNORECASE))
+        for term in [
+            "agent",
+            "prompt",
+            "rag",
+            "embed",
+            "llm",
+            "openai",
+            "claude",
+            "gemini",
+            "litellm",
+            "telemetry",
+            "opentelemetry",
+        ]:
+            matches = list(re.finditer(r"\b" + re.escape(term) + r"\b", content, re.IGNORECASE))
             if matches:
                 ai_terms.append((term, len(matches)))
 
         return {
             "file": os.path.basename(filepath),
-            "imports": sorted(list(set(auditor.imports))),
+            "imports": sorted(set(auditor.imports)),
             "classes": auditor.classes,
             "functions": auditor.functions,
             "todos": todos,
             "sql_lines": auditor.sql_executions,
             "urllib_lines": auditor.urllib_calls,
-            "ai_terms": ai_terms
+            "ai_terms": ai_terms,
         }
     except Exception as e:
-        return {
-            "file": os.path.basename(filepath),
-            "error": str(e)
-        }
+        return {"file": os.path.basename(filepath), "error": str(e)}
+
 
 def run_audit(root_dir):
     results = {}
@@ -94,10 +105,11 @@ def run_audit(root_dir):
         if fname.startswith("uawos_") and fname.endswith(".py") and fname != "__init__.py":
             filepath = os.path.join(root_dir, fname)
             results[fname] = audit_file(filepath)
-            
+
     with open(os.path.join(root_dir, "scratch", "audit_report_data.json"), "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
     print(f"Audited {len(results)} files. Written to scratch/audit_report_data.json")
+
 
 if __name__ == "__main__":
     run_audit(r"C:\Users\rajaj\Projects\UAWOS")

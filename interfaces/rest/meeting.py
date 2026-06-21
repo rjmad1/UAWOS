@@ -1,39 +1,97 @@
 # interfaces/rest/meeting.py
 import re
 import uuid
-from typing import List, Dict, Any
+from typing import Any
+
 from fastapi import APIRouter, Header, HTTPException, Request
 
 import uawos_weaverouter
-from interfaces.rest.auth import verify_secure_token
 from application.use_cases.objective_use_cases import create_objective
 from application.use_cases.outcome_use_cases import create_outcome
+from interfaces.rest.auth import verify_secure_token
 
 router = APIRouter()
 
 # Seeded Transcripts for Demo Scenarios
 DEMO_TRANSCRIPTS = {
     "sprint": [
-        {"speaker": "Alice (Product Manager)", "timestamp": "00:02", "text": "Welcome team. Today we are aligning on the unified design system sprint objective. We must define core spacing tokens and accessibility compliance metrics by week 2."},
-        {"speaker": "Bob (Tech Lead)", "timestamp": "00:25", "text": "Agreed. From the engineering side, we need to ensure all Tailwind or Vanilla CSS utility classes import these tokens automatically. I can take ownership of the repository theme setup."},
-        {"speaker": "Charlie (CEO Advisor)", "timestamp": "00:54", "text": "Excellent. Our strategic priority is ARR retention. Let's make sure this UI transition doesn't disrupt checkout conversion. We should target less than 5% conversion drift in A/B trials."},
-        {"speaker": "Alice (Product Manager)", "timestamp": "01:22", "text": "Good point. Bob, let's configure Qdrant collections to log visual regression screenshots. We also need to get legal compliance approval on accessibility standards."},
-        {"speaker": "Diana (Compliance)", "timestamp": "01:48", "text": "Yes, I will run the OPA constraint audit rules to verify license structures and WCAG AA contrast ratios."}
+        {
+            "speaker": "Alice (Product Manager)",
+            "timestamp": "00:02",
+            "text": "Welcome team. Today we are aligning on the unified design system sprint objective. We must define core spacing tokens and accessibility compliance metrics by week 2.",
+        },
+        {
+            "speaker": "Bob (Tech Lead)",
+            "timestamp": "00:25",
+            "text": "Agreed. From the engineering side, we need to ensure all Tailwind or Vanilla CSS utility classes import these tokens automatically. I can take ownership of the repository theme setup.",
+        },
+        {
+            "speaker": "Charlie (CEO Advisor)",
+            "timestamp": "00:54",
+            "text": "Excellent. Our strategic priority is ARR retention. Let's make sure this UI transition doesn't disrupt checkout conversion. We should target less than 5% conversion drift in A/B trials.",
+        },
+        {
+            "speaker": "Alice (Product Manager)",
+            "timestamp": "01:22",
+            "text": "Good point. Bob, let's configure Qdrant collections to log visual regression screenshots. We also need to get legal compliance approval on accessibility standards.",
+        },
+        {
+            "speaker": "Diana (Compliance)",
+            "timestamp": "01:48",
+            "text": "Yes, I will run the OPA constraint audit rules to verify license structures and WCAG AA contrast ratios.",
+        },
     ],
     "governance": [
-        {"speaker": "Diana (Compliance Officer)", "timestamp": "00:05", "text": "We are initiating the quarterly OPA and SBOM license audit. We need to inspect all direct dependencies for copyleft licenses."},
-        {"speaker": "Edward (CFO)", "timestamp": "00:32", "text": "Let's review the budget ceiling. Our current API spend with Weaverouter stands at $12,400 out of our $15,000 allocation. We must prevent cost overruns."},
-        {"speaker": "Frank (Legal Counsel)", "timestamp": "01:10", "text": "Strictly speaking, direct imports of copyleft Marker-parser libraries violate core licensing rules. We must isolate Marker in a sandboxed Docker container immediately."},
-        {"speaker": "Edward (CFO)", "timestamp": "01:45", "text": "Agreed. Let's decide to officially block any direct copyleft imports. Frank, please draft the compliance policy amendment by Friday."},
-        {"speaker": "Diana (Compliance Officer)", "timestamp": "02:15", "text": "I will register the new OPA gating rules in Marquez to track data lineage provenance."}
+        {
+            "speaker": "Diana (Compliance Officer)",
+            "timestamp": "00:05",
+            "text": "We are initiating the quarterly OPA and SBOM license audit. We need to inspect all direct dependencies for copyleft licenses.",
+        },
+        {
+            "speaker": "Edward (CFO)",
+            "timestamp": "00:32",
+            "text": "Let's review the budget ceiling. Our current API spend with Weaverouter stands at $12,400 out of our $15,000 allocation. We must prevent cost overruns.",
+        },
+        {
+            "speaker": "Frank (Legal Counsel)",
+            "timestamp": "01:10",
+            "text": "Strictly speaking, direct imports of copyleft Marker-parser libraries violate core licensing rules. We must isolate Marker in a sandboxed Docker container immediately.",
+        },
+        {
+            "speaker": "Edward (CFO)",
+            "timestamp": "01:45",
+            "text": "Agreed. Let's decide to officially block any direct copyleft imports. Frank, please draft the compliance policy amendment by Friday.",
+        },
+        {
+            "speaker": "Diana (Compliance Officer)",
+            "timestamp": "02:15",
+            "text": "I will register the new OPA gating rules in Marquez to track data lineage provenance.",
+        },
     ],
     "consultation": [
-        {"speaker": "Grace (Client)", "timestamp": "00:04", "text": "Our primary concern is customer checkouts. Users are repeatedly abandoning carts at the final step when shipping fees are disclosed."},
-        {"speaker": "Henry (Attorney)", "timestamp": "00:31", "text": "That creates regulatory exposure under standard consumer transparency rules. Upfront shipping estimations are legally required in multiple states."},
-        {"speaker": "Grace (Client)", "timestamp": "00:58", "text": "Understood. We need to build an upfront shipping estimation calculator. Our budget is $10,000 for this fix, and we need it ready in 30 days."},
-        {"speaker": "Henry (Attorney)", "timestamp": "01:25", "text": "I advise auditing the checkout conversion logs to document prior complaints. I'll review consumer standards to ensure compliance of the new flow."}
-    ]
+        {
+            "speaker": "Grace (Client)",
+            "timestamp": "00:04",
+            "text": "Our primary concern is customer checkouts. Users are repeatedly abandoning carts at the final step when shipping fees are disclosed.",
+        },
+        {
+            "speaker": "Henry (Attorney)",
+            "timestamp": "00:31",
+            "text": "That creates regulatory exposure under standard consumer transparency rules. Upfront shipping estimations are legally required in multiple states.",
+        },
+        {
+            "speaker": "Grace (Client)",
+            "timestamp": "00:58",
+            "text": "Understood. We need to build an upfront shipping estimation calculator. Our budget is $10,000 for this fix, and we need it ready in 30 days.",
+        },
+        {
+            "speaker": "Henry (Attorney)",
+            "timestamp": "01:25",
+            "text": "I advise auditing the checkout conversion logs to document prior complaints. I'll review consumer standards to ensure compliance of the new flow.",
+        },
+    ],
 }
+
 
 @router.post("/api/meeting/transcribe")
 async def transcribe_meeting(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
@@ -42,7 +100,7 @@ async def transcribe_meeting(request: Request, x_uawos_token: str = Header(None)
         payload = await request.json()
         template_key = payload.get("template", "sprint")
         raw_text = payload.get("text", "")
-        
+
         # If raw text was typed or uploaded, parse into mock diarized turns
         if raw_text:
             lines = [l.strip() for l in raw_text.split("\n") if l.strip()]
@@ -56,23 +114,16 @@ async def transcribe_meeting(request: Request, x_uawos_token: str = Header(None)
                 else:
                     speaker = f"Participant {i % 3 + 1}"
                     text = line
-                timestamp = f"{i//60:02d}:{i%60:02d}"
-                transcript.append({
-                    "speaker": speaker,
-                    "timestamp": timestamp,
-                    "text": text
-                })
+                timestamp = f"{i // 60:02d}:{i % 60:02d}"
+                transcript.append({"speaker": speaker, "timestamp": timestamp, "text": text})
         else:
             transcript = DEMO_TRANSCRIPTS.get(template_key, DEMO_TRANSCRIPTS["sprint"])
-            
+
         meeting_id = f"MTG-{uuid.uuid4().hex[:4].upper()}"
-        return {
-            "status": "Success",
-            "meeting_id": meeting_id,
-            "transcript": transcript
-        }
+        return {"status": "Success", "meeting_id": meeting_id, "transcript": transcript}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/api/meeting/synthesize")
 async def synthesize_meeting(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
@@ -82,7 +133,7 @@ async def synthesize_meeting(request: Request, x_uawos_token: str = Header(None)
         meeting_id = payload.get("meeting_id", "MTG-909")
         transcript = payload.get("transcript", [])
         personas = payload.get("personas", ["Product Manager", "Legal Analyst"])
-        
+
         # Check payload first, then headers as fallback
         provider = payload.get("provider") or request.headers.get("x-uawos-provider")
         api_key = payload.get("api_key") or request.headers.get("x-uawos-api-key")
@@ -90,9 +141,9 @@ async def synthesize_meeting(request: Request, x_uawos_token: str = Header(None)
         model = payload.get("model") or request.headers.get("x-uawos-model")
         language = payload.get("language") or request.headers.get("x-uawos-language") or "English"
         is_offline = payload.get("offline", False) or request.headers.get("x-uawos-offline") == "true"
-        
+
         transcript_text = "\n".join([f"{t['speaker']} [{t['timestamp']}]: {t['text']}" for t in transcript])
-        
+
         # Construct synthesis prompt
         prompt = f"""[INST] You are the UAWOS Meeting Intelligence Synthesis Engine.
 Analyze the following multi-party meeting transcript through these expert personas: {", ".join(personas)}.
@@ -173,7 +224,7 @@ Output strictly in JSON format (no backticks, no wrap text, no comments):
   }}
 }}
 [/INST]"""
-        
+
         notes = {}
         if is_offline:
             print("[Meeting Synthesis] Offline mode requested. Skipping LLM call and running fallback heuristics...")
@@ -187,22 +238,22 @@ Output strictly in JSON format (no backticks, no wrap text, no comments):
                     agent_name="Meeting Synthesis Agent",
                     provider=provider,
                     api_key=api_key,
-                    api_url=api_url
+                    api_url=api_url,
                 )
                 import json
+
                 notes = json.loads(llm_response)
             except Exception as e:
-                print(f"[Meeting Synthesis Warning] LLM synthesis failed or timeout: {e}. Running fallback heuristics...")
+                print(
+                    f"[Meeting Synthesis Warning] LLM synthesis failed or timeout: {e}. Running fallback heuristics..."
+                )
                 # Run rich fallback heuristic compiler
                 notes = run_fallback_synthesis_heuristics(transcript, personas, language)
-            
-        return {
-            "status": "Success",
-            "meeting_id": meeting_id,
-            "synthesis": notes
-        }
+
+        return {"status": "Success", "meeting_id": meeting_id, "synthesis": notes}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/api/meeting/promote")
 async def promote_meeting_item(request: Request, x_uawos_token: str = Header(None), authorization: str = Header(None)):
@@ -216,10 +267,10 @@ async def promote_meeting_item(request: Request, x_uawos_token: str = Header(Non
         priority = payload.get("priority", "Medium")
         metric_name = payload.get("metric_name", "Completion Rate")
         metric_unit = payload.get("metric_unit", "percent")
-        
+
         if not title:
             raise HTTPException(status_code=400, detail="Title is required to promote to Objective.")
-            
+
         # Create Objective programmatically
         obj = create_objective(
             title=title,
@@ -229,9 +280,9 @@ async def promote_meeting_item(request: Request, x_uawos_token: str = Header(Non
             owner=target_owner,
             sponsor="Executive Board",
             priority=priority,
-            dependencies=[]
+            dependencies=[],
         )
-        
+
         # Create corresponding outcome metric
         create_outcome(
             objective_id=obj["id"],
@@ -240,19 +291,21 @@ async def promote_meeting_item(request: Request, x_uawos_token: str = Header(Non
             unit=metric_unit,
             baseline_state=0.0,
             target_state=100.0,
-            current_state=0.0
+            current_state=0.0,
         )
-        
+
         return {
             "status": "Success",
             "objective_id": obj["id"],
-            "message": f"Successfully promoted to UAWOS Objective {obj['id']} with measurable outcomes."
+            "message": f"Successfully promoted to UAWOS Objective {obj['id']} with measurable outcomes.",
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def run_fallback_synthesis_heuristics(transcript: List[Dict[str, str]], personas: List[str], language: str = "English") -> Dict[str, Any]:
+def run_fallback_synthesis_heuristics(
+    transcript: list[dict[str, str]], personas: list[str], language: str = "English"
+) -> dict[str, Any]:
     """Rich rule-based heuristic compiler that constructs the standard PRD sections from transcripts with multilingual translation maps."""
     # Translation dictionaries
     translation_maps = {
@@ -323,7 +376,6 @@ def run_fallback_synthesis_heuristics(transcript: List[Dict[str, str]], personas
             "Medium": "Medio",
             "Low": "Bajo",
             "Pending": "Pendiente",
-            "Establish project scope alignment, resource limits, and compliance benchmarks.": "Establecer la alineación del alcance del proyecto, los límites de recursos y los puntos de referencia de cumplimiento."
         },
         "French": {
             "Establish project scope alignment, resource limits, and compliance benchmarks.": "Établir l'alignement de la portée du projet, les limites des ressources et les jalons de conformité.",
@@ -391,7 +443,7 @@ def run_fallback_synthesis_heuristics(transcript: List[Dict[str, str]], personas
             "High": "Élevé",
             "Medium": "Moyen",
             "Low": "Faible",
-            "Pending": "En attente"
+            "Pending": "En attente",
         },
         "German": {
             "Establish project scope alignment, resource limits, and compliance benchmarks.": "Projektumfangsabgleich, Ressourcenlimits und Compliance-Benchmarks festlegen.",
@@ -459,7 +511,7 @@ def run_fallback_synthesis_heuristics(transcript: List[Dict[str, str]], personas
             "High": "Hoch",
             "Medium": "Mittel",
             "Low": "Niedrig",
-            "Pending": "Ausstehend"
+            "Pending": "Ausstehend",
         },
         "Chinese": {
             "Establish project scope alignment, resource limits, and compliance benchmarks.": "建立项目范围对齐、资源限制和合规基准。",
@@ -527,12 +579,13 @@ def run_fallback_synthesis_heuristics(transcript: List[Dict[str, str]], personas
             "High": "高",
             "Medium": "中",
             "Low": "低",
-            "Pending": "待办"
-        }
+            "Pending": "待办",
+        },
     }
 
     # Helper function to recursively translate all string values in the notes dictionary
     lang = language.strip().title()
+
     def translate_val(val: Any) -> Any:
         if isinstance(val, dict):
             return {k: translate_val(v) for k, v in val.items()}
@@ -551,182 +604,221 @@ def run_fallback_synthesis_heuristics(transcript: List[Dict[str, str]], personas
         return val
 
     transcript_text = " ".join([t["text"] for t in transcript]).lower()
-    
+
     # 1. Executive Summary heuristics
     purpose = "Establish project scope alignment, resource limits, and compliance benchmarks."
     if "license" in transcript_text or "dependency" in transcript_text:
         purpose = "Quarterly dependency license audit and OPA compliance rules review."
     elif "shipping" in transcript_text or "checkout" in transcript_text:
         purpose = "Address checkout cart abandonment rates and design upfront pricing estimations."
-        
+
     context = f"Cross-functional alignment workshop conducted by {', '.join(personas[:3])}."
-    
-    key_outcomes = ["Aligned stakeholders on critical delivery milestones.", "Determined target budget constraints and enforcement rules."]
+
+    key_outcomes = [
+        "Aligned stakeholders on critical delivery milestones.",
+        "Determined target budget constraints and enforcement rules.",
+    ]
     if "whisper" in transcript_text or "token" in transcript_text:
         key_outcomes.append("Determined Whisper container sizing parameters.")
-        
+
     major_decisions = ["Approve standard workflow dispatch routes."]
     if "block" in transcript_text or "isolate" in transcript_text:
         major_decisions.append("Block direct copyleft library imports and isolate Marker in sandbox container.")
     elif "shipping" in transcript_text or "calculator" in transcript_text:
         major_decisions.append("Build frontend upfront shipping cost calculator to satisfy consumer standards.")
-        
+
     # 2. Detailed notes by topic
     topics = []
     if "sprint" in transcript_text or "design" in transcript_text:
-        topics.append({
-            "topic": "Design System Tokens",
-            "summary": "Align spacing, typography, and accessibility variables across UI libraries.",
-            "evidence": "Alice initiated discussion on WCAG AA contrast rules. Bob took owner tag for repo theme integration."
-        })
+        topics.append(
+            {
+                "topic": "Design System Tokens",
+                "summary": "Align spacing, typography, and accessibility variables across UI libraries.",
+                "evidence": "Alice initiated discussion on WCAG AA contrast rules. Bob took owner tag for repo theme integration.",
+            }
+        )
     if "license" in transcript_text or "compliance" in transcript_text or "opa" in transcript_text:
-        topics.append({
-            "topic": "Dependency Licensing & Governance",
-            "summary": "Inspect codebase direct imports for GPL risk profile compliance.",
-            "evidence": "Frank advised that direct Marker library usage violates licensing terms. Edward ordered sandbox container isolation."
-        })
+        topics.append(
+            {
+                "topic": "Dependency Licensing & Governance",
+                "summary": "Inspect codebase direct imports for GPL risk profile compliance.",
+                "evidence": "Frank advised that direct Marker library usage violates licensing terms. Edward ordered sandbox container isolation.",
+            }
+        )
     if "shipping" in transcript_text or "checkout" in transcript_text:
-        topics.append({
-            "topic": "Cart Abandonment Mitigations",
-            "summary": "Analyze drop-off triggers when shipping prices are revealed late-stage.",
-            "evidence": "Grace highlighted cart churn spikes. Henry verified upfront estimations are legally required in multiple states."
-        })
-        
+        topics.append(
+            {
+                "topic": "Cart Abandonment Mitigations",
+                "summary": "Analyze drop-off triggers when shipping prices are revealed late-stage.",
+                "evidence": "Grace highlighted cart churn spikes. Henry verified upfront estimations are legally required in multiple states.",
+            }
+        )
+
     # Default topic if none matched
     if not topics:
-        topics.append({
-            "topic": "Strategic Milestones Alignment",
-            "summary": "Review current portfolio roadmap progress and resolve resource limits.",
-            "evidence": "Stakeholders reviewed objective health charts and discussed budget approvals."
-        })
-        
+        topics.append(
+            {
+                "topic": "Strategic Milestones Alignment",
+                "summary": "Review current portfolio roadmap progress and resolve resource limits.",
+                "evidence": "Stakeholders reviewed objective health charts and discussed budget approvals.",
+            }
+        )
+
     # 3. Decisions Register
     decisions_reg = []
     for i, dec in enumerate(major_decisions):
-        decisions_reg.append({
-            "id": f"DEC-{i+1}",
-            "decision": dec,
-            "owner": "Executive Sponsor",
-            "rationale": "Mitigate operational dependency and compliance risks.",
-            "priority": "High"
-        })
-        
+        decisions_reg.append(
+            {
+                "id": f"DEC-{i + 1}",
+                "decision": dec,
+                "owner": "Executive Sponsor",
+                "rationale": "Mitigate operational dependency and compliance risks.",
+                "priority": "High",
+            }
+        )
+
     # 4. Action Items
     action_items = []
     if "sprint" in transcript_text:
-        action_items.append({
-            "id": "ACT-1",
-            "task": "Setup spacing and design system tokens in Tailwind config",
-            "owner": "Bob (Tech Lead)",
-            "deadline": "Week 2",
-            "dependencies": [],
-            "priority": "High",
-            "status": "Pending"
-        })
-        action_items.append({
-            "id": "ACT-2",
-            "task": "Configure visual regression tests inside Qdrant pipeline",
-            "owner": "Bob (Tech Lead)",
-            "deadline": "Friday",
-            "dependencies": ["ACT-1"],
-            "priority": "Medium",
-            "status": "Pending"
-        })
+        action_items.append(
+            {
+                "id": "ACT-1",
+                "task": "Setup spacing and design system tokens in Tailwind config",
+                "owner": "Bob (Tech Lead)",
+                "deadline": "Week 2",
+                "dependencies": [],
+                "priority": "High",
+                "status": "Pending",
+            }
+        )
+        action_items.append(
+            {
+                "id": "ACT-2",
+                "task": "Configure visual regression tests inside Qdrant pipeline",
+                "owner": "Bob (Tech Lead)",
+                "deadline": "Friday",
+                "dependencies": ["ACT-1"],
+                "priority": "Medium",
+                "status": "Pending",
+            }
+        )
     if "license" in transcript_text or "dependency" in transcript_text:
-        action_items.append({
-            "id": "ACT-1",
-            "task": "Isolate Marker parser in sandboxed Docker REST container",
-            "owner": "DevOps Architect",
-            "deadline": "Friday",
-            "dependencies": [],
-            "priority": "High",
-            "status": "Pending"
-        })
-        action_items.append({
-            "id": "ACT-2",
-            "task": "Draft OPA gating policy amendments",
-            "owner": "Frank (Legal)",
-            "deadline": "Next week",
-            "dependencies": ["ACT-1"],
-            "priority": "Medium",
-            "status": "Pending"
-        })
+        action_items.append(
+            {
+                "id": "ACT-1",
+                "task": "Isolate Marker parser in sandboxed Docker REST container",
+                "owner": "DevOps Architect",
+                "deadline": "Friday",
+                "dependencies": [],
+                "priority": "High",
+                "status": "Pending",
+            }
+        )
+        action_items.append(
+            {
+                "id": "ACT-2",
+                "task": "Draft OPA gating policy amendments",
+                "owner": "Frank (Legal)",
+                "deadline": "Next week",
+                "dependencies": ["ACT-1"],
+                "priority": "Medium",
+                "status": "Pending",
+            }
+        )
     if "shipping" in transcript_text:
-        action_items.append({
-            "id": "ACT-1",
-            "task": "Draft frontend user stories for upfront shipping calculator",
-            "owner": "Grace (Product)",
-            "deadline": "Thursday",
-            "dependencies": [],
-            "priority": "High",
-            "status": "Pending"
-        })
-        action_items.append({
-            "id": "ACT-2",
-            "task": "Verify consumer standards compliance checklist",
-            "owner": "Henry (Attorney)",
-            "deadline": "Friday",
-            "dependencies": ["ACT-1"],
-            "priority": "Medium",
-            "status": "Pending"
-        })
-        
+        action_items.append(
+            {
+                "id": "ACT-1",
+                "task": "Draft frontend user stories for upfront shipping calculator",
+                "owner": "Grace (Product)",
+                "deadline": "Thursday",
+                "dependencies": [],
+                "priority": "High",
+                "status": "Pending",
+            }
+        )
+        action_items.append(
+            {
+                "id": "ACT-2",
+                "task": "Verify consumer standards compliance checklist",
+                "owner": "Henry (Attorney)",
+                "deadline": "Friday",
+                "dependencies": ["ACT-1"],
+                "priority": "Medium",
+                "status": "Pending",
+            }
+        )
+
     if not action_items:
-        action_items.append({
-            "id": "ACT-1",
-            "task": "Formulate measurable outcome metrics and targets",
-            "owner": "Lead PM",
-            "deadline": "End of week",
-            "dependencies": [],
-            "priority": "Medium",
-            "status": "Pending"
-        })
-        
+        action_items.append(
+            {
+                "id": "ACT-1",
+                "task": "Formulate measurable outcome metrics and targets",
+                "owner": "Lead PM",
+                "deadline": "End of week",
+                "dependencies": [],
+                "priority": "Medium",
+                "status": "Pending",
+            }
+        )
+
     # 5. Risks & Opportunities
     risks = []
     opportunities = []
-    
+
     if "license" in transcript_text:
-        risks.append({
-            "risk": "Copyleft licensing violation via direct imports.",
-            "severity": "High",
-            "mitigation": "Isolate GPL dependencies in sandboxed Docker containers."
-        })
-        opportunities.append({
-            "opportunity": "Automated SBOM scans via Dependency-Track API",
-            "value": "100% compliance audit coverage",
-            "action": "Configure pipeline SBOM ingestion"
-        })
+        risks.append(
+            {
+                "risk": "Copyleft licensing violation via direct imports.",
+                "severity": "High",
+                "mitigation": "Isolate GPL dependencies in sandboxed Docker containers.",
+            }
+        )
+        opportunities.append(
+            {
+                "opportunity": "Automated SBOM scans via Dependency-Track API",
+                "value": "100% compliance audit coverage",
+                "action": "Configure pipeline SBOM ingestion",
+            }
+        )
     elif "shipping" in transcript_text:
-        risks.append({
-            "risk": "Revenue ARR decay from high checkout cart abandonment rates.",
-            "severity": "High",
-            "mitigation": "Expose shipping fee calculator earlier in checkout flow."
-        })
-        opportunities.append({
-            "opportunity": "Optimize shipping pricing transparency",
-            "value": "10-15% conversion improvement",
-            "action": "A/B test calculator page placements"
-        })
+        risks.append(
+            {
+                "risk": "Revenue ARR decay from high checkout cart abandonment rates.",
+                "severity": "High",
+                "mitigation": "Expose shipping fee calculator earlier in checkout flow.",
+            }
+        )
+        opportunities.append(
+            {
+                "opportunity": "Optimize shipping pricing transparency",
+                "value": "10-15% conversion improvement",
+                "action": "A/B test calculator page placements",
+            }
+        )
     else:
-        risks.append({
-            "risk": "Resource capacity constraints and cycle overlaps.",
-            "severity": "Medium",
-            "mitigation": "Run cycle-detection DFS analysis before dispatching workflows."
-        })
-        opportunities.append({
-            "opportunity": "Automated scenario planning simulations",
-            "value": "Reduce planning duration by 20%",
-            "action": "Run scenario alternative model engines"
-        })
-        
+        risks.append(
+            {
+                "risk": "Resource capacity constraints and cycle overlaps.",
+                "severity": "Medium",
+                "mitigation": "Run cycle-detection DFS analysis before dispatching workflows.",
+            }
+        )
+        opportunities.append(
+            {
+                "opportunity": "Automated scenario planning simulations",
+                "value": "Reduce planning duration by 20%",
+                "action": "Run scenario alternative model engines",
+            }
+        )
+
     res = {
         "executive_summary": {
             "purpose": purpose,
             "context": context,
             "key_outcomes": key_outcomes,
             "major_decisions": major_decisions,
-            "strategic_implications": "Improves overall project delivery velocity and compliance score."
+            "strategic_implications": "Improves overall project delivery velocity and compliance score.",
         },
         "detailed_notes": topics,
         "decisions_register": decisions_reg,
@@ -737,19 +829,22 @@ def run_fallback_synthesis_heuristics(transcript: List[Dict[str, str]], personas
             {
                 "issue": "Verification parameters for third-party tools.",
                 "owner": "Lead Architect",
-                "follow_up": "Establish sandboxed sandbox runtime constraints."
+                "follow_up": "Establish sandboxed sandbox runtime constraints.",
             }
         ],
         "stakeholder_analysis": {
             "influence": "Product Managers drive task ordering, Compliance guards licensing, and Executive Sponsors hold waiver authority.",
-            "concerns": "Meeting budget parameters while keeping high compliance health."
+            "concerns": "Meeting budget parameters while keeping high compliance health.",
         },
         "strategic_insights": "Aligning operational intentions directly with structured workforce objectives reduces coordination overhead.",
         "knowledge_extraction": {
-            "facts": ["Platform relies on FastAPI proxying backend APIs.", "State is stored in local-first JSON databases."],
+            "facts": [
+                "Platform relies on FastAPI proxying backend APIs.",
+                "State is stored in local-first JSON databases.",
+            ],
             "assumptions": ["Sufficient compute capacity is active for Whisper diarization."],
-            "lessons_learned": ["Direct copyleft packages must be decoupled from core IP repositories."]
-        }
+            "lessons_learned": ["Direct copyleft packages must be decoupled from core IP repositories."],
+        },
     }
-    
+
     return translate_val(res)

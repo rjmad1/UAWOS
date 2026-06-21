@@ -1,17 +1,16 @@
 # application/use_cases/memory_use_cases.py
+import json
 import os
 import time
-import json
 import uuid
-from typing import List, Dict, Any
 
 from domains.memory.memory import MemoryEntry
 from infrastructure.storage.json_fallback_store import load_state, save_state
 
 STATE_FILE = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "uawos_memory_state.json"
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uawos_memory_state.json"
 )
+
 
 def get_default_state() -> dict:
     return {
@@ -46,7 +45,7 @@ def append_memory(
 
     state = load_state()
     index = len(state["memory_logs"])
-    
+
     entry = MemoryEntry(
         index=index,
         timestamp=int(time.time()),
@@ -55,12 +54,13 @@ def append_memory(
         owner=owner,
         status="active",
     )
-    
+
     state["memory_logs"].append(entry.to_dict())
     save_state(state)
 
     try:
         from infrastructure.database.db import index_memory
+
         index_memory(index, content, scope, owner)
     except Exception:
         pass
@@ -86,7 +86,7 @@ def curate_memory(index: int, updated_content: str) -> dict:
 
     entry_dict = state["memory_logs"][index]
     entry = MemoryEntry.from_dict(entry_dict)
-    
+
     entry.original_content = entry.content
     entry.content = updated_content
     entry.curated_timestamp = int(time.time())
@@ -96,6 +96,7 @@ def curate_memory(index: int, updated_content: str) -> dict:
 
     try:
         from infrastructure.database.db import index_memory
+
         index_memory(index, updated_content, entry.scope, entry.owner)
     except Exception:
         pass
@@ -122,9 +123,11 @@ def apply_retention_policy(retention_seconds: int):
 
 # ----------------- STM & Episodic Memory Upgrade (Level 5.0) -----------------
 
+
 def create_stm_session(tenant_id: str, actor_owner: str) -> str:
     """Create a new short-term memory session in the database."""
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return str(uuid.uuid4())
     try:
@@ -150,6 +153,7 @@ def create_stm_session(tenant_id: str, actor_owner: str) -> str:
 def add_stm_message(session_id: str, sender: str, content: str, parent_message_id: int = None) -> int:
     """Add a new sliding-context message to the active session."""
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return None
     try:
@@ -178,6 +182,7 @@ def add_stm_message(session_id: str, sender: str, content: str, parent_message_i
 def get_stm_sliding_context(session_id: str, max_tokens: int = 1500) -> list:
     """Retrieve sliding-context messages for the session up to token capacity."""
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return []
     try:
@@ -222,6 +227,7 @@ def get_stm_sliding_context(session_id: str, max_tokens: int = 1500) -> list:
 def update_agent_scratchpad(agent_id: str, session_id: str, thought_process: str, active_plan_step: str):
     """Upsert agent scratchpad thinking process and step details."""
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return
     try:
@@ -249,6 +255,7 @@ def update_agent_scratchpad(agent_id: str, session_id: str, thought_process: str
 def get_agent_scratchpad(agent_id: str) -> dict:
     """Retrieve active scratchpad details for an agent."""
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return {}
     try:
@@ -282,6 +289,7 @@ def get_agent_scratchpad(agent_id: str) -> dict:
 def create_episode(session_id: str, objective_id: str, summary: str) -> str:
     """Create a new episodic execution block."""
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return str(uuid.uuid4())
     try:
@@ -307,6 +315,7 @@ def create_episode(session_id: str, objective_id: str, summary: str) -> str:
 def add_episode_event(episode_id: str, actor_id: str, event_type: str, content: str, telemetry: dict = None):
     """Log an execution event under the episode timeline."""
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return
     try:
@@ -331,6 +340,7 @@ def add_episode_decision(
 ):
     """Log a decision linked to the current execution episode."""
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return
     try:
@@ -361,6 +371,7 @@ def add_episode_decision(
 def get_episode_timeline(episode_id: str) -> list:
     """Retrieve the chronological timeline of events for an episode."""
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return []
     try:
@@ -404,11 +415,10 @@ def reflect_on_episode(episode_id: str) -> dict:
     reflection_text = f"Continuous learning summary of events: {events_summary[:200]}"
     try:
         import uawos_weaverouter
+
         prompt = f"Summarize these workflow events into a technical best practice rule: {events_summary[:300]}"
         reflection_text = uawos_weaverouter.uawos_generate_response(
-            prompt=prompt,
-            model="tinyllama",
-            agent_name="Memory Consolidation Agent"
+            prompt=prompt, model="tinyllama", agent_name="Memory Consolidation Agent"
         )
     except Exception:
         pass
@@ -424,6 +434,7 @@ def reflect_on_episode(episode_id: str) -> dict:
     )
 
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if DB_AVAILABLE:
         try:
             conn = get_db_connection()
@@ -445,6 +456,7 @@ def auto_consolidate_memories(similarity_threshold: float = 0.92) -> list:
     """Scan knowledge assets in PostgreSQL, detect near-duplicate contents, and consolidate them."""
     consolidated = []
     from infrastructure.database.db import DB_AVAILABLE, get_db_connection
+
     if not DB_AVAILABLE:
         return []
     try:

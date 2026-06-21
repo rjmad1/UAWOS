@@ -1,8 +1,8 @@
 # infrastructure/security/opa_client.py
 import json
 import os
-import urllib.request
 import urllib.error
+import urllib.request
 
 OPA_HOST = os.environ.get("OPA_HOST", "127.0.0.1")
 OPA_PORT = int(os.environ.get("OPA_PORT", 8181))

@@ -13,8 +13,7 @@ router = APIRouter()
 def get_requirement_list():
     try:
         return uawos_requirement_studio.load_state(
-            uawos_requirement_studio.STATE_FILE,
-            uawos_requirement_studio.get_default_state
+            uawos_requirement_studio.STATE_FILE, uawos_requirement_studio.get_default_state
         )
     except Exception as e:
         return {"error": str(e)}

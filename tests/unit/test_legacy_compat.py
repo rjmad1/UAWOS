@@ -1,12 +1,12 @@
 # tests/unit/test_legacy_compat.py
-import uawos_objective
+import uawos_action
 import uawos_budget
 import uawos_governance
+import uawos_memory
+import uawos_objective
+import uawos_outcome
 import uawos_planning
 import uawos_workflow
-import uawos_action
-import uawos_outcome
-import uawos_memory
 
 
 def test_legacy_objective():

@@ -1,13 +1,13 @@
 # application/use_cases/outcome_use_cases.py
 import os
-from typing import List
+
 from domains.outcome.outcome import Outcome
 from infrastructure.storage.json_fallback_store import load_state, save_state
 
 STATE_FILE = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "uawos_outcome_state.json"
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uawos_outcome_state.json"
 )
+
 
 def get_default_state() -> dict:
     return {
@@ -46,14 +46,13 @@ def get_default_state() -> dict:
     }
 
 
-
 def create_outcome(
     objective_id: str,
     title: str,
     metric: str,
     unit: str,
     weight: float = 1.0,
-    dependencies: List[str] = None,
+    dependencies: list[str] = None,
     confidence_score: float = 90.0,
     owner: str = "Product Owner",
     baseline_state: float = 0.0,
@@ -62,11 +61,11 @@ def create_outcome(
 ) -> dict:
     if not metric or not unit:
         raise ValueError("metric and unit are required for a measurable Outcome.")
-        
+
     state = load_state()
     outcome_id = f"OUT-{len(state['outcomes']) + 101:03d}"
     dependencies = dependencies or []
-    
+
     out = Outcome(
         id=outcome_id,
         objective_id=objective_id,
@@ -81,11 +80,11 @@ def create_outcome(
         target_state=target_state,
         current_state=current_state,
     )
-    
+
     out.forecasted_state = out.calculate_forecast()
     state["outcomes"][outcome_id] = out.to_dict()
     save_state(state)
-    
+
     # Recalculate forecasts
     recalculate_forecasts(outcome_id)
     return load_state()["outcomes"][outcome_id]
@@ -101,9 +100,9 @@ def update_outcome(outcome_id: str, updates: dict) -> dict:
     out_dict = state["outcomes"].get(outcome_id)
     if not out_dict:
         raise ValueError(f"Outcome {outcome_id} not found.")
-        
+
     out = Outcome.from_dict(out_dict)
-    
+
     for k, v in updates.items():
         if k in [
             "title",
@@ -118,10 +117,10 @@ def update_outcome(outcome_id: str, updates: dict) -> dict:
             "current_state",
         ]:
             setattr(out, k, v)
-            
+
     state["outcomes"][outcome_id] = out.to_dict()
     save_state(state)
-    
+
     recalculate_forecasts(outcome_id)
     return load_state()["outcomes"][outcome_id]
 
@@ -131,9 +130,9 @@ def recalculate_forecasts(outcome_id: str):
     out_dict = state["outcomes"].get(outcome_id)
     if not out_dict:
         return
-        
+
     out = Outcome.from_dict(out_dict)
     out.forecasted_state = out.calculate_forecast()
-    
+
     state["outcomes"][outcome_id] = out.to_dict()
     save_state(state)

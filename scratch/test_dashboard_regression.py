@@ -1,8 +1,9 @@
 # scratch/test_dashboard_regression.py
 import os
 import re
-import pytest
 from html.parser import HTMLParser
+
+import pytest
 
 # Resolve paths of HTML files in the project root
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,7 +32,7 @@ class UAWOSHTMLParser(HTMLParser):
         attrs_dict = dict(attrs)
 
         # Check for ARIA attributes
-        aria_keys = [k for k in attrs_dict.keys() if k.startswith("aria-")]
+        aria_keys = [k for k in attrs_dict if k.startswith("aria-")]
         if aria_keys or "role" in attrs_dict:
             self.aria_elements.append((tag, attrs_dict))
 
@@ -60,7 +61,7 @@ def test_html_files_existence():
 def test_html_structural_integrity(filepath):
     """Parse each HTML file to check for structural tag closures and syntax correctness."""
     filename = os.path.basename(filepath)
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         html_content = f.read()
 
     parser = UAWOSHTMLParser()
@@ -81,9 +82,8 @@ def test_html_structural_integrity(filepath):
         if tag in ["html", "head", "body", "div", "table", "thead", "tbody", "tr", "p"]:
             if action == "start":
                 open_tags.append(tag)
-            elif action == "end":
-                if open_tags and open_tags[-1] == tag:
-                    open_tags.pop()
+            elif action == "end" and open_tags and open_tags[-1] == tag:
+                open_tags.pop()
 
     # We don't assert open_tags is empty because standard HTML allows missing optional tags,
     # but we assert that there are no catastrophic mismatch blocks.
@@ -94,7 +94,7 @@ def test_html_structural_integrity(filepath):
 def test_dashboard_css_variables_and_styling(filepath):
     """Verify HSL status colors and CSS properties structure match visual system specs."""
     filename = os.path.basename(filepath)
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         html_content = f.read()
 
     # All dashboard files should define or utilize HSL variables or standard color variables for system status mapping
@@ -114,12 +114,11 @@ def test_dashboard_css_variables_and_styling(filepath):
         assert red_var, f"{filename} CSS is missing --red definition."
 
 
-
 @pytest.mark.parametrize("filepath", HTML_FILES)
 def test_wcag_accessibility_parameters(filepath):
     """Verify keyboard focus outlines and ARIA role mappings comply with WCAG 2.1 AA."""
     filename = os.path.basename(filepath)
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         html_content = f.read()
 
     parser = UAWOSHTMLParser()
@@ -136,7 +135,6 @@ def test_wcag_accessibility_parameters(filepath):
     # Validate that interactive elements have descriptive label helpers
     for tag, attrs in parser.interactive_elements:
         # Elements should either have text content, an aria-label, or an aria-labelledby
-        has_label = "aria-label" in attrs or "aria-labelledby" in attrs or "id" in attrs
         # If it's an anchor link, it must have a label or reference
         if tag == "a":
             assert "href" in attrs, f"Anchor link in {filename} is missing href attribute: {attrs}"

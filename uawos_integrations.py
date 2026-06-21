@@ -356,49 +356,46 @@ def ingest_ard_catalog(domain: str) -> dict:
     Fetches the catalog, validates the schema, and registers discovered agents.
     """
     import json
-    import urllib.request
     import urllib.error
+    import urllib.request
+
     import uawos_agent_workforce
 
     # 1. Fallback / Mock for local testing domain to avoid external requests
     if domain == "mock-ecosystem.local":
         catalog_data = {
             "specVersion": "1.0",
-            "host": {
-                "displayName": "Mock Enterprise Catalog",
-                "identifier": "mock-ecosystem.local"
-            },
+            "host": {"displayName": "Mock Enterprise Catalog", "identifier": "mock-ecosystem.local"},
             "entries": [
                 {
                     "identifier": "urn:ai:mock-ecosystem.local:agents:accounting",
                     "displayName": "Accounting Agent",
                     "type": "application/mcp-server-card+json",
                     "url": "http://mock-ecosystem.local/api/mcp/accounting",
-                    "description": "Handles corporate billing and balance sheets."
+                    "description": "Handles corporate billing and balance sheets.",
                 },
                 {
                     "identifier": "urn:ai:mock-ecosystem.local:agents:payroll",
                     "displayName": "Payroll Agent",
                     "type": "application/mcp-server-card+json",
                     "url": "http://mock-ecosystem.local/api/mcp/payroll",
-                    "description": "Handles staff payroll processing."
-                }
+                    "description": "Handles staff payroll processing.",
+                },
             ],
             "trustManifest": {
                 "identity": "spiffe://mock-ecosystem.local/platform",
                 "identityType": "spiffe",
-                "attestations": ["attestation-payload-signature-2026"]
-            }
+                "attestations": ["attestation-payload-signature-2026"],
+            },
         }
     else:
         # Build URL
         schema = "http" if (domain == "localhost" or domain.endswith(".local") or ":" in domain) else "https"
         url = f"{schema}://{domain}/.well-known/ai-catalog.json"
-        
+
         try:
             req = urllib.request.Request(
-                url,
-                headers={"Accept": "application/json", "User-Agent": "UAWOS-ARD-Crawler/1.0"}
+                url, headers={"Accept": "application/json", "User-Agent": "UAWOS-ARD-Crawler/1.0"}
             )
             with urllib.request.urlopen(req, timeout=5.0) as response:
                 catalog_data = json.loads(response.read().decode("utf-8"))
@@ -412,7 +409,7 @@ def ingest_ard_catalog(domain: str) -> dict:
         raise ValueError("Invalid ARD catalog: missing or invalid entries list")
 
     ingested_agents = []
-    
+
     # Process entries
     for entry in catalog_data["entries"]:
         urn = entry.get("identifier") or entry.get("urn")
@@ -450,22 +447,15 @@ def ingest_ard_catalog(domain: str) -> dict:
 
         # Register in agent workforce
         registered = uawos_agent_workforce.register_agent(
-            name=name,
-            agent_class=agent_class,
-            capabilities=capabilities,
-            lifecycle_state="active"
+            name=name, agent_class=agent_class, capabilities=capabilities, lifecycle_state="active"
         )
-        
+
         # Connect MCP server mapping in integrations state
         setup_mcp_agent_server(agent_id=name, mcp_url=physical_url)
-        
-        ingested_agents.append({
-            "name": name,
-            "urn": urn,
-            "class": agent_class,
-            "url": physical_url,
-            "id": registered.get("id")
-        })
+
+        ingested_agents.append(
+            {"name": name, "urn": urn, "class": agent_class, "url": physical_url, "id": registered.get("id")}
+        )
 
     # Save trust manifest metadata if present
     trust_manifest = catalog_data.get("trustManifest")
@@ -476,7 +466,7 @@ def ingest_ard_catalog(domain: str) -> dict:
         state["trust_catalog"][domain] = {
             "trust_manifest": trust_manifest,
             "ingested_at": int(time.time()),
-            "status": "verified"
+            "status": "verified",
         }
         save_state(state)
 
@@ -486,7 +476,7 @@ def ingest_ard_catalog(domain: str) -> dict:
         "host": catalog_data.get("host", {}),
         "agents_ingested_count": len(ingested_agents),
         "agents": ingested_agents,
-        "trusted": trust_manifest is not None
+        "trusted": trust_manifest is not None,
     }
 
 
@@ -504,6 +494,8 @@ def verify_fr_weaverouter():
     state = load_state()
     assert state["integrations"]["Weaverouter"]["status"] == "connected", "Weaverouter registration failed"
     return True
+
+
 def verify_fr_201():
     return setup_api_integration("API")["status"] == "connected"
 

@@ -1,15 +1,14 @@
 # application/use_cases/workflow_use_cases.py
 import os
 import time
-from typing import List, Dict
 
 from domains.workflow.workflow import Workflow
 from infrastructure.storage.json_fallback_store import load_state, save_state
 
 STATE_FILE = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "uawos_workflow_state.json"
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uawos_workflow_state.json"
 )
+
 
 def get_default_state() -> dict:
     return {
@@ -33,7 +32,6 @@ def get_default_state() -> dict:
     }
 
 
-
 def create_workflow(
     plan_id: str,
     title: str,
@@ -43,7 +41,7 @@ def create_workflow(
 ) -> dict:
     state = load_state()
     wid = f"WRK-{len(state['workflows']) + 101:03d}"
-    
+
     wf = Workflow(
         id=wid,
         plan_id=plan_id,
@@ -53,7 +51,7 @@ def create_workflow(
         state="active",
         governed=governed,
     )
-    
+
     state["workflows"][wid] = wf.to_dict()
     save_state(state)
     return state["workflows"][wid]
@@ -83,7 +81,7 @@ def modify_workflow(workflow_id: str, updates: dict) -> dict:
         raise ValueError(f"Workflow {workflow_id} not found.")
 
     wf = Workflow.from_dict(wf_dict)
-    
+
     # Save to history
     snap = {k: v for k, v in wf.to_dict().items() if k != "history"}
     wf.history.append({"timestamp": time.time(), "state": snap})
@@ -131,6 +129,7 @@ def execute_workflow(workflow_id: str) -> dict:
     run_id = None
     try:
         import asyncio
+
         from temporalio.client import Client
 
         async def _run():

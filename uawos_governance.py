@@ -1,22 +1,20 @@
 # uawos_governance.py
 import os
-import time
-
-from uawos_state_utils import load_state, save_state
 
 from application.use_cases.governance_use_cases import (
-    create_policy,
-    evaluate_action_governance,
-    detect_policy_conflicts,
-    approve_policy,
-    request_exception,
-    process_exception,
     accept_risk,
+    approve_policy,
+    create_policy,
+    detect_policy_conflicts,
+    evaluate_action_governance,
+    get_dynamic_agent_autonomy_level,  # noqa: F401
     log_audit,
-    get_dynamic_agent_autonomy_level,
-    run_governor_audit_analysis,
+    process_exception,
+    request_exception,
+    run_governor_audit_analysis,  # noqa: F401
 )
-from infrastructure.security.opa_client import evaluate_via_opa
+from infrastructure.security.opa_client import evaluate_via_opa  # noqa: F401
+from uawos_state_utils import load_state, save_state
 
 # Exposed variables for compatibility/tests
 OPA_HOST = os.environ.get("OPA_HOST", "127.0.0.1")
@@ -209,15 +207,19 @@ if __name__ == "__main__":
 import sys
 import types
 
+
 class GovernanceModule(types.ModuleType):
     @property
     def _policy_uploaded(self):
         import infrastructure.security.opa_client as client
+
         return client._policy_uploaded
 
     @_policy_uploaded.setter
     def _policy_uploaded(self, value):
         import infrastructure.security.opa_client as client
+
         client._policy_uploaded = value
+
 
 sys.modules[__name__].__class__ = GovernanceModule

@@ -55,7 +55,7 @@ def verify_secure_token(x_uawos_token: str = None, authorization: str = None):
     if not token:
         raise HTTPException(status_code=401, detail="Unauthorized: Invalid or missing authentication credentials.")
 
-    is_dev_mode = (SECURE_TOKEN in _DEFAULT_TOKENS)
+    is_dev_mode = SECURE_TOKEN in _DEFAULT_TOKENS
 
     if token != SECURE_TOKEN and not (is_dev_mode and token in _DEFAULT_TOKENS):
         claims = decode_token_payload(token, SECURE_TOKEN)

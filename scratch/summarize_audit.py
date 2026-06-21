@@ -1,14 +1,26 @@
 import json
-import os
 
-with open(r"C:\Users\rajaj\Projects\UAWOS\scratch\audit_report_data.json", "r", encoding="utf-8") as f:
+with open(r"C:\Users\rajaj\Projects\UAWOS\scratch\audit_report_data.json", encoding="utf-8") as f:
     data = json.load(f)
 
 print("=== CODEBASE STRUCTURE SUMMARY ===")
 print(f"Total UAWOS files audited: {len(data)}\n")
 
 # 1. AI Stack Usage
-ai_packages = ["pydantic_ai", "dspy", "instructor", "outlines", "guidance", "mem0ai", "graphiti", "haystack", "llama_index", "fastembed", "litellm", "opentelemetry"]
+ai_packages = [
+    "pydantic_ai",
+    "dspy",
+    "instructor",
+    "outlines",
+    "guidance",
+    "mem0ai",
+    "graphiti",
+    "haystack",
+    "llama_index",
+    "fastembed",
+    "litellm",
+    "opentelemetry",
+]
 ai_usage = {}
 for fname, info in data.items():
     if "error" in info:

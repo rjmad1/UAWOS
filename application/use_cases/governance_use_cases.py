@@ -1,17 +1,16 @@
 # application/use_cases/governance_use_cases.py
 import os
 import time
-from typing import List, Dict
 
-from domains.governance.governance import Policy, ExceptionRequest, RiskAcceptance, AuditLog
-from infrastructure.storage.json_fallback_store import load_state, save_state, state_transaction
-from infrastructure.security.opa_client import evaluate_via_opa
+from domains.governance.governance import AuditLog, ExceptionRequest, Policy, RiskAcceptance
 from infrastructure.security.fga_client import check_fga_authorization
+from infrastructure.security.opa_client import evaluate_via_opa
+from infrastructure.storage.json_fallback_store import load_state, save_state, state_transaction
 
 STATE_FILE = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "uawos_governance_state.json"
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uawos_governance_state.json"
 )
+
 
 def get_default_state() -> dict:
     return {
@@ -37,7 +36,6 @@ def get_default_state() -> dict:
         "risk_acceptances": {},
         "audit_logs": [],
     }
-
 
 
 def create_policy(name: str, rule: str, category: str) -> dict:
@@ -127,7 +125,7 @@ def approve_policy(policy_id: str) -> dict:
         policy_dict = state["policies"].get(policy_id)
         if not policy_dict:
             raise ValueError(f"Policy {policy_id} not found.")
-        
+
         policy = Policy.from_dict(policy_dict)
         policy.status = "approved"
         state["policies"][policy_id] = policy.to_dict()
@@ -139,7 +137,7 @@ def request_exception(action_id: str, reason: str) -> dict:
     with state_transaction(STATE_FILE):
         state = load_state(STATE_FILE)
         exc_id = f"EXC-{len(state['exceptions']) + 1:03d}"
-        
+
         exc = ExceptionRequest(
             id=exc_id,
             action_id=action_id,
@@ -158,7 +156,7 @@ def process_exception(action_id: str, decision: str) -> dict:
         exc_dict = state["exceptions"].get(action_id)
         if not exc_dict:
             raise ValueError(f"Exception request for {action_id} not found.")
-        
+
         exc = ExceptionRequest.from_dict(exc_dict)
         exc.status = decision
         state["exceptions"][action_id] = exc.to_dict()
@@ -169,7 +167,7 @@ def process_exception(action_id: str, decision: str) -> dict:
 def accept_risk(risk_id: str, justification: str) -> dict:
     with state_transaction(STATE_FILE):
         state = load_state(STATE_FILE)
-        
+
         ra = RiskAcceptance(
             risk_id=risk_id,
             justification=justification,
@@ -184,7 +182,7 @@ def accept_risk(risk_id: str, justification: str) -> dict:
 def log_audit(event_type: str, details: dict):
     with state_transaction(STATE_FILE):
         state = load_state(STATE_FILE)
-        
+
         log = AuditLog(
             event_type=event_type,
             details=details,
@@ -197,6 +195,7 @@ def log_audit(event_type: str, details: dict):
 def get_dynamic_agent_autonomy_level(agent_name: str) -> int:
     try:
         import uawos_agent_workforce
+
         trust = uawos_agent_workforce.calculate_agent_trust(agent_name)
     except Exception:
         trust = 95.0

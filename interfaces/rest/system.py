@@ -262,6 +262,7 @@ def evaluate_integrations(infra_status, venv_ok, is_semgrep_available, running_c
     marker_running = "uawos-marker-service" in running_containers or "marker-service" in running_containers
 
     import importlib.util
+
     mesa_ok = importlib.util.find_spec("mesa") is not None
 
     return {
@@ -291,9 +292,7 @@ def evaluate_security(is_semgrep_available, is_docker_running, infra_status):
     return {
         "Semgrep SAST": "YELLOW" if not is_semgrep_available else "GREEN",
         "Trivy Container Scanner": "GREEN" if is_docker_running else "YELLOW",
-        "Gitleaks Secret Detection": (
-            "GREEN" if os.path.exists(os.path.join(ROOT_DIR, ".git")) else "YELLOW"
-        ),
+        "Gitleaks Secret Detection": ("GREEN" if os.path.exists(os.path.join(ROOT_DIR, ".git")) else "YELLOW"),
         "Dependency-Track SBOM Auditor": ("GREEN" if (infra_status.get(DEP_TRACK_API) == "GREEN") else "RED"),
         "Falco Sandbox / OpenHands Sandboxing": sandboxing_healthy,
     }
@@ -318,7 +317,9 @@ def evaluate_data(infra_status):
     return {
         "Vector Storage (Qdrant)": ("GREEN" if (infra_status.get(QDRANT_VECTOR_DB) == "GREEN") else "RED"),
         "Relational Databases (Postgres)": ("GREEN" if (infra_status.get("Postgres DB") == "GREEN") else "RED"),
-        "Long-term Log Storage (ClickHouse)": ("GREEN" if check_port(settings.CLICKHOUSE_HOST, settings.CLICKHOUSE_PORT) else "YELLOW"),
+        "Long-term Log Storage (ClickHouse)": (
+            "GREEN" if check_port(settings.CLICKHOUSE_HOST, settings.CLICKHOUSE_PORT) else "YELLOW"
+        ),
     }
 
 
@@ -412,6 +413,7 @@ def run_health_checks():
     agents_status = _evaluate_dynamic_agents(uawos_budget is not None, uawos_objective is not None)
 
     import importlib.util
+
     dspy_ok = importlib.util.find_spec("dspy") is not None
     instructor_ok = importlib.util.find_spec("instructor") is not None
     fastembed_ok = importlib.util.find_spec("fastembed") is not None
@@ -422,10 +424,13 @@ def run_health_checks():
     marquez_ok = importlib.util.find_spec("marquez_client") is not None
 
     import shutil
+
     java_ok = shutil.which("java") is not None
     npm_ok = shutil.which("npm") is not None
 
-    neo4j_running = check_port(settings.NEO4J_HOST, settings.NEO4J_PORT_1) or check_port(settings.NEO4J_HOST, settings.NEO4J_PORT_2)
+    neo4j_running = check_port(settings.NEO4J_HOST, settings.NEO4J_PORT_1) or check_port(
+        settings.NEO4J_HOST, settings.NEO4J_PORT_2
+    )
     clickhouse_running = check_port(settings.CLICKHOUSE_HOST, settings.CLICKHOUSE_PORT)
 
     if dspy_ok and ollama_running:
@@ -633,36 +638,50 @@ def run_git_sync_now():
                     last_git_sync_msg = res.stdout.strip() or "Synchronization completed successfully."
                     last_git_sync_time = time.time()
                     return True, last_git_sync_msg
-            
+
             # Direct Git commands fallback (crucial for Linux/Docker)
             # 1. Check status
-            status_res = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=10.0)
+            status_res = subprocess.run(
+                ["git", "status", "--porcelain"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=10.0
+            )
             if status_res.returncode != 0:
                 raise Exception(f"git status failed: {status_res.stderr.strip()}")
-            
+
             if status_res.stdout.strip():
                 # Staging & committing
                 subprocess.run(["git", "add", "."], cwd=ROOT_DIR, capture_output=True, timeout=10.0)
                 timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-                subprocess.run(["git", "commit", "-m", f"auto-sync: {timestamp}"], cwd=ROOT_DIR, capture_output=True, timeout=10.0)
-            
+                subprocess.run(
+                    ["git", "commit", "-m", f"auto-sync: {timestamp}"], cwd=ROOT_DIR, capture_output=True, timeout=10.0
+                )
+
             # 2. Pull with rebase
-            pull_res = subprocess.run(["git", "pull", "--rebase", "origin", "main"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=60.0)
+            pull_res = subprocess.run(
+                ["git", "pull", "--rebase", "origin", "main"],
+                cwd=ROOT_DIR,
+                capture_output=True,
+                text=True,
+                timeout=60.0,
+            )
             if pull_res.returncode != 0:
                 raise Exception(f"git pull failed: {pull_res.stderr.strip()}")
-            
+
             # 3. Check if ahead and push
-            sb_res = subprocess.run(["git", "status", "-sb"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=10.0)
+            sb_res = subprocess.run(
+                ["git", "status", "-sb"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=10.0
+            )
             if sb_res.returncode == 0 and "ahead" in sb_res.stdout:
-                push_res = subprocess.run(["git", "push", "origin", "main"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=60.0)
+                push_res = subprocess.run(
+                    ["git", "push", "origin", "main"], cwd=ROOT_DIR, capture_output=True, text=True, timeout=60.0
+                )
                 if push_res.returncode != 0:
                     raise Exception(f"git push failed: {push_res.stderr.strip()}")
-            
+
             last_git_sync_status = "GREEN"
             last_git_sync_msg = "Synchronization complete!"
             last_git_sync_time = time.time()
             return True, last_git_sync_msg
-            
+
         except Exception as e:
             last_git_sync_status = "RED"
             last_git_sync_msg = f"Sync failed: {str(e)}"
@@ -687,12 +706,12 @@ def git_sync_loop():
 def daemon_loop():
     """Periodic health checks background loop."""
     global status_cache, git_sync_thread_started
-    
+
     # Start the Git Sync thread if not already running
     if not git_sync_thread_started:
         t = threading.Thread(target=git_sync_loop, daemon=True)
         t.start()
-        
+
     while True:
         try:
             status_cache = run_health_checks()
@@ -701,7 +720,9 @@ def daemon_loop():
                 "status": last_git_sync_status,
                 "message": last_git_sync_msg,
                 "last_sync_time": last_git_sync_time,
-                "last_sync_time_str": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(last_git_sync_time)) if last_git_sync_time > 0 else "Never"
+                "last_sync_time_str": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(last_git_sync_time))
+                if last_git_sync_time > 0
+                else "Never",
             }
             with open(STATUS_FILE, "w", encoding="utf-8") as f:
                 json.dump(status_cache, f, indent=2)
@@ -819,12 +840,12 @@ def get_docs():
 def get_docs_content(file: str = ""):
     if not file:
         raise HTTPException(status_code=400, detail="File path parameter is required.")
-    
+
     # Resolve the absolute path relative to ROOT_DIR
     # Normalize paths to handle backslashes and relative paths safely
     normalized_file = file.replace("\\", "/").lstrip("/")
     safe_path = os.path.abspath(os.path.join(ROOT_DIR, normalized_file))
-    
+
     # Security check: must reside inside ROOT_DIR
     # Using commonpath to securely verify containment
     try:
@@ -833,15 +854,15 @@ def get_docs_content(file: str = ""):
             raise HTTPException(status_code=403, detail="Access denied. Path traversal detected.")
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid path format.")
-        
+
     # Check if the file is a markdown file
     if not safe_path.lower().endswith(".md"):
         raise HTTPException(status_code=400, detail="Only Markdown (.md) files are accessible.")
-        
+
     # Check if file exists
     if not os.path.exists(safe_path) or not os.path.isfile(safe_path):
         raise HTTPException(status_code=404, detail=f"Document not found: {file}")
-        
+
     try:
         with open(safe_path, encoding="utf-8") as f:
             return f.read()

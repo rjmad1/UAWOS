@@ -1,6 +1,6 @@
 # domains/planning/plan.py
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import Any
 
 
 @dataclass
@@ -8,16 +8,16 @@ class Plan:
     id: str
     objective_id: str
     title: str
-    steps: List[str]
+    steps: list[str]
     cost_estimate: float
     duration_estimate: int
-    resource_requirements: List[str]
+    resource_requirements: list[str]
     success_probability: float
     status: str = "draft"
     version: int = 1
-    history: List[Dict[str, Any]] = field(default_factory=list)
-    risks: List[str] = field(default_factory=list)
-    assumptions: List[str] = field(default_factory=list)
+    history: list[dict[str, Any]] = field(default_factory=list)
+    risks: list[str] = field(default_factory=list)
+    assumptions: list[str] = field(default_factory=list)
     is_alternative: bool = False
 
     def to_dict(self) -> dict:

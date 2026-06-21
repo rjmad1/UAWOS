@@ -4,15 +4,14 @@ import os
 import time
 import urllib.parse
 import urllib.request
-from typing import List, Dict
 
 from domains.action.action import Action
 from infrastructure.storage.json_fallback_store import load_state, save_state
 
 STATE_FILE = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "uawos_action_state.json"
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uawos_action_state.json"
 )
+
 
 def get_default_state() -> dict:
     return {

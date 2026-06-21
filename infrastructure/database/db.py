@@ -10,6 +10,7 @@ from shared.utilities.context import get_tenant_id
 
 try:
     import psycopg2
+
     DB_AVAILABLE = True
 except ImportError:
     DB_AVAILABLE = False
@@ -17,6 +18,7 @@ except ImportError:
 try:
     from qdrant_client import QdrantClient
     from qdrant_client.models import Distance, PointStruct, VectorParams
+
     QDRANT_AVAILABLE = True
 except ImportError:
     QDRANT_AVAILABLE = False
@@ -591,6 +593,7 @@ def index_knowledge(asset_id: str, title: str, content: str, source_type: str, p
     )
 
     import uuid
+
     point_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, asset_id))
     db_save_semantic_chunk(asset_id=asset_id, chunk_index=0, content=content, vector_id=point_id)
 
@@ -751,7 +754,7 @@ _active_locks = {}
 
 def acquire_advisory_lock(lock_id: int):
     """Acquire a session-level PostgreSQL advisory lock (blocking).
-    
+
     Raises:
         ConnectionError: If the database is offline or lock acquisition fails.
     """
@@ -1394,6 +1397,7 @@ def db_save_subscription(tenant_id: str, plan_type: str, status: str, expires_at
         return {}
     try:
         import datetime
+
         expires_at = datetime.datetime.fromtimestamp(expires_at_timestamp) if expires_at_timestamp else None
         conn = get_db_connection()
         cursor = conn.cursor()

@@ -1,5 +1,4 @@
 # uawos_traceability.py
-import json
 import os
 import sys
 import time
@@ -665,6 +664,7 @@ def get_traceability_matrix(status_data):
 
     # Load requirement studio candidates dynamically
     import uawos_state_utils
+
     state_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json")
     try:
         state = uawos_state_utils.load_state(
@@ -674,7 +674,7 @@ def get_traceability_matrix(status_data):
                 "roadmap_candidates": {},
                 "published_items": [],
                 "resequenced_portfolio": [],
-            }
+            },
         )
         for cid, cand in state.get("roadmap_candidates", {}).items():
             if cand["status"] in ["APPROVED", "PUBLISHED"]:
@@ -806,6 +806,7 @@ def _get_default_roadmap():
 def _load_roadmap_candidates(roadmap):
     """Load and add dynamically published roadmap candidates."""
     import uawos_state_utils
+
     state_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uawos_requirement_state.json")
     try:
         state = uawos_state_utils.load_state(
@@ -815,7 +816,7 @@ def _load_roadmap_candidates(roadmap):
                 "roadmap_candidates": {},
                 "published_items": [],
                 "resequenced_portfolio": [],
-            }
+            },
         )
         for cid, cand in state.get("roadmap_candidates", {}).items():
             if cand["status"] in ["APPROVED", "PUBLISHED"]:

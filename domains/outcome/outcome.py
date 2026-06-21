@@ -1,6 +1,5 @@
 # domains/outcome/outcome.py
 from dataclasses import dataclass, field
-from typing import List
 
 
 @dataclass
@@ -11,7 +10,7 @@ class Outcome:
     metric: str
     unit: str
     weight: float = 1.0
-    dependencies: List[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
     confidence_score: float = 90.0
     owner: str = "Product Owner"
     baseline_state: float = 0.0

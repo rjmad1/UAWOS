@@ -1,7 +1,5 @@
 import json
 import os
-import urllib.error
-import urllib.request
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
 
@@ -197,6 +195,7 @@ def analyze_unstructured_input(text: str) -> dict:
     # 2. Try LLM enrichment via local Ollama gateway (tinyllama)
     try:
         import uawos_weaverouter
+
         prompt = f"""[INST] You are the UAWOS Domain Translation & Artifact Synthesis Engine (DTASE).
 Analyze this unstructured human input and output a structured JSON analysis.
 Input: "{text}"
@@ -214,12 +213,9 @@ Output JSON format (strictly JSON, no extra text):
   "summary": "one-sentence professional summary"
 }}
 [/INST]"""
-        
+
         llm_text = uawos_weaverouter.uawos_generate_response(
-            prompt=prompt,
-            model="tinyllama",
-            format="json",
-            agent_name="DTASE Agent"
+            prompt=prompt, model="tinyllama", format="json", agent_name="DTASE Agent"
         )
 
         # Parse LLM response

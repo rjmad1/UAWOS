@@ -1,6 +1,5 @@
 # domains/action/action.py
 from dataclasses import dataclass, field
-from typing import List
 
 
 @dataclass
@@ -9,7 +8,7 @@ class Action:
     workflow_id: str
     name: str
     owner: str = "Unassigned"
-    dependencies: List[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
     priority: str = "Medium"
     budget: float = 0.0
     deadline: int = 0

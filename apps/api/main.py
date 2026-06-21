@@ -12,11 +12,11 @@ from interfaces.rest.auth import SECURE_TOKEN, decode_token_payload
 from interfaces.rest.billing import router as billing_router
 from interfaces.rest.dtase import router as dtase_router
 from interfaces.rest.governance import router as governance_router
+from interfaces.rest.meeting import router as meeting_router
 from interfaces.rest.objectives import router as objectives_router
 from interfaces.rest.requirements import router as requirements_router
 from interfaces.rest.system import daemon_loop
 from interfaces.rest.system import router as system_router
-from interfaces.rest.meeting import router as meeting_router
 from shared.utilities.context import reset_context, set_context
 
 # HTML paths
@@ -102,6 +102,7 @@ def serve_operations_dashboard():
             return f.read()
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Operations Dashboard file not found.")
+
 
 @app.get("/delivery", response_class=HTMLResponse)
 @app.get("/delivery.html", response_class=HTMLResponse)

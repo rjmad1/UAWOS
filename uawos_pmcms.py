@@ -62,14 +62,14 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     dtrack_port = int(os.environ.get("DTRACK_PORT", 8081))
 
     opa_online = os.environ.get("OPA_MOCK_ACTIVE", "false").lower() == "true" or check_port(opa_host, opa_port)
-    openfga_online = (
-        os.environ.get("OPENFGA_MOCK_ACTIVE", "false").lower() == "true" or check_port(openfga_host, openfga_port)
+    openfga_online = os.environ.get("OPENFGA_MOCK_ACTIVE", "false").lower() == "true" or check_port(
+        openfga_host, openfga_port
     )
-    qdrant_online = (
-        os.environ.get("QDRANT_MOCK_ACTIVE", "false").lower() == "true" or check_port(qdrant_host, qdrant_port)
+    qdrant_online = os.environ.get("QDRANT_MOCK_ACTIVE", "false").lower() == "true" or check_port(
+        qdrant_host, qdrant_port
     )
-    postgres_online = (
-        os.environ.get("POSTGRES_MOCK_ACTIVE", "false").lower() == "true" or check_port(postgres_host, postgres_port)
+    postgres_online = os.environ.get("POSTGRES_MOCK_ACTIVE", "false").lower() == "true" or check_port(
+        postgres_host, postgres_port
     )
     (
         os.environ.get("CLICKHOUSE_MOCK_ACTIVE", "false").lower() == "true"
@@ -79,7 +79,6 @@ def get_maturity_assessment(status_data: dict = None) -> dict:
     (os.environ.get("MARQUEZ_MOCK_ACTIVE", "false").lower() == "true" or check_port(marquez_host, marquez_port))
     (os.environ.get("SUPERSET_MOCK_ACTIVE", "false").lower() == "true" or check_port(superset_host, superset_port))
     (os.environ.get("DTRACK_MOCK_ACTIVE", "false").lower() == "true" or check_port(dtrack_host, dtrack_port))
-
 
     # Engine import checks
     has_obj = check_module("uawos_objective")

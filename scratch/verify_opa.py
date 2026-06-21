@@ -1,8 +1,9 @@
+import os
+import sys
 import traceback
 
 import uawos_agent_runtime
-import sys
-import os
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "adapters"))
 import uawos_semantic_kernel_adapter
 

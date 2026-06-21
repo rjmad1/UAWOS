@@ -9,4 +9,4 @@
 | psycopg2-binary | BSD | Approved | None | Uses port 5435 instead of default postgres |
 | marker-wrapper | GPLv3 | Isolated | None | Isolated to port 8000 REST service; compliant |
 
-*Last updated: 2026-06-21T18:03:18+0530*
+*Last updated: 2026-06-21T19:38:57+0530*

@@ -2,18 +2,17 @@
 import os
 import sys
 import time
-import pytest
 
 # Ensure project root is in path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
+import uawos_budget
 import uawos_context
 import uawos_objective
 import uawos_pmcms
 import uawos_traceability
-import uawos_budget
 from uawos_dashboard_daemon import run_health_checks
 
 
@@ -38,7 +37,7 @@ def test_api_performance_benchmarks():
         # Benchmark 1: PMCMS Maturity Engine execution time
         print("\nBenchmarking PMCMS Maturity Engine...")
         start_time = time.perf_counter()
-        assessment = uawos_pmcms.get_maturity_assessment(status_cache)
+        uawos_pmcms.get_maturity_assessment(status_cache)
         duration_ms = (time.perf_counter() - start_time) * 1000.0
         print(f"  PMCMS assessment duration: {duration_ms:.2f}ms")
         assert duration_ms < 5000.0, f"PMCMS latency exceeded budget: {duration_ms:.2f}ms"
@@ -46,7 +45,7 @@ def test_api_performance_benchmarks():
         # Benchmark 2: Objective Conflict Detection (DFS priority graph cycles checks)
         print("Benchmarking DFS Objective Conflict Detection...")
         start_time = time.perf_counter()
-        conflicts = uawos_objective.detect_conflicts()
+        uawos_objective.detect_conflicts()
         duration_ms = (time.perf_counter() - start_time) * 1000.0
         print(f"  DFS Conflict Detection duration: {duration_ms:.2f}ms")
         assert duration_ms < 500.0, f"Conflict detection latency exceeded budget: {duration_ms:.2f}ms"
@@ -54,7 +53,7 @@ def test_api_performance_benchmarks():
         # Benchmark 3: Traceability Matrix rollups
         print("Benchmarking Requirements Traceability mapping...")
         start_time = time.perf_counter()
-        matrix = uawos_traceability.get_traceability_matrix(status_cache)
+        uawos_traceability.get_traceability_matrix(status_cache)
         duration_ms = (time.perf_counter() - start_time) * 1000.0
         print(f"  Traceability matrix duration: {duration_ms:.2f}ms")
         assert duration_ms < 1000.0, f"Traceability latency exceeded budget: {duration_ms:.2f}ms"
@@ -62,7 +61,7 @@ def test_api_performance_benchmarks():
         # Benchmark 4: Budget Ledger rollup
         print("Benchmarking Budget Summary rollup...")
         start_time = time.perf_counter()
-        summary = uawos_budget.get_summary()
+        uawos_budget.get_summary()
         duration_ms = (time.perf_counter() - start_time) * 1000.0
         print(f"  Budget Summary duration: {duration_ms:.2f}ms")
         assert duration_ms < 500.0, f"Budget summary latency exceeded budget: {duration_ms:.2f}ms"

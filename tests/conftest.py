@@ -1,7 +1,9 @@
 # tests/conftest.py
 import os
+
 import pytest
-from shared.utilities.context import set_context, reset_context
+
+from shared.utilities.context import reset_context, set_context
 
 
 @pytest.fixture(autouse=True)

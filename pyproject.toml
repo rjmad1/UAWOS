@@ -101,6 +101,12 @@ ignore = [
     "S104",  # Allow binding to all interfaces (0.0.0.0)
     "S105",  # Allow mock/test secrets
     "S608",  # Allow parameterized SQL string constructions
+    "N802",  # Allow uppercase property/function names in settings
+    "S324",  # Allow md5 use for non-security locking
+    "F403",  # Allow wildcard imports for backward compatibility
+    "E402",  # Allow module level imports after code for compatibility
+    "A002",  # Allow builtin shadowing for standard API parameters
+    "E741",  # Allow ambiguous single-letter variable names
 ]
 
 [tool.ruff.lint.per-file-ignores]

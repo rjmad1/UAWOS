@@ -1,4 +1,6 @@
 # infrastructure/storage/json_fallback_store.py
+import contextlib
+import hashlib
 import inspect
 import json
 import os
@@ -6,11 +8,9 @@ import sys
 import threading
 from collections.abc import Callable
 from typing import Any
-import contextlib
-import hashlib
 
-from shared.utilities.context import get_tenant_id
 from config.settings import settings
+from shared.utilities.context import get_tenant_id
 
 # Global lock repository to handle concurrent writes on file fallbacks
 _file_locks = {}
@@ -30,12 +30,14 @@ def _get_db_key(state_file: str) -> str:
 
 def _resolve_state_file(state_file: str) -> str:
     import tempfile
+
     if state_file and os.path.isabs(state_file):
         try:
             norm_state_file = os.path.normpath(state_file)
             temp_dir = os.path.normpath(tempfile.gettempdir())
             if os.name == "nt":
                 import ctypes
+
                 buf = ctypes.create_unicode_buffer(1024)
                 if ctypes.windll.kernel32.GetLongPathNameW(norm_state_file, buf, 1024) > 0:
                     norm_state_file = buf.value
@@ -80,13 +82,15 @@ def load_state(state_file: str = None, default_state_func: Callable[[], Any] = N
             raise RuntimeError("PostgreSQL database is offline.")
     except Exception as e:
         # DB is offline or errored - fall back to local JSON file
-        sys.stderr.write(f"WARNING: PostgreSQL database offline ({e}). Falling back to local JSON file state: {state_file}\n")
-        
+        sys.stderr.write(
+            f"WARNING: PostgreSQL database offline ({e}). Falling back to local JSON file state: {state_file}\n"
+        )
+
         lock = _get_file_lock(state_file)
         with lock:
             if os.path.exists(state_file):
                 try:
-                    with open(state_file, "r", encoding="utf-8") as f:
+                    with open(state_file, encoding="utf-8") as f:
                         return json.load(f)
                 except Exception as file_err:
                     sys.stderr.write(f"ERROR: Failed to read local JSON state file: {file_err}\n")
@@ -135,8 +139,10 @@ def save_state(state_file: str = None, state: Any = None, tenant_id: str = "defa
         else:
             raise RuntimeError("PostgreSQL database is offline.")
     except Exception as e:
-        sys.stderr.write(f"WARNING: PostgreSQL database offline ({e}). Falling back to local JSON file save: {state_file}\n")
-        
+        sys.stderr.write(
+            f"WARNING: PostgreSQL database offline ({e}). Falling back to local JSON file save: {state_file}\n"
+        )
+
         lock = _get_file_lock(state_file)
         with lock:
             try:
@@ -171,6 +177,7 @@ def state_transaction(state_file: str = None, tenant_id: str = "default_tenant")
     acquired = False
     try:
         from infrastructure.database.db import acquire_advisory_lock
+
         acquire_advisory_lock(lock_id)
         acquired = True
     except Exception as e:
@@ -182,6 +189,7 @@ def state_transaction(state_file: str = None, tenant_id: str = "default_tenant")
         if acquired:
             try:
                 from infrastructure.database.db import release_advisory_lock
+
                 release_advisory_lock(lock_id)
             except Exception as e:
                 sys.stderr.write(f"ERROR: Failed to release state advisory lock ({e})\n")

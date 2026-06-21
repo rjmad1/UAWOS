@@ -1,20 +1,18 @@
 # uawos_objective.py
 import os
-import time
 
-from uawos_state_utils import load_state, save_state
 from application.use_cases.objective_use_cases import (
-    create_objective,
-    update_objective,
     archive_objective,
-    restore_objective,
     cancel_objective,
-    pause_objective,
-    resume_objective,
+    create_objective,
     create_objective_from_input,
-    recalculate_scores,
     detect_objective_conflicts,
+    pause_objective,
+    recalculate_scores,
+    restore_objective,
+    update_objective,
 )
+from uawos_state_utils import load_state, save_state
 
 # Alias for backwards compatibility
 detect_conflicts = detect_objective_conflicts
