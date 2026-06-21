@@ -37,6 +37,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi.staticfiles import StaticFiles
+# Mount Vite compiled assets folder
+app.mount("/assets", StaticFiles(directory=os.path.join(WEB_DIR, "assets")), name="assets")
+
 
 @app.middleware("http")
 async def tenant_context_middleware(request: Request, call_next):
