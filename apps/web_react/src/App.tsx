@@ -113,8 +113,8 @@ function App() {
     const handleHashChange = () => {
       const hash = window.location.hash;
       if (hash === '#c4-topology') setActiveView('architecture');
-      else if (hash === '#delivery') setActiveView('delivery');
-      else if (hash === '#ingestion-studio') setActiveView('ingestion');
+      else if (hash === '#delivery' || hash === '#traceability-matrix') setActiveView('delivery');
+      else if (hash === '#ingestion-studio' || hash === '#requirement-studio') setActiveView('ingestion');
       else if (hash === '#roadmap-timeline') setActiveView('roadmap');
       else if (hash === '#exceptions') setActiveView('exceptions');
       else if (hash === '#knowledge') setActiveView('knowledge');
