@@ -9,4 +9,4 @@
 | 60 Days | Storage capacity warning on Qdrant collections with unindexed metadata vectors. | Medium (45%) | Medium (Score: 45) | Short-term memory recall degradation and vector retrieval latency spikes. |
 | 90 Days | Circular dependency deadlock within executing planning graphs. | High (65%) | Critical (Score: 85) | Cascading task cancellations and state engine freeze. |
 
-*Last updated: 2026-06-21T19:38:57+0530*
+*Last updated: 2026-06-22T06:49:00+0530*

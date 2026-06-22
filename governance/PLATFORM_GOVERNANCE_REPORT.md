@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-- **Overall Platform Confidence Score:** 53 / 100
+- **Overall Platform Confidence Score:** 50 / 100
 - **Future Risk Score:** 64 / 100
 - **Operational Readiness Score:** 80 / 100
 - **Predicted Stability Trend:** Degrading
@@ -12,7 +12,7 @@
 | Warning Code | Title | Evidence | Predicted Outcome | Time Horizon | Severity |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | WARNING-0021 | Authentication / Governance Blast Radius Rising | ReBAC OpenFGA checks added to uawos_governance.py. Upstream dependents: 1. | Cascading authorization failures if OpenFGA service goes offline. | 30 Days | Level 3 - Warning |
-| WARNING-0023 | High Complexity Untested Module: uawos_agent_workforce | File complexity: 1067. Confidence score: 20% (No tests in scratch). | Regressions introduced during refactoring or roadmap additions. | 14 Days | Level 4 - High Risk |
+| WARNING-0023 | High Complexity Untested Module: uawos_action | File complexity: 657. Confidence score: 20% (No tests in scratch). | Regressions introduced during refactoring or roadmap additions. | 14 Days | Level 4 - High Risk |
 
 ## Proactive Decision Matrix
 
@@ -22,4 +22,4 @@
 | Option B — Balanced (Recommended) | Medium (2.0 Engineering Days) | Medium (Refactoring and tests) | 65% (Resolves complexity and test gaps) | Very High (Substantial reduction in regression risk) |
 | Option C — Strategic | High (5.0 Engineering Days) | High (Database replication and standby setup) | 90% (Eliminates single points of failure) | Moderate (Ensures long-term platform resilience) |
 
-*Last updated: 2026-06-21T19:38:57+0530*
+*Last updated: 2026-06-22T06:49:00+0530*
