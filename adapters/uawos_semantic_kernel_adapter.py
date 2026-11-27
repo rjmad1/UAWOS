@@ -313,7 +313,7 @@ class SemanticKernelVectorBridge:
             # Create a unique 64-bit int ID from key hash
             import hashlib
 
-            id_int = int(hashlib.md5(key.encode()).hexdigest(), 16) % (2**31 - 1)  # noqa: S324
+            id_int = int(hashlib.md5(key.encode(), usedforsecurity=False).hexdigest(), 16) % (2**31 - 1)
 
             client.upsert(
                 collection_name=collection,
