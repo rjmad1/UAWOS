@@ -172,7 +172,7 @@ def state_transaction(state_file: str = None, tenant_id: str = "default_tenant")
         tenant_id = get_tenant_id()
 
     key = _get_db_key(state_file)
-    lock_id = int(hashlib.md5(key.encode()).hexdigest(), 16) % (2**31 - 1)
+    lock_id = int(hashlib.md5(key.encode(), usedforsecurity=False).hexdigest(), 16) % (2**31 - 1)
 
     acquired = False
     try:
